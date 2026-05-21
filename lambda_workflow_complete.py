@@ -111,9 +111,10 @@ def fetch_upcoming_races_from_betfair(hours_ahead=8):
 
     try:
         # Import Betfair fetcher
-        from betfair_odds_fetcher import fetch_todays_races
+        from betfair_odds_fetcher import get_live_betfair_races
 
-        races = fetch_todays_races()
+        races_data = get_live_betfair_races()
+        races = races_data.get('races', []) if isinstance(races_data, dict) else races_data
 
         # Filter to upcoming races
         now = datetime.utcnow()
