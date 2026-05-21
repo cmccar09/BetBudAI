@@ -52,3 +52,9 @@ temp_inspect/
 # AWS
 .aws-sam/
 samconfig.toml
+docs/ANTHROPIC_SETUP.md
+*.key
+**/client-*.crt
+**/client-*.key
+.env
+**/*credentials*
