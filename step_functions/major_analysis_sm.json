@@ -1,0 +1,67 @@
+{
+  "Comment": "SureBet Major Race Analysis — Monday 07:00 UTC weekly. Scrapes ante-post markets, scores horses, and picks early-bird winners for upcoming Group 1 major races.",
+  "StartAt": "InjectDate",
+  "States": {
+
+    "InjectDate": {
+      "Type": "Pass",
+      "Parameters": {
+        "date.$": "States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'), 0)"
+      },
+      "Next": "RunMajorAnalysis"
+    },
+
+    "RunMajorAnalysis": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-major-analysis",
+        "Payload.$": "$"
+      },
+      "ResultSelector": {
+        "races_analysed.$": "$.Payload.races_analysed",
+        "message.$":        "$.Payload.message",
+        "success.$":        "$.Payload.success"
+      },
+      "ResultPath": "$.analysisResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 120,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "AnalysisFailed"
+        }
+      ],
+      "Next": "AnalysisComplete"
+    },
+
+    "AnalysisFailed": {
+      "Type": "Pass",
+      "Parameters": {
+        "status": "FAILED",
+        "error.$": "$.error"
+      },
+      "End": true
+    },
+
+    "AnalysisComplete": {
+      "Type": "Pass",
+      "Parameters": {
+        "status": "COMPLETE",
+        "result.$": "$.analysisResult"
+      },
+      "End": true
+    }
+  }
+}

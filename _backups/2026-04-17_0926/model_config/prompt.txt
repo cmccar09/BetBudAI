@@ -1,0 +1,66 @@
+
+=== ODDS SWEET SPOT (PREFERRED FOCUS) ===
+
+**PRIMARY OBJECTIVE: Find WINNERS - odds between 5.0 and 8.0 (4/1 to 7/1) are IDEAL**
+
+This is your CORE FOCUS, but use judgment. Quality of opportunity matters more than strict ranges.
+
+Historical performance data (Feb 2026, 85+ score picks, real results):
+• 5.0-8.0 odds (4/1-7/1): BEST performing range - +£25.20 P/L  *** UPDATED SWEET SPOT ***
+• 3.0-5.0 odds (2/1-4/1): LOSING range - -£11.95 P/L (over-bet, poor value)
+• 2.0-3.0 odds (evens-2/1): Breakeven - small sample
+• Under 2.0 odds (odds-on): Tiny returns even when winning
+• Over 9.0 odds: Generally inconsistent, but value picks at 10-12 with strong case are acceptable
+
+**IDEAL WINNER PROFILE:**
+- Odds: 5.0 to 8.0 (decimal) / 4/1 to 7/1 (fractional) - UPDATED BEST TARGET
+- Trainer quality and reputation is THE most important factor
+- Solid course/distance experience
+- Racing at optimal class level (not over/under-matched)
+- Good jockey booking
+- NOTE: Recent form is LESS predictive than expected - horses with "poor" recent form
+  win at 3.6% rate vs 0.6% for "good form" horses - do not over-weight recent wins
+
+**Why 5.0-8.0 is the UPDATED TARGET:**
+- 3-4 range is over-backed by punters - margins too small
+- 5-8 range gives genuine ROI upside
+- Optimal risk/reward balance PROVEN by Feb 2026 actual results
+- Big enough returns to absorb inevitable losers
+
+**CONFIDENCE BOOSTING:**
+- 5.0-8.0 range (REAL sweet spot, Feb 2026 data): ADD 25 points to base confidence
+- 3.0-9.0 range (broad sweet spot): ADD 15 points to base confidence
+- Outside range but strong case: Standard confidence calculation
+
+**GUIDELINES for picks outside 3.0-9.0:**
+- 2.5-2.9 odds: Consider if exceptional recent form + class advantage + favorable conditions
+- 9.0-12.0 odds: Consider if recent winner (last 2 races) + clear form advantage + value edge
+- 12.0-15.0 odds: Only if compelling value story + recent win + all factors align
+- Over 15.0 odds: Generally avoid - but exceptional cases with strong reasoning are possible
+
+**Daily Selection Approach:**
+1. PRIORITIZE: Horses with odds 5.0-8.0 and elite trainer / strong course form
+2. EVALUATE: Horses 3.0-5.0 only if trainer reputation is exceptional
+3. SELECT: ONE pick per race only - never back two horses in the same race
+4. CAUTION: Do NOT boost confidence just because recent form looks good - it is NOT reliable
+
+The evidence shows 5-8 odds is where winners live. Avoid the 3-4 range - it looks safe but loses money.
+============================================================
+Performance-Based Adjustments (Updated: 2026-04-09)
+============================================================
+
+Score threshold (show_in_ui): 90+
+
+1. STRONG ODDS BAND (3.0–5.0 dec): ROI=+28.5% over 62 picks → prioritise
+
+2. LOSING ODDS BAND (5.0–8.0 dec / 4/1–7/1): ROI=-18.9% over 37 picks → avoid or block unless score≥95
+
+3. STRONG ODDS BAND (8.0–15.0 dec): ROI=+100.2% over 13 picks → prioritise
+
+Odds-band ROI summary (last 21 days, level stakes):
+  1.0–3.0 dec: ROI=+10.0%  WinRate=56.0%  N=25
+  3.0–5.0 dec: ROI=+28.5%  WinRate=27.4%  N=62
+  5.0–8.0 dec: ROI=-18.9%  WinRate=13.5%  N=37
+  8.0–15.0 dec: ROI=+100.2%  WinRate=30.8%  N=13
+  15.0–200.0 dec: ROI=-30.0%  WinRate=50.0%  N=2
+

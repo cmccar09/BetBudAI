@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BetBudAI — Platform Valuation Analysis · April 2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0e17; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; padding: 40px 20px; }
+  .container { max-width: 900px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 48px; padding: 40px 24px; background: linear-gradient(135deg, rgba(5,150,105,0.2) 0%, rgba(16,185,129,0.08) 50%, rgba(4,120,87,0.15) 100%); border: 2px solid rgba(52,211,153,0.4); border-radius: 20px; box-shadow: 0 0 60px rgba(52,211,153,0.1); }
+  .header h1 { font-size: 36px; font-weight: 900; color: white; margin-bottom: 8px; }
+  .header .subtitle { font-size: 14px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px; }
+  .roi-hero { display: inline-flex; align-items: center; gap: 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(52,211,153,0.3); border-radius: 16px; padding: 16px 32px; }
+  .roi-hero .emoji { font-size: 48px; }
+  .roi-hero .number { font-size: 56px; font-weight: 900; color: #34d399; text-shadow: 0 0 30px rgba(52,211,153,0.4); line-height: 1; }
+  .roi-hero .meta { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 4px; }
+
+  h2 { font-size: 22px; font-weight: 800; color: white; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  h2 .emoji { margin-right: 8px; }
+  h3 { font-size: 16px; font-weight: 700; color: #94a3b8; margin: 24px 0 12px; text-transform: uppercase; letter-spacing: 1px; font-size: 13px; }
+
+  .highlight-box { background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.06)); border: 1px solid rgba(129,140,248,0.3); border-radius: 14px; padding: 20px 24px; margin: 20px 0; font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.7; }
+  .highlight-box strong { color: #818cf8; }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; background: rgba(255,255,255,0.03); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); }
+  th { background: rgba(255,255,255,0.06); padding: 12px 16px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.45); font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  td { padding: 11px 16px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.75); }
+  tr:last-child td { border-bottom: none; }
+  td:first-child { font-weight: 600; color: rgba(255,255,255,0.9); }
+  .green { color: #34d399; font-weight: 700; }
+  .amber { color: #fbbf24; font-weight: 700; }
+  .blue { color: #60a5fa; font-weight: 700; }
+  .purple { color: #a78bfa; font-weight: 700; }
+  .red { color: #f87171; }
+
+  .val-card { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 20px 0; }
+  .val-card .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 24px; text-align: center; }
+  .val-card .card .stage { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 8px; font-weight: 700; }
+  .val-card .card .range { font-size: 28px; font-weight: 900; line-height: 1.2; margin-bottom: 6px; }
+  .val-card .card .desc { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.5; }
+  .val-card .card.now { border-color: rgba(251,191,36,0.4); background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.04)); }
+  .val-card .card.now .range { color: #fbbf24; }
+  .val-card .card.mid { border-color: rgba(99,102,241,0.4); background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(129,140,248,0.04)); }
+  .val-card .card.mid .range { color: #818cf8; }
+  .val-card .card.future { border-color: rgba(52,211,153,0.4); background: linear-gradient(135deg, rgba(52,211,153,0.1), rgba(16,185,129,0.04)); box-shadow: 0 0 30px rgba(52,211,153,0.08); }
+  .val-card .card.future .range { color: #34d399; text-shadow: 0 0 20px rgba(52,211,153,0.3); }
+
+  .asset-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 16px 0; }
+  .asset { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; }
+  .asset .icon { font-size: 24px; margin-bottom: 8px; }
+  .asset .label { font-size: 13px; font-weight: 700; color: white; margin-bottom: 4px; }
+  .asset .detail { font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1.5; }
+
+  .caveat { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); border-radius: 10px; padding: 16px 20px; margin: 8px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .caveat .icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+  .caveat .text { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+  .caveat .text strong { color: #fca5a5; }
+
+  .needle { background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.2); border-radius: 10px; padding: 14px 18px; margin: 8px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .needle .num { background: rgba(52,211,153,0.2); color: #34d399; font-weight: 800; font-size: 14px; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .needle .text { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.6; }
+  .needle .text strong { color: #34d399; }
+
+  .footer { margin-top: 48px; text-align: center; padding: 24px; border-top: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.25); font-size: 11px; }
+
+  @media (max-width: 640px) {
+    .header h1 { font-size: 26px; }
+    .roi-hero { flex-direction: column; padding: 16px 20px; gap: 8px; }
+    .roi-hero .number { font-size: 42px; }
+    .roi-hero .emoji { font-size: 36px; }
+    .val-card .card .range { font-size: 22px; }
+    table { font-size: 12px; }
+    th, td { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="subtitle">Confidential · Platform Valuation Analysis</div>
+    <h1>BetBudAI.com</h1>
+    <div style="font-size:14px; color:rgba(255,255,255,0.5); margin-bottom:24px;">AI-Powered Horse Racing Analytics · UK &amp; Ireland · April 2026</div>
+    <div class="roi-hero">
+      <div class="emoji">💰</div>
+      <div>
+        <div class="number">+60.9%</div>
+        <div class="meta">Verified ROI · 122 settled bets · Since 22 March 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The Headline -->
+  <div class="highlight-box">
+    A <strong>60.9% ROI across 122 bets</strong> is extraordinary. The best public tipsters in the world sustain ~5–10% ROI long-term. Every pick is logged <strong>pre-race</strong>, timestamped, and fully transparent — no cherry-picking, no retroactive edits. If this edge holds, BetBudAI is in a different league entirely.
+  </div>
+
+  <!-- Revenue Projections -->
+  <h2><span class="emoji">📊</span> Revenue Projections (SaaS Model)</h2>
+  <p style="font-size:13px; color:rgba(255,255,255,0.5); margin-bottom:16px;">Based on Premium @ €19.99/mo and VIP Rollers @ €99/mo pricing tiers.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Scenario</th>
+        <th>Premium Subs</th>
+        <th>VIP Subs</th>
+        <th>Monthly Revenue</th>
+        <th>ARR</th>
+        <th>Valuation (5–8×)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Conservative</td>
+        <td>200</td>
+        <td>30</td>
+        <td class="amber">€6,968</td>
+        <td>€83K</td>
+        <td class="amber">€415K – €668K</td>
+      </tr>
+      <tr>
+        <td>Moderate</td>
+        <td>500</td>
+        <td>100</td>
+        <td class="blue">€19,895</td>
+        <td>€239K</td>
+        <td class="blue">€1.2M – €1.9M</td>
+      </tr>
+      <tr>
+        <td>Ambitious</td>
+        <td>2,000</td>
+        <td>500</td>
+        <td class="green">€89,480</td>
+        <td>€1.07M</td>
+        <td class="green">€5.4M – €8.6M</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Comparable Platforms -->
+  <h2><span class="emoji">🔍</span> Comparable Platforms &amp; Acquisitions</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Platform / Category</th>
+        <th>Type</th>
+        <th>Valuation Range</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Naps Table / Timeform / Racing Post Pro</td>
+        <td>Subscription tip services</td>
+        <td class="purple">£5M – £50M</td>
+      </tr>
+      <tr>
+        <td>SmartBets / Betfair-adjacent analytics</td>
+        <td>Acquisitions</td>
+        <td class="blue">£2M – £10M</td>
+      </tr>
+      <tr>
+        <td>AI sports analytics startups (US)</td>
+        <td>Seed rounds</td>
+        <td class="amber">$2M – $10M pre-revenue</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- What You Have -->
+  <h2><span class="emoji">🏗️</span> Asset Inventory</h2>
+  <div class="asset-grid">
+    <div class="asset">
+      <div class="icon">🧠</div>
+      <div class="label">Verified 60.9% ROI Model</div>
+      <div class="detail">The core IP. Every pick logged pre-race with timestamps. Fully transparent, no cherry-picking. This is rare in the industry.</div>
+    </div>
+    <div class="asset">
+      <div class="icon">⚙️</div>
+      <div class="label">Full Tech Stack</div>
+      <div class="detail">AWS Lambda, Step Functions, API Gateway, DynamoDB, Betfair API, React frontend, Amplify hosting. €50K–€100K replacement cost.</div>
+    </div>
+    <div class="asset">
+      <div class="icon">🔄</div>
+      <div class="label">Automated Pipeline</div>
+      <div class="detail">Scraping → AI analysis → pick generation → live results tracking → ROI calculation. Runs daily with zero manual intervention.</div>
+    </div>
+    <div class="asset">
+      <div class="icon">💳</div>
+      <div class="label">Monetisation Ready</div>
+      <div class="detail">3 subscription tiers (Free / Premium / VIP Rollers), Stripe integration infrastructure built, user authentication and role management live.</div>
+    </div>
+    <div class="asset">
+      <div class="icon">📱</div>
+      <div class="label">Mobile-Responsive UI</div>
+      <div class="detail">Fully responsive web app. Today's picks, live results, VIP Rollers lay analysis, Major Races calendar — all optimised for mobile.</div>
+    </div>
+    <div class="asset">
+      <div class="icon">🏇</div>
+      <div class="label">Lay the Fav System</div>
+      <div class="detail">Unique secondary product identifying vulnerable short-price favourites. Separate revenue stream and differentiation from pure tipping services.</div>
+    </div>
+  </div>
+
+  <!-- Valuation Estimate -->
+  <h2><span class="emoji">💎</span> Valuation Estimate</h2>
+  <div class="val-card">
+    <div class="card now">
+      <div class="stage">Today · Pre-Revenue</div>
+      <div class="range">€50K – €150K</div>
+      <div class="desc">122 bets, no paying customers yet. Tech stack built, model unproven at scale.</div>
+    </div>
+    <div class="card mid">
+      <div class="stage">After 500+ Bets · Paying Users</div>
+      <div class="range">€250K – €750K</div>
+      <div class="desc">Sustained ROI &gt;20%, first paying subscribers, statistically significant sample size.</div>
+    </div>
+    <div class="card future">
+      <div class="stage">At €100K+ ARR · Proven Edge</div>
+      <div class="range">€500K – €2M+</div>
+      <div class="desc">Recurring revenue, 500+ bets with &gt;20% ROI, growing subscriber base, investable.</div>
+    </div>
+  </div>
+
+  <!-- Caveats -->
+  <h2><span class="emoji">⚠️</span> Honest Caveats</h2>
+  <div class="caveat">
+    <div class="icon">📉</div>
+    <div class="text"><strong>122 bets is a small sample.</strong> Statisticians would want 500–1,000+ settled bets to confirm the edge is real vs. a hot streak. A 25-day run isn't proof of a long-term system.</div>
+  </div>
+  <div class="caveat">
+    <div class="icon">💸</div>
+    <div class="text"><strong>No paying customers yet.</strong> Pre-revenue = higher risk = lower multiple. The infrastructure is ready but unproven commercially.</div>
+  </div>
+  <div class="caveat">
+    <div class="icon">👤</div>
+    <div class="text"><strong>Single-person dependency.</strong> All the IP is in one person's head + this codebase. Key-person risk is the biggest red flag for any acquirer.</div>
+  </div>
+  <div class="caveat">
+    <div class="icon">📊</div>
+    <div class="text"><strong>ROI will likely regress.</strong> Even if genuinely skilled, 60% will probably settle to 15–30% over hundreds more bets. That's still world-class — but expectations should be calibrated.</div>
+  </div>
+
+  <!-- What Moves the Needle -->
+  <h2><span class="emoji">🚀</span> What Moves the Needle</h2>
+  <div class="needle">
+    <div class="num">1</div>
+    <div class="text"><strong>Get Stripe live and customers paying.</strong> Pre-revenue to revenue is the single biggest valuation jump. Even 10 paying subscribers changes the conversation entirely.</div>
+  </div>
+  <div class="needle">
+    <div class="num">2</div>
+    <div class="text"><strong>Keep logging every pick transparently.</strong> 500+ bets with &gt;20% ROI makes this investable. The transparent, pre-race logging is your credibility moat.</div>
+  </div>
+  <div class="needle">
+    <div class="num">3</div>
+    <div class="text"><strong>Build a public track record page.</strong> A standalone proof page showing every bet, timestamped pre-race, with running ROI. This is the thing investors and subscribers will share.</div>
+  </div>
+  <div class="needle">
+    <div class="num">4</div>
+    <div class="text"><strong>If ROI holds above 25% past 500 bets</strong>, you have something genuinely worth seven figures to the right buyer — bookmakers, betting syndicates, or media companies like Racing Post, Betfair, or Sky Bet.</div>
+  </div>
+
+  <!-- Summary -->
+  <div style="margin-top:40px; background:linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:28px 32px; text-align:center;">
+    <div style="font-size:11px; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,0.35); margin-bottom:12px;">Bottom Line</div>
+    <div style="font-size:18px; font-weight:700; color:white; line-height:1.6; max-width:700px; margin:0 auto;">
+      The tech is worth <span class="amber">€50–100K</span> today as-is.<br/>
+      The <span class="green">model</span> is where the real value sits — but only time and sample size will prove it.<br/>
+      <span style="color:rgba(255,255,255,0.45); font-size:14px; font-weight:400; display:block; margin-top:12px;">Get to 500 bets, keep the ROI above 20%, start charging — and this becomes a very different conversation.</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    BetBudAI.com · Confidential Valuation Analysis · April 2026<br/>
+    This document is for internal planning purposes only. Figures are estimates based on current performance and market comparables.
+  </div>
+
+</div>
+</body>
+</html>

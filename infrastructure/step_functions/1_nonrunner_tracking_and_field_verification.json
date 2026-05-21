@@ -1,0 +1,233 @@
+{
+  "Comment": "Step 1: Real-time Nonrunner Tracking & Field Verification Pipeline",
+  "Description": "Tracks nonrunners in real-time from BetFair, re-analyzes fields 5 mins before race, prevents missing winners from field composition changes",
+  "StartAt": "CheckTimeToRaceStart",
+  "States": {
+    "CheckTimeToRaceStart": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:check-race-timing",
+      "Parameters": {
+        "race_time.$": "$.race_time",
+        "check_interval_minutes": 30
+      },
+      "Next": "TimingDecision",
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "IntervalSeconds": 60,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "LogTimingError",
+          "ResultPath": "$.error"
+        }
+      ]
+    },
+    "TimingDecision": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.minutes_to_race",
+          "NumericGreaterThan": 5,
+          "Next": "FetchCurrentBetfairField"
+        },
+        {
+          "Variable": "$.minutes_to_race",
+          "NumericLessThanEquals": 5,
+          "Next": "FetchFinalBetfairField"
+        }
+      ],
+      "Default": "WaitForNextCheck"
+    },
+    "WaitForNextCheck": {
+      "Type": "Wait",
+      "Seconds": 600,
+      "Next": "CheckTimeToRaceStart"
+    },
+    "FetchCurrentBetfairField": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:betfair-fetch-current-field",
+      "Parameters": {
+        "market_id.$": "$.market_id",
+        "course.$": "$.course",
+        "race_time.$": "$.race_time",
+        "fetch_type": "current_runners"
+      },
+      "Next": "CompareFieldToModelField",
+      "ResultPath": "$.betfair_field",
+      "TimeoutSeconds": 30,
+      "Retry": [
+        {
+          "ErrorEquals": ["BetfairAPI.Timeout", "BetfairAPI.RateLimit"],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 5,
+          "BackoffRate": 1.5
+        }
+      ]
+    },
+    "FetchFinalBetfairField": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:betfair-fetch-current-field",
+      "Parameters": {
+        "market_id.$": "$.market_id",
+        "course.$": "$.course",
+        "race_time.$": "$.race_time",
+        "fetch_type": "final_field"
+      },
+      "Next": "CompareFieldToModelField",
+      "ResultPath": "$.betfair_field",
+      "TimeoutSeconds": 30,
+      "Retry": [
+        {
+          "ErrorEquals": ["BetfairAPI.Timeout", "BetfairAPI.RateLimit"],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 5,
+          "BackoffRate": 1.5
+        }
+      ]
+    },
+    "CompareFieldToModelField": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:compare-race-fields",
+      "Parameters": {
+        "market_id.$": "$.market_id",
+        "course.$": "$.course",
+        "race_time.$": "$.race_time",
+        "current_betfair_field.$": "$.betfair_field.runners",
+        "model_field.$": "$.model_field"
+      },
+      "Next": "FieldChangeDecision",
+      "ResultPath": "$.field_comparison"
+    },
+    "FieldChangeDecision": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.field_comparison.field_change_percent",
+          "NumericGreaterThanEquals": 15,
+          "Next": "StoreNonrunnerRecord"
+        },
+        {
+          "Variable": "$.field_comparison.nonrunner_count",
+          "NumericGreaterThanEquals": 2,
+          "Next": "StoreNonrunnerRecord"
+        }
+      ],
+      "Default": "StoreNonrunnerRecord"
+    },
+    "StoreNonrunnerRecord": {
+      "Type": "Task",
+      "Resource": "arn:aws:dynamodb:eu-west-1:ACCOUNT_ID:dynamodb:putItem",
+      "Parameters": {
+        "TableName": "RaceNonrunnerTracking",
+        "Item": {
+          "market_id": {
+            "S.$": "$.market_id"
+          },
+          "course": {
+            "S.$": "$.course"
+          },
+          "race_time": {
+            "S.$": "$.race_time"
+          },
+          "nonrunners": {
+            "SS.$": "$.field_comparison.nonrunners"
+          },
+          "field_change_percent": {
+            "N.$": "$.field_comparison.field_change_percent"
+          },
+          "final_field_count": {
+            "N.$": "$.field_comparison.final_field_count"
+          },
+          "timestamp": {
+            "S.$": "$$.State.EnteredTime"
+          }
+        }
+      },
+      "Next": "DecideReanalysis"
+    },
+    "DecideReanalysis": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.field_comparison.field_change_percent",
+          "NumericGreaterThanEquals": 15,
+          "Next": "ReAnalyzeRaceWithNewField"
+        },
+        {
+          "Variable": "$.minutes_to_race",
+          "NumericLessThanEquals": 5,
+          "Next": "ReAnalyzeRaceWithNewField"
+        }
+      ],
+      "Default": "CheckTimeToRaceStart"
+    },
+    "ReAnalyzeRaceWithNewField": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:surebet-analysis",
+      "Parameters": {
+        "market_id.$": "$.market_id",
+        "course.$": "$.course",
+        "race_time.$": "$.race_time",
+        "final_field.$": "$.betfair_field.runners",
+        "reanalysis_reason": "Field composition changed significantly",
+        "force_reanalysis": true
+      },
+      "Next": "UpdatePicksWithNewAnalysis",
+      "ResultPath": "$.reanalysis_result"
+    },
+    "UpdatePicksWithNewAnalysis": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:update-race-picks",
+      "Parameters": {
+        "market_id.$": "$.market_id",
+        "old_picks.$": "$.original_picks",
+        "new_picks.$": "$.reanalysis_result.picks",
+        "reason": "Post-nonrunner field verification"
+      },
+      "Next": "LogReanalysisComplete"
+    },
+    "LogReanalysisComplete": {
+      "Type": "Task",
+      "Resource": "arn:aws:logs:eu-west-1:ACCOUNT_ID:log-group:/aws/lambda/nonrunner-tracking",
+      "Parameters": {
+        "market_id.$": "$.market_id",
+        "event": "Race reanalyzed due to nonrunners",
+        "original_picks_count.$": "$.original_picks[*].horse",
+        "new_picks_count.$": "$.reanalysis_result.picks[*].horse"
+      },
+      "Next": "WaitForRaceTime"
+    },
+    "WaitForRaceTime": {
+      "Type": "Wait",
+      "SecondsPath": "$.seconds_until_race",
+      "Next": "RaceComplete"
+    },
+    "RaceComplete": {
+      "Type": "Pass",
+      "Result": {
+        "status": "complete",
+        "message": "Nonrunner tracking and field verification completed"
+      },
+      "End": true
+    },
+    "LogTimingError": {
+      "Type": "Task",
+      "Resource": "arn:aws:logs:eu-west-1:ACCOUNT_ID:log-group:/aws/lambda/nonrunner-tracking",
+      "Parameters": {
+        "error_message.$": "$.error.Error",
+        "market_id.$": "$.market_id"
+      },
+      "Next": "FailState"
+    },
+    "FailState": {
+      "Type": "Fail",
+      "Error": "NonrunnerTrackingFailed",
+      "Cause": "Failed to track nonrunners and verify field"
+    }
+  }
+}

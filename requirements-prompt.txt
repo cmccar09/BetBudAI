@@ -1,0 +1,12 @@
+# Requirements for the betting prompt integration
+
+# Core dependencies
+pandas>=2.0.0
+requests>=2.31.0
+
+# LLM providers (install at least one)
+openai>=1.0.0
+anthropic>=0.18.0
+
+# Optional but recommended
+python-dateutil>=2.8.0

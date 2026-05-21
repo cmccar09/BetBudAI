@@ -1,0 +1,233 @@
+{
+  "Comment": "Step 3: Deep Dive on Model Miss Analysis Pipeline",
+  "Description": "Analyzes all model misses to identify patterns, adds field strength factor, improves pace dynamics, finds systematic model weaknesses",
+  "StartAt": "LoadModelMissRaces",
+  "States": {
+    "LoadModelMissRaces": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:load-model-miss-races",
+      "Parameters": {
+        "date_from": "2026-05-07",
+        "date_to": "2026-05-13",
+        "miss_type": "other_model_miss"
+      },
+      "Next": "ParallelAnalyzeAll39Races",
+      "ResultPath": "$.miss_races"
+    },
+    "ParallelAnalyzeAll39Races": {
+      "Type": "Map",
+      "ItemsPath": "$.miss_races.races",
+      "MaxConcurrency": 5,
+      "Iterator": {
+        "StartAt": "AnalyzeSingleMissRace",
+        "States": {
+          "AnalyzeSingleMissRace": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:analyze-single-model-miss",
+            "Parameters": {
+              "market_id.$": "$.market_id",
+              "course.$": "$.course",
+              "race_time.$": "$.race_time",
+              "top_pick_horse.$": "$.top_pick",
+              "top_pick_score.$": "$.top_score",
+              "actual_winner.$": "$.winner",
+              "winner_score.$": "$.winner_score",
+              "winner_rank.$": "$.winner_rank",
+              "winner_odds.$": "$.winner_odds"
+            },
+            "End": true
+          }
+        }
+      },
+      "Next": "AggregateAnalysisResults",
+      "ResultPath": "$.individual_analyses"
+    },
+    "AggregateAnalysisResults": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:aggregate-miss-analysis",
+      "Parameters": {
+        "analyses.$": "$.individual_analyses[*]"
+      },
+      "Next": "CalculateFieldStrengthFactor",
+      "ResultPath": "$.aggregated_analysis"
+    },
+    "CalculateFieldStrengthFactor": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:calculate-field-strength",
+      "Parameters": {
+        "races.$": "$.miss_races.races",
+        "field_metrics": [
+          "average_official_rating",
+          "number_of_runners",
+          "race_class",
+          "winner_odds_vs_field"
+        ]
+      },
+      "Next": "AnalyzePaceDynamics",
+      "ResultPath": "$.field_strength_analysis"
+    },
+    "AnalyzePaceDynamics": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:analyze-pace-dynamics",
+      "Parameters": {
+        "races.$": "$.miss_races.races",
+        "pace_factors": [
+          "expected_pace",
+          "actual_pace",
+          "frontrunner_outcome",
+          "closer_outcome",
+          "mid_field_outcome"
+        ]
+      },
+      "Next": "IdentifyMissingFactors",
+      "ResultPath": "$.pace_analysis"
+    },
+    "IdentifyMissingFactors": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:identify-missing-scoring-factors",
+      "Parameters": {
+        "aggregated_analysis.$": "$.aggregated_analysis",
+        "field_strength_analysis.$": "$.field_strength_analysis",
+        "pace_analysis.$": "$.pace_analysis",
+        "min_correlation_threshold": 0.15
+      },
+      "Next": "RankNewFactorsByImpact",
+      "ResultPath": "$.missing_factors"
+    },
+    "RankNewFactorsByImpact": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:rank-missing-factors",
+      "Parameters": {
+        "factors.$": "$.missing_factors.new_factors",
+        "rank_by": "correlation_to_actual_winners",
+        "top_n": 10
+      },
+      "Next": "ParallelValidateNewFactors",
+      "ResultPath": "$.ranked_factors"
+    },
+    "ParallelValidateNewFactors": {
+      "Type": "Map",
+      "ItemsPath": "$.ranked_factors.top_factors",
+      "MaxConcurrency": 5,
+      "Iterator": {
+        "StartAt": "ValidateFactorCorrelation",
+        "States": {
+          "ValidateFactorCorrelation": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:validate-factor-correlation",
+            "Parameters": {
+              "factor_name.$": "$.name",
+              "correlation_score.$": "$.correlation",
+              "affected_races.$": "$.affected_races",
+              "validation_races.$": "$.validation_races"
+            },
+            "End": true
+          }
+        }
+      },
+      "Next": "CompileRecommendations",
+      "ResultPath": "$.factor_validations"
+    },
+    "CompileRecommendations": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:compile-model-recommendations",
+      "Parameters": {
+        "aggregated_analysis.$": "$.aggregated_analysis",
+        "field_strength_analysis.$": "$.field_strength_analysis",
+        "pace_analysis.$": "$.pace_analysis",
+        "validated_factors.$": "$.factor_validations[*]",
+        "threshold_minimum_impact": 5
+      },
+      "Next": "GenerateDetailedReport",
+      "ResultPath": "$.recommendations"
+    },
+    "GenerateDetailedReport": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:generate-model-miss-report",
+      "Parameters": {
+        "market_id_list.$": "$.miss_races.races[*].market_id",
+        "total_races": 39,
+        "analyses.$": "$.individual_analyses[*]",
+        "aggregated_findings.$": "$.aggregated_analysis",
+        "field_strength_findings.$": "$.field_strength_analysis",
+        "pace_findings.$": "$.pace_analysis",
+        "recommended_changes.$": "$.recommendations"
+      },
+      "Next": "StoreAnalysisResults",
+      "ResultPath": "$.detailed_report"
+    },
+    "StoreAnalysisResults": {
+      "Type": "Task",
+      "Resource": "arn:aws:dynamodb:eu-west-1:ACCOUNT_ID:dynamodb:putItem",
+      "Parameters": {
+        "TableName": "ModelMissAnalysis",
+        "Item": {
+          "analysis_id": {
+            "S": "model_miss_2026_05_07_to_05_13"
+          },
+          "analysis_date": {
+            "S.$": "$$.State.EnteredTime"
+          },
+          "races_analyzed": {
+            "N": "39"
+          },
+          "top_missing_factors": {
+            "SS.$": "$.ranked_factors.top_factors[*].name"
+          },
+          "field_strength_impact": {
+            "N.$": "$.field_strength_analysis.average_impact"
+          },
+          "pace_dynamics_impact": {
+            "N.$": "$.pace_analysis.average_impact"
+          },
+          "recommended_scoring_adjustments": {
+            "S.$": "$.recommendations.scoring_changes_summary"
+          },
+          "expected_accuracy_improvement": {
+            "N.$": "$.recommendations.projected_improvement_percent"
+          },
+          "full_report_s3_path": {
+            "S.$": "$.detailed_report.s3_location"
+          }
+        }
+      },
+      "Next": "PublishReportToS3"
+    },
+    "PublishReportToS3": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:putObject",
+      "Parameters": {
+        "Bucket": "betbudai-reports",
+        "Key": "model-analysis/miss_analysis_2026_05_07_to_05_13.json",
+        "Body.$": "$.detailed_report"
+      },
+      "Next": "CreateScalingPlan",
+      "ResultPath": "$.s3_publish"
+    },
+    "CreateScalingPlan": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:create-scoring-update-plan",
+      "Parameters": {
+        "recommendations.$": "$.recommendations",
+        "implementation_priority": [
+          "field_strength_factor",
+          "pace_dynamics_analysis",
+          "new_scoring_factors"
+        ],
+        "testing_period_days": 7
+      },
+      "Next": "LogAnalysisComplete"
+    },
+    "LogAnalysisComplete": {
+      "Type": "Pass",
+      "Result": {
+        "status": "analysis_complete",
+        "message": "Deep dive model miss analysis completed successfully",
+        "races_analyzed": 39,
+        "new_factors_identified.$": "$.ranked_factors.top_factors[*].name",
+        "projected_improvement": "$.recommendations.projected_improvement_percent"
+      },
+      "End": true
+    }
+  }
+}

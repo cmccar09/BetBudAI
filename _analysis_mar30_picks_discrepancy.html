@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mar 30 Picks Discrepancy Analysis</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1b2a; color: #c9d6e3; font-family: 'Segoe UI', sans-serif; font-size: 14px; padding: 24px; }
+  h1 { color: #fff; font-size: 22px; margin-bottom: 4px; }
+  .subtitle { color: #7a90a8; font-size: 13px; margin-bottom: 32px; }
+  h2 { color: #60a5fa; font-size: 16px; margin: 32px 0 12px; border-left: 3px solid #60a5fa; padding-left: 10px; }
+  h3 { color: #94a3b8; font-size: 13px; font-weight: 600; margin: 16px 0 8px; text-transform: uppercase; letter-spacing: .05em; }
+
+  /* Summary banner */
+  .root-cause {
+    background: #1e1b4b; border: 1px solid #4338ca; border-radius: 8px;
+    padding: 16px 20px; margin-bottom: 32px;
+  }
+  .root-cause .label { color: #a5b4fc; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing:.1em; margin-bottom: 6px; }
+  .root-cause p { color: #e0e7ff; line-height: 1.6; }
+  .root-cause strong { color: #fbbf24; }
+
+  /* Comparison grid */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+  .compare-card { background: #111d2e; border-radius: 8px; padding: 16px; }
+  .compare-card .card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 12px; }
+  .morning .card-title { color: #f59e0b; }
+  .evening .card-title { color: #34d399; }
+
+  /* Pick rows */
+  .pick { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; margin-bottom: 6px; }
+  .pick:last-child { margin-bottom: 0; }
+  .pick.win { background: rgba(52,211,153,.1); border-left: 3px solid #34d399; }
+  .pick.loss { background: rgba(239,68,68,.1); border-left: 3px solid #ef4444; }
+  .pick.placed { background: rgba(59,130,246,.1); border-left: 3px solid #3b82f6; }
+  .pick.unknown { background: rgba(148,163,184,.08); border-left: 3px solid #475569; }
+  .pick.replaced { background: rgba(239,68,68,.06); border-left: 3px solid #b91c1c; opacity: .75; }
+  .badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+  .badge.elite { background: #d97706; color: #fff; }
+  .badge.strong { background: #2563eb; color: #fff; }
+  .badge.good   { background: #059669; color: #fff; }
+  .badge.win-b  { background: #065f46; color: #6ee7b7; }
+  .badge.loss-b { background: #7f1d1d; color: #fca5a5; }
+  .badge.placed-b { background: #1e3a5f; color: #93c5fd; }
+  .badge.removed { background: #3b0764; color: #d8b4fe; }
+  .pick-info { flex: 1; }
+  .pick-name { color: #fff; font-weight: 600; font-size: 13px; }
+  .pick-meta { color: #7a90a8; font-size: 11px; margin-top: 2px; }
+  .pick-pnl { font-weight: 700; font-size: 13px; margin-left: auto; }
+  .pick-pnl.pos { color: #34d399; }
+  .pick-pnl.neg { color: #ef4444; }
+  .pick-pnl.neu { color: #94a3b8; }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 24px; margin-bottom: 32px; }
+  .timeline::before { content:''; position:absolute; left:7px; top:0; bottom:0; width:2px; background:#1e3a5f; }
+  .tl-item { position: relative; margin-bottom: 20px; }
+  .tl-dot { position:absolute; left:-21px; top:3px; width:12px; height:12px; border-radius:50%; background:#1e40af; border:2px solid #3b82f6; }
+  .tl-dot.warning { background:#92400e; border-color:#f59e0b; }
+  .tl-dot.danger  { background:#7f1d1d; border-color:#ef4444; }
+  .tl-time { font-size: 11px; color: #7a90a8; margin-bottom: 3px; }
+  .tl-title { color: #e2e8f0; font-weight: 600; font-size: 13px; margin-bottom: 3px; }
+  .tl-body { color: #94a3b8; font-size: 12px; line-height: 1.5; }
+
+  /* Race breakdown table */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  th { background: #0f2033; color: #7a90a8; font-size: 11px; text-transform: uppercase; letter-spacing:.05em; padding: 8px 10px; text-align: left; }
+  td { padding: 8px 10px; border-bottom: 1px solid #1a2d42; font-size: 12px; }
+  tr:hover td { background: #0f2033; }
+  td.horse { color: #e2e8f0; font-weight: 600; }
+  td.score-high { color: #34d399; }
+  td.score-mid  { color: #fbbf24; }
+  td.score-low  { color: #ef4444; }
+  .chip { display:inline-block; font-size:10px; padding:1px 6px; border-radius:3px; }
+  .chip.shown   { background:#065f46; color:#6ee7b7; }
+  .chip.hidden  { background:#1f2937; color:#6b7280; }
+  .chip.winner  { background:#1c3a1c; color:#86efac; }
+  .chip.loser   { background:#3b1f1f; color:#fca5a5; }
+
+  /* Stats row */
+  .stats-row { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+  .stat-box { background: #111d2e; border-radius: 8px; padding: 14px 18px; flex: 1; min-width: 130px; }
+  .stat-val { font-size: 26px; font-weight: 700; color: #60a5fa; }
+  .stat-val.warn { color: #f59e0b; }
+  .stat-val.bad  { color: #ef4444; }
+  .stat-lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+  /* Fix section */
+  .fix-list { list-style: none; background: #0a1929; border-radius: 8px; padding: 16px 20px; }
+  .fix-list li { padding: 8px 0; border-bottom: 1px solid #1a2d42; font-size: 13px; color: #c9d6e3; line-height: 1.5; }
+  .fix-list li:last-child { border-bottom: none; }
+  .fix-list .num { display:inline-block; background:#1e3a6e; color:#93c5fd; font-weight:700; font-size:11px; border-radius:12px; padding:1px 7px; margin-right:8px; }
+
+  .divider { border: none; border-top: 1px solid #1a2d42; margin: 32px 0; }
+  .note { background:#1a2d1a; border:1px solid #166534; border-radius:6px; padding:10px 14px; font-size:12px; color:#86efac; margin-bottom:16px; }
+  .warn-note { background:#1c1600; border:1px solid #713f12; border-radius:6px; padding:10px 14px; font-size:12px; color:#fde68a; margin-bottom:16px; }
+</style>
+</head>
+<body>
+
+<h1>March 30, 2026 — Picks Discrepancy Analysis</h1>
+<p class="subtitle">Why the morning UI picks differed from the final evening results</p>
+
+<!-- Root Cause -->
+<div class="root-cause">
+  <div class="label">Root Cause</div>
+  <p>The <strong>workflow ran twice</strong> on March 30. The first run produced the picks visible in the mid-afternoon UI. A second run later in the day <strong>overwrote the same DynamoDB records</strong> (via identical <code>bet_id</code> keys) with freshly re-scored values from updated odds &amp; going data. Because the re-score changed the top horse in several races, the final evening results came from different picks than what was shown during the day.</p>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+  <div class="stat-box"><div class="stat-val warn">2</div><div class="stat-lbl">Workflow runs detected</div></div>
+  <div class="stat-box"><div class="stat-val bad">5</div><div class="stat-lbl">Duplicate overwritten records</div></div>
+  <div class="stat-box"><div class="stat-val bad">4</div><div class="stat-lbl">Morning picks silently replaced</div></div>
+  <div class="stat-box"><div class="stat-val">7</div><div class="stat-lbl">Final show_in_ui=True picks</div></div>
+  <div class="stat-box"><div class="stat-val">3</div><div class="stat-lbl">Wins + Placed (final picks)</div></div>
+</div>
+
+<!-- Side-by-side comparison -->
+<h2>Morning UI vs Evening Results</h2>
+<div class="compare-grid">
+
+  <div class="compare-card morning">
+    <div class="card-title">☀ Morning UI Picks (mid-afternoon, pre-result)</div>
+
+    <div class="pick replaced">
+      <div class="pick-info">
+        <div class="pick-name">Dippedinmoonlight</div>
+        <div class="pick-meta">15:18 · Navan</div>
+      </div>
+      <span class="badge elite">100 ELITE</span>
+      <span class="badge removed">REPLACED</span>
+    </div>
+
+    <div class="pick unknown">
+      <div class="pick-info">
+        <div class="pick-name">Scarlet Moon</div>
+        <div class="pick-meta">14:27 · Ludlow</div>
+      </div>
+      <span class="badge elite">106 ELITE</span>
+    </div>
+
+    <div class="pick replaced">
+      <div class="pick-info">
+        <div class="pick-name">Your Darling</div>
+        <div class="pick-meta">15:57 · Ludlow</div>
+      </div>
+      <span class="badge elite">96 ELITE</span>
+      <span class="badge removed">DROPPED</span>
+    </div>
+
+    <div class="pick replaced">
+      <div class="pick-info">
+        <div class="pick-name">Crest Of Stars</div>
+        <div class="pick-meta">16:27 · Ludlow</div>
+      </div>
+      <span class="badge elite">95 ELITE</span>
+      <span class="badge removed">DROPPED</span>
+    </div>
+
+    <div class="pick replaced">
+      <div class="pick-info">
+        <div class="pick-name">Lady Plimsoll</div>
+        <div class="pick-meta">16:48 · Navan</div>
+      </div>
+      <span class="badge strong">85 STRONG</span>
+      <span class="badge removed">DROPPED</span>
+    </div>
+
+    <div class="pick replaced">
+      <div class="pick-info">
+        <div class="pick-name">Fine Interview</div>
+        <div class="pick-meta">~17:15 · Doncaster</div>
+      </div>
+      <span class="badge strong">~85</span>
+      <span class="badge removed">DROPPED</span>
+    </div>
+  </div>
+
+  <div class="compare-card evening">
+    <div class="card-title">🌙 Evening Results (final DB picks)</div>
+
+    <div class="pick placed">
+      <div class="pick-info">
+        <div class="pick-name">Scarlet Moon</div>
+        <div class="pick-meta">14:27 · Ludlow · 11/4</div>
+      </div>
+      <span class="badge elite">100 ELITE</span>
+      <span class="badge placed-b">PLACED</span>
+      <div class="pick-pnl pos">+£0.69</div>
+    </div>
+
+    <div class="pick placed">
+      <div class="pick-info">
+        <div class="pick-name">Galileo Dame</div>
+        <div class="pick-meta">15:18 · Navan · 3/1 <em>(replaced Dippedinmoonlight)</em></div>
+      </div>
+      <span class="badge strong">88 STRONG</span>
+      <span class="badge placed-b">PLACED</span>
+      <div class="pick-pnl neg">-£6.00</div>
+    </div>
+
+    <div class="pick loss">
+      <div class="pick-info">
+        <div class="pick-name">Kool One</div>
+        <div class="pick-meta">15:48 · Navan · 4/1 <em>(not in morning UI)</em></div>
+      </div>
+      <span class="badge good">80 GOOD</span>
+      <span class="badge loss-b">LOSS</span>
+      <div class="pick-pnl neg">-£6.00</div>
+    </div>
+
+    <div class="pick win">
+      <div class="pick-info">
+        <div class="pick-name">Al Durry</div>
+        <div class="pick-meta">18:30 &middot; Wolverhampton &middot; 9/4 <em>(evening race, BST)</em></div>
+      </div>
+      <span class="badge elite">98 ELITE</span>
+      <span class="badge win-b">WIN</span>
+      <div class="pick-pnl pos">+£13.50</div>
+    </div>
+
+    <div class="pick win">
+      <div class="pick-info">
+        <div class="pick-name">Layla Liz</div>
+        <div class="pick-meta">19:30 &middot; Wolverhampton &middot; <strong style="color:#fbbf24">12/1 SP</strong> <em>(system stored 9/4 Betfair exchange price — wrong)</em></div>
+      </div>
+      <span class="badge strong">86 STRONG</span>
+      <span class="badge win-b">WIN</span>
+      <div class="pick-pnl pos" title="System recorded +£13.50 using wrong exchange odds (9/4). Actual SP return on £6: +£72.00">+£13.50 <span style="font-size:10px;color:#f59e0b">(&#x26A0; wrong odds)</span></div>
+    </div>
+
+    <div class="warn-note" style="margin-top:12px;">
+      <strong>Odds bug detected:</strong> Layla Liz actual SP was <strong>12/1</strong> (Sporting Life confirmed). System stored Betfair exchange price 3.25 (9/4) — the price when the workflow ran, hours before the race. Actual profit on a £6 bet at SP = <strong>+£72.00</strong>, not +£13.50. Results recording must be updated to fetch the final Betfair SP rather than storing the pre-race exchange price.
+    </div>
+
+    <div class="note" style="margin-bottom:0;">
+      Also shown in final results (from screenshot): Shazani (Doncaster 14:30, score 79) and Say What You See (Doncaster 15:05, score 94) — not visible in morning UI.
+    </div>
+  </div>
+
+</div>
+
+<!-- Timeline -->
+<h2>What Happened — Timeline</h2>
+<div class="timeline">
+  <div class="tl-item">
+    <div class="tl-dot"></div>
+    <div class="tl-time">Morning — Run 1 (no-colon bet_id format)</div>
+    <div class="tl-title">Workflow ran, scored 430 records, set initial show_in_ui flags</div>
+    <div class="tl-body">
+      At this point: Dippedinmoonlight scored ~100 (top of 15:18 Navan), Your Darling ~96 (top of 15:57 Ludlow),
+      Crest Of Stars ~95, Lady Plimsoll ~85, Fine Interview ~85 — all set to show_in_ui=True. These appeared in the UI.
+    </div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-dot warning"></div>
+    <div class="tl-time">Later same day — Run 2 (same no-colon bet_id keys → OVERWRITES)</div>
+    <div class="tl-title">Workflow re-ran with updated odds/going data — same bet_ids overwritten in DynamoDB</div>
+    <div class="tl-body">
+      Re-scoring produced different values. Dippedinmoonlight fell 100→84; Galileo Dame rose to 88, becoming the new top pick
+      for that race. Your Darling fell 96→73 (below threshold). Crest Of Stars fell 95→60. Lady Plimsoll fell 85→79.
+      Fine Interview fell to 61. The DB records were silently overwritten — no history preserved.
+    </div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-dot danger"></div>
+    <div class="tl-time">Later — Partial Run 3 (colon-format bet_ids)</div>
+    <div class="tl-title">A third partial workflow run created 5 new records with a different timestamp format</div>
+    <div class="tl-body">
+      5 records written with bet_ids like <code>2026-03-30T14:18:00+00:00_…</code> (with colons) vs the usual
+      <code>2026-03-30T141800+0000_…</code> (without). None promoted to show_in_ui=True. Suggests a code change
+      or environment difference between workflow invocations changed how timestamps were formatted in bet_ids.
+    </div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-dot"></div>
+    <div class="tl-time">Evening — Results recorded</div>
+    <div class="tl-title">Auto-results run settled picks against Run 2's show_in_ui=True set</div>
+    <div class="tl-body">
+      The results page reflects Run 2's picks (Galileo Dame, Kool One, Al Durry, Layla Liz, Scarlet Moon, Shazani, Say What You See).
+      The morning picks (Dippedinmoonlight, Your Darling, Crest Of Stars, Lady Plimsoll, Fine Interview) were never settled
+      because they had already been overwritten to show_in_ui=False.
+    </div>
+  </div>
+</div>
+
+<!-- Key race breakdowns -->
+<h2>Race-by-Race Score Changes</h2>
+
+<h3>15:18 Navan — Pick swapped (Dippedinmoonlight → Galileo Dame)</h3>
+<table>
+  <tr><th>Horse</th><th>Score (Run 2 / final)</th><th>Score Gap</th><th>UI Status</th><th>Outcome</th></tr>
+  <tr><td class="horse">Galileo Dame</td><td class="score-high">88</td><td>+4</td><td><span class="chip shown">show_in_ui=True</span></td><td><span class="chip winner">PLACED (2nd)</span></td></tr>
+  <tr><td class="horse">Dippedinmoonlight</td><td class="score-mid">84</td><td>0</td><td><span class="chip hidden">show_in_ui=False</span></td><td><span class="chip loser">unplaced</span></td></tr>
+  <tr><td>Kizlyar</td><td>77 / 56</td><td>0</td><td><span class="chip hidden">hidden</span></td><td>—</td></tr>
+  <tr><td>Mordor</td><td class="score-mid">74</td><td>0</td><td><span class="chip hidden">hidden</span></td><td><span class="chip winner">WON</span></td></tr>
+</table>
+<div class="warn-note">
+  <strong>Note:</strong> In Run 1, Dippedinmoonlight scored ~100 (shown in the morning UI as "100 ELITE"). By Run 2 it had dropped to 84 — a swing of ~16 points, likely due to updated going conditions or revised Betfair odds narrowing the odds-position bonus. Galileo Dame's Run 2 score (88) exceeded Dippedinmoonlight's, flipping the pick. The actual winner was Mordor (scored only 74 — not in top picks either run).
+</div>
+
+<h3>15:57 Ludlow — Your Darling dropped entirely (score fell below threshold)</h3>
+<table>
+  <tr><th>Horse</th><th>Score (Run 2 / final)</th><th>Score Gap</th><th>UI Status</th><th>Outcome</th></tr>
+  <tr><td class="horse">Your Darling</td><td class="score-mid">73</td><td>+15</td><td><span class="chip hidden">show_in_ui=False</span></td><td><span class="chip winner">WON (9/4)</span></td></tr>
+  <tr><td>Destroytheevidence</td><td>58</td><td>0</td><td><span class="chip hidden">hidden</span></td><td>—</td></tr>
+  <tr><td>The Kalooki Kid</td><td>53</td><td>0</td><td><span class="chip hidden">hidden</span></td><td>—</td></tr>
+</table>
+<div class="warn-note">
+  <strong>Note:</strong> Your Darling was the clear top scorer (score=73, gap=+15) and actually WON the race at 9/4 (+£13.50 missed). It was shown in the morning UI with score ~96, but Run 2 dropped it to 73 — falling below the show_in_ui confidence gate (likely 75 or 80). This is the biggest P&amp;L miss of the day.
+</div>
+
+<h3>16:27 Ludlow — Crest Of Stars dropped (score 95 → 60)</h3>
+<table>
+  <tr><th>Horse</th><th>Score (Run 2 / final)</th><th>Score Gap</th><th>UI Status</th><th>Outcome</th></tr>
+  <tr><td class="horse">High Fibre (top scorer)</td><td class="score-mid">67</td><td>0</td><td><span class="chip hidden">hidden</span></td><td>—</td></tr>
+  <tr><td class="horse">Crest Of Stars</td><td class="score-low">60</td><td>0</td><td><span class="chip hidden">show_in_ui=False</span></td><td><span class="chip loser">LOSS</span></td></tr>
+</table>
+
+<h3>16:48 Navan — Lady Plimsoll dropped (score 85 → 79)</h3>
+<table>
+  <tr><th>Horse</th><th>Score (Run 2 / final)</th><th>Score Gap</th><th>UI Status</th><th>Outcome</th></tr>
+  <tr><td class="horse">Lady Plimsoll</td><td class="score-mid">79</td><td>+17</td><td><span class="chip hidden">show_in_ui=False</span></td><td><span class="chip loser">PLACED 3rd (no payout)</span></td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- Fixes -->
+<h2>How to Fix This</h2>
+<ul class="fix-list">
+  <li>
+    <span class="num">1</span>
+    <strong>Prevent double workflow runs on the same day.</strong> Add a DynamoDB guard record (e.g. <code>bet_date="2026-03-30", bet_id="WORKFLOW_RUN_LOCK"</code>) at the start of the workflow and abort if it already exists. Only clear it the following day.
+  </li>
+  <li>
+    <span class="num">2</span>
+    <strong>Never overwrite show_in_ui=True picks on re-run.</strong> Before updating a DynamoDB record, check if <code>show_in_ui=True</code> already. If so, preserve the existing pick rather than re-scoring it — or at minimum write to a new versioned record rather than mutating the existing one.
+  </li>
+  <li>
+    <span class="num">3</span>
+    <strong>Fix the bet_id timestamp format inconsistency.</strong> The third run wrote <code>2026-03-30T14:18:00+00:00_…</code> (with colons) while all other runs use <code>2026-03-30T141800+0000_…</code>. This means Run 3 created NEW records instead of overwriting Run 2's, escaping the lock. Normalise the bet_id format in one place.
+  </li>
+  <li>
+    <span class="num">4</span>
+    <strong>Log workflow run start/end timestamps.</strong> Write a <code>WORKFLOW_RUN_LOG</code> record each time the workflow triggers so you can audit when re-runs happened and what changed.
+  </li>
+  <li>
+    <span class="num">5</span>
+    <strong>Investigate Your Darling score drop (96 → 73).</strong> A 23-point swing suggests a going or odds update was applied mid-day that significantly penalised it. That horse WON — worth understanding what signal contradicted the market.
+  </li>
+</ul>
+
+<p style="margin-top:32px; color:#334155; font-size:11px; text-align:right;">Generated March 31, 2026 · SureBet Betting System</p>
+</body>
+</html>

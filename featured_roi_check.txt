@@ -1,0 +1,1 @@
+C:\Users\charl\OneDrive\futuregenAI\BetBudAI\.venv\Scripts\python.exe: can't open file 'C:\\Users\\charl\\OneDrive\\futuregenAI\\BetBudAI\\scripts\\calculate_roi_today.py': [Errno 2] No such file or directory

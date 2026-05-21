@@ -1,0 +1,6 @@
+{
+  "username": "YOUR_BETFAIR_USERNAME",
+  "password": "YOUR_BETFAIR_PASSWORD",
+  "app_key": "YOUR_BETFAIR_APP_KEY",
+  "session_token": "YOUR_SESSION_TOKEN_HERE"
+}

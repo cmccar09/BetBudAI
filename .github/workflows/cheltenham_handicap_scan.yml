@@ -1,0 +1,90 @@
+name: Cheltenham Handicap Festival Scanner
+
+# ─── Schedule ─────────────────────────────────────────────────────────────────
+# Runs every morning at 07:30 UTC (07:30 UK in winter / ~08:30 BST) during
+# the four days of the Cheltenham Festival 2026 (10-13 March).
+# Also available on manual dispatch (Actions → Run workflow).
+# ──────────────────────────────────────────────────────────────────────────────
+
+on:
+  schedule:
+    - cron: "30 7 10-13 3 *"   # 07:30 UTC, 10–13 March every year
+  workflow_dispatch:
+    inputs:
+      race:
+        description: "Optional: filter to one race (partial name, e.g. Pertemps)"
+        required: false
+        default: ""
+      rp_scrape:
+        description: "Enable Racing Post form scrape (slower, but richer signals)"
+        type: boolean
+        required: false
+        default: false
+      dry_run:
+        description: "Dry run — skip DynamoDB write"
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  handicap-scan:
+    name: "Run handicap festival improvement scan"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      # ── 1. Checkout repo ──────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Python setup ───────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # ── 3. Install dependencies ───────────────────────────────────────────
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install boto3 requests beautifulsoup4 lxml
+
+      # ── 4. Configure AWS credentials ──────────────────────────────────────
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            eu-west-1
+
+      # ── 5. Build run flags ────────────────────────────────────────────────
+      - name: Build scanner flags
+        id: flags
+        run: |
+          FLAGS=""
+          if [ -n "${{ inputs.race }}" ]; then FLAGS="$FLAGS --race \"${{ inputs.race }}\""; fi
+          if [ "${{ inputs.rp_scrape }}" = "true" ];  then FLAGS="$FLAGS --rp"; fi
+          if [ "${{ inputs.dry_run }}"   = "true" ];  then FLAGS="$FLAGS --no-save"; fi
+          echo "flags=$FLAGS" >> $GITHUB_OUTPUT
+
+      # ── 6. Run the scanner ────────────────────────────────────────────────
+      - name: Run handicap festival scanner
+        run: |
+          python handicap_festival_scanner.py ${{ steps.flags.outputs.flags }}
+
+      # ── 7. Upload the text report as an artifact ──────────────────────────
+      - name: Upload improvement report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: handicap-improvement-report-${{ github.run_number }}
+          path: handicap_improvement_report.txt
+          retention-days: 30
+
+      # ── 8. Notify on failure ──────────────────────────────────────────────
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error title=Scanner failed::handicap_festival_scanner.py exited with errors."
+          echo "Check the logs above and the artifact report for details."

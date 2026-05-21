@@ -1,0 +1,1 @@
+{"statusCode": 500, "body": "{\"success\": false, \"error\": \"Login failed: CERT_AUTH_REQUIRED\", \"timestamp\": \"2026-03-08T17:20:34.341035\", \"region\": \"eu-west-1\"}"}

@@ -1,0 +1,18 @@
+BetBudAI ROI Report - May 20, 2026
+======================================================================
+
+Total Picks: 318
+Settled: 154 | Pending: 164
+Wins: 5 (3.2%) | Places: 23 | Losses: 126
+
+Stake: GBP154.00
+Returns: GBP112.99
+Profit: GBP-41.01
+ROI: -26.6%
+
+WINNERS:
+  - Unknown (Ayr) at 5.8
+  - Unknown (Warwick) at 1.4
+  - Unknown (Ffos Las) at 9.2
+  - Unknown (Warwick) at 6.4
+  - Unknown (Ffos Las) at 2.6

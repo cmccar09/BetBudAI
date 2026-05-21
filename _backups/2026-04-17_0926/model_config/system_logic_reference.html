@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FutureGen AI Betting System — Full Logic Reference</title>
+<style>
+  :root {
+    --bg:       #0f1117;
+    --panel:    #181c27;
+    --border:   #2a2f3e;
+    --accent:   #4f8ef7;
+    --green:    #2ecc71;
+    --amber:    #f39c12;
+    --orange:   #e67e22;
+    --red:      #e74c3c;
+    --purple:   #9b59b6;
+    --teal:     #1abc9c;
+    --text:     #d4d8e8;
+    --muted:    #7a8099;
+    --yellow:   #f1c40f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 24px 16px 60px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 2rem; color: #fff; margin-bottom: 4px; }
+  h2 { font-size: 1.35rem; color: var(--accent); margin: 32px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  h3 { font-size: 1.05rem; color: #c8ccdf; margin: 20px 0 8px; }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 32px; }
+  .version { display: inline-block; background: var(--accent); color: #fff; font-size: 0.75rem; border-radius: 4px; padding: 2px 8px; margin-left: 10px; vertical-align: middle; }
+
+  /* Cards / panels */
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 18px; }
+  .panel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+
+  /* Score badge */
+  .pts { display: inline-block; font-weight: 700; font-size: 0.85rem; padding: 2px 7px; border-radius: 4px; min-width: 38px; text-align: right; }
+  .pts-pos  { background: #1a3a1f; color: var(--green); }
+  .pts-neg  { background: #3a1a1a; color: var(--red); }
+  .pts-neu  { background: #1f2035; color: #aaa; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  th { background: #1e2235; color: var(--accent); text-align: left; padding: 8px 10px; font-weight: 600; border-bottom: 2px solid var(--border); }
+  td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #1a1f2e; }
+
+  /* Grade boxes */
+  .grade { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; }
+  .grade-excellent { background: #0d2b1a; border: 1px solid var(--green); color: var(--green); }
+  .grade-good      { background: #2b200d; border: 1px solid var(--amber); color: var(--amber); }
+  .grade-fair      { background: #2b1700; border: 1px solid var(--orange); color: var(--orange); }
+  .grade-poor      { background: #2b0d0d; border: 1px solid var(--red); color: var(--red); }
+  .grade-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
+
+  /* Signal table */
+  .signal-row td:nth-child(1) { font-family: monospace; color: var(--teal); }
+  .signal-row td:nth-child(2) { font-weight: 600; }
+
+  /* Tag pills */
+  .tag { display: inline-block; font-size: 0.75rem; padding: 1px 7px; border-radius: 12px; border: 1px solid; margin: 2px; }
+  .tag-blue  { border-color: var(--accent); color: var(--accent); }
+  .tag-green { border-color: var(--green); color: var(--green); }
+  .tag-red   { border-color: var(--red); color: var(--red); }
+  .tag-amber { border-color: var(--amber); color: var(--amber); }
+
+  /* Bar chart rows */
+  .bar-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; font-size: 0.82rem; }
+  .bar-label { width: 220px; flex-shrink: 0; color: #c0c4d4; }
+  .bar-track { flex: 1; background: #1e2235; border-radius: 3px; height: 14px; }
+  .bar-fill  { height: 14px; border-radius: 3px; background: var(--accent); }
+  .bar-val   { width: 40px; text-align: right; font-weight: 600; color: var(--accent); }
+
+  code { font-family: monospace; font-size: 0.82rem; color: var(--teal); background: #111620; padding: 1px 5px; border-radius: 3px; }
+
+  .cap-box { background: #2b1a00; border: 1px solid var(--amber); border-radius: 8px; padding: 14px 18px; margin: 10px 0; }
+  .lesson-box { background: #2b0d0d; border: 1px solid #8b3030; border-radius: 8px; padding: 14px 18px; margin: 8px 0; font-size: 0.85rem; color: #e0a0a0; }
+  .note-box { background: #0d1f2b; border: 1px solid #1a6080; border-radius: 8px; padding: 12px 16px; margin: 8px 0; font-size: 0.85rem; color: #a0d0e8; }
+
+  .section-num { display: inline-block; background: var(--accent); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-right: 6px; }
+  .new-badge { display: inline-block; background: var(--teal); color: #000; font-size: 0.65rem; font-weight: 700; padding: 1px 5px; border-radius: 3px; margin-left: 6px; }
+  .changed-badge { display: inline-block; background: var(--amber); color: #000; font-size: 0.65rem; font-weight: 700; padding: 1px 5px; border-radius: 3px; margin-left: 6px; }
+
+  summary { cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  details > summary { padding: 10px; background: #1e2235; border-radius: 6px; color: var(--accent); font-weight: 600; }
+  details[open] > summary { border-radius: 6px 6px 0 0; }
+  details .detail-body { background: #181c27; border: 1px solid var(--border); border-top: none; padding: 16px; border-radius: 0 0 6px 6px; }
+
+  .roi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .roi-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px; text-align: center; }
+  .roi-card .big { font-size: 2rem; font-weight: 700; }
+  .roi-card .label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+  .roi-card.green { border-color: var(--green); }
+  .roi-card.amber { border-color: var(--amber); }
+  .roi-card.red   { border-color: var(--red); }
+  .roi-card.blue  { border-color: var(--accent); }
+  .roi-card.purple{ border-color: var(--purple); }
+</style>
+</head>
+<body>
+
+<h1>FutureGen AI — Betting System Logic Reference <span class="version">v4.5 · 2026-03-20</span></h1>
+<p class="subtitle">Full breakdown of every scoring signal, weight, penalty, grade threshold, and expected performance target — generated from <code>comprehensive_pick_logic.py</code></p>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>1 · System Overview</h2>
+<div class="panel">
+  <p>Each horse in each race is scored on a <strong>0 → ~200 scale</strong> (practical range 30–150) by summing weighted signals across 16 sections. The highest scorer per race is selected as the pick. Scores are then banded into 4 confidence tiers that drive stake sizing. The pipeline runs automatically every 15 minutes via EventBridge → Lambda.</p>
+  <br>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:0.85rem;">
+    <span class="tag tag-blue">Betfair API → runner data</span>
+    <span class="tag tag-blue">going_conditions.json → going scores</span>
+    <span class="tag tag-blue">DynamoDB SureBetBets → history</span>
+    <span class="tag tag-blue">form_enricher → Racing Post per-run history</span>
+    <span class="tag tag-green">comprehensive_pick_logic.py → score</span>
+    <span class="tag tag-green">4-tier grade → stake</span>
+    <span class="tag tag-green">lambda_api_picks.py → UI + auto-record</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>2 · 4-Tier Confidence Grading &amp; Stake Sizing</h2>
+<div class="panel">
+  <div class="grade-row">
+    <div class="grade grade-excellent">🟢 EXCELLENT · 70+ pts · 2.0× stake</div>
+    <div class="grade grade-good">🟡 GOOD · 55–69 pts · 1.5× stake</div>
+    <div class="grade grade-fair">🟠 FAIR · 40–54 pts · 1.0× stake</div>
+    <div class="grade grade-poor">🔴 POOR · &lt;40 pts · 0.5× stake</div>
+  </div>
+  <table style="margin-top:14px;">
+    <thead><tr><th>Grade</th><th>Score range</th><th>Stake multiplier</th><th>Expectation</th></tr></thead>
+    <tbody>
+      <tr><td><strong style="color:var(--green)">EXCELLENT</strong></td><td>70+</td><td>2.0×</td><td>High-confidence pick; maximum evidence across signals</td></tr>
+      <tr><td><strong style="color:var(--amber)">GOOD</strong></td><td>55–69</td><td>1.5×</td><td>Solid pick with meaningful evidence in most signals</td></tr>
+      <tr><td><strong style="color:var(--orange)">FAIR</strong></td><td>40–54</td><td>1.0×</td><td>Marginal pick; bet standard stake</td></tr>
+      <tr><td><strong style="color:var(--red)">POOR</strong></td><td>&lt;40</td><td>0.5×</td><td>Low confidence; minimal stake or skip</td></tr>
+    </tbody>
+  </table>
+  <div class="note-box" style="margin-top:12px;">Class 5/6 races have a <strong>hard ceiling of 80 pts</strong> regardless of accumulated score. This prevents form-streak inflation from creating false certainty in the lowest, most random race class.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>3 · Master Weights Table</h2>
+<p style="font-size:0.85rem;color:var(--muted);margin-bottom:12px;">All default scoring weights from <code>DEFAULT_WEIGHTS</code> (rebalanced 2026-03-16). Dynamic weights may override during learning cycles.</p>
+<div class="panel" style="padding:0;">
+<table>
+  <thead><tr><th>Key</th><th>Points</th><th>Direction</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>sweet_spot</code></td><td><span class="pts pts-pos">12</span></td><td>✅ Bonus</td><td>Graduated: full pts for 3–9 odds, partial for extremes. ↓ from 20.</td></tr>
+    <tr><td><code>optimal_odds</code></td><td><span class="pts pts-pos">10</span></td><td>✅ Bonus</td><td>Proximity to avg winner odds (4.65). ↓ from 15.</td></tr>
+    <tr><td><code>recent_win</code></td><td><span class="pts pts-pos">22</span></td><td>✅ Bonus</td><td>Won last race (strongest single predictor). ↑ from 15.</td></tr>
+    <tr><td><code>total_wins</code></td><td><span class="pts pts-pos">8</span></td><td>✅ Bonus × count</td><td>Each '1' in form string = 8pts. ↑ from 5.</td></tr>
+    <tr><td><code>consistency</code></td><td><span class="pts pts-pos">4</span></td><td>✅ Bonus × count</td><td>Each '2' or '3' in form string = 4pts. ↑ from 2.</td></tr>
+    <tr><td><code>course_bonus</code></td><td><span class="pts pts-pos">12</span></td><td>✅ Bonus</td><td>Course validated by earlier winners today. ↑ from 10.</td></tr>
+    <tr><td><code>database_history</code></td><td><span class="pts pts-pos">15</span></td><td>✅ Bonus</td><td>Horse has a past win in our DynamoDB history.</td></tr>
+    <tr><td><code>going_suitability</code></td><td><span class="pts pts-pos">16</span></td><td>✅/❌ Both</td><td>Base 16pts suited; 32pts in extreme (Heavy/Firm); −16 if 0 wins in extreme. ↑ from 14.</td></tr>
+    <tr><td><code>track_pattern_bonus</code></td><td><span class="pts pts-pos">8</span></td><td>✅ Bonus</td><td>Matches dominant winning pattern from today's earlier races. ↓ from 10.</td></tr>
+    <tr><td><code>trainer_reputation</code></td><td><span class="pts pts-pos">15</span></td><td>✅ Bonus</td><td><strong>Tier 1 Elite only.</strong> ↓ from 25.</td></tr>
+    <tr><td><code>trainer_tier2</code></td><td><span class="pts pts-pos">8</span></td><td>✅ Bonus</td><td>Good trainers (Skelton, Fry, O'Brien, etc.)</td></tr>
+    <tr><td><code>trainer_tier3</code></td><td><span class="pts pts-pos">4</span></td><td>✅ Bonus</td><td>Decent trainers (Pipe, Wadham, Lee, etc.)</td></tr>
+    <tr><td><code>favorite_correction</code></td><td><span class="pts pts-pos">7</span></td><td>✅ Bonus</td><td>Short-odds + elite-trainer combo only. ↓ from 12.</td></tr>
+    <tr><td><code>jockey_quality</code></td><td><span class="pts pts-pos">12</span></td><td>✅ Bonus</td><td>Tier 1 elite jockeys (Townend, Kennedy, Moore…). ↓ from 15.</td></tr>
+    <tr><td><code>jockey_tier2</code></td><td><span class="pts pts-pos">6</span></td><td>✅ Bonus</td><td>Champion / very good jockeys (Cobden, Skelton, de Boinville…)</td></tr>
+    <tr><td><code>weight_penalty</code></td><td><span class="pts pts-pos">10</span></td><td>✅ Bonus</td><td>Carrying less weight than field average.</td></tr>
+    <tr><td><code>age_bonus</code></td><td><span class="pts pts-pos">10</span></td><td>✅/❌ Both</td><td>NH peak 6–9yo; Flat peak 3–5yo. −5 penalty outside peak.</td></tr>
+    <tr><td><code>distance_suitability</code></td><td><span class="pts pts-pos">18</span></td><td>✅ Bonus</td><td>Graded by form evidence (CD proves → ÷3 confirming; recent win + 2W → full 18). ↑ from 12.</td></tr>
+    <tr><td><code>novice_race_penalty</code></td><td><span class="pts pts-neg">−15</span></td><td>❌ Penalty</td><td>Applied to all runners in races containing 'nov/novice/maiden'.</td></tr>
+    <tr><td><code>aw_low_class_penalty</code></td><td><span class="pts pts-neg">−50</span></td><td>❌ Penalty</td><td>AW Class 5/6: full 50pt penalty. ↑ from 35. (Lesson: Beauzon 91pts → 6th)</td></tr>
+    <tr><td><code>heavy_going_penalty</code></td><td><span class="pts pts-neg">−12</span></td><td>❌ Penalty</td><td><strong>All</strong> horses in Heavy going lose 12pts — unpredictability surcharge. (Lesson: El Gavilan 5th)</td></tr>
+    <tr><td><code>cd_bonus</code></td><td><span class="pts pts-pos">18</span></td><td>✅ Bonus</td><td>CD marker = full 18pts; C or D alone = 9pts. ↑ from 12.</td></tr>
+    <tr><td><code>graded_race_cd_bonus</code></td><td><span class="pts pts-pos">+8</span></td><td>✅ Extra</td><td>Additive to cd_bonus in Grd1/2/3/Listed races.</td></tr>
+    <tr><td><code>official_rating_bonus</code></td><td><span class="pts pts-pos">8</span></td><td>✅ Bonus</td><td>High OR in field = class horse.</td></tr>
+    <tr><td><code>jockey_course_bonus</code></td><td><span class="pts pts-pos">8</span></td><td>✅ Bonus</td><td>Jockey has historical course winners.</td></tr>
+    <tr><td><code>relative_weight_bonus</code></td><td><span class="pts pts-pos">8</span></td><td>✅ Bonus</td><td>Carrying less than field average.</td></tr>
+    <tr><td><code>meeting_focus_trainer</code></td><td><span class="pts pts-pos">10</span></td><td>✅ Bonus</td><td>Trainer's sole runner at this meeting today.</td></tr>
+    <tr><td><code>meeting_focus_jockey</code></td><td><span class="pts pts-pos">8</span></td><td>✅ Bonus</td><td>Jockey's sole ride / fewer than 3 mounts today.</td></tr>
+    <tr><td><code>trainer_jockey_combo</code></td><td><span class="pts pts-pos">12</span></td><td>✅ Bonus</td><td>Proven trainer−jockey partnership with past wins.</td></tr>
+    <tr><td><code>new_trainer_debut</code></td><td><span class="pts pts-pos">5</span></td><td>✅ Bonus</td><td>First run for this trainer (often signals effort).</td></tr>
+    <!-- Deep form section -->
+    <tr style="background:#0d1820"><td><code>form_exact_course_win</code> <span class="new-badge">NEW</span></td><td><span class="pts pts-pos">20</span></td><td>✅ Bonus</td><td>From Racing Post run history: won at this exact course.</td></tr>
+    <tr style="background:#0d1820"><td><code>form_exact_distance_win</code> <span class="new-badge">NEW</span></td><td><span class="pts pts-pos">20</span></td><td>✅ Bonus</td><td>Won at today's distance (±0.5f match from run history).</td></tr>
+    <tr style="background:#0d1820"><td><code>form_going_win</code> <span class="new-badge">NEW</span></td><td><span class="pts pts-pos">16–32</span></td><td>✅ Bonus</td><td>Won on same going type. Scales up to 2× (32pts) for 2+ wins.</td></tr>
+    <tr style="background:#0d1820"><td><code>form_going_place</code> <span class="new-badge">NEW</span></td><td><span class="pts pts-pos">6</span></td><td>✅ Bonus</td><td>Placed (2nd/3rd) on same going type — if no going wins.</td></tr>
+    <tr style="background:#0d1820"><td><code>form_fresh_optimal</code> <span class="new-badge">NEW</span></td><td><span class="pts pts-pos">10</span></td><td>✅ Bonus</td><td>Last run 14–35 days ago (peak fitness window).</td></tr>
+    <tr style="background:#0d1820"><td><code>form_close_2nd</code> <span class="new-badge">NEW</span></td><td><span class="pts pts-pos">14</span></td><td>✅ Bonus</td><td>Finished 2nd beaten &lt;4 lengths last run (unlucky loser).</td></tr>
+    <tr style="background:#0d1820"><td><code>form_or_rising</code> <span class="new-badge">NEW</span></td><td><span class="pts pts-pos">10</span></td><td>✅ Bonus</td><td>Official Rating rising across last 3 runs (improving horse).</td></tr>
+    <tr style="background:#0d1820"><td><code>form_big_field_win</code> <span class="new-badge">NEW</span></td><td><span class="pts pts-pos">8</span></td><td>✅ Bonus</td><td>Won in a field of 10+ runners — proven in competitive conditions.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>4 · Scoring Sections — Step by Step</h2>
+<p style="font-size:0.85rem;color:var(--muted);margin-bottom:14px;">The 16 scoring sections execute in order inside <code>analyze_horse_comprehensive()</code>.</p>
+
+<details open>
+<summary><span class="section-num">§1</span> Sweet Spot — Odds Range</summary>
+<div class="detail-body">
+  <p>Rewards horses at odds likely to produce value. Not a main signal — just a filter. Max <strong>12 pts</strong>.</p>
+  <table>
+    <thead><tr><th>Odds range</th><th>Pts (% of 12)</th></tr></thead>
+    <tbody>
+      <tr><td>3.0 – 9.0 (sweet spot)</td><td><span class="pts pts-pos">12</span> (100%)</td></tr>
+      <tr><td>2.0 – 2.9 (short)</td><td><span class="pts pts-pos">7</span> (60%)</td></tr>
+      <tr><td>1.5 – 1.9 (very short)</td><td><span class="pts pts-pos">5</span> (40%)</td></tr>
+      <tr><td>&lt;1.5 (heavy fav)</td><td><span class="pts pts-pos">2</span> (20%)</td></tr>
+      <tr><td>9.1 – 15.0 (medium outsider)</td><td><span class="pts pts-pos">6</span> (50%)</td></tr>
+      <tr><td>&gt;15 (long shot)</td><td><span class="pts pts-pos">2</span> (20%)</td></tr>
+    </tbody>
+  </table>
+</div>
+</details>
+
+<details>
+<summary><span class="section-num">§2</span> Optimal Odds Position</summary>
+<div class="detail-body">
+  <p>Distance from the <strong>average winner odds (4.65)</strong>. Max <strong>10 pts</strong>.</p>
+  <table>
+    <thead><tr><th>Distance from 4.65</th><th>Pts</th></tr></thead>
+    <tbody>
+      <tr><td>&lt;1.0 (close match)</td><td><span class="pts pts-pos">10</span></td></tr>
+      <tr><td>1.0 – 2.0 (near)</td><td><span class="pts pts-pos">5</span></td></tr>
+      <tr><td>&gt;2.0 (far)</td><td><span class="pts pts-neu">0</span></td></tr>
+    </tbody>
+  </table>
+</div>
+</details>
+
+<details open>
+<summary><span class="section-num">§3</span> Form Analysis — Form String Parsing</summary>
+<div class="detail-body">
+  <p>Parses the Betfair form string (e.g. <code>3/211-1</code>). '1' = win, '2'/'3' = place.</p>
+  <table>
+    <thead><tr><th>Signal</th><th>Points</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td>Recent win (last race = '1' after final '-')</td><td><span class="pts pts-pos">+22</span></td><td>Single strongest predictor</td></tr>
+      <tr><td>Each win in form string</td><td><span class="pts pts-pos">+8</span> per win</td><td>e.g. 3 wins = +24</td></tr>
+      <tr><td>Each place (2nd/3rd)</td><td><span class="pts pts-pos">+4</span> per place</td><td>e.g. 2 places = +8</td></tr>
+    </tbody>
+  </table>
+  <div class="note-box">Form string patterns like '111' and '1111' get additional Cheltenham bonuses (see §17).</div>
+</div>
+</details>
+
+<details>
+<summary><span class="section-num">§4</span> Course Validation + Claiming Jockey</summary>
+<div class="detail-body">
+  <p><strong>Course validation (12 pts):</strong> If any earlier race at this course today produced a winner, all runners get +12 as confidence in the track reading.</p>
+  <br>
+  <p><strong>Claiming jockey bonus (§4.5):</strong> Jockeys with a weight allowance (e.g. <code>T McCain-Mitchell(5)</code>) benefit from lower carry weight.</p>
+  <table>
+    <thead><tr><th>Condition</th><th>Pts</th></tr></thead>
+    <tbody>
+      <tr><td>In Heavy or Soft going × 2 per lb claimed</td><td><span class="pts pts-pos">+10</span> (5lb claim)</td></tr>
+      <tr><td>Normal going × 1 per lb claimed</td><td><span class="pts pts-pos">+5</span> (5lb claim)</td></tr>
+    </tbody>
+  </table>
+</div>
+</details>
+
+<details open>
+<summary><span class="section-num">§5</span> Going Conditions <span class="changed-badge">KEY SIGNAL</span></summary>
+<div class="detail-body">
+  <p>Going is the single most critical discriminator in UK/Irish racing. Base weight = <strong>16 pts</strong>, doubled to <strong>32 pts</strong> in extreme going (Heavy/Soft or very firm).</p>
+  <table>
+    <thead><tr><th>Scenario</th><th>Points</th></tr></thead>
+    <tbody>
+      <tr><td>All-weather — going irrelevant</td><td><span class="pts pts-pos">+8</span> (neutral, all runners)</td></tr>
+      <tr><td>Proven/suited to today's going</td><td><span class="pts pts-pos">+16</span> (or +32 extreme)</td></tr>
+      <tr><td>0 wins, extreme going</td><td><span class="pts pts-neg">−16</span></td></tr>
+      <tr><td>≤1 win, extreme going</td><td><span class="pts pts-neg">−8</span></td></tr>
+      <tr><td>Going unknown / track not in dataset</td><td><span class="pts pts-neu">0</span> (unless winter: 2+ wins = +8)</td></tr>
+    </tbody>
+  </table>
+  <div class="lesson-box">
+    <strong>§5a Heavy Going Penalty:</strong> ALL horses lose <strong>−12 pts</strong> when going = Heavy (not just Soft). Lesson: El Gavilan 100pts, 3/1 fav → 5th. Heavy ground fundamentally randomises results.
+  </div>
+  <div class="note-box">
+    <strong>§5b Graded Race Correction:</strong> If a going penalty is applied but the race is Grade 1/2/3 or Listed, the penalty is <strong>removed</strong>. Elite horses are prepared for all conditions. Lesson: James Du Berlais (Grd2 Navan, form 55-1632) won despite penalty being triggered.
+  </div>
+  <div class="note-box">
+    <strong>§5c C/D Marker Bonus:</strong> CD = +18pts (or +26 in graded race); C only = +9pts; D only = +9pts. These are hard proof of ability — the form string alone can't capture this.
+  </div>
+</div>
+</details>
+
+<details>
+<summary><span class="section-num">§6</span> Database History</summary>
+<div class="detail-body">
+  <p>Queries DynamoDB <code>SureBetBets</code> table for past wins by this horse name. Any historical win = <strong>+15 pts</strong> flat.</p>
+</div>
+</details>
+
+<details>
+<summary><span class="section-num">§7</span> Track Pattern Bonus</summary>
+<div class="detail-body">
+  <p>Uses <code>get_track_insights(course)</code> which analyses outcomes from earlier races today at the same course. If a dominant pattern is found (e.g. "form-backed favourites winning"), horses that match that pattern get up to <strong>+8 pts</strong> (capped).</p>
+</div>
+</details>
+
+<details open>
+<summary><span class="section-num">§8</span> Trainer Reputation — 3 Tiers</summary>
+<div class="detail-body">
+  <table>
+    <thead><tr><th>Tier</th><th>Pts</th><th>Trainers (examples)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong style="color:var(--green)">Tier 1 — Elite</strong></td>
+        <td><span class="pts pts-pos">+15</span></td>
+        <td>W.P. Mullins, Gordon Elliott, Nicky Henderson, Paul Nicholls, Henry De Bromhead</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--amber)">Tier 2 — Good</strong></td>
+        <td><span class="pts pts-pos">+8</span></td>
+        <td>Dan Skelton, Donald McCain, Harry Fry, Emma Lavelle, Alan King, Kim Bailey, Venetia Williams, Philip Hobbs, Olly Murphy, Gavin Cromwell, Fergal O'Brien…</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--orange)">Tier 3 — Decent</strong></td>
+        <td><span class="pts pts-pos">+4</span></td>
+        <td>David Pipe, Kerry Lee, Sam Thomas, Jamie Snowden, Ian Williams, Gary Moore, Lucy Wadham, Tim Easterby, Neil Mulholland…</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="lesson-box">
+    <strong>David Pipe penalty:</strong> If going is Heavy or Soft, Pipe's trainer bonus is halved. Lesson from 2026-02-20 analysis.
+  </div>
+</div>
+</details>
+
+<details>
+<summary><span class="section-num">§9</span> Favourite Correction</summary>
+<div class="detail-body">
+  <p>Stacking bonus only when trainer is elite AND horse is at short odds. Maximum <strong>+7 pts</strong>.</p>
+  <table>
+    <thead><tr><th>Condition</th><th>Pts</th></tr></thead>
+    <tbody>
+      <tr><td>Odds &lt;2.0 + Tier 1 trainer</td><td><span class="pts pts-pos">+7</span></td></tr>
+      <tr><td>Odds &lt;4.0 + Tier 1 trainer</td><td><span class="pts pts-pos">+4</span></td></tr>
+      <tr><td>Odds &lt;4.0 + Tier 2 trainer</td><td><span class="pts pts-pos">+2</span></td></tr>
+    </tbody>
+  </table>
+</div>
+</details>
+
+<details>
+<summary><span class="section-num">§10</span> Jockey Quality — 2 Tiers</summary>
+<div class="detail-body">
+  <table>
+    <thead><tr><th>Tier</th><th>Pts</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td><strong style="color:var(--green)">Tier 1 — Elite</strong></td><td><span class="pts pts-pos">+12</span></td><td>Paul Townend, Jack Kennedy, Rachael Blackmore, Mark Walsh, Ryan Moore, William Buick, Oisin Murphy</td></tr>
+      <tr><td><strong style="color:var(--amber)">Tier 2 — Champion</strong></td><td><span class="pts pts-pos">+6</span></td><td>Harry Cobden, Danny Mullins, Nico de Boinville, Harry Skelton, Sam Twiston-Davies, Tom Scudamore, Hollie Doyle, Jim Crowley, Tom Marquand…</td></tr>
+    </tbody>
+  </table>
+</div>
+</details>
+
+<details>
+<summary><span class="section-num">§11</span> Race Type Penalties</summary>
+<div class="detail-body">
+  <table>
+    <thead><tr><th>Penalty</th><th>Pts</th><th>Trigger</th></tr></thead>
+    <tbody>
+      <tr><td>Novice / Maiden race</td><td><span class="pts pts-neg">−15</span></td><td>Race name contains 'nov', 'novice', 'maiden'</td></tr>
+      <tr><td>AW Class 5/6 race</td><td><span class="pts pts-neg">−50</span></td><td>All-weather surface AND race_class = 5 or 6</td></tr>
+      <tr><td>Turf Class 5/6</td><td><span class="pts pts-neg">−25</span></td><td>Grass surface AND race_class = 5 or 6 (½ rate)</td></tr>
+      <tr><td>Class 5/6 hard score cap</td><td><span class="pts pts-neg">cap 80</span></td><td>Final score capped at 80 regardless of all other signals</td></tr>
+    </tbody>
+  </table>
+  <div class="lesson-box">Lessons: Beauzon 91pts → 6th (AW Class5), Queen Of Steel 99pts → 3rd (Turf Class5 Soft). El Rojo Grande 98pts → 2nd.</div>
+</div>
+</details>
+
+<details>
+<summary><span class="section-num">§12–§14</span> Weight, Official Rating, Relative Weight, Meeting Focus</summary>
+<div class="detail-body">
+  <table>
+    <thead><tr><th>Signal</th><th>Pts</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td>Official Rating bonus</td><td><span class="pts pts-pos">+8</span></td><td>High OR in the field = class horse indicator</td></tr>
+      <tr><td>Relative weight bonus</td><td><span class="pts pts-pos">+8</span></td><td>Carrying less than field average weight</td></tr>
+      <tr><td>Jockey course bonus</td><td><span class="pts pts-pos">+8</span></td><td>Jockey has course winner history</td></tr>
+      <tr><td>Meeting focus — trainer sole runner</td><td><span class="pts pts-pos">+10</span></td><td>Trainer sent only one runner to this meeting</td></tr>
+      <tr><td>Meeting focus — jockey sole ride</td><td><span class="pts pts-pos">+8</span></td><td>Jockey has &lt;3 rides at meeting (mission trip)</td></tr>
+      <tr><td>Trainer−jockey proven combo</td><td><span class="pts pts-pos">+12</span></td><td>Partnership with recorded wins together</td></tr>
+      <tr><td>New trainer debut</td><td><span class="pts pts-pos">+5</span></td><td>First run under this trainer (often effort signal)</td></tr>
+    </tbody>
+  </table>
+</div>
+</details>
+
+<details>
+<summary><span class="section-num">§15</span> Age Bonus</summary>
+<div class="detail-body">
+  <p>Max <strong>±10 pts</strong>.</p>
+  <table>
+    <thead><tr><th>Race type</th><th>Peak age</th><th>Pts</th><th>Outside peak</th></tr></thead>
+    <tbody>
+      <tr><td>National Hunt (hurdle/chase)</td><td>6–9 years</td><td><span class="pts pts-pos">+10</span></td><td>−5 if &lt;5yo or &gt;11yo</td></tr>
+      <tr><td>Flat</td><td>3–5 years</td><td><span class="pts pts-pos">+10</span></td><td>−5 if &gt;7yo</td></tr>
+    </tbody>
+  </table>
+</div>
+</details>
+
+<details open>
+<summary><span class="section-num">§13</span> Distance Suitability</summary>
+<div class="detail-body">
+  <p>Grades evidence of distance compatibility. Max <strong>+18 pts</strong>.</p>
+  <table>
+    <thead><tr><th>Evidence</th><th>Pts</th></tr></thead>
+    <tbody>
+      <tr><td>C/D marker already awarded → confirming bonus</td><td><span class="pts pts-pos">+6</span> (18÷3)</td></tr>
+      <tr><td>Recent win + 2+ total wins</td><td><span class="pts pts-pos">+18</span></td></tr>
+      <tr><td>3+ total form wins</td><td><span class="pts pts-pos">+12</span> (⅔)</td></tr>
+      <tr><td>1 win + 2+ places</td><td><span class="pts pts-pos">+6</span> (⅓)</td></tr>
+      <tr><td>No evidence</td><td><span class="pts pts-neu">0</span></td></tr>
+    </tbody>
+  </table>
+</div>
+</details>
+
+<details open>
+<summary><span class="section-num">§16</span> Deep Form Signals — Racing Post Run History <span class="new-badge">NEW 2026-03-20</span></summary>
+<div class="detail-body">
+  <p>Fetches the last 6 races per horse from Racing Post via <code>form_enricher.py</code> (cached 12h). Derives 8 hard-evidence signals using actual per-run data (course, distance in furlongs, going, finish position, field size, Official Rating, beaten lengths).</p>
+  <div class="note-box">These signals only fire when <code>form_runs</code> data is available (Racing Post not blocked). If Racing Post is unavailable, all 8 signals score 0 — graceful degradation.</div>
+  <br>
+  <table class="signal-row">
+    <thead><tr><th>Signal key</th><th>Pts</th><th>Trigger condition</th></tr></thead>
+    <tbody>
+      <tr><td>exact_course_win</td><td><span class="pts pts-pos">+20</span></td><td>Won at today's <em>exact course</em> in run history (only if no CD marker already awarded)</td></tr>
+      <tr><td>exact_distance_win</td><td><span class="pts pts-pos">+20</span></td><td>Won at today's distance ±0.5f (only if no CD marker already awarded)</td></tr>
+      <tr><td>going_win_match</td><td><span class="pts pts-pos">+16 – +32</span></td><td>Won on same going type (heavy/soft/gd_soft/good/firm/aw). Scales: 1 win = +16, 2+ wins = +32 (capped)</td></tr>
+      <tr><td>going_place_match</td><td><span class="pts pts-pos">+6</span></td><td>Placed on same going type (only if no going wins)</td></tr>
+      <tr><td>fresh_days_optimal</td><td><span class="pts pts-pos">+10</span></td><td>Last run 14–35 days ago (peak freshness window)</td></tr>
+      <tr><td>close_2nd_last_time</td><td><span class="pts pts-pos">+14</span></td><td>Finished 2nd beaten &lt;4 lengths in most recent run</td></tr>
+      <tr><td>or_trajectory_up</td><td><span class="pts pts-pos">+10</span></td><td>Official Rating rising across last 3 runs (improving trajectory)</td></tr>
+      <tr><td>big_field_win</td><td><span class="pts pts-pos">+8</span></td><td>Won in a field of 10+ runners (proven in competitive company)</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:12px;font-size:0.85rem;color:var(--muted)">Maximum possible from Section 16: <strong>~100 pts</strong> (course + distance + 2× going wins + fresh + close-2nd + rising OR + big-field). Typical contribution for a well-evidenced horse: <strong>30–70 pts</strong>.</p>
+</div>
+</details>
+
+<details open>
+<summary><span class="section-num">§17</span> Cheltenham Festival Bonus</summary>
+<div class="detail-body">
+  <p>Applies only during Cheltenham Festival (10–13 March). Uses historical 2021–2025 data from <code>cheltenham_analyzer.py</code>.</p>
+  <table>
+    <thead><tr><th>Signal</th><th>Pts</th><th>Basis</th></tr></thead>
+    <tbody>
+      <tr><td>Trainer bonus (elite, e.g. Mullins)</td><td><span class="pts pts-pos">+up to 30</span></td><td>(weight_multiplier − 1.0) × 30</td></tr>
+      <tr><td>Irish trained bonus</td><td><span class="pts pts-pos">+15</span></td><td>73% of Championship winners are Irish-trained</td></tr>
+      <tr><td>Race specialty match</td><td><span class="pts pts-pos">+20</span></td><td>Trainer's specialist race matches today's race</td></tr>
+      <tr><td>Jockey elite (&gt;5 wins)</td><td><span class="pts pts-pos">+15</span></td><td>Championship jockey record</td></tr>
+      <tr><td>Jockey experienced (&gt;3 wins)</td><td><span class="pts pts-pos">+10</span></td><td></td></tr>
+      <tr><td>Trainer−jockey proven combo</td><td><span class="pts pts-pos">+variable</span></td><td>From <code>JOCKEY_STATS.combo_bonus</code></td></tr>
+      <tr><td>Form '1111' (elite pattern)</td><td><span class="pts pts-pos">+20</span></td><td>Championship form pattern</td></tr>
+      <tr><td>Form '111' (strong pattern)</td><td><span class="pts pts-pos">+15</span></td><td></td></tr>
+      <tr><td>Form '11' (winning streak)</td><td><span class="pts pts-pos">+10</span></td><td></td></tr>
+      <tr><td>Odds &lt;3.0 (short favourite)</td><td><span class="pts pts-pos">+7</span></td><td>41% Championship win rate for favourites</td></tr>
+    </tbody>
+  </table>
+</div>
+</details>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>5 · Weight Visualisation — All Signals at Max Value</h2>
+<div class="panel">
+  <p style="font-size:0.85rem;color:var(--muted);margin-bottom:14px;">Maximum achievable points per signal (showing top contributors)</p>
+  <div class="bar-row"><div class="bar-label">recent_win</div><div class="bar-track"><div class="bar-fill" style="width:22%;background:#2ecc71"></div></div><div class="bar-val">22</div></div>
+  <div class="bar-row"><div class="bar-label">form_exact_course_win <span class="new-badge">NEW</span></div><div class="bar-track"><div class="bar-fill" style="width:20%;background:#1abc9c"></div></div><div class="bar-val">20</div></div>
+  <div class="bar-row"><div class="bar-label">form_exact_distance_win <span class="new-badge">NEW</span></div><div class="bar-track"><div class="bar-fill" style="width:20%;background:#1abc9c"></div></div><div class="bar-val">20</div></div>
+  <div class="bar-row"><div class="bar-label">distance_suitability</div><div class="bar-track"><div class="bar-fill" style="width:18%"></div></div><div class="bar-val">18</div></div>
+  <div class="bar-row"><div class="bar-label">cd_bonus</div><div class="bar-track"><div class="bar-fill" style="width:18%"></div></div><div class="bar-val">18</div></div>
+  <div class="bar-row"><div class="bar-label">form_going_win (2× cap) <span class="new-badge">NEW</span></div><div class="bar-track"><div class="bar-fill" style="width:32%;background:#1abc9c"></div></div><div class="bar-val">32</div></div>
+  <div class="bar-row"><div class="bar-label">going_suitability (extreme)</div><div class="bar-track"><div class="bar-fill" style="width:32%;background:#e67e22"></div></div><div class="bar-val">32</div></div>
+  <div class="bar-row"><div class="bar-label">trainer_reputation (t1)</div><div class="bar-track"><div class="bar-fill" style="width:15%"></div></div><div class="bar-val">15</div></div>
+  <div class="bar-row"><div class="bar-label">database_history</div><div class="bar-track"><div class="bar-fill" style="width:15%"></div></div><div class="bar-val">15</div></div>
+  <div class="bar-row"><div class="bar-label">form_close_2nd <span class="new-badge">NEW</span></div><div class="bar-track"><div class="bar-fill" style="width:14%;background:#1abc9c"></div></div><div class="bar-val">14</div></div>
+  <div class="bar-row"><div class="bar-label">trainer_jockey_combo</div><div class="bar-track"><div class="bar-fill" style="width:12%"></div></div><div class="bar-val">12</div></div>
+  <div class="bar-row"><div class="bar-label">jockey_quality (t1)</div><div class="bar-track"><div class="bar-fill" style="width:12%"></div></div><div class="bar-val">12</div></div>
+  <div class="bar-row"><div class="bar-label">sweet_spot</div><div class="bar-track"><div class="bar-fill" style="width:12%"></div></div><div class="bar-val">12</div></div>
+  <div class="bar-row"><div class="bar-label">heavy_going_penalty (all horses)</div><div class="bar-track"><div class="bar-fill" style="width:12%;background:#e74c3c"></div></div><div class="bar-val">−12</div></div>
+  <div class="bar-row"><div class="bar-label">AW_low_class_penalty</div><div class="bar-track"><div class="bar-fill" style="width:50%;background:#e74c3c"></div></div><div class="bar-val">−50</div></div>
+  <div style="margin-top:10px;font-size:0.8rem;color:var(--muted)">Bar width is proportional to max pts value (100pt = 100% width). Red bars = penalties.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>6 · Penalties Summary</h2>
+<div class="panel" style="padding:0;">
+<table>
+  <thead><tr><th>Penalty</th><th>Pts</th><th>Trigger</th><th>Lesson / Reason</th></tr></thead>
+  <tbody>
+    <tr><td>Novice / Maiden race</td><td><span class="pts pts-neg">−15</span></td><td>Race name contains 'novice', 'nov', 'maiden'</td><td>First-time runners and novice fields are far less predictable</td></tr>
+    <tr><td>AW Class 5/6</td><td><span class="pts pts-neg">−50</span></td><td>All-weather + class 5 or 6</td><td>Beauzon 91pts → 6th. AW low-class = pure lottery</td></tr>
+    <tr><td>Turf Class 5/6</td><td><span class="pts pts-neg">−25</span></td><td>Grass + class 5 or 6</td><td>Queen Of Steel 99pts → 3rd. Slower going masks unpredictability somewhat</td></tr>
+    <tr><td>Class 5/6 hard cap</td><td><span class="pts pts-neg">cap 80</span></td><td>Any Class 5/6 race, regardless of score</td><td>El Rojo Grande 98pts → 2nd. Stop presenting random races as 95+ certainties</td></tr>
+    <tr><td>Heavy going (all field)</td><td><span class="pts pts-neg">−12</span></td><td>Going starts with 'Heavy'</td><td>El Gavilan 100pts, 3/1 fav → 5th. Heavy = randomise outcomes</td></tr>
+    <tr><td>Going unproven (0W, extreme)</td><td><span class="pts pts-neg">−16</span></td><td>0 form wins in extreme going</td><td>No form evidence for these conditions</td></tr>
+    <tr><td>Going limited (1W, extreme)</td><td><span class="pts pts-neg">−8</span></td><td>1 form win in extreme going</td><td>Insufficient evidence</td></tr>
+    <tr><td>David Pipe (Heavy/Soft)</td><td><span class="pts pts-neg">−½ trainer</span></td><td>Trainer = Pipe AND Heavy/Soft</td><td>Historical poor record in soft ground at this trainer</td></tr>
+    <tr><td>Age outside peak (NH)</td><td><span class="pts pts-neg">−5</span></td><td>&lt;5yo or &gt;11yo in NH race</td><td>Outside proven performance window</td></tr>
+    <tr><td>Age outside peak (Flat)</td><td><span class="pts pts-neg">−5</span></td><td>&gt;7yo on flat</td><td>Outside proven performance window</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>7 · Special Case Rules</h2>
+<div class="panel-grid">
+  <div class="panel">
+    <h3>Graded Race (Grd1/2/3 / Listed)</h3>
+    <p style="font-size:0.85rem;">Going penalties are <strong>removed</strong> for graded races. Elite horses are prepared for all conditions; penalising based on 4–6 form digits is a false negative. CD bonus also gets +8 bonus on top of base.</p>
+  </div>
+  <div class="panel">
+    <h3>Cheltenham Festival (10–13 Mar)</h3>
+    <p style="font-size:0.85rem;">Full Cheltenham-specific overlay applies: trainer history (Mullins 32% SR), Irish bias (73% of winners), form patterns ('1111' = +20), jockey records, race specialties.</p>
+  </div>
+  <div class="panel">
+    <h3>Class 5/6 Hard Cap</h3>
+    <p style="font-size:0.85rem;">Maximum score of <strong>80 pts</strong> enforced after all sections. Prevents form-streaks overwhelming the unpredictability signals in lowest-grade fields.</p>
+  </div>
+  <div class="panel">
+    <h3>Dynamic Weights Override</h3>
+    <p style="font-size:0.85rem;">The continuous learning system (<code>get_dynamic_weights()</code>) loads from DynamoDB / a weights JSON and may adjust DEFAULT_WEIGHTS based on recent results. Falls back to defaults if unavailable.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>8 · Deep Form Enrichment — Data Flow</h2>
+<div class="panel">
+  <p style="font-size:0.85rem;margin-bottom:12px;">How per-run race history flows from Racing Post into the scoring engine:</p>
+  <div style="font-family:monospace;font-size:0.82rem;color:var(--teal);line-height:2;padding:12px;background:#0d1117;border-radius:6px;overflow-x:auto;">
+    Betfair API ──► comprehensive_workflow.py<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fetch_upcoming_races()<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enrich_runners(races)&nbsp;&nbsp;&nbsp;◄── form_enricher.py<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fetch_form(horse_name)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ Racing Post → parse<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form_cache.json (12h TTL)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;runner['form_runs'] = [dict, ...]<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;analyze_horse_comprehensive()<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;§16 get_form_signals() → 8 signals → score
+  </div>
+  <p style="margin-top:12px;font-size:0.82rem;color:var(--muted)">Each run dict carries: <code>date, course, distance_f, going, position, field_size, official_rating, beaten_lengths</code></p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>9 · Expected Performance Targets</h2>
+<div class="roi-grid">
+  <div class="roi-card green">
+    <div class="big" style="color:var(--green)">20%+</div>
+    <div class="label">Target ROI (sustained 12+ months)<br><em>worth £500k–£2M in system value</em></div>
+  </div>
+  <div class="roi-card amber">
+    <div class="big" style="color:var(--amber)">25%+</div>
+    <div class="label">Gold standard ROI (36+ months)<br><em>worth £5M–£25M</em></div>
+  </div>
+  <div class="roi-card blue">
+    <div class="big" style="color:var(--accent)">75%+</div>
+    <div class="label">Confidence threshold for GREEN picks<br><em>to warrant 2× stake</em></div>
+  </div>
+  <div class="roi-card purple">
+    <div class="big" style="color:var(--purple)">30%</div>
+    <div class="label">Target: GREEN picks per day<br><em>(≥70 pts, ≥18% ROI)</em></div>
+  </div>
+  <div class="roi-card">
+    <div class="big" style="color:#fff">53.7%</div>
+    <div class="label">Observed EXCELLENT picks<br><em>(2026-02-03 sample: 22/41)</em></div>
+  </div>
+  <div class="roi-card">
+    <div class="big" style="color:#fff">29.3%</div>
+    <div class="label">Observed GOOD picks<br><em>(2026-02-03 sample: 12/41)</em></div>
+  </div>
+</div>
+<div class="panel" style="margin-top:14px;">
+  <h3>Expected Win Rate by Race Tier</h3>
+  <table>
+    <thead><tr><th>Race class / type</th><th>Predicted reliability</th><th>System approach</th></tr></thead>
+    <tbody>
+      <tr><td>Grade 1/2/3, Listed</td><td>High — elite horses match elite signals</td><td>Going penalty removed; CD bonus uplifted +8</td></tr>
+      <tr><td>Class 1–4 Turf / NH</td><td>Medium–High — core model strongest here</td><td>Full 16-section scoring, no cap</td></tr>
+      <tr><td>Class 5/6 Turf</td><td>Low–Medium — handicappers equalise fields</td><td>−25pt penalty + 80pt hard cap</td></tr>
+      <tr><td>AW Class 1–4</td><td>Medium — going neutral, form still matters</td><td>AW going = neutral score (+8 flat)</td></tr>
+      <tr><td>AW Class 5/6</td><td>Very low — deliberately unpredictable</td><td>−50pt penalty + 80pt hard cap</td></tr>
+      <tr><td>Novice / Maiden</td><td>Very Low — unknown quantities</td><td>−15pt penalty applied, advise skip</td></tr>
+      <tr><td>Heavy going (any class)</td><td>Low — ground randomly selects winners</td><td>−12pt universal penalty applied</td></tr>
+      <tr><td>Cheltenham Festival (March)</td><td>High with RP specialist data</td><td>Full §17 overlay + Irish bias + form patterns</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>10 · Version History &amp; Key Lessons Learned</h2>
+<div class="panel">
+<table>
+  <thead><tr><th>Date</th><th>Version change</th><th>Lesson</th></tr></thead>
+  <tbody>
+    <tr><td>2026-02-20</td><td>Claiming jockey bonus added</td><td>Weight allowances matter more in soft/heavy ground</td></tr>
+    <tr><td>2026-02-28</td><td>AW Class 5/6 penalty raised to 35</td><td>Lingfield AW Class5 result — form unreliable</td></tr>
+    <tr><td>2026-03-16</td><td>Full rebalance v4.4</td><td>Multiple Class5/6 high-scoring misfires. Trainer bonus ↓, form ↑, AW penalty → 50, Heavy penalty added</td></tr>
+    <tr><td>2026-03-16</td><td>David Pipe soft penalty</td><td>David Pipe historically weak in heavy/soft going</td></tr>
+    <tr><td>2026-03-16</td><td>Graded race going correction</td><td>James Du Berlais (Grd2, form 55-1632) won despite going penalty being triggered</td></tr>
+    <tr><td>2026-03-19</td><td>Meeting-focus signals added</td><td>Trainer sole runner = targeted optimism; jockey sole ride = mission trip</td></tr>
+    <tr><td>2026-03-20</td><td>Section 16 deep form signals (8 new)</td><td>Paddy Power per-run detail shows proven going/distance/course wins — much stronger evidence than form string alone</td></tr>
+    <tr><td>2026-03-20</td><td>EventBridge auto-record wired</td><td>Results recorded automatically 30min post-race, no manual entry needed</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>11 · Max Theoretical Score Breakdown</h2>
+<div class="panel">
+  <p style="font-size:0.85rem;color:var(--muted);margin-bottom:12px;">Hypothetical "perfect horse" accumulating all signals simultaneously (non-Class5/6 race)</p>
+  <div class="bar-row"><div class="bar-label">Recent win (§3)</div><div class="bar-track"><div class="bar-fill" style="width:22%;background:var(--green)"></div></div><div class="bar-val">22</div></div>
+  <div class="bar-row"><div class="bar-label">3+ form wins × 8 (§3)</div><div class="bar-track"><div class="bar-fill" style="width:24%;background:var(--green)"></div></div><div class="bar-val">24</div></div>
+  <div class="bar-row"><div class="bar-label">Deep form: going 2× wins (§16)</div><div class="bar-track"><div class="bar-fill" style="width:32%;background:var(--teal)"></div></div><div class="bar-val">32</div></div>
+  <div class="bar-row"><div class="bar-label">Going suitability extreme (§5)</div><div class="bar-track"><div class="bar-fill" style="width:32%;background:#e67e22"></div></div><div class="bar-val">32</div></div>
+  <div class="bar-row"><div class="bar-label">Deep form: exact course win (§16)</div><div class="bar-track"><div class="bar-fill" style="width:20%;background:var(--teal)"></div></div><div class="bar-val">20</div></div>
+  <div class="bar-row"><div class="bar-label">Deep form: exact distance win (§16)</div><div class="bar-track"><div class="bar-fill" style="width:20%;background:var(--teal)"></div></div><div class="bar-val">20</div></div>
+  <div class="bar-row"><div class="bar-label">C/D marker (§5c)</div><div class="bar-track"><div class="bar-fill" style="width:18%"></div></div><div class="bar-val">18</div></div>
+  <div class="bar-row"><div class="bar-label">Distance suitability (§13)</div><div class="bar-track"><div class="bar-fill" style="width:18%"></div></div><div class="bar-val">18</div></div>
+  <div class="bar-row"><div class="bar-label">Trainer T1 + fav correction (§8+§9)</div><div class="bar-track"><div class="bar-fill" style="width:22%"></div></div><div class="bar-val">22</div></div>
+  <div class="bar-row"><div class="bar-label">Elite jockey T1 (§10)</div><div class="bar-track"><div class="bar-fill" style="width:12%"></div></div><div class="bar-val">12</div></div>
+  <div class="bar-row"><div class="bar-label">Database history (§6)</div><div class="bar-track"><div class="bar-fill" style="width:15%"></div></div><div class="bar-val">15</div></div>
+  <div class="bar-row"><div class="bar-label">Meeting focus signals (§12)</div><div class="bar-track"><div class="bar-fill" style="width:22%"></div></div><div class="bar-val">22</div></div>
+  <div class="bar-row"><div class="bar-label">Deep form: close 2nd + OR rising (§16)</div><div class="bar-track"><div class="bar-fill" style="width:24%;background:var(--teal)"></div></div><div class="bar-val">24</div></div>
+  <div class="bar-row"><div class="bar-label">Sweet spot + optimal odds (§1+§2)</div><div class="bar-track"><div class="bar-fill" style="width:22%"></div></div><div class="bar-val">22</div></div>
+  <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:0.9rem;">
+    <strong>Theoretical maximum ≈ 320 pts</strong> &nbsp;(excl. Cheltenham overlay) — but practically &gt;150 pts is rare. Real picks range <strong>40–120 pts</strong> for well-evidenced horses.
+  </div>
+</div>
+
+<div style="text-align:center;margin-top:40px;font-size:0.8rem;color:var(--muted);">
+  Generated by GitHub Copilot · FutureGen AI Betting System · v4.5 · 2026-03-20
+</div>
+
+</body>
+</html>

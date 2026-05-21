@@ -1,0 +1,531 @@
+{
+  "Comment": "SureBet Refresh Pipeline — runs at 12:00, 13:30, 14:00, 16:00, 18:00 UTC. Re-fetches odds, re-scores, validates, analyzes featured meeting, sends updated picks, then settles finished races via SL + Betfair. The 13:30 UTC run finalises the featured meeting; from then on the featured picks stay locked for the day while results continue updating.",
+  "StartAt": "InjectDate",
+  "States": {
+    "InjectDate": {
+      "Type": "Pass",
+      "Parameters": {
+        "date.$": "States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'), 0)"
+      },
+      "Next": "FetchBetfairOdds"
+    },
+    "FetchBetfairOdds": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:surebet-betfair-fetch",
+        "Payload": {
+          "date.$": "$.date",
+          "run_type": "refresh"
+        }
+      },
+      "ResultSelector": {
+        "date.$": "$.Payload.date",
+        "race_count.$": "$.Payload.race_count",
+        "s3_key.$": "$.Payload.s3_key",
+        "success.$": "$.Payload.success"
+      },
+      "ResultPath": "$.fetchResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "RefreshFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "RunAnalysis"
+    },
+    "RunAnalysis": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:surebet-analysis",
+        "Payload": {
+          "date.$": "$.date",
+          "s3_key.$": "$.fetchResult.s3_key"
+        }
+      },
+      "ResultSelector": {
+        "date.$": "$.Payload.date",
+        "picks_count.$": "$.Payload.picks_count",
+        "success.$": "$.Payload.success"
+      },
+      "ResultPath": "$.analysisResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 60,
+          "MaxAttempts": 1,
+          "BackoffRate": 1.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "RefreshFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "RunPhaseFreeFeeds"
+    },
+    "ValidatePicks": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:surebet-validate",
+        "Payload": {
+          "date.$": "$.date",
+          "picks_count.$": "$.analysisResult.picks_count"
+        }
+      },
+      "ResultSelector": {
+        "valid_picks.$": "$.Payload.valid_picks",
+        "errors.$": "$.Payload.errors"
+      },
+      "ResultPath": "$.validateResult",
+      "Retry": [],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "RefreshFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "CalculateImproverBoost"
+    },
+    "CalculateImproverBoost": {
+      "Comment": "Apply improver boost scoring (+15 base, +5 for trip) to candidate horses",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:calculate-improver-boost-scores",
+        "Payload": {
+          "date.$": "$.date",
+          "target_date.$": "$.date"
+        }
+      },
+      "ResultSelector": {
+        "all_horses.$": "$.Payload.all_horses",
+        "boost_summary.$": "$.Payload.boost_summary",
+        "success.$": "$.Payload.success"
+      },
+      "ResultPath": "$.improverBoostResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 15,
+          "MaxAttempts": 1,
+          "BackoffRate": 1.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "ApplyImproverBoostedPicks",
+          "ResultPath": "$.improverBoostError",
+          "Comment": "Non-fatal — continue even if improver boost calculation fails"
+        }
+      ],
+      "Next": "ApplyImproverBoostedPicks"
+    },
+    "ApplyImproverBoostedPicks": {
+      "Comment": "Enforce improver-boosted picks as official final selection",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:apply-improver-boosted-picks",
+        "Payload": {
+          "all_horses.$": "$.improverBoostResult.all_horses",
+          "picks_to_select": 5
+        }
+      },
+      "ResultSelector": {
+        "official_picks.$": "$.Payload.official_picks",
+        "success.$": "$.Payload.success"
+      },
+      "ResultPath": "$.improverPicksResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 15,
+          "MaxAttempts": 1,
+          "BackoffRate": 1.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "CompareRaceFields",
+          "ResultPath": "$.improverPicksError",
+          "Comment": "Non-fatal — continue to field comparison"
+        }
+      ],
+      "Next": "CompareRaceFields"
+    },
+    "CompareRaceFields": {
+      "Comment": "Detect nonrunners and field changes (≥15% or 2+ nonrunners) — triggers re-analysis if significant",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:compare-race-fields",
+        "Payload": {
+          "date.$": "$.date",
+          "change_threshold_pct": 15
+        }
+      },
+      "ResultSelector": {
+        "should_reanalyze.$": "$.Payload.should_reanalyze",
+        "field_changes.$": "$.Payload.field_changes",
+        "success.$": "$.Payload.success"
+      },
+      "ResultPath": "$.fieldCompareResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 15,
+          "MaxAttempts": 1,
+          "BackoffRate": 1.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "AnalyzeFeaturedMeeting",
+          "ResultPath": "$.fieldCompareError",
+          "Comment": "Non-fatal — continue to featured meeting analysis"
+        }
+      ],
+      "Next": "AnalyzeFeaturedMeeting"
+    },
+    "AnalyzeFeaturedMeeting": {
+      "Comment": "Analyze featured meeting: pick top horse per race and check vs actual results. The 13:30 UTC run finalises the daily featured meeting lock; later refreshes keep the locked picks and only update results.",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:surebet-featured-meeting",
+        "Payload": {
+          "date.$": "$.date"
+        }
+      },
+      "ResultSelector": {
+        "date.$": "$.Payload.date",
+        "course.$": "$.Payload.featured_course",
+        "races.$": "$.Payload.race_count",
+        "accuracy.$": "$.Payload.featured_accuracy",
+        "success.$": "$.Payload.success"
+      },
+      "ResultPath": "$.featuredMeetingResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 1,
+          "BackoffRate": 1.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "ApplyFeaturedImproverBoost",
+          "ResultPath": "$.featuredMeetingError",
+          "Comment": "Non-fatal — continue to featured improver enforcement"
+        }
+      ],
+      "Next": "ApplyFeaturedImproverBoost"
+    },
+    "ApplyFeaturedImproverBoost": {
+      "Comment": "Apply improver boost to featured meeting picks for consistent optimization",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:featured-improver-enforcer",
+        "Payload": {
+          "date.$": "$.date",
+          "featured_course.$": "$.featuredMeetingResult.course",
+          "all_horses.$": "$.improverBoostResult.all_horses"
+        }
+      },
+      "ResultSelector": {
+        "featured_picks_updated.$": "$.Payload.featured_picks_updated",
+        "boost_summary.$": "$.Payload.boost_summary",
+        "success.$": "$.Payload.success"
+      },
+      "ResultPath": "$.featuredImproverResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 15,
+          "MaxAttempts": 1,
+          "BackoffRate": 1.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "SendNotifications",
+          "ResultPath": "$.featuredImproverError",
+          "Comment": "Non-fatal — continue to notifications"
+        }
+      ],
+      "Next": "SendNotifications"
+    },
+    "SendNotifications": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:surebet-notify",
+        "Payload": {
+          "date.$": "$.date",
+          "valid_picks.$": "$.validateResult.valid_picks"
+        }
+      },
+      "ResultSelector": {
+        "notifications_sent.$": "$.Payload.notifications_sent",
+        "skipped.$": "$.Payload.skipped"
+      },
+      "ResultPath": "$.notifyResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "RefreshFavResults",
+          "ResultPath": "$.notifyError"
+        }
+      ],
+      "Next": "RefreshSLResults"
+    },
+    "RefreshSLResults": {
+      "Comment": "Settle finished races via Sporting Life fast-results — fires 10-30 min before Betfair settles.",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:surebet-sl-results",
+        "Payload.$": "$"
+      },
+      "ResultSelector": {
+        "statusCode.$": "$.Payload.statusCode",
+        "date.$": "$.Payload.date",
+        "success.$": "$.Payload.success",
+        "message.$": "$.Payload.message"
+      },
+      "ResultPath": "$.slResultsResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "RefreshFavResults",
+          "ResultPath": "$.slResultsError",
+          "Comment": "Non-fatal — continue to fav results even if SL scrape fails"
+        }
+      ],
+      "Next": "RefreshFavResults"
+    },
+    "RefreshFavResults": {
+      "Comment": "Write fav_outcome to favourites throughout the day so Results page shows win/loss for each lay candidate.",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:surebet-fav-results",
+        "Payload.$": "$"
+      },
+      "ResultSelector": {
+        "races_processed.$": "$.Payload.races_processed",
+        "favs_updated.$": "$.Payload.favs_updated",
+        "success.$": "$.Payload.success"
+      },
+      "ResultPath": "$.favResultsResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 15,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "RefreshBetfairResults",
+          "ResultPath": "$.favResultsError",
+          "Comment": "Non-fatal — continue to Betfair results even if fav results write fails"
+        }
+      ],
+      "Next": "RefreshBetfairResults"
+    },
+    "RefreshBetfairResults": {
+      "Comment": "Settle any remaining races via Betfair market status — catches anything SL missed.",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:surebet-results-fetch",
+        "Payload.$": "$"
+      },
+      "ResultSelector": {
+        "date.$": "$.Payload.date",
+        "results_recorded.$": "$.Payload.results_recorded",
+        "winners.$": "$.Payload.winners",
+        "success.$": "$.Payload.success"
+      },
+      "ResultPath": "$.betfairResultsResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "RefreshComplete",
+          "ResultPath": "$.betfairResultsError",
+          "Comment": "Non-fatal — refresh still succeeds even if Betfair results fetch fails"
+        }
+      ],
+      "Next": "RefreshComplete"
+    },
+    "RefreshComplete": {
+      "Type": "Succeed"
+    },
+    "RefreshFailed": {
+      "Type": "Fail",
+      "Error": "RefreshPipelineFailed",
+      "Cause": "A critical step in the refresh pipeline failed — check CloudWatch Logs"
+    },
+    "RunPhaseFreeFeeds": {
+      "Comment": "Phase 1+2 free feeds enrichment and score adjustment before validation",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:surebet-free-feeds",
+        "Payload": {
+          "date.$": "$.date"
+        }
+      },
+      "ResultSelector": {
+        "target_date.$": "$.Payload.target_date",
+        "rows_updated.$": "$.Payload.rows_updated",
+        "success.$": "$.Payload.success"
+      },
+      "ResultPath": "$.freeFeedsResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 20,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "ValidatePicks",
+          "ResultPath": "$.freeFeedsError",
+          "Comment": "Non-fatal - continue with validation if free feeds fail"
+        }
+      ],
+      "Next": "ValidatePicks"
+    }
+  }
+}

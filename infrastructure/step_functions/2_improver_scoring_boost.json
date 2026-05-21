@@ -1,0 +1,177 @@
+{
+  "Comment": "Step 2: Recalibrate Potential Improver Scoring Pipeline",
+  "Description": "Boosts improver-flagged horses by +15 points, makes top 3 improver picks official picks, tracks improver flag effectiveness",
+  "StartAt": "LoadRaceData",
+  "States": {
+    "LoadRaceData": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:load-race-scoring-data",
+      "Parameters": {
+        "market_id.$": "$.market_id",
+        "course.$": "$.course",
+        "race_time.$": "$.race_time"
+      },
+      "Next": "IdentifyImproverFlaggedHorses",
+      "ResultPath": "$.race_data"
+    },
+    "IdentifyImproverFlaggedHorses": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:identify-improver-candidates",
+      "Parameters": {
+        "all_horses.$": "$.race_data.all_horses",
+        "trip_suitability_threshold": 15,
+        "trainer_improvement_threshold": 5
+      },
+      "Next": "EvaluateImproverCandidates",
+      "ResultPath": "$.improver_candidates"
+    },
+    "EvaluateImproverCandidates": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:evaluate-improver-strength",
+      "Parameters": {
+        "candidates.$": "$.improver_candidates.horses",
+        "evaluation_factors": [
+          "trip_suitability",
+          "trainer_hot_form",
+          "jockey_hot_form",
+          "distance_improvement_pattern",
+          "recent_efforts"
+        ]
+      },
+      "Next": "CalculateImprovedScores",
+      "ResultPath": "$.improver_evaluation"
+    },
+    "CalculateImprovedScores": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:calculate-improver-boost-scores",
+      "Parameters": {
+        "all_horses.$": "$.race_data.all_horses",
+        "improver_candidates.$": "$.improver_evaluation.ranked_improvers",
+        "base_improver_boost": 15,
+        "trip_suitability_boost": 5,
+        "max_boost_cap": 35
+      },
+      "Next": "RankHorsesByBoostedScore",
+      "ResultPath": "$.boosted_scores"
+    },
+    "RankHorsesByBoostedScore": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:rank-horses-by-score",
+      "Parameters": {
+        "horses_with_scores.$": "$.boosted_scores.all_horses",
+        "sort_order": "descending"
+      },
+      "Next": "ExtractTop3ImproverPicks",
+      "ResultPath": "$.ranked_horses"
+    },
+    "ExtractTop3ImproverPicks": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "extract-improver-picks",
+        "Payload": {
+          "ranked_horses.$": "$.ranked_horses.rankings",
+          "improver_candidates.$": "$.improver_evaluation.ranked_improvers",
+          "top_n": 3
+        }
+      },
+      "Next": "ValidateImproverPicks",
+      "ResultPath": "$.improver_picks"
+    },
+    "ValidateImproverPicks": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:validate-improver-picks",
+      "Parameters": {
+        "improver_picks.$": "$.improver_picks.Payload",
+        "market_id.$": "$.market_id",
+        "minimum_confidence_score": 70,
+        "minimum_win_probability": 0.15
+      },
+      "Next": "CheckValidPicks",
+      "ResultPath": "$.pick_validation"
+    },
+    "CheckValidPicks": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.pick_validation.valid_picks_count",
+          "NumericGreaterThan": 0,
+          "Next": "PromoteToOfficialPicks"
+        }
+      ],
+      "Default": "NoValidImproverPicks"
+    },
+    "PromoteToOfficialPicks": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:promote-improver-picks",
+      "Parameters": {
+        "market_id.$": "$.market_id",
+        "course.$": "$.course",
+        "race_time.$": "$.race_time",
+        "valid_picks.$": "$.pick_validation.valid_picks",
+        "original_pick_type": "learning",
+        "new_pick_type": "official",
+        "promotion_reason": "Improver-flagged horse with strong trip suitability",
+        "new_scores.$": "$.boosted_scores.improver_boosted_scores"
+      },
+      "Next": "StoreImproverBoostMetrics",
+      "ResultPath": "$.promotion_result"
+    },
+    "StoreImproverBoostMetrics": {
+      "Type": "Task",
+      "Resource": "arn:aws:dynamodb:eu-west-1:ACCOUNT_ID:dynamodb:putItem",
+      "Parameters": {
+        "TableName": "ImproverBoostMetrics",
+        "Item": {
+          "market_id": {
+            "S.$": "$.market_id"
+          },
+          "course": {
+            "S.$": "$.course"
+          },
+          "race_time": {
+            "S.$": "$.race_time"
+          },
+          "improver_candidates_count": {
+            "N.$": "$.improver_evaluation.total_candidates"
+          },
+          "valid_picks_promoted": {
+            "N.$": "$.pick_validation.valid_picks_count"
+          },
+          "average_score_boost": {
+            "N.$": "$.boosted_scores.average_boost_applied"
+          },
+          "top_improver_horse": {
+            "S.$": "$.pick_validation.valid_picks[0].horse"
+          },
+          "top_improver_boosted_score": {
+            "N.$": "$.pick_validation.valid_picks[0].boosted_score"
+          },
+          "timestamp": {
+            "S.$": "$$.State.EnteredTime"
+          }
+        }
+      },
+      "Next": "LogImproverBoostSuccess"
+    },
+    "LogImproverBoostSuccess": {
+      "Type": "Pass",
+      "Result": {
+        "status": "success",
+        "message": "Improver scoring boost applied and picks promoted",
+        "picks_promoted.$": "$.pick_validation.valid_picks_count",
+        "top_pick.$": "$.pick_validation.valid_picks[0]"
+      },
+      "End": true
+    },
+    "NoValidImproverPicks": {
+      "Type": "Pass",
+      "Result": {
+        "status": "no_valid_improvers",
+        "message": "No improver picks met validation criteria for this race",
+        "reason": "All improver candidates failed confidence or win probability checks"
+      },
+      "End": true
+    }
+  }
+}

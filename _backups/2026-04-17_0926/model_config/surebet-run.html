@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SureBet-Run — Full Orchestration Plan</title>
+<style>
+  :root {
+    --bg:        #0d1117;
+    --panel:     #161b22;
+    --border:    #30363d;
+    --accent:    #58a6ff;
+    --green:     #3fb950;
+    --amber:     #d29922;
+    --red:       #f85149;
+    --purple:    #bc8cff;
+    --cyan:      #79c0ff;
+    --muted:     #8b949e;
+    --text:      #e6edf3;
+    --text2:     #c9d1d9;
+    --tag-bg:    #21262d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; }
+
+  /* ── Header ─────────────────────────────── */
+  .header {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1c2333 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 36px 48px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 60% -20%, rgba(88,166,255,0.08) 0%, transparent 70%);
+  }
+  .header-logo { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .header h1 { font-size: 32px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+  .header h1 span { color: var(--accent); }
+  .header-sub { margin-top: 8px; color: var(--muted); font-size: 14px; max-width: 700px; }
+  .header-meta { margin-top: 18px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .meta-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--tag-bg); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 12px; font-size: 12px; color: var(--muted);
+  }
+  .meta-pill b { color: var(--text2); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .dot-green  { background: var(--green); }
+  .dot-amber  { background: var(--amber); }
+  .dot-blue   { background: var(--accent); }
+  .dot-purple { background: var(--purple); }
+
+  /* ── Layout ─────────────────────────────── */
+  .main { max-width: 1280px; margin: 0 auto; padding: 32px 48px 64px; }
+
+  /* ── Section ────────────────────────────── */
+  .section { margin-bottom: 48px; }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .section-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .icon-blue   { background: rgba(88,166,255,0.15); }
+  .icon-green  { background: rgba(63,185,80,0.15); }
+  .icon-amber  { background: rgba(210,153,34,0.15); }
+  .icon-red    { background: rgba(248,81,73,0.15); }
+  .icon-purple { background: rgba(188,140,255,0.15); }
+  .icon-cyan   { background: rgba(121,192,255,0.15); }
+  .section-header h2 { font-size: 18px; font-weight: 600; color: var(--text); }
+  .section-header .step-num {
+    font-size: 11px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  /* ── Cards ──────────────────────────────── */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600; color: var(--text);
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  }
+  .card-body { color: var(--text2); font-size: 13px; }
+
+  /* ── Grid: Phase cards ───────────────────── */
+  .phase-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+
+  /* ── Timeline ───────────────────────────── */
+  .timeline { position: relative; padding-left: 32px; }
+  .timeline::before {
+    content: ''; position: absolute;
+    left: 10px; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(to bottom, var(--accent) 0%, var(--purple) 50%, var(--green) 100%);
+  }
+  .tl-item { position: relative; margin-bottom: 24px; }
+  .tl-dot {
+    position: absolute; left: -26px; top: 5px;
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 2px solid var(--bg);
+  }
+  .tl-dot-blue   { background: var(--accent); }
+  .tl-dot-green  { background: var(--green); }
+  .tl-dot-amber  { background: var(--amber); }
+  .tl-dot-red    { background: var(--red); }
+  .tl-dot-purple { background: var(--purple); }
+  .tl-time { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .tl-title { font-size: 14px; font-weight: 600; color: var(--text); margin: 2px 0 4px; }
+  .tl-body { font-size: 13px; color: var(--muted); }
+
+  /* ── Score table ─────────────────────────── */
+  .score-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .score-table th { text-align: left; padding: 8px 12px; color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
+  .score-table td { padding: 8px 12px; border-bottom: 1px solid rgba(48,54,61,0.5); vertical-align: top; }
+  .score-table tr:last-child td { border-bottom: none; }
+  .score-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .pts { font-weight: 700; color: var(--accent); }
+  .pts-high { color: var(--green); }
+  .pts-med  { color: var(--amber); }
+  .pts-low  { color: var(--muted); }
+
+  /* ── Tags ───────────────────────────────── */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+  }
+  .tag-blue   { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .tag-green  { background: rgba(63,185,80,0.15);  color: var(--green); }
+  .tag-amber  { background: rgba(210,153,34,0.15); color: var(--amber); }
+  .tag-red    { background: rgba(248,81,73,0.15);  color: var(--red); }
+  .tag-purple { background: rgba(188,140,255,0.15);color: var(--purple); }
+  .tag-cyan   { background: rgba(121,192,255,0.15);color: var(--cyan); }
+
+  /* ── Code ───────────────────────────────── */
+  code {
+    font-family: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
+    background: var(--tag-bg); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 4px; font-size: 12px; color: var(--cyan);
+  }
+  .code-block {
+    background: #0d1117; border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 20px;
+    font-family: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 12px; color: var(--text2); line-height: 1.7;
+    overflow-x: auto; tab-size: 2;
+  }
+  .code-comment { color: #484f58; }
+  .code-key     { color: var(--accent); }
+  .code-val     { color: var(--green); }
+  .code-str     { color: var(--amber); }
+
+  /* ── Grade bands ─────────────────────────── */
+  .grade-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .grade-card { border-radius: 8px; padding: 16px; text-align: center; border: 1px solid transparent; }
+  .grade-E { background: rgba(63,185,80,0.1);  border-color: rgba(63,185,80,0.4); }
+  .grade-G { background: rgba(210,153,34,0.08); border-color: rgba(210,153,34,0.3); }
+  .grade-F { background: rgba(230,120,0,0.07); border-color: rgba(230,120,0,0.25); }
+  .grade-P { background: rgba(248,81,73,0.06); border-color: rgba(248,81,73,0.2); }
+  .grade-label { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+  .grade-E .grade-label { color: var(--green); }
+  .grade-G .grade-label { color: var(--amber); }
+  .grade-F .grade-label { color: #e07820; }
+  .grade-P .grade-label { color: var(--red); }
+  .grade-pts { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .grade-stake { font-size: 11px; color: var(--muted); }
+
+  /* ── Data flow boxes ─────────────────────── */
+  .flow-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .flow-box {
+    background: var(--tag-bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 14px; font-size: 12px; font-weight: 500; color: var(--text2);
+  }
+  .flow-arrow { font-size: 16px; color: var(--muted); }
+  .flow-box.src  { border-color: rgba(88,166,255,0.4); color: var(--accent); }
+  .flow-box.proc { border-color: rgba(188,140,255,0.4); color: var(--purple); }
+  .flow-box.dest { border-color: rgba(63,185,80,0.4);  color: var(--green); }
+
+  /* ── DB table ────────────────────────────── */
+  .db-table { display: grid; grid-template-columns: 200px 1fr; gap: 0; }
+  .db-row { display: contents; }
+  .db-key, .db-val {
+    padding: 8px 14px; font-size: 12px;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .db-key { color: var(--cyan); font-family: monospace; background: rgba(13,17,23,0.5); }
+  .db-val { color: var(--text2); }
+
+  /* ── Scheduler table ─────────────────────── */
+  .sched-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .sched-table th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); border-bottom: 1px solid var(--border); }
+  .sched-table td { padding: 10px 14px; border-bottom: 1px solid rgba(48,54,61,0.4); vertical-align: middle; }
+  .sched-table tr:last-child td { border-bottom: none; }
+  .sched-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ── Self-healing panel ─────────────────── */
+  .heal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .heal-card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; }
+  .heal-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .heal-body { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* ── Divider ─────────────────────────────── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* ── Legend ──────────────────────────────── */
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+
+  /* ── Status bar ─────────────────────────── */
+  .status-bar {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 20px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .status-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .pulse { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  ul.feature-list { padding-left: 18px; }
+  ul.feature-list li { color: var(--text2); font-size: 13px; margin-bottom: 4px; }
+  ul.feature-list li::marker { color: var(--accent); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width: 900px) { .two-col, .grade-grid { grid-template-columns: 1fr; } .main { padding: 24px 20px; } }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<div class="header">
+  <div class="header-logo">SureBet Platform · Orchestration Blueprint</div>
+  <h1><span>SureBet</span>-Run</h1>
+  <p class="header-sub">
+    Fully automated, self-improving daily pipeline — from data ingestion through race analysis,
+    pick selection, live result capture, evening loss analysis and continuous learning.
+    Runs every day with zero manual intervention.
+  </p>
+  <div class="header-meta">
+    <span class="meta-pill"><span class="dot dot-green"></span><b>6 Scheduled Tasks</b></span>
+    <span class="meta-pill"><span class="dot dot-blue"></span><b>3 AWS Services</b></span>
+    <span class="meta-pill"><span class="dot dot-amber"></span><b>40+ Scoring Signals</b></span>
+    <span class="meta-pill"><span class="dot dot-purple"></span><b>100% Race Coverage</b></span>
+    <span class="meta-pill"><pulse></pulse><b>Self-Healing + Learning Loop</b></span>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ─── Status bar ─── -->
+<div class="status-bar">
+  <div class="status-item"><span class="pulse"></span><b style="color:var(--green)">Live</b></div>
+  <div class="status-item"><span class="dot dot-blue"></span>Windows Task Scheduler</div>
+  <div class="status-item"><span class="dot dot-green"></span>DynamoDB · eu-west-1</div>
+  <div class="status-item"><span class="dot dot-amber"></span>Betfair API</div>
+  <div class="status-item"><span class="dot dot-purple"></span>Sporting Life Scraper</div>
+  <div class="status-item"><span class="dot dot-blue"></span>AWS Lambda + API Gateway</div>
+  <div class="status-item"><span class="dot dot-cyan" style="background:var(--cyan)"></span>AWS Amplify React UI</div>
+</div>
+
+
+<!-- ═══════════════ MASTER DAILY TIMELINE ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🕐</div>
+    <div>
+      <div class="step-num">Master Flow</div>
+      <h2>Daily Orchestration Timeline</h2>
+    </div>
+  </div>
+
+  <div class="card">
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-blue"></div>
+      <div class="tl-time">08:30 — Scheduled Task: SureBet-Morning-Racecard</div>
+      <div class="tl-title">Phase 1 · SL Racecard Ingestion</div>
+      <div class="tl-body">
+        <code>sl_racecard_fetcher.py</code> fetches today's full UK racecard from Sporting Life.
+        Every race gets: trainer, jockey, weight, form figures, official rating, Timeform stars, 
+        Rating123, draw, pre-race odds, last-6-run history, going, class, distance, tipster verdict text.
+        Saved to <code>racecard_cache.json</code> and DynamoDB <code>SureBetRacecards</code>.
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-blue"></div>
+      <div class="tl-time">09:00 — Scheduled Task: SureBet-Daily-Health-Check</div>
+      <div class="tl-title">Phase 2 · Pre-Flight Health Check</div>
+      <div class="tl-body">
+        <code>daily_health_check.py</code> validates that all required data files exist and are fresh,
+        DynamoDB tables are accessible, Race data has form, Betfair credentials are valid.
+        Aborts the pipeline if critical issues found; emits warnings for non-blockers.
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-blue"></div>
+      <div class="tl-time">09:30 — Scheduled Task: SureBet-Betfair-Fetch</div>
+      <div class="tl-title">Phase 3 · Betfair Live Data Ingestion</div>
+      <div class="tl-body">
+        <code>betfair_odds_fetcher.py</code> authenticates via AWS Secrets Manager and fetches all UK
+        WIN markets for the next 6 hours from the Betfair Exchange API. Returns live BSP odds, 
+        form strings, trainer, jockey, draw, last-run info per runner. Saved to 
+        <code>response_horses.json</code>. Also enriched with <code>form_enricher.py</code> 
+        (Racing Post last-6-race history: course, distance, going, position, class).
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-purple"></div>
+      <div class="tl-time">10:00 — Scheduled Task: SureBet-Comprehensive-Analysis</div>
+      <div class="tl-title">Phase 4 · Full Field Analysis (100% Coverage)</div>
+      <div class="tl-body">
+        <code>comprehensive_workflow.py</code> loops every race and every runner.
+        Builds meeting-level context (trainer/jockey focus signals, new-trainer flags).
+        Scores every horse through the 40-signal scoring engine in <code>comprehensive_pick_logic.py</code>.
+        Picks passing 4-tier validation are written to DynamoDB <code>SureBetBets</code> with 
+        <code>show_in_ui=True</code>. All horses scored (not just picks) for learning.
+        Mandatory 90% field coverage — races below threshold are skipped.
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-green"></div>
+      <div class="tl-time">10:30 — Automated</div>
+      <div class="tl-title">Phase 5 · Top-3 Gap Validation &amp; UI Publication</div>
+      <div class="tl-body">
+        After scoring, only picks with a <strong>score gap ≥ 20pts</strong> over the next-highest horse
+        are flagged for UI. The Lambda function <code>BettingPicksAPI</code> serves validated picks
+        via API Gateway to the React frontend on AWS Amplify. Weak-gap picks are suppressed 
+        (<code>show_in_ui=False</code>, rejection reason stored).
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-amber"></div>
+      <div class="tl-time">Every 30 minutes (10:00 – 21:00) — Task: SureBet-Hourly-ResultsFetcher</div>
+      <div class="tl-title">Phase 6 · Live Result Capture</div>
+      <div class="tl-body">
+        <code>sl_results_fetcher.py</code> runs every 30 minutes.
+        <strong>Primary:</strong> hits <code>sportinglife.com/racing/fast-results</code> — single JSON
+        fetch, 30 most recent results globally, instant after weigh-in.
+        <strong>Fallback:</strong> per-race HTML page scraping for any race not yet in the fast feed.
+        Records: outcome (win/placed/loss), finish position, profit/loss, winner name, winner 
+        trainer/jockey, tote win/place, exacta, tricast, winning margins, non-runner count.
+        Also pulls pick's own racecard data: trainer, form, Timeform stars.
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-amber"></div>
+      <div class="tl-time">Every 30 minutes (10:00 – 21:00) — Continuous</div>
+      <div class="tl-title">Phase 7 · Coordinated Learning Loop</div>
+      <div class="tl-body">
+        <code>coordinated_learning_workflow.py</code> runs a background loop:
+        analyzes ALL horses (learning track), matches results as they arrive, 
+        updates signal weights in DynamoDB based on what's winning.
+        Dynamic weights are hot-loaded (5-min cache) on every scoring call — no restart needed.
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-red"></div>
+      <div class="tl-time">20:00 — Scheduled Task: SureBet-Evening-Loss-Report</div>
+      <div class="tl-title">Phase 8 · Evening Loss Analysis &amp; Report</div>
+      <div class="tl-body">
+        <code>evening_loss_report.py</code> queries today's settled picks, identifies red flags
+        on each loss (extreme odds, going mismatch, class mismatch, low coverage, trainer absence, 
+        score gap too narrow), generates an HTML report saved to <code>reports/</code>,
+        and emails it to <code>charles.mccarthy@gmail.com</code> via AWS SES.
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot tl-dot-purple"></div>
+      <div class="tl-time">21:00 — Automated</div>
+      <div class="tl-title">Phase 9 · Learning Cycle &amp; Weight Update</div>
+      <div class="tl-body">
+        <code>daily_learning_cycle.py</code> loads the last 7 days of settled picks from DynamoDB,
+        runs <code>learning_engine.analyze_performance_patterns()</code> to detect overweight signals,
+        calls <code>update_prompt_with_learnings()</code> to persist updated weights back to DynamoDB.
+        Weights take effect immediately (hot-loaded cache) — the model improves overnight 
+        ready for the next day's analysis run.
+      </div>
+    </div>
+
+  </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ PHASE 1-3: DATA SOURCES ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">📡</div>
+    <div>
+      <div class="step-num">Phase 1–3</div>
+      <h2>Data Sources &amp; Ingestion</h2>
+    </div>
+  </div>
+
+  <div class="phase-grid">
+
+    <div class="card">
+      <div class="card-title">🏇 Sporting Life Racecard <span class="tag tag-blue">08:30 daily</span></div>
+      <div class="card-body">
+        <p style="margin-bottom:10px">Script: <code>sl_racecard_fetcher.py</code></p>
+        <ul class="feature-list">
+          <li>Fetches full UK/Irish race card from <code>/racing/racecards/{date}</code></li>
+          <li>Per race: going, distance, class, age-band, handicap flag, tipster verdict</li>
+          <li>Per runner: trainer, jockey, weight, draw, official rating, age/sex</li>
+          <li>Per runner: form figures, pre-race odds, Timeform stars, Rating123</li>
+          <li>Per runner: last 6 runs (course, distance, going, position, class, odds)</li>
+          <li>Output: <code>racecard_cache.json</code> · <code>SureBetRacecards</code> DynamoDB</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Betfair Exchange API <span class="tag tag-green">09:30 daily</span></div>
+      <div class="card-body">
+        <p style="margin-bottom:10px">Script: <code>betfair_odds_fetcher.py</code></p>
+        <ul class="feature-list">
+          <li>Authenticates via AWS Secrets Manager (session token)</li>
+          <li>Fetches all UK WIN markets for the next 6 hours</li>
+          <li>Returns: BSP odds, form, trainer, jockey, draw, last-run, weight carried</li>
+          <li>All UK horse racing markets (Event Type 7)</li>
+          <li>Output: <code>response_horses.json</code> — live BSP odds per runner</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📜 Racing Post Form Enricher <span class="tag tag-amber">On demand</span></div>
+      <div class="card-body">
+        <p style="margin-bottom:10px">Script: <code>form_enricher.py</code></p>
+        <ul class="feature-list">
+          <li>Scrapes Racing Post profiles for last-6-race history per runner</li>
+          <li>Per run: date, course, distance (furlongs), going, position, field size, OR, class</li>
+          <li>12-hour local cache in <code>form_cache.json</code> — avoids repeat scraping</li>
+          <li>Powers: exact course win (+20), exact distance win (+20), going win (+16), 
+              close 2nd (+14), fresh window (+10), OR rising (+10), big-field win (+8)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🌦 Weather &amp; Going Inference <span class="tag tag-cyan">Continuous</span></div>
+      <div class="card-body">
+        <p style="margin-bottom:10px">Module: <code>weather_going_inference.py</code></p>
+        <ul class="feature-list">
+          <li>Fetches live going reports per track for race day</li>
+          <li>Infers going (Good, Soft, Heavy, AW Standard) from SL data</li>
+          <li>Used by scoring: going_suitability (+16), heavy_going_penalty (−12)</li>
+          <li>1-hour cache to avoid excessive fetches</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚡ SL Fast-Results Feed <span class="tag tag-purple">Every 30 min</span></div>
+      <div class="card-body">
+        <p style="margin-bottom:10px">Source: <code>sportinglife.com/racing/fast-results</code></p>
+        <ul class="feature-list">
+          <li>Single-page JSON feed (<code>__NEXT_DATA__</code>), 30–40 most recent races globally</li>
+          <li>Available within seconds of weigh-in</li>
+          <li>Contains: winner + top-3, draw, SP, favourite flag, race details</li>
+          <li>Also captures: tote win/place, exacta, tricast, winning distances, runner count</li>
+          <li>Fallback: full per-race HTML scrape for races not yet in feed</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🗄 DynamoDB Tables <span class="tag tag-blue">eu-west-1</span></div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li><code>SureBetBets</code> — picks, scores, results, P&amp;L  (PK: bet_date)</li>
+          <li><code>SureBetRacecards</code> — pre-race racecard data per race</li>
+          <li><code>SureBetWeights</code> — dynamic scoring signal weights</li>
+          <li><code>RacingPostRaces</code> — enriched form history cache</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════ PHASE 4: SCORING ENGINE ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🧠</div>
+    <div>
+      <div class="step-num">Phase 4</div>
+      <h2>16-Category Scoring Engine</h2>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">Core: <code>comprehensive_pick_logic.py</code> → <code>analyze_horse_comprehensive()</code></div>
+    <div class="card-body">
+      Weights are stored in DynamoDB <code>SureBetWeights</code> and <strong>hot-loaded every 5 minutes</strong> —
+      the learning system updates them overnight, and the scoring engine picks up changes instantly.
+      If DynamoDB is unreachable, falls back to <code>DEFAULT_WEIGHTS</code> defined in code.
+    </div>
+  </div>
+
+  <div class="card">
+    <table class="score-table">
+      <thead>
+        <tr>
+          <th>Signal</th>
+          <th>Default Pts</th>
+          <th>What it Measures</th>
+          <th>Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>recent_win</code></td><td><span class="pts pts-high">22</span></td><td>Won last race — single strongest predictor</td><td>Betfair form</td></tr>
+        <tr><td><code>distance_suitability</code></td><td><span class="pts pts-high">18</span></td><td>Proven at this race distance (±½f)</td><td>Form history</td></tr>
+        <tr><td><code>cd_bonus</code></td><td><span class="pts pts-high">18</span></td><td>Course &amp; Distance winner — strongest course evidence</td><td>Form history</td></tr>
+        <tr><td><code>going_suitability</code></td><td><span class="pts pts-high">16</span></td><td>Proven / suited to today's going</td><td>Form + weather</td></tr>
+        <tr><td><code>trainer_reputation</code></td><td><span class="pts pts-med">15</span></td><td>Elite tier trainer only (Hendersons, Mullins, O'Brien…)</td><td>Betfair</td></tr>
+        <tr><td><code>database_history</code></td><td><span class="pts pts-med">15</span></td><td>Horse has positive win/place history in our DB</td><td>DynamoDB</td></tr>
+        <tr><td><code>form_close_2nd</code></td><td><span class="pts pts-med">14</span></td><td>2nd last time, beaten &lt;4 lengths — unlucky loser</td><td>Racing Post</td></tr>
+        <tr><td><code>jockey_quality</code></td><td><span class="pts pts-med">12</span></td><td>Elite tier jockey (Doyle, Dettori, Townend…)</td><td>Betfair</td></tr>
+        <tr><td><code>heavy_going_penalty</code></td><td><span class="pts pts-med">−12</span></td><td>Races on Heavy — unpredictable, model penalises hard</td><td>Weather</td></tr>
+        <tr><td><code>sweet_spot</code></td><td><span class="pts pts-low">12</span></td><td>BSP odds in optimal 3.5–7.0 range</td><td>Betfair BSP</td></tr>
+        <tr><td><code>course_bonus</code></td><td><span class="pts pts-low">12</span></td><td>Has raced at this course before (familiarity)</td><td>Form</td></tr>
+        <tr><td><code>form_exact_course_win</code></td><td><span class="pts pts-high">20</span></td><td>Has won at THIS course previously</td><td>Racing Post</td></tr>
+        <tr><td><code>form_exact_distance_win</code></td><td><span class="pts pts-high">20</span></td><td>Has won at THIS distance (Racing Post enrichment)</td><td>Racing Post</td></tr>
+        <tr><td><code>form_going_win</code></td><td><span class="pts pts-high">16</span></td><td>Past win on same going type as today</td><td>Racing Post</td></tr>
+        <tr><td><code>meeting_focus_trainer</code></td><td><span class="pts pts-low">10</span></td><td>Trainer's only runner at this meeting — focus signal</td><td>Context</td></tr>
+        <tr><td><code>meeting_focus_jockey</code></td><td><span class="pts pts-low">10</span></td><td>Jockey riding here only — commitment signal</td><td>Context</td></tr>
+        <tr><td><code>meeting_focus_combo</code></td><td><span class="pts pts-low">10</span></td><td>Trainer+jockey only together at this meeting</td><td>Context</td></tr>
+        <tr><td><code>form_fresh_optimal</code></td><td><span class="pts pts-low">10</span></td><td>14–35 days since last run (peak freshness window)</td><td>Racing Post</td></tr>
+        <tr><td><code>optimal_odds</code></td><td><span class="pts pts-low">10</span></td><td>Broad odds range filter (not too short, not too big)</td><td>Betfair BSP</td></tr>
+        <tr><td><code>aw_low_class_penalty</code></td><td><span class="pts pts-med">−50</span></td><td>AW Class 5/6 — form streaks overwhelm model; heavy penalty</td><td>Race data</td></tr>
+        <tr><td><code>total_wins, consistency</code></td><td><span class="pts pts-low">8+4</span></td><td>Career wins and places — form profile</td><td>Betfair form</td></tr>
+        <tr><td><code>trainer_tier2/tier3</code></td><td><span class="pts pts-low">8/4</span></td><td>Good/decent trainers below elite tier</td><td>Betfair</td></tr>
+        <tr><td><code>new_trainer_debut</code></td><td><span class="pts pts-low">5</span></td><td>New trainer for this horse — change of yard signal</td><td>DB history</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ═══════════════ PHASE 5: GRADING + PICK SELECTION ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">🎯</div>
+    <div>
+      <div class="step-num">Phase 5</div>
+      <h2>4-Tier Grading &amp; Pick Validation</h2>
+    </div>
+  </div>
+
+  <div class="grade-grid" style="margin-bottom:20px">
+    <div class="grade-card grade-E">
+      <div class="grade-label">EXCELLENT</div>
+      <div class="grade-pts">75+ points</div>
+      <div class="grade-stake">×2.0 stake · Green UI</div>
+    </div>
+    <div class="grade-card grade-G">
+      <div class="grade-label">GOOD</div>
+      <div class="grade-pts">60–74 points</div>
+      <div class="grade-stake">×1.5 stake · Amber UI</div>
+    </div>
+    <div class="grade-card grade-F">
+      <div class="grade-label">FAIR</div>
+      <div class="grade-pts">45–59 points</div>
+      <div class="grade-stake">×1.0 stake · Dark amber</div>
+    </div>
+    <div class="grade-card grade-P">
+      <div class="grade-label">POOR</div>
+      <div class="grade-pts">&lt;45 points</div>
+      <div class="grade-stake">×0.5 stake · Red UI</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">✅ Pick Approval Criteria</div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li>Score above minimum threshold for grade tier</li>
+          <li><strong>Score gap &gt;20pts</strong> over next-highest horse in field</li>
+          <li>Race not in skip list (e.g. Class 3–6 handicaps too unpredictable)</li>
+          <li>Field coverage ≥90% (minimum 90% of runners must be scored)</li>
+          <li>Odds not extreme (&lt;20.0 BSP preferred)</li>
+          <li>100% field analysis mandatory — no partial-field picks</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">❌ Automatic Reject Conditions</div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li>Score gap &lt;20pts — model cannot separate with confidence</li>
+          <li>Race coverage &lt;90% — incomplete field data</li>
+          <li>Horse flagged as AW Class 5/6 (−50pt penalty applied)</li>
+          <li>Heavy going with no proven form on the ground</li>
+          <li>Race type in <code>should_skip_race()</code> blocklist</li>
+          <li>No Betfair market data available (no runners object)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ PHASE 6: RESULTS ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-amber">📋</div>
+    <div>
+      <div class="step-num">Phase 6</div>
+      <h2>Result Capture &amp; Enrichment</h2>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">Result Pipeline — <code>sl_results_fetcher.py</code> every 30 minutes</div>
+    <div class="card-body">
+      <div class="flow-row">
+        <div class="flow-box src">Fast-Results Feed</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box proc">Match by course + time ±15min</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box dest">DynamoDB SureBetBets</div>
+      </div>
+      <div class="flow-row" style="margin-top:6px">
+        <div class="flow-box src">Per-race HTML page (fallback)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box proc">Regex finish order + off-time</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box dest">DynamoDB SureBetBets</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Data Written Per Settled Pick</div>
+      <div class="db-table">
+        <div class="db-row"><div class="db-key">outcome</div><div class="db-val">win / placed / loss</div></div>
+        <div class="db-row"><div class="db-key">result_emoji</div><div class="db-val">WIN / PLACED / LOSS</div></div>
+        <div class="db-row"><div class="db-key">profit</div><div class="db-val">Calculated P&amp;L (Decimal)</div></div>
+        <div class="db-row"><div class="db-key">finish_position</div><div class="db-val">1–N (0 = unplaced)</div></div>
+        <div class="db-row"><div class="db-key">winner_name</div><div class="db-val">Winning horse name</div></div>
+        <div class="db-row"><div class="db-key">winner_trainer</div><div class="db-val">From racecard cache</div></div>
+        <div class="db-row"><div class="db-key">winner_jockey</div><div class="db-val">From racecard cache</div></div>
+        <div class="db-row"><div class="db-key">winner_sp</div><div class="db-val">Winning SP (e.g. 8/1)</div></div>
+        <div class="db-row"><div class="db-key">winner_draw</div><div class="db-val">Draw stall of winner</div></div>
+        <div class="db-row"><div class="db-key">tote_win / tote_place</div><div class="db-val">Tote payout amounts</div></div>
+        <div class="db-row"><div class="db-key">exacta_win</div><div class="db-val">Exacta payout</div></div>
+        <div class="db-row"><div class="db-key">tricast_win</div><div class="db-val">Tricast payout</div></div>
+        <div class="db-row"><div class="db-key">winning_margins</div><div class="db-val">Distances (½, ¾…)</div></div>
+        <div class="db-row"><div class="db-key">non_runners_count</div><div class="db-val">Number of NRs</div></div>
+        <div class="db-row"><div class="db-key">pick_trainer/jockey</div><div class="db-val">Our pick's trainer/jockey</div></div>
+        <div class="db-row"><div class="db-key">pick_form</div><div class="db-val">Our pick's form string</div></div>
+        <div class="db-row"><div class="db-key">pick_timeform_stars</div><div class="db-val">Timeform rating (1–5)</div></div>
+        <div class="db-row"><div class="db-key">result_analysis</div><div class="db-val">Human-readable summary</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">P&amp;L Calculation Logic</div>
+      <div class="card-body" style="margin-bottom:16px">
+        <ul class="feature-list">
+          <li><strong>WIN</strong>: profit = (BSP odds − 1) × stake</li>
+          <li><strong>PLACED (2nd/3rd)</strong>: −stake (win-only bet)</li>
+          <li><strong>LOSS/Unplaced</strong>: −stake</li>
+          <li>Stake scaled by grade tier (×2.0 / ×1.5 / ×1.0 / ×0.5)</li>
+          <li>Base stake configured per bet (default £6)</li>
+        </ul>
+      </div>
+      <div class="card-title" style="margin-top:12px">Match Algorithm</div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li>Normalise course name to lowercase</li>
+          <li>Match race time ±15 minute window</li>
+          <li>Normalise horse name: strip <code>(IRE)</code>/<code>(FR)</code> suffixes, lowercase</li>
+          <li>Find finishing position by index in ordered list</li>
+          <li>If horse not in top 3 list → infer Unplaced/LOSS</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ PHASE 8: LOSS REPORT ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-red">📉</div>
+    <div>
+      <div class="step-num">Phase 8</div>
+      <h2>Evening Loss Analysis</h2>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><code>evening_loss_report.py</code> — 20:00 daily via <code>BettingLossReport</code> task</div>
+    <div class="card-body">
+      <p style="margin-bottom:12px">For every loss today, the system applies the <strong>red-flag detector</strong>:</p>
+      <div class="phase-grid">
+        <div>
+          <ul class="feature-list">
+            <li>🔴 Odds > 20/1 — extreme outsider, model blind spot</li>
+            <li>🔴 Going mismatch — won on opposite going type</li>
+            <li>🔴 Score gap &lt;10pts — model unable to separate field</li>
+            <li>🔴 Field coverage &lt;70% — incomplete analysis</li>
+          </ul>
+        </div>
+        <div>
+          <ul class="feature-list">
+            <li>🔴 Race class mismatch — stepped up in class unexpectedly</li>
+            <li>🔴 Trainer/jockey absent from our data</li>
+            <li>🔴 Score inflated by going bonus alone (&gt;35% of total)</li>
+            <li>🔴 Winner was lower-scoring horse — learning opportunity</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:12px; color: var(--muted)">
+        Report saved to <code>reports/{date}_loss_report.html</code> and emailed to 
+        <code>charles.mccarthy@gmail.com</code> via AWS SES. 
+        Archive of all daily reports kept in <code>reports/</code> folder.
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ PHASE 9: LEARNING ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">🔄</div>
+    <div>
+      <div class="step-num">Phase 9</div>
+      <h2>Self-Improving Learning Loop</h2>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">How the system gets smarter every day</div>
+    <div class="card-body">
+      <div class="flow-row" style="flex-wrap:wrap;gap:10px;align-items:center">
+        <div class="flow-box src">Today's settled picks<br><small>DynamoDB SureBetBets</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box proc">learning_engine.py<br><small>analyze_performance_patterns()</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box proc">Identify over/under-weighted signals</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box dest">Update SureBetWeights<br><small>DynamoDB</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box dest">Hot-load next morning<br><small>5-min cache</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="heal-grid">
+    <div class="heal-card">
+      <div class="heal-title">⚡ Dynamic Weight Hot-Loading</div>
+      <div class="heal-body">
+        <code>get_dynamic_weights()</code> in <code>comprehensive_pick_logic.py</code> loads from 
+        DynamoDB with a 5-minute cache. No service restart needed — updated overnight weights 
+        are live by 09:00 analysis run.
+      </div>
+    </div>
+    <div class="heal-card">
+      <div class="heal-title">📐 Pattern Detection</div>
+      <div class="heal-body">
+        <code>learning_engine.analyze_performance_patterns()</code> looks at the last 7 days of bets,
+        identifies which signals appeared in winners vs. losers, and adjusts weights accordingly.
+        Score inflation from single signals is detected and penalised (e.g. going bonus cap).
+      </div>
+    </div>
+    <div class="heal-card">
+      <div class="heal-title">🛡 Score Gap Enforcement</div>
+      <div class="heal-body">
+        Known lesson: Fahrenheit Seven had +1pt gap and was immediately removed.
+        The minimum score gap (currently 20pts) acts as a confidence threshold — 
+        a model that can't decisively separate horses doesn't bet. Gap is tracked and can be 
+        auto-raised by the learning system if win rate drops.
+      </div>
+    </div>
+    <div class="heal-card">
+      <div class="heal-title">🧩 Dual-Track Analysis</div>
+      <div class="heal-body">
+        Every horse in every race is scored (<code>show_in_ui=False</code>) so the learning 
+        system sees the full field distribution, not just our picks. This reveals which signals 
+        predicted the actual winner even when we didn't back it.
+      </div>
+    </div>
+    <div class="heal-card">
+      <div class="heal-title">🔁 Coordinated Loop</div>
+      <div class="heal-body">
+        <code>coordinated_learning_workflow.py</code> runs an intra-day loop: analyse races →  
+        wait for results → learn from results → apply to next race predictions.
+        Weights can shift during the race day based on morning results feeding into 
+        afternoon picks.
+      </div>
+    </div>
+    <div class="heal-card">
+      <div class="heal-title">📝 Prompt &amp; Insight Archive</div>
+      <div class="heal-body">
+        <code>update_prompt_with_learnings()</code> writes human-readable summaries to 
+        <code>prompt.txt</code> and daily insights via <code>track_daily_insights.py</code>.
+        This creates a growing knowledge base of lessons-learned that feed future analyses.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ SELF-HEALING ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-amber">🔧</div>
+    <div>
+      <div class="step-num">Resilience</div>
+      <h2>Self-Healing &amp; Fault Tolerance</h2>
+    </div>
+  </div>
+  <div class="heal-grid">
+    <div class="heal-card">
+      <div class="heal-title">✅ Daily Health Check</div>
+      <div class="heal-body">
+        <code>daily_health_check.py</code> at 09:00 validates data files, DynamoDB access, 
+        Betfair credentials, form data presence. Blocks the pipeline on critical failures.
+        Non-blockers emit warnings only.
+      </div>
+    </div>
+    <div class="heal-card">
+      <div class="heal-title">🔄 Fast-Results Fallback</div>
+      <div class="heal-body">
+        If the fast-results JSON feed is unavailable or doesn't contain a race, the system
+        automatically falls back to scraping individual per-race HTML pages. No human action 
+        required; fallback triggered per unresolved pick.
+      </div>
+    </div>
+    <div class="heal-card">
+      <div class="heal-title">⚖ Weight Fallback</div>
+      <div class="heal-body">
+        If DynamoDB <code>SureBetWeights</code> is unreachable, <code>get_dynamic_weights()</code>
+        returns the hardcoded <code>DEFAULT_WEIGHTS</code> dict in <code>comprehensive_pick_logic.py</code>.
+        Analysis always completes.
+      </div>
+    </div>
+    <div class="heal-card">
+      <div class="heal-title">📦 Racecard Cache Fallback</div>
+      <div class="heal-body">
+        <code>sl_racecard_fetcher.py</code> is optional — if import fails, 
+        <code>sl_results_fetcher.py</code> sets <code>_RACECARD_AVAILABLE = False</code> and
+        continues without trainer/jockey enrichment. Core result capture is unaffected.
+      </div>
+    </div>
+    <div class="heal-card">
+      <div class="heal-title">🛑 Coverage Guard</div>
+      <div class="heal-body">
+        Any race where &lt;90% of runners can be scored is <strong>skipped entirely</strong>.
+        Lesson from Carlisle 15:35 (9% coverage → system failure). Better no pick than a 
+        bad pick formed without full-field data.
+      </div>
+    </div>
+    <div class="heal-card">
+      <div class="heal-title">🔒 AW Class 5/6 Guard</div>
+      <div class="heal-body">
+        Lesson from Beauzon (91pts, finished 6th, AW Class 5): a −50pt penalty is applied to 
+        AW Class 5/6 entries. This effectively blocks them from reaching the pick threshold 
+        regardless of form streak.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ SCHEDULER TABLE ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🗓</div>
+    <div>
+      <div class="step-num">Automation</div>
+      <h2>Windows Task Scheduler — Full Schedule</h2>
+    </div>
+  </div>
+
+  <div class="card">
+    <table class="sched-table">
+      <thead>
+        <tr>
+          <th>Task Name</th>
+          <th>Time / Frequency</th>
+          <th>Script</th>
+          <th>Purpose</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>SureBet-Morning-Racecard</code></td>
+          <td><span class="tag tag-blue">08:30 daily</span></td>
+          <td><code>run_racecard_fetcher.bat</code><br><small>→ sl_racecard_fetcher.py</small></td>
+          <td>Fetch full UK racecard: trainer/jockey/form/going/Timeform per runner</td>
+          <td><span class="tag tag-green">Active</span></td>
+        </tr>
+        <tr>
+          <td><code>SureBet-Daily-Health-Check</code></td>
+          <td><span class="tag tag-blue">09:00 daily</span></td>
+          <td><code>daily_health_check.py</code></td>
+          <td>Pre-flight checks: data freshness, DynamoDB, Betfair credentials</td>
+          <td><span class="tag tag-amber">Recommended</span></td>
+        </tr>
+        <tr>
+          <td><code>SureBet-Betfair-Fetch</code></td>
+          <td><span class="tag tag-blue">09:30 daily</span></td>
+          <td><code>betfair_odds_fetcher.py</code></td>
+          <td>Live Betfair BSP odds + form for all UK races (next 6 hours)</td>
+          <td><span class="tag tag-green">Active</span></td>
+        </tr>
+        <tr>
+          <td><code>SureBet-Comprehensive-Analysis</code></td>
+          <td><span class="tag tag-blue">10:00 daily</span></td>
+          <td><code>comprehensive_workflow.py</code></td>
+          <td>Full analysis: score ALL horses, select top picks, write to DynamoDB</td>
+          <td><span class="tag tag-green">Active</span></td>
+        </tr>
+        <tr>
+          <td><code>SureBet-Hourly-ResultsFetcher</code></td>
+          <td><span class="tag tag-purple">Every 30 min<br>10:00–21:00</span></td>
+          <td><code>run_results_fetcher.bat</code><br><small>→ sl_results_fetcher.py</small></td>
+          <td>Capture results from SL fast-results feed; enrich with trainer/tote data</td>
+          <td><span class="tag tag-green">Active · PT30M</span></td>
+        </tr>
+        <tr>
+          <td><code>BettingLossReport</code></td>
+          <td><span class="tag tag-red">20:00 daily</span></td>
+          <td><code>evening_loss_report.py</code></td>
+          <td>Loss analysis, HTML report generation, email via AWS SES</td>
+          <td><span class="tag tag-green">Active</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">Recommended missing tasks to add</div>
+    <div class="card-body">
+      <table class="sched-table">
+        <thead>
+          <tr><th>Task to Create</th><th>Time</th><th>Script</th><th>Reason</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>SureBet-Daily-Health-Check</code></td>
+            <td><span class="tag tag-amber">09:00 daily</span></td>
+            <td><code>daily_health_check.py</code></td>
+            <td>Currently exists but should be scheduled before analysis</td>
+          </tr>
+          <tr>
+            <td><code>SureBet-Learning-Cycle</code></td>
+            <td><span class="tag tag-purple">21:00 daily</span></td>
+            <td><code>daily_learning_cycle.py</code></td>
+            <td>Persist learning insights; update scoring weights overnight</td>
+          </tr>
+          <tr>
+            <td><code>SureBet-System-Monitor</code></td>
+            <td><span class="tag tag-blue">Every 4 hours</span></td>
+            <td><code>system_health_monitor.py</code></td>
+            <td>Ongoing health check during race day; alert on failures</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ AWS ARCHITECTURE ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-cyan">☁️</div>
+    <div>
+      <div class="step-num">Infrastructure</div>
+      <h2>AWS Architecture</h2>
+    </div>
+  </div>
+
+  <div class="phase-grid">
+    <div class="card">
+      <div class="card-title">🗄 DynamoDB (eu-west-1)</div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li><code>SureBetBets</code> — all picks + results (PK: bet_date, SK: bet_id)</li>
+          <li><code>SureBetRacecards</code> — pre-race racecard data (PK: race_date, SK: race_id)</li>
+          <li><code>SureBetWeights</code> — dynamic scoring signal weights (auto-updated nightly)</li>
+          <li><code>RacingPostRaces</code> — enriched form history cache per runner</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">⚡ Lambda + API Gateway</div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li><code>BettingPicksAPI</code> Lambda — serves today's top picks</li>
+          <li>API Gateway: <code>mnybvagd5m.execute-api.eu-west-1.amazonaws.com</code></li>
+          <li>Routes: <code>/api/picks/today</code> · <code>/api/results/today</code> · <code>/api/picks/{date}</code></li>
+          <li>Reads <code>SureBetBets</code> where <code>show_in_ui=True</code></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🌐 AWS Amplify — React UI</div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li>App ID: <code>d2hmpykfsdweob</code> · branch: <code>main</code></li>
+          <li>Auto-deploy on git push to <code>frontend/</code></li>
+          <li>Displays picks, grades, results, P&amp;L in real time</li>
+          <li>Manual re-deploy: <code>aws amplify start-job --job-type RELEASE</code></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📧 AWS SES — Email Reports</div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li>Sends nightly loss report to <code>charles.mccarthy@gmail.com</code></li>
+          <li>HTML email with red-flag analysis per loss</li>
+          <li>Sender verified: <code>charles.mccarthy@gmail.com</code></li>
+          <li>Used by <code>evening_loss_report.py</code> at 20:00</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🔐 AWS Secrets Manager</div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li>Stores Betfair API credentials (app key + session token)</li>
+          <li>Read by <code>betfair_odds_fetcher.py</code> at runtime</li>
+          <li>Auto-refreshes session token on expiry</li>
+          <li>Falls back to local <code>betfair-creds.json</code> for dev</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📡 External Data APIs</div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li><strong>Betfair Exchange</strong> — live odds, form, markets (Auth via SSOAPI)</li>
+          <li><strong>Sporting Life</strong> — racecard, fast-results, going (web scrape via <code>__NEXT_DATA__</code>)</li>
+          <li><strong>Racing Post</strong> — form enrichment: last-6-runs per runner</li>
+          <li><strong>Weather services</strong> — going inference via <code>weather_going_inference.py</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ DATA FLOW DIAGRAM ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🔀</div>
+    <div>
+      <div class="step-num">Data Flow</div>
+      <h2>End-to-End Data Pipeline</h2>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-block">
+<span class="code-comment">╔═══════════════════════════════════════════════════════════════════════════════╗</span>
+<span class="code-comment">║                        SureBet-Run  ·  Daily Data Flow                       ║</span>
+<span class="code-comment">╚═══════════════════════════════════════════════════════════════════════════════╝</span>
+
+<span class="code-comment">08:30  SL Racecard Page ──────► sl_racecard_fetcher.py ──► racecard_cache.json</span>
+<span class="code-comment">                                                      └──► DynamoDB SureBetRacecards</span>
+
+<span class="code-comment">09:30  Betfair Exchange API ──► betfair_odds_fetcher.py ──► response_horses.json</span>
+<span class="code-comment">       Racing Post ──────────► form_enricher.py ──────────► form_cache.json</span>
+<span class="code-comment">       Weather data ──────────► weather_going_inference.py ► (in-memory)</span>
+
+<span class="code-comment">10:00  response_horses.json ─┐</span>
+<span class="code-comment">       racecard_cache.json ──┤</span>
+<span class="code-comment">       form_cache.json ──────┼──► comprehensive_workflow.py</span>
+<span class="code-comment">       DynamoDB weights ─────┘         │</span>
+<span class="code-comment">                                       ├─► analyze_horse_comprehensive() ×N runners</span>
+<span class="code-comment">                                       │       40+ scoring signals applied</span>
+<span class="code-comment">                                       │</span>
+<span class="code-comment">                                       ├─► 4-tier grading + gap validation</span>
+<span class="code-comment">                                       │</span>
+<span class="code-comment">                                       └─► DynamoDB SureBetBets (show_in_ui=True)</span>
+
+<span class="code-comment">10:30  DynamoDB SureBetBets ──► Lambda BettingPicksAPI ──► API Gateway</span>
+<span class="code-comment">                                                      └──► React UI (AWS Amplify)</span>
+
+<span class="code-comment">10:00─21:00  [Every 30min]</span>
+<span class="code-comment">       SL Fast-Results ───────┐</span>
+<span class="code-comment">       SL Per-Race HTML ──────┴──► sl_results_fetcher.py</span>
+<span class="code-comment">       racecard_cache.json ───────────── │</span>
+<span class="code-comment">                                         ├─► Match pending picks by course+time</span>
+<span class="code-comment">                                         ├─► Determine WIN / PLACED / LOSS</span>
+<span class="code-comment">                                         └─► Update DynamoDB SureBetBets</span>
+<span class="code-comment">                                              (outcome, profit, trainer, tote…)</span>
+
+<span class="code-comment">20:00  DynamoDB SureBetBets ──► evening_loss_report.py</span>
+<span class="code-comment">                                    ├─► reports/{date}_loss_report.html</span>
+<span class="code-comment">                                    └─► AWS SES email</span>
+
+<span class="code-comment">21:00  DynamoDB (last 7 days) ──► daily_learning_cycle.py</span>
+<span class="code-comment">                                    ├─► learning_engine.analyze_performance_patterns()</span>
+<span class="code-comment">                                    ├─► Adjust signal weights</span>
+<span class="code-comment">                                    └─► DynamoDB SureBetWeights  ◄── hot-loaded 09:00</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ KEY FILES REFERENCE ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-cyan">📁</div>
+    <div>
+      <div class="step-num">Reference</div>
+      <h2>Key Production Files</h2>
+    </div>
+  </div>
+
+  <div class="card">
+    <table class="score-table">
+      <thead>
+        <tr><th>File</th><th>Role</th><th>Called By</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>sl_racecard_fetcher.py</code></td><td>Morning racecard ingestion — trainer/jockey/form/TF per runner</td><td>Scheduler 08:30</td></tr>
+        <tr><td><code>betfair_odds_fetcher.py</code></td><td>Live Betfair BSP odds + form for all races</td><td>Scheduler 09:30</td></tr>
+        <tr><td><code>form_enricher.py</code></td><td>Racing Post last-6-run history, 12h cache</td><td><code>comprehensive_workflow.py</code></td></tr>
+        <tr><td><code>weather_going_inference.py</code></td><td>Live going conditions per track</td><td><code>comprehensive_pick_logic.py</code></td></tr>
+        <tr><td><code>daily_health_check.py</code></td><td>Pre-flight validation — blocks broken pipeline</td><td>Scheduler 09:00</td></tr>
+        <tr><td><code>comprehensive_workflow.py</code></td><td>Main analysis orchestrator — 100% field coverage loop</td><td>Scheduler 10:00</td></tr>
+        <tr><td><code>comprehensive_pick_logic.py</code></td><td>40-signal scoring engine · 4-tier grading · dynamic weights</td><td><code>comprehensive_workflow.py</code></td></tr>
+        <tr><td><code>enforce_comprehensive_analysis.py</code></td><td>UI pick validator — gap check, coverage check, final gate</td><td><code>comprehensive_workflow.py</code></td></tr>
+        <tr><td><code>sl_results_fetcher.py</code></td><td>Result capture: fast-results primary + fallback scraping</td><td>Scheduler every 30min</td></tr>
+        <tr><td><code>fetch_hourly_results.py</code></td><td>Thin launcher for sl_results_fetcher.py</td><td><code>run_results_fetcher.bat</code></td></tr>
+        <tr><td><code>evening_loss_report.py</code></td><td>Loss red-flag detection, HTML report, AWS SES email</td><td>Scheduler 20:00</td></tr>
+        <tr><td><code>learning_engine.py</code></td><td>Pattern analysis, weight adjustment algorithms</td><td><code>daily_learning_cycle.py</code></td></tr>
+        <tr><td><code>daily_learning_cycle.py</code></td><td>Load 7-day results, run patterns, update DynamoDB weights</td><td>Scheduler 21:00</td></tr>
+        <tr><td><code>coordinated_learning_workflow.py</code></td><td>Intra-day continuous learning loop</td><td>Background process</td></tr>
+        <tr><td><code>track_daily_insights.py</code></td><td>Track-level insights journal</td><td><code>coordinated_learning_workflow.py</code></td></tr>
+        <tr><td><code>system_health_monitor.py</code></td><td>Ongoing health monitoring during raceday</td><td>Scheduler every 4h</td></tr>
+        <tr><td><code>racecard_cache.json</code></td><td>Local racecard cache — trainer/jockey/form per runner today</td><td><code>sl_results_fetcher.py</code></td></tr>
+        <tr><td><code>response_horses.json</code></td><td>Today's Betfair race + runner data (odds, form, trainer)</td><td><code>comprehensive_workflow.py</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<hr class="divider">
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; color:var(--muted); font-size:12px;">
+  <div>
+    <strong style="color:var(--text2)">SureBet-Run</strong> · Orchestration Blueprint v1.0 · March 2026
+  </div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <span><span class="dot dot-green" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px"></span>DynamoDB eu-west-1</span>
+    <span><span class="dot dot-blue" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:5px"></span>6 Scheduled Tasks</span>
+    <span><span class="dot dot-purple" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--purple);margin-right:5px"></span>40+ Scoring Signals</span>
+    <span><span class="dot dot-amber" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-right:5px"></span>Self-improving daily</span>
+  </div>
+</div>
+<div style="height:32px"></div>
+
+</div><!-- /main -->
+</body>
+</html>

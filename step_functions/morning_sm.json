@@ -1,0 +1,166 @@
+{
+  "Comment": "SureBet Morning Pipeline — 08:30 UTC daily. Fetches odds, scores all horses, validates picks, sends first notifications.",
+  "StartAt": "InjectDate",
+  "States": {
+
+    "InjectDate": {
+      "Comment": "Extract YYYY-MM-DD from execution StartTime (ISO string split on T, take index 0).",
+      "Type": "Pass",
+      "Parameters": {
+        "date.$": "States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'), 0)"
+      },
+      "Next": "FetchBetfairOdds"
+    },
+
+    "FetchBetfairOdds": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-betfair-fetch",
+        "Payload": {
+          "date.$": "$.date",
+          "run_type": "morning"
+        }
+      },
+      "ResultSelector": {
+        "date.$":       "$.Payload.date",
+        "race_count.$": "$.Payload.race_count",
+        "s3_key.$":     "$.Payload.s3_key",
+        "success.$":    "$.Payload.success"
+      },
+      "ResultPath": "$.fetchResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "PipelineFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "RunAnalysis"
+    },
+
+    "RunAnalysis": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-analysis",
+        "Payload": {
+          "date.$":   "$.date",
+          "s3_key.$": "$.fetchResult.s3_key"
+        }
+      },
+      "ResultSelector": {
+        "date.$":        "$.Payload.date",
+        "picks_count.$": "$.Payload.picks_count",
+        "success.$":     "$.Payload.success"
+      },
+      "ResultPath": "$.analysisResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 60,
+          "MaxAttempts": 1,
+          "BackoffRate": 1.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "PipelineFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "ValidatePicks"
+    },
+
+    "ValidatePicks": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-validate",
+        "Payload": {
+          "date.$":        "$.date",
+          "picks_count.$": "$.analysisResult.picks_count"
+        }
+      },
+      "ResultSelector": {
+        "valid_picks.$": "$.Payload.valid_picks",
+        "errors.$":      "$.Payload.errors"
+      },
+      "ResultPath": "$.validateResult",
+      "Retry": [],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "PipelineFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "SendNotifications"
+    },
+
+    "SendNotifications": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-notify",
+        "Payload": {
+          "date.$":        "$.date",
+          "valid_picks.$": "$.validateResult.valid_picks"
+        }
+      },
+      "ResultSelector": {
+        "notifications_sent.$": "$.Payload.notifications_sent",
+        "skipped.$":            "$.Payload.skipped"
+      },
+      "ResultPath": "$.notifyResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "MorningComplete",
+          "ResultPath": "$.notifyError",
+          "Comment": "Notification failure is not fatal — pipeline completes anyway"
+        }
+      ],
+      "Next": "MorningComplete"
+    },
+
+    "MorningComplete": {
+      "Type": "Succeed"
+    },
+
+    "PipelineFailed": {
+      "Type": "Fail",
+      "Error": "MorningPipelineFailed",
+      "Cause": "A critical step in the morning pipeline failed — check CloudWatch Logs"
+    }
+  }
+}

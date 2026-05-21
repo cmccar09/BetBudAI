@@ -1,0 +1,1367 @@
+{
+    "Items": [
+        {
+            "race_time": {
+                "S": "2026-05-13T13:00:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T130000+0000_Perth_Bracing_Brook"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Bracing Brook"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:00:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T130000+0000_Perth_Expensive_Emotion"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Expensive Emotion"
+            }
+        },
+        {
+            "result_winner_name": {
+                "S": "Lowlands"
+            },
+            "race_time": {
+                "S": "2026-05-13T13:00:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T130000+0000_Perth_Frankies_Fortune"
+            },
+            "outcome": {
+                "S": "placed"
+            },
+            "finish_position": {
+                "N": "2"
+            },
+            "horse": {
+                "S": "Frankies Fortune"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:00:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T130000+0000_Perth_Hunters_Spring"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Hunters Spring"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:00:00+00:00"
+            },
+            "race_winner_name": {
+                "S": "Lowlands"
+            },
+            "result_winner_name": {
+                "S": "Lowlands"
+            },
+            "bet_id": {
+                "S": "2026-05-13T130000+0000_Perth_Kaydence"
+            },
+            "outcome": {
+                "S": "placed"
+            },
+            "finish_position": {
+                "N": "3"
+            },
+            "horse": {
+                "S": "Kaydence"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:00:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T130000+0000_Perth_Kaylas_Friend"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Kaylas Friend"
+            }
+        },
+        {
+            "result_winner_name": {
+                "S": "Lowlands"
+            },
+            "race_time": {
+                "S": "2026-05-13T13:00:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T130000+0000_Perth_Lowlands"
+            },
+            "outcome": {
+                "S": "win"
+            },
+            "finish_position": {
+                "N": "1"
+            },
+            "horse": {
+                "S": "Lowlands"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:00:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T130000+0000_Perth_Nufinbutdatruth"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Nufinbutdatruth"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:00:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T130000+0000_Perth_Oor_Wish"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Oor Wish"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:00:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T130000+0000_Perth_Poppies_In_July"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Poppies In July"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:00:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T130000+0000_Perth_Quinnfinity"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Quinnfinity"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T133300+0000_Perth_Dance_Thief"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Dance Thief"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T133300+0000_Perth_Garde_Des_Champs"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Garde Des Champs"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T133300+0000_Perth_Hypotenus"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Hypotenus"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T133300+0000_Perth_Mister_Cessna"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Mister Cessna"
+            }
+        },
+        {
+            "result_winner_name": {
+                "S": "Newtown Rambler"
+            },
+            "race_time": {
+                "S": "2026-05-13T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T133300+0000_Perth_Newtown_Rambler"
+            },
+            "outcome": {
+                "S": "win"
+            },
+            "finish_position": {
+                "N": "1"
+            },
+            "horse": {
+                "S": "Newtown Rambler"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T133300+0000_Perth_Next_Twist"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Next Twist"
+            },
+            "race_winner_name": {
+                "S": "Newtown Rambler"
+            }
+        },
+        {
+            "result_winner_name": {
+                "S": "Newtown Rambler"
+            },
+            "race_time": {
+                "S": "2026-05-13T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T133300+0000_Perth_Shadowfax_Of_Rohan"
+            },
+            "outcome": {
+                "S": "placed"
+            },
+            "finish_position": {
+                "N": "2"
+            },
+            "horse": {
+                "S": "Shadowfax Of Rohan"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T140800+0000_Perth_A_Year_Older"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "A Year Older"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T140800+0000_Perth_Bayonetta"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Bayonetta"
+            }
+        },
+        {
+            "result_winner_name": {
+                "S": "Ebselysees"
+            },
+            "race_time": {
+                "S": "2026-05-13T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T140800+0000_Perth_Buy_Some_Time"
+            },
+            "outcome": {
+                "S": "placed"
+            },
+            "finish_position": {
+                "N": "2"
+            },
+            "horse": {
+                "S": "Buy Some Time"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T140800+0000_Perth_Carismatic_Soldier"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Carismatic Soldier"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T140800+0000_Perth_Dalileo"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Dalileo"
+            }
+        },
+        {
+            "result_winner_name": {
+                "S": "Ebselysees"
+            },
+            "race_time": {
+                "S": "2026-05-13T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T140800+0000_Perth_Ebselysees"
+            },
+            "outcome": {
+                "S": "win"
+            },
+            "finish_position": {
+                "N": "1"
+            },
+            "horse": {
+                "S": "Ebselysees"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T140800+0000_Perth_Fairlawn_Skipper"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Fairlawn Skipper"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T140800+0000_Perth_Lady_In_The_Park"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Lady In The Park"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T140800+0000_Perth_Manowest"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Manowest"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T140800+0000_Perth_Maura_Jeanne"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Maura Jeanne"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T140800+0000_Perth_Shoeshine_Boy"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Shoeshine Boy"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:08:00+00:00"
+            },
+            "race_winner_name": {
+                "S": "Lowlands"
+            },
+            "result_winner_name": {
+                "S": "Ebselysees"
+            },
+            "bet_id": {
+                "S": "2026-05-13T140800+0000_Perth_Suspected"
+            },
+            "outcome": {
+                "S": "placed"
+            },
+            "finish_position": {
+                "N": "3"
+            },
+            "horse": {
+                "S": "Suspected"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:43:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T144300+0000_Perth_Aill_Dubh"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Aill Dubh"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:43:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T144300+0000_Perth_Attaboyarchie"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Attaboyarchie"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:43:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T144300+0000_Perth_Burgundy_Man"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Burgundy Man"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:43:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T144300+0000_Perth_Defying_Gravity"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Defying Gravity"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:43:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T144300+0000_Perth_Jirko"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Jirko"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:43:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T144300+0000_Perth_Similar_Story"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Similar Story"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:43:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T144300+0000_Perth_Sir_Carnegie"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Sir Carnegie"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T14:43:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T144300+0000_Perth_The_Flying_Poet"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "The Flying Poet"
+            },
+            "race_winner_name": {
+                "S": "Newtown Rambler"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:18:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T151800+0000_Perth_Deerstalker"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Deerstalker"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:18:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T151800+0000_Perth_Foxinthebox"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Foxinthebox"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:18:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T151800+0000_Perth_Phantoms_Cave"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Phantoms Cave"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:18:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T151800+0000_Perth_Potters_Party"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Potters Party"
+            },
+            "race_winner_name": {
+                "S": "Ebselysees"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:18:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T151800+0000_Perth_Ruler_Of_The_River"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Ruler Of The River"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:18:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T151800+0000_Perth_Theoldboggroad"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Theoldboggroad"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:55:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T155500+0000_Perth_Byron_Hill"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Byron Hill"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:55:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T155500+0000_Perth_Dublinofficecallin"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Dublinofficecallin"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:55:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T155500+0000_Perth_Getaway_Master"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Getaway Master"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:55:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T155500+0000_Perth_Gonnino"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Gonnino"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:55:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T155500+0000_Perth_Mayor_Of_Maghera"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Mayor Of Maghera"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:55:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T155500+0000_Perth_Mistral_Milly"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Mistral Milly"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:55:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T155500+0000_Perth_Popa_Rich"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Popa Rich"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:55:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T155500+0000_Perth_Prince_Nino"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Prince Nino"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:55:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T155500+0000_Perth_Takeyoutotheisland"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Takeyoutotheisland"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T15:55:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T155500+0000_Perth_Velvet_Vulcan"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Velvet Vulcan"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T16:25:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T162500+0000_Perth_Beat_The_Retreat"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Beat The Retreat"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T16:25:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T162500+0000_Perth_Betteryouthanme"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Betteryouthanme"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T16:25:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T162500+0000_Perth_Ivynator"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Ivynator"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T16:25:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T162500+0000_Perth_Jack_Dempsey"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Jack Dempsey"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T16:25:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T162500+0000_Perth_Knockeranna_Rose"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Knockeranna Rose"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T16:25:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T162500+0000_Perth_Livano_Bello"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Livano Bello"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T16:25:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T162500+0000_Perth_Loro_White"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Loro White"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T16:25:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T162500+0000_Perth_Malangen"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Malangen"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T16:25:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T162500+0000_Perth_The_Longest_Day"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "The Longest Day"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T16:25:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-13T162500+0000_Perth_Theirshegoes"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Theirshegoes"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Breaking_Ground"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Breaking Ground"
+            },
+            "race_winner_name": {
+                "S": "Lowlands"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Brewdog"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Brewdog"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Etretat"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Etretat"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Hackley_Bay"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Hackley Bay"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Hawthorn_Road"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Hawthorn Road"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Kibris"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Kibris"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Lappel_Du_Large"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Lappel Du Large"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Lexington_Wood"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Lexington Wood"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Nae_Bother_At_A"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Nae Bother At A"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Scriabin"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Scriabin"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Sonyourastar"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Sonyourastar"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Struth"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Struth"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T12:58:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T125800+0000_Perth_Way_Maker"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Way Maker"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T133300+0000_Perth_Busty_Boy"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Busty Boy"
+            },
+            "race_winner_name": {
+                "S": "Newtown Rambler"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T133300+0000_Perth_Cosmic_Blizzard"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Cosmic Blizzard"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T133300+0000_Perth_Inis_Oirr"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Inis Oirr"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T133300+0000_Perth_Largy_Force"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Largy Force"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T133300+0000_Perth_Ned_Tanner"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Ned Tanner"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T13:33:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T133300+0000_Perth_Red_Happy"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Red Happy"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T140800+0000_Perth_Bold_Light"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Bold Light"
+            },
+            "race_winner_name": {
+                "S": "Ebselysees"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T140800+0000_Perth_Carismatic_Soldier"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Carismatic Soldier"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T140800+0000_Perth_Dalileo"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Dalileo"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T140800+0000_Perth_Dubhain"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Dubhain"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T140800+0000_Perth_Easy_To_Follow"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Easy To Follow"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T140800+0000_Perth_Follow_Charlie"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Follow Charlie"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T140800+0000_Perth_Moyganny_Phil"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Moyganny Phil"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T140800+0000_Perth_Summergrounds"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Summergrounds"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-14T14:08:00+00:00"
+            },
+            "bet_id": {
+                "S": "2026-05-14T140800+0000_Perth_Sun_Art"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "horse": {
+                "S": "Sun Art"
+            }
+        }
+    ],
+    "Count": 92,
+    "ScannedCount": 46934,
+    "ConsumedCapacity": null
+}

@@ -1,0 +1,275 @@
+#!/usr/bin/env python3
+"""Full system health check for BetBudAI - May 2026"""
+
+import boto3
+import json
+from datetime import datetime, timezone, timedelta
+from boto3.dynamodb.conditions import Key
+
+REGION = "eu-west-1"
+TODAY = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+NOW = datetime.now(timezone.utc)
+
+lc = boto3.client('lambda', region_name=REGION)
+ddb = boto3.resource('dynamodb', region_name=REGION)
+logs = boto3.client('logs', region_name=REGION)
+events = boto3.client('events', region_name=REGION)
+s3 = boto3.client('s3', region_name=REGION)
+
+OK = "✓"
+FAIL = "✗"
+WARN = "⚠"
+
+results = []
+
+def section(title):
+    print(f"\n{'='*60}")
+    print(f"  {title}")
+    print(f"{'='*60}")
+
+def check(label, status, detail=""):
+    icon = OK if status else FAIL
+    line = f"  {icon} {label}"
+    if detail:
+        line += f"  [{detail}]"
+    print(line)
+    results.append((label, status))
+    return status
+
+def warn(label, detail=""):
+    line = f"  {WARN} {label}"
+    if detail:
+        line += f"  [{detail}]"
+    print(line)
+
+# ─── 1. LAMBDA FUNCTIONS ──────────────────────────────────────────────────────
+section("1. LAMBDA FUNCTIONS")
+
+LAMBDAS = [
+    "betbudai-morning",
+    "betbudai-refresh",
+    "betbudai-evening",
+    "surebet-analysis",
+    "surebet-sl-results",
+    "betbudai-picks-api",
+]
+
+for fn in LAMBDAS:
+    try:
+        r = lc.get_function(FunctionName=fn)
+        cfg = r['Configuration']
+        state = cfg.get('State', 'Unknown')
+        last_mod = cfg.get('LastModified', '')[:19]
+        timeout = cfg.get('Timeout')
+        mem = cfg.get('MemorySize')
+        ok = state == 'Active'
+        check(f"{fn}", ok, f"state={state} timeout={timeout}s mem={mem}MB modified={last_mod}")
+    except Exception as e:
+        check(f"{fn}", False, str(e)[:80])
+
+# ─── 2. TODAY'S PICKS IN DYNAMODB ─────────────────────────────────────────────
+section(f"2. TODAY'S PICKS IN DYNAMODB ({TODAY})")
+
+try:
+    table = ddb.Table('SureBetBets')
+    resp = table.query(KeyConditionExpression=Key('bet_date').eq(TODAY))
+    all_picks = resp.get('Items', [])
+    # paginate if needed
+    while 'LastEvaluatedKey' in resp:
+        resp = table.query(
+            KeyConditionExpression=Key('bet_date').eq(TODAY),
+            ExclusiveStartKey=resp['LastEvaluatedKey']
+        )
+        all_picks.extend(resp.get('Items', []))
+
+    total = len(all_picks)
+    check(f"Total picks stored for {TODAY}", total > 0, f"{total} picks")
+
+    # Official picks (show_in_ui=True)
+    official = [p for p in all_picks if p.get('show_in_ui') == True]
+    check(f"Official picks (show_in_ui=True)", len(official) == 5, f"{len(official)} expected 5")
+
+    # Value picks (odds > 4.0)
+    value = [p for p in official if float(p.get('odds', 0)) > 4.0]
+    check(f"Value picks (odds > 4/1)", len(value) >= 2, f"{len(value)} at >4/1")
+
+    # Settlement status
+    settled = [p for p in all_picks if p.get('result') not in (None, '', 'PENDING')]
+    pending = [p for p in all_picks if p.get('result') in (None, '', 'PENDING')]
+    print(f"\n  Settled: {len(settled)}  |  Pending: {len(pending)}")
+
+    # Show official picks detail
+    if official:
+        print(f"\n  OFFICIAL PICKS:")
+        for i, p in enumerate(sorted(official, key=lambda x: x.get('pick_rank', 99)), 1):
+            horse = p.get('horse', '?')
+            course = p.get('course', '?')
+            time_ = p.get('race_time', '?')
+            odds = p.get('odds', '?')
+            result = p.get('result', 'PENDING')
+            score = p.get('comprehensive_score', '?')
+            print(f"    #{i} {horse} | {course} {time_} | odds={odds} | score={score} | {result}")
+
+except Exception as e:
+    check("DynamoDB SureBetBets", False, str(e)[:100])
+
+# ─── 3. S3 PIPELINE DATA ──────────────────────────────────────────────────────
+section("3. S3 PIPELINE DATA")
+
+BUCKET = "surebet-pipeline-data"
+for key in [f"morning_prices.json", f"response_horses.json"]:
+    full_key = f"{TODAY}/{key}"
+    try:
+        r = s3.head_object(Bucket=BUCKET, Key=full_key)
+        size = r['ContentLength']
+        modified = r['LastModified'].strftime('%H:%M UTC')
+        check(f"s3://{BUCKET}/{full_key}", True, f"{size:,} bytes at {modified}")
+    except Exception as e:
+        msg = str(e)
+        if '404' in msg or 'NoSuchKey' in msg or 'Not Found' in msg:
+            check(f"s3://{BUCKET}/{full_key}", False, "NOT FOUND")
+        else:
+            check(f"s3://{BUCKET}/{full_key}", False, msg[:60])
+
+# ─── 4. CLOUDWATCH LOGS - RECENT ERRORS ───────────────────────────────────────
+section("4. CLOUDWATCH LOGS - RECENT ERRORS (last 2 hours)")
+
+LOG_GROUPS = {
+    "betbudai-morning": "/aws/lambda/betbudai-morning",
+    "betbudai-refresh": "/aws/lambda/betbudai-refresh",
+    "betbudai-evening": "/aws/lambda/betbudai-evening",
+    "surebet-sl-results": "/aws/lambda/surebet-sl-results",
+    "surebet-analysis": "/aws/lambda/surebet-analysis",
+}
+
+cutoff_ms = int((NOW - timedelta(hours=2)).timestamp() * 1000)
+
+for fn_name, group in LOG_GROUPS.items():
+    try:
+        r = logs.filter_log_events(
+            logGroupName=group,
+            startTime=cutoff_ms,
+            filterPattern="?ERROR ?Exception ?Traceback",
+            limit=5,
+        )
+        events_found = r.get('events', [])
+        if events_found:
+            warn(f"{fn_name}: {len(events_found)} error(s) in last 2h")
+            for ev in events_found[:2]:
+                msg = ev['message'].strip()[:120]
+                ts = datetime.fromtimestamp(ev['timestamp']/1000, tz=timezone.utc).strftime('%H:%M:%S')
+                print(f"      [{ts}] {msg}")
+        else:
+            check(f"{fn_name}: no errors in last 2h", True)
+    except logs.exceptions.ResourceNotFoundException:
+        warn(f"{fn_name}: log group not found (never run?)")
+    except Exception as e:
+        warn(f"{fn_name}: could not check logs - {str(e)[:60]}")
+
+# ─── 5. LAST SUCCESSFUL RUN TIMES ─────────────────────────────────────────────
+section("5. LAST PIPELINE RUNS (last 24h)")
+
+for fn_name, group in LOG_GROUPS.items():
+    cutoff_24h = int((NOW - timedelta(hours=24)).timestamp() * 1000)
+    try:
+        r = logs.filter_log_events(
+            logGroupName=group,
+            startTime=cutoff_24h,
+            filterPattern="REPORT",
+            limit=1,
+        )
+        events_found = r.get('events', [])
+        if events_found:
+            last = events_found[-1]
+            ts = datetime.fromtimestamp(last['timestamp']/1000, tz=timezone.utc).strftime('%H:%M UTC')
+            # Extract billed duration if present
+            msg = last['message']
+            dur = ""
+            if "Billed Duration:" in msg:
+                dur_part = msg.split("Billed Duration:")[1].split("ms")[0].strip()
+                dur = f" | billed={dur_part}ms"
+            check(f"{fn_name}: last run", True, f"{ts}{dur}")
+        else:
+            warn(f"{fn_name}: no runs in last 24h")
+    except logs.exceptions.ResourceNotFoundException:
+        warn(f"{fn_name}: log group not found")
+    except Exception as e:
+        warn(f"{fn_name}: {str(e)[:60]}")
+
+# ─── 6. EVENTBRIDGE SCHEDULES ─────────────────────────────────────────────────
+section("6. EVENTBRIDGE SCHEDULES")
+
+RULES = [
+    "betbudai-morning-trigger",
+    "betbudai-refresh-12",
+    "betbudai-refresh-14",
+    "betbudai-refresh-16",
+    "betbudai-refresh-18",
+    "betbudai-field-verification-scheduler",
+]
+
+for rule_name in RULES:
+    try:
+        r = events.describe_rule(Name=rule_name)
+        state = r.get('State', 'UNKNOWN')
+        schedule = r.get('ScheduleExpression', r.get('EventPattern', ''))[:60]
+
+        # Check targets
+        t = events.list_targets_by_rule(Rule=rule_name)
+        target_count = len(t.get('Targets', []))
+
+        ok = state == 'ENABLED' and target_count > 0
+        detail = f"state={state} schedule={schedule} targets={target_count}"
+        if target_count == 0:
+            warn(f"{rule_name}: ENABLED but NO TARGETS", schedule)
+        else:
+            check(f"{rule_name}", ok, detail)
+    except events.exceptions.ResourceNotFoundException:
+        warn(f"{rule_name}: rule not found")
+    except Exception as e:
+        warn(f"{rule_name}: {str(e)[:60]}")
+
+# ─── 7. DYNAMODB TABLE HEALTH ─────────────────────────────────────────────────
+section("7. DYNAMODB TABLE HEALTH")
+
+for table_name in ['SureBetBets', 'SureBetLearning', 'SureBetWeights']:
+    try:
+        t = ddb.Table(table_name)
+        t.load()
+        status = t.table_status
+        count = t.item_count
+        check(f"{table_name}", status == 'ACTIVE', f"status={status} items≈{count:,}")
+    except Exception as e:
+        check(f"{table_name}", False, str(e)[:80])
+
+# ─── 8. WEIGHTS TABLE ─────────────────────────────────────────────────────────
+section("8. ACTIVE WEIGHTS (DynamoDB override vs defaults)")
+
+try:
+    wt = ddb.Table('SureBetWeights')
+    wr = wt.scan()
+    items = wr.get('Items', [])
+    if items:
+        print(f"  Found {len(items)} weight override(s) in DynamoDB:")
+        for item in items[:10]:
+            print(f"    {item.get('weight_name', '?')}: {item.get('value', '?')}")
+    else:
+        print("  No weight overrides in DynamoDB — using hardcoded DEFAULT_WEIGHTS from weights.py")
+        warn("All 12 Claude Code weight changes are LIVE (no DynamoDB override to revert quickly)")
+except Exception as e:
+    warn(f"Could not check weights table: {str(e)[:80]}")
+
+# ─── SUMMARY ──────────────────────────────────────────────────────────────────
+section("SUMMARY")
+
+passed = sum(1 for _, ok in results if ok)
+failed = sum(1 for _, ok in results if not ok)
+total = len(results)
+
+print(f"\n  {passed}/{total} checks passed")
+if failed:
+    print(f"\n  FAILURES:")
+    for label, ok in results:
+        if not ok:
+            print(f"    {FAIL} {label}")
+print()

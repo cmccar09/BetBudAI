@@ -1,0 +1,279 @@
+════════════════════════════════════════════════════════════════════════════════
+  CHELTENHAM HANDICAP FESTIVAL IMPROVEMENT SCANNER  —  2026-03-09
+════════════════════════════════════════════════════════════════════════════════
+
+Signals: festival venue in last 3 runs + soft ground + distance match
+         + improving form position + cheltenham record
+
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 1  ·  Challenge Cup Chase  [2.5m, soft]
+  Current pick: Backmersackme (score 80)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  Backmersackme                    80    11  In-form winning run, Ideal prep gap timing, P ◄ OUR PICK
+  Kurasso Blue                     74     3  Ideal prep gap timing
+  Newton Tornado                   63     8  In-form winning run, Ideal prep gap timing
+  Holloway Queen                   57     8  In-form winning run, Ideal prep gap timing
+  Wade Out                         61     3  Ideal prep gap timing
+  Union Station                    58     3  Ideal prep gap timing
+  Will Do                          56     3  Ideal prep gap timing
+  Iceberg Theory                   54     5  In-form winning run
+  Pic Roc                          51     8  In-form winning run, Ideal prep gap timing
+  King Of Answers                  45     8  In-form winning run, Ideal prep gap timing
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 1  ·  Cheltenham Plate Chase  [2.5m, soft]
+  Current pick: Madara (score 104)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  Madara                          104    36  Previous Festival winner, Won same dist/cours ◄ OUR PICK
+  Zurich                          101    36  Previous Festival winner, Won same dist/cours 🌙 DARK HORSE
+  Guard Your Dreams                85    41  Previous Festival winner, Won same dist/cours 🌙 DARK HORSE
+  Theatre Native                   88    36  Previous Festival winner, Won same dist/cours 🌙 DARK HORSE
+  Peaky Boy                        84    36  Previous Festival winner, Won same dist/cours 🌙 DARK HORSE
+  Riskintheground                  73    36  Previous Festival winner, Won same dist/cours 🌙 DARK HORSE
+  Down Memory Lane                 98     8  In-form winning run, Ideal prep gap timing
+  Moon Dorange                     65    36  Previous Festival winner, Won same dist/cours 🌙 DARK HORSE
+  McLaurey                         74     3  Ideal prep gap timing
+  OMoore Park                      70     3  Ideal prep gap timing
+
+  ⚡ DARK HORSES — not our pick but strong festival signal:
+    → Zurich @ ?  FI=36  trainer=Henry de Bromhead
+       • Previous Festival winner
+       • Won same dist/course class bracket
+       • Won this exact race before
+       • Ideal prep gap timing
+       • Cheltenham winner: Won Cheltenham 2m4f Chase 2023
+    → Guard Your Dreams @ ?  FI=41  trainer=Nigel Twiston-Davies
+       • Previous Festival winner
+       • Won same dist/course class bracket
+       • Won this exact race before
+       • In-form winning run
+       • Ideal prep gap timing
+       • Cheltenham winner: Won Cheltenham 2m4f Chase 2024
+    → Theatre Native @ ?  FI=36  trainer=Henry de Bromhead
+       • Previous Festival winner
+       • Won same dist/course class bracket
+       • Won this exact race before
+       • Ideal prep gap timing
+       • Cheltenham winner: Won Cheltenham 2m4f Chase 2022
+    → Peaky Boy @ ?  FI=36  trainer=Jonjo O'Neill
+       • Previous Festival winner
+       • Won same dist/course class bracket
+       • Won this exact race before
+       • Ideal prep gap timing
+       • Cheltenham winner: Won Cheltenham 2m4f Chase 2023
+    → Riskintheground @ ?  FI=36  trainer=Dan Skelton
+       • Previous Festival winner
+       • Won same dist/course class bracket
+       • Won this exact race before
+       • Ideal prep gap timing
+       • Cheltenham winner: Won Cheltenham 2m4f 2023
+    → Moon Dorange @ ?  FI=36  trainer=John McConnell
+       • Previous Festival winner
+       • Won same dist/course class bracket
+       • Won this exact race before
+       • Ideal prep gap timing
+       • Cheltenham winner: Won Cheltenham 2m4f Chase 2024
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 1  ·  Fred Winter Handicap Hurdle  [2.0m, soft]
+  Current pick: Manlaga (score 97)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  Manlaga                          97     8  In-form winning run, Ideal prep gap timing ◄ OUR PICK
+  Glen To Glen                     76     8  In-form winning run, Ideal prep gap timing
+  Madness Delle                    73     8  In-form winning run, Ideal prep gap timing
+  Harwa                            64     8  In-form winning run, Ideal prep gap timing
+  Dignam                           66     3  Ideal prep gap timing
+  Barbizon                         66     3  Ideal prep gap timing
+  Mino Des Mottes                  65     3  Ideal prep gap timing
+  Winston Junior                   60     8  In-form winning run, Ideal prep gap timing
+  Quinta Do Lago                   63     3  Ideal prep gap timing
+  Mustang Du Breuil                62     3  Ideal prep gap timing
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 1  ·  Ultima Handicap Chase  [3.2m, soft]
+  Current pick: Jagwar (score 152)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  Jagwar                          152    31  Previous Festival winner, In-form winning run ◄ OUR PICK
+  Hyland                           94     8  In-form winning run, Ideal prep gap timing
+  Myretown                         93     3  Ideal prep gap timing
+  Quebecois                        90     5  In-form winning run
+  Konfusion                        88     3  Ideal prep gap timing
+  Knight Of Allen                  83     3  Ideal prep gap timing
+  Imperial Saint                   71     5  In-form winning run
+  Blaze The Way                    67     8  In-form winning run, Ideal prep gap timing
+  Handstands                       67     3  Ideal prep gap timing
+  The Short Go                     68     0  —
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 2  ·  BetMGM Cup Hurdle  [2.8m, soft]
+  Current pick: Storm Heart (score 126)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  Storm Heart                     126    11  In-form winning run, Ideal prep gap timing, P ◄ OUR PICK
+  Ndaawi                           98     3  Ideal prep gap timing
+  Lucky Place                      89     3  Ideal prep gap timing
+  Jump Allen                       81     8  In-form winning run, Ideal prep gap timing
+  The Yellow Clay                  78     3  Ideal prep gap timing
+  Maxxum                           68     3  Ideal prep gap timing
+  Kateira                          62     8  In-form winning run, Ideal prep gap timing
+  Workahead                        65     3  Ideal prep gap timing
+  Jingko Blue                      57     3  Ideal prep gap timing
+  Iberico Lord                     52     8  In-form winning run, Ideal prep gap timing
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 2  ·  Glenfarclas Cross Country Chase  [4.0m, soft]
+  Current pick: Stumptown (score 143)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  Favori De Champdou              143    44  Previous Festival winner, Won same dist/cours 🌙 DARK HORSE
+  Stumptown                       143    41  Previous Festival winner, Won same dist/cours ◄ OUR PICK
+  Vanillier                        82     8  In-form winning run, Ideal prep gap timing
+  Desertmore House                 59    16  In-form winning run, Ideal prep gap timing, C
+  Conflated                        71     3  Ideal prep gap timing
+  Chemical Energy                  63    11  In-form winning run, Ideal prep gap timing, P
+  Pied Piper                       68     3  Ideal prep gap timing
+  Final Orders                     60     3  Ideal prep gap timing
+  Anibale Fly                      55     3  Ideal prep gap timing
+
+  ⚡ DARK HORSES — not our pick but strong festival signal:
+    → Favori De Champdou @ ?  FI=44  trainer=Gordon Elliott
+       • Previous Festival winner
+       • Won same dist/course class bracket
+       • Won this exact race before
+       • In-form winning run
+       • Ideal prep gap timing
+       • Cheltenham winner: Won 2024 Glenfarclas Cross Country Chase
+       • Profile: 3 Cheltn runs
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 2  ·  Grand Annual Handicap Chase  [2.0m, soft]
+  Current pick: Touch Me Not (score 105)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  Touch Me Not                    105     3  Ideal prep gap timing ◄ OUR PICK
+  Coeur De Lion                    94     8  In-form winning run, Ideal prep gap timing
+  Edwardstone                      76    23  Previous Festival winner, Ideal prep gap timi
+  Inthepocket                      90     3  Ideal prep gap timing
+  Waterbys Hurricane               73     8  In-form winning run, Ideal prep gap timing
+  Calico                           65     3  Ideal prep gap timing
+  Jour D'Evasion                   59     8  In-form winning run, Ideal prep gap timing
+  No Questions Asked               54     8  In-form winning run, Ideal prep gap timing
+  Vanderpoel                       51     8  In-form winning run, Ideal prep gap timing
+  Rubaud                           50     3  Ideal prep gap timing
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 3  ·  Kim Muir Handicap Chase  [3.2m, soft]
+  Current pick: Jeriko Du Reponet (score 68)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  Jeriko Du Reponet                68     3  Ideal prep gap timing ◄ OUR PICK
+  Prends Garde A Toi               66     3  Ideal prep gap timing
+  Waterford Whispers               60     6  Ideal prep gap timing, Profile: 1 Cheltn runs
+  The Enabler                      58     3  Ideal prep gap timing
+  Hyland                           57     3  Ideal prep gap timing
+  Herakles Westwood                50     8  In-form winning run, Ideal prep gap timing
+  Search For Glory                 56     0  —
+  Kelce                            47     8  In-form winning run, Ideal prep gap timing
+  Monbeg Genius                    46     3  Ideal prep gap timing
+  King's Threshold                 40     5  In-form winning run
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 3  ·  Martin Pipe Handicap Hurdle  [2.6m, soft]
+  Current pick: He Can't Dance (score 93)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  He Can't Dance                   93     8  In-form winning run, Ideal prep gap timing ◄ OUR PICK
+  Sony Bill                        84     8  In-form winning run, Ideal prep gap timing
+  Kel Histoire                     83     3  Ideal prep gap timing
+  The Passing Wife                 78     3  Ideal prep gap timing
+  Nurse Susan                      71     8  In-form winning run, Ideal prep gap timing
+  East India Express               68     8  In-form winning run, Ideal prep gap timing
+  A Pai De Nom                     62     8  In-form winning run, Ideal prep gap timing
+  Sa Fureur                        63     3  Ideal prep gap timing
+  Its Bilbo                        58     8  In-form winning run, Ideal prep gap timing
+  Roc Dino                         65     0  —
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 3  ·  Pertemps Handicap Hurdle  [3.2m, soft]
+  Current pick: Impose Toi (score 119)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  Impose Toi                      119     3  Ideal prep gap timing ◄ OUR PICK
+  Staffordshire Knot              101     8  In-form winning run, Ideal prep gap timing
+  Minella Emperor                  76     8  In-form winning run, Ideal prep gap timing
+  Supremely West                   67     8  In-form winning run, Ideal prep gap timing
+  Absolutely Doyen                 69     3  Ideal prep gap timing
+  C'Est Different                  63     3  Ideal prep gap timing
+  Duke Silver                      63     3  Ideal prep gap timing
+  Ikarak                           50     8  In-form winning run, Ideal prep gap timing
+  Electric Mason                   50     8  In-form winning run, Ideal prep gap timing
+  Champagne Chic                   47     8  In-form winning run, Ideal prep gap timing
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 4  ·  County Handicap Hurdle  [2.0m, soft]
+  Current pick: Absurde (score 86)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  Absurde                          86     3  Ideal prep gap timing ◄ OUR PICK
+  Karbau                           83     3  Ideal prep gap timing
+  Jump Allen                       75     8  In-form winning run, Ideal prep gap timing
+  Bowensonfire                     73     8  In-form winning run, Ideal prep gap timing
+  Ndaawi                           76     3  Ideal prep gap timing
+  Murcia                           70     6  Ideal prep gap timing, Profile: 1 Cheltn runs
+  Hello Neighbour                  62     8  In-form winning run, Ideal prep gap timing
+  Sinnatra                         62     8  In-form winning run, Ideal prep gap timing
+  Khrisma                          62     8  In-form winning run, Ideal prep gap timing
+  Jubilee Alpha                    59     8  In-form winning run, Ideal prep gap timing
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 4  ·  JCB Triumph Hurdle  [2.2m, soft]
+  Current pick: Proactif (score 147)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  Proactif                        147     8  In-form winning run, Ideal prep gap timing ◄ OUR PICK
+  Highland Crystal                105     8  In-form winning run, Ideal prep gap timing
+  Macho Man                        88     8  In-form winning run, Ideal prep gap timing
+  Madness D'elle                   85     8  In-form winning run, Ideal prep gap timing
+  Minella Study                    84     8  In-form winning run, Ideal prep gap timing
+  Selma De Vary                    87     3  Ideal prep gap timing
+  Barbizon                         81     8  In-form winning run, Ideal prep gap timing
+  Fantasy World                    72     8  In-form winning run, Ideal prep gap timing
+  Maestro Conti                    70     3  Ideal prep gap timing
+  Manganese                        63     8  In-form winning run, Ideal prep gap timing
+
+──────────────────────────────────────────────────────────────────────────────
+  Day 4  ·  St James's Place Hunters' Chase  [3.2m, soft]
+  Current pick: Chemical Energy (score 87)
+  Horse                           Sys    FI  Signals
+  ───────────────────────────────────────────────────────────────────────────────────
+  Wonderwall                       70    28  Previous Festival winner, In-form winning run
+  Chemical Energy                  87     6  Ideal prep gap timing, Profile: 6 Cheltn runs ◄ OUR PICK
+  Its On The Line                  71     8  In-form winning run, Ideal prep gap timing
+  Panda Boy                        63     8  In-form winning run, Ideal prep gap timing
+  Barton Snow                      57     8  In-form winning run, Ideal prep gap timing
+  Golden Son                       53     8  In-form winning run, Ideal prep gap timing
+  Stattler                         51     8  In-form winning run, Ideal prep gap timing
+  Solitary Man                     50     8  In-form winning run, Ideal prep gap timing
+  What A Glance                    47     8  In-form winning run, Ideal prep gap timing
+  Music Drive                      45     8  In-form winning run, Ideal prep gap timing
+
+══════════════════════════════════════════════════════════════════════════════
+  DARK HORSE SUMMARY — festival improvement signal > our current pick
+══════════════════════════════════════════════════════════════════════════════
+  Glenfarclas Cross Country Chase            Favori De Champdou           @ ?        FI= 44  sys=143
+  Cheltenham Plate Chase                     Guard Your Dreams            @ ?        FI= 41  sys= 85
+  Cheltenham Plate Chase                     Zurich                       @ ?        FI= 36  sys=101
+  Cheltenham Plate Chase                     Theatre Native               @ ?        FI= 36  sys= 88
+  Cheltenham Plate Chase                     Peaky Boy                    @ ?        FI= 36  sys= 84
+  Cheltenham Plate Chase                     Riskintheground              @ ?        FI= 36  sys= 73
+  Cheltenham Plate Chase                     Moon Dorange                 @ ?        FI= 36  sys= 65
+  St James's Place Hunters' Chase            Wonderwall                   @ ?        FI= 28  sys= 70
+
+  Scan complete: 13 races · 191 horses evaluated · 8 dark horse flags
+  Results saved to DynamoDB table: CheltenhamHandicapFlags
+══════════════════════════════════════════════════════════════════════════════

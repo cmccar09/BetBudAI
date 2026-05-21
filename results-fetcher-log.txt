@@ -1,0 +1,23 @@
+START RequestId: 102993b1-303e-42ab-8df9-ecba85a2efd9 Version: $LATEST
+=== RACE RESULTS FETCHER ===
+Time: 2026-01-08T15:26:52.765617
+Authenticating with Betfair...
+Attempting interactive login (username/password)...
+✓ Interactive authentication successful
+Session token: A4MmZGTaueRIoFQRR2cO...
+✓ Authentication successful
+Found 4 bets ready for results (>1hr since race)
+Fetching results for 3 markets...
+✓ Fetched results for 3 markets
+Market 1.252425860: OPEN (not settled)
+Market 1.252429556: OPEN (not settled)
+Market 1.252461894: OPEN (not settled)
+No results for market 1.252425860
+No results for market 1.252461894
+No results for market 1.252425860
+No results for market 1.252429556
+=== COMPLETE ===
+Updated 0 bets with results
+END RequestId: 102993b1-303e-42ab-8df9-ecba85a2efd9
+REPORT RequestId: 102993b1-303e-42ab-8df9-ecba85a2efd9	Duration: 418.56 ms	Billed Duration: 1077 ms	Memory Size: 512 MB	Max Memory Used: 93 MB	Init Duration: 658.37 ms	
+

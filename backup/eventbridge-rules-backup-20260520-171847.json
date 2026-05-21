@@ -1,0 +1,256 @@
+{
+    "Rules": [
+        {
+            "Name": "BettingAutoResults",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/BettingAutoResults",
+            "State": "ENABLED",
+            "Description": "Auto-record Betfair results 30min after each race",
+            "ScheduleExpression": "rate(15 minutes)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "BettingLearningAnalysis",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/BettingLearningAnalysis",
+            "State": "ENABLED",
+            "ScheduleExpression": "cron(30 13-23 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "BettingResultsFetcher",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/BettingResultsFetcher",
+            "State": "ENABLED",
+            "ScheduleExpression": "cron(0 14-23 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "BettingResultsHourly",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/BettingResultsHourly",
+            "State": "ENABLED",
+            "Description": "Fetch Betfair results every hour",
+            "ScheduleExpression": "cron(0 * * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "BettingWinnerAnalysis",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/BettingWinnerAnalysis",
+            "State": "ENABLED",
+            "Description": "Run winner analysis every 2 hours",
+            "ScheduleExpression": "cron(45 14-23/2 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "BettingWorkflow-15Min",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/BettingWorkflow-15Min",
+            "State": "ENABLED",
+            "ScheduleExpression": "cron(15 12-19 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "BettingWorkflow-45Min",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/BettingWorkflow-45Min",
+            "State": "ENABLED",
+            "ScheduleExpression": "cron(45 12-19 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-DailyPicksReadyEmail-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-DailyPicksReadyEmail-Schedule",
+            "State": "ENABLED",
+            "Description": "Daily picks-ready SES email blast at 12:20 UTC",
+            "ScheduleExpression": "cron(20 12 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-Evening-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-Evening-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet evening results & report — 20:00 UTC",
+            "ScheduleExpression": "cron(0 20 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-Learning-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-Learning-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet nightly learning cycle — 21:00 UTC",
+            "ScheduleExpression": "cron(0 21 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-MajorAnalysis-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-MajorAnalysis-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet daily major-race early-bird analysis — 07:00 UTC",
+            "ScheduleExpression": "cron(0 7 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-Morning-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-Morning-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet morning pipeline — 08:30 UTC",
+            "ScheduleExpression": "cron(30 8 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-Refresh-12-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-Refresh-12-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet midday refresh — 12:00 UTC",
+            "ScheduleExpression": "cron(0 12 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-Refresh-13-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-Refresh-13-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet Refresh at 13:00 UTC",
+            "ScheduleExpression": "cron(0 13 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-Refresh-1330-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-Refresh-1330-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet featured finalisation refresh — 13:30 UTC",
+            "ScheduleExpression": "cron(30 13 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-Refresh-14-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-Refresh-14-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet afternoon refresh — 14:00 UTC",
+            "ScheduleExpression": "cron(0 14 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-Refresh-15-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-Refresh-15-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet Refresh at 15:00 UTC",
+            "ScheduleExpression": "cron(0 15 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-Refresh-16-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-Refresh-16-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet late-afternoon refresh — 16:00 UTC",
+            "ScheduleExpression": "cron(0 16 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-Refresh-17-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-Refresh-17-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet Refresh at 17:00 UTC",
+            "ScheduleExpression": "cron(0 17 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-Refresh-18-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-Refresh-18-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet evening refresh — 18:00 UTC",
+            "ScheduleExpression": "cron(0 18 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "SureBet-ResultsPoll-30Min-Schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/SureBet-ResultsPoll-30Min-Schedule",
+            "State": "ENABLED",
+            "Description": "SureBet 30-minute results pull + commentary learning nudges — 10:00-21:59 UTC",
+            "ScheduleExpression": "cron(0/30 10-21 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "betbudai-evening-trigger",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/betbudai-evening-trigger",
+            "State": "DISABLED",
+            "Description": "BetBudAI evening pipeline",
+            "ScheduleExpression": "cron(0 20 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "betbudai-field-verification-scheduler",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/betbudai-field-verification-scheduler",
+            "State": "ENABLED",
+            "Description": "Field verification every 10 min (Expert Review 2026-05-20)",
+            "ScheduleExpression": "rate(10 minutes)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "betbudai-learning-trigger",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/betbudai-learning-trigger",
+            "State": "DISABLED",
+            "Description": "BetBudAI learning pipeline",
+            "ScheduleExpression": "cron(0 22 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "betbudai-morning-trigger",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/betbudai-morning-trigger",
+            "State": "ENABLED",
+            "Description": "BetBudAI morning pipeline",
+            "ScheduleExpression": "cron(30 8 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "betbudai-refresh-12-trigger",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/betbudai-refresh-12-trigger",
+            "State": "ENABLED",
+            "Description": "BetBudAI refresh at 12:00",
+            "ScheduleExpression": "cron(0 12 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "betbudai-refresh-14-trigger",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/betbudai-refresh-14-trigger",
+            "State": "ENABLED",
+            "Description": "BetBudAI refresh at 14:00",
+            "ScheduleExpression": "cron(0 14 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "betbudai-refresh-16-trigger",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/betbudai-refresh-16-trigger",
+            "State": "ENABLED",
+            "Description": "BetBudAI refresh at 16:00",
+            "ScheduleExpression": "cron(0 16 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "betbudai-refresh-18-trigger",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/betbudai-refresh-18-trigger",
+            "State": "ENABLED",
+            "Description": "BetBudAI refresh at 18:00",
+            "ScheduleExpression": "cron(0 18 * * ? *)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "betfair-session-refresh-schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/betfair-session-refresh-schedule",
+            "State": "ENABLED",
+            "Description": "Refresh Betfair session token every 8 hours",
+            "ScheduleExpression": "rate(8 hours)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "cheltenham-picks-schedule",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/cheltenham-picks-schedule",
+            "State": "ENABLED",
+            "Description": "Cheltenham picks save — every 30 min (Lambda filters by time/date)",
+            "ScheduleExpression": "rate(30 minutes)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "racing-results-scraper",
+            "Arn": "arn:aws:events:eu-west-1:813281204422:rule/racing-results-scraper",
+            "State": "ENABLED",
+            "Description": "Scrape Racing Post for race results every 2 hours",
+            "ScheduleExpression": "rate(2 hours)",
+            "EventBusName": "default"
+        }
+    ]
+}

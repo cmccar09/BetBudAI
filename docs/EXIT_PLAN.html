@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BetBudAI Exit Plan</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #121b2e;
+      --muted: #9fb0d3;
+      --text: #eaf0ff;
+      --accent: #5dd6ff;
+      --good: #4ade80;
+      --warn: #fbbf24;
+      --bad: #f87171;
+      --line: #243351;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(180deg, #0b1220 0%, #0e1730 100%);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 16px 48px;
+    }
+    .hero {
+      background: radial-gradient(circle at top right, rgba(93, 214, 255, 0.2), transparent 35%), var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: 0.3px;
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+    h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+    p, li { color: var(--muted); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .kpi {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 4px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      padding: 10px 8px;
+      vertical-align: top;
+    }
+    th { color: var(--text); font-weight: 600; }
+    td { color: var(--muted); }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .good { background: rgba(74, 222, 128, 0.15); color: var(--good); }
+    .warn { background: rgba(251, 191, 36, 0.15); color: var(--warn); }
+    .bad { background: rgba(248, 113, 113, 0.15); color: var(--bad); }
+    .calc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #0c1528;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 9px 10px;
+    }
+    .result {
+      margin-top: 12px;
+      background: #0c1528;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .small { font-size: 12px; color: var(--muted); }
+    .foot { margin-top: 16px; font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>BetBudAI Exit Plan</h1>
+      <p>This document outlines what targets to hit before a sale, how buyers will value the platform, and what subscriber/ROI milestones support higher valuation multiples.</p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Current Pricing Model</h2>
+        <p>Use your live public pricing as the baseline for all valuation math.</p>
+        <div class="kpi">Premium: EUR 9.99/mo</div>
+        <div class="kpi">VIP: EUR 49.99/mo</div>
+        <p class="small">Formula: ARR = (Premium subs x 9.99 x 12) + (VIP subs x 49.99 x 12)</p>
+      </article>
+
+      <article class="card">
+        <h2>Buyer Lens</h2>
+        <ul>
+          <li>Can this grow predictably with low churn?</li>
+          <li>Is ROI real, consistent, and auditable?</li>
+          <li>Is operational risk low (automation, uptime, data pipeline)?</li>
+          <li>Can a new owner run it without founder dependency?</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Exit Timing Trigger</h2>
+        <p>Start sale process when all are true for at least 3 consecutive months:</p>
+        <ul>
+          <li>MRR above EUR 25k</li>
+          <li>Net churn below 4%</li>
+          <li>90-day ROI positive with published audit trail</li>
+          <li>No critical pipeline failures affecting customer trust</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="card">
+      <h2>Target Bands For Sale Readiness</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>Free Users</th>
+            <th>Paid Subscribers</th>
+            <th>VIP Share</th>
+            <th>ROI Quality</th>
+            <th>Indicative Multiple</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag warn">Base</span></td>
+            <td>5,000+</td>
+            <td>600+</td>
+            <td>10-15%</td>
+            <td>30-day ROI > 10%, low transparency</td>
+            <td>2.0x-3.0x ARR</td>
+          </tr>
+          <tr>
+            <td><span class="tag good">Growth</span></td>
+            <td>15,000+</td>
+            <td>2,000+</td>
+            <td>15-25%</td>
+            <td>90-day ROI > 18%, audited logs public</td>
+            <td>3.5x-5.0x ARR</td>
+          </tr>
+          <tr>
+            <td><span class="tag good">Premium Exit</span></td>
+            <td>40,000+</td>
+            <td>5,000+</td>
+            <td>25-35%</td>
+            <td>180-day ROI > 25%, controlled drawdown</td>
+            <td>5.5x-8.0x ARR</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card" style="margin-top: 14px;">
+      <h2>Estimated Sale Price Scenarios</h2>
+      <p>These estimates combine subscriber mix assumptions with ARR multiples, using current pricing (Premium EUR 9.99/mo, VIP EUR 49.99/mo).</p>
+      <p class="small"><strong>Mostly free subscribers?</strong> Jump to the dedicated section: <a href="#mostly-free-subscribers" style="color:#5dd6ff;">If You Have Mostly Free Subscribers</a>.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Assumed Subscriber Mix</th>
+            <th>Estimated ARR</th>
+            <th>Multiple Range</th>
+            <th>Estimated Sale Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag bad">Conservative</span></td>
+            <td>1,000 Premium + 150 VIP</td>
+            <td>EUR 102k</td>
+            <td>2.0x-3.0x</td>
+            <td>EUR 200k-300k</td>
+          </tr>
+          <tr>
+            <td><span class="tag warn">Base</span></td>
+            <td>2,000 Premium + 300 VIP</td>
+            <td>EUR 228k</td>
+            <td>2.5x-4.0x</td>
+            <td>EUR 570k-910k</td>
+          </tr>
+          <tr>
+            <td><span class="tag good">Growth</span></td>
+            <td>4,000 Premium + 800 VIP</td>
+            <td>EUR 576k</td>
+            <td>3.5x-5.0x</td>
+            <td>EUR 2.0m-2.9m</td>
+          </tr>
+          <tr>
+            <td><span class="tag good">Premium Exit</span></td>
+            <td>8,000 Premium + 2,000 VIP</td>
+            <td>EUR 1.30m</td>
+            <td>5.5x-8.0x</td>
+            <td>EUR 7.1m-10.3m</td>
+          </tr>
+          <tr>
+            <td><span class="tag good">Strategic Upside</span></td>
+            <td>12,000 Premium + 3,500 VIP</td>
+            <td>EUR 2.24m</td>
+            <td>6.0x-10.0x</td>
+            <td>EUR 13.5m-22.4m</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="small">Use the calculator below for custom scenarios. Final price depends on churn quality, legal/compliance posture, reliability, and concentration risk.</p>
+    </section>
+
+    <section class="grid" style="margin-top: 14px;">
+      <article class="card">
+        <h2>ROI Standards Buyers Expect</h2>
+        <ul>
+          <li><strong>Consistency:</strong> Positive returns across 30/90/180-day windows.</li>
+          <li><strong>Risk control:</strong> Max drawdown clearly reported and capped.</li>
+          <li><strong>Auditability:</strong> Every pick traceable to timestamped input/output.</li>
+          <li><strong>No cherry-picking:</strong> Full published history, including losing periods.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Subscriber Benchmarks</h2>
+        <ul>
+          <li>Free-to-paid conversion: target 5-9%</li>
+          <li>Monthly paid churn: target under 5%</li>
+          <li>VIP upgrade rate from Premium: target 12-20%</li>
+          <li>LTV/CAC: target greater than 3.0x</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Risk Discounts To Avoid</h2>
+        <ul>
+          <li>Single founder dependency without SOPs</li>
+          <li>Pipeline outages affecting picks delivery</li>
+          <li>No legal/terms clarity around betting disclaimers</li>
+          <li>Unclear user data compliance posture</li>
+        </ul>
+      </article>
+    </section>
+
+    <section id="mostly-free-subscribers" class="card" style="margin-top: 14px;">
+      <h2>If You Have Mostly Free Subscribers</h2>
+      <p>A large free user base can still support a sale, but buyers will apply a discount unless conversion and monetization are proven and stable.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>What Buyers See</th>
+            <th>Likely Valuation Impact</th>
+            <th>What To Improve Before Sale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mostly free, low conversion (under 3%)</td>
+            <td>Audience value is unproven and revenue is fragile</td>
+            <td>Typically lower range, around 1.0x-2.5x ARR</td>
+            <td>Improve onboarding, paid triggers, and upgrade journeys; prove 90-day conversion lift</td>
+          </tr>
+          <tr>
+            <td>Mostly free, improving conversion (3-6%)</td>
+            <td>Early signs of monetization fit with upside</td>
+            <td>Usually base range, around 2.0x-4.0x ARR</td>
+            <td>Show cohort retention and reduced paid churn across at least 2-3 quarters</td>
+          </tr>
+          <tr>
+            <td>Mostly free, strong conversion (6%+)</td>
+            <td>Efficient acquisition funnel with clear revenue engine</td>
+            <td>Can approach growth range, around 3.5x-5.5x ARR</td>
+            <td>Protect ROI quality, improve VIP upgrade rate, and document repeatable growth playbooks</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="small">For free-heavy products, buyers focus on conversion trend quality, not just total user count. A stable conversion curve can materially increase final sale price.</p>
+    </section>
+
+    <section class="card" style="margin-top: 14px;">
+      <h2>Quick Valuation Calculator</h2>
+      <div class="calc">
+        <div>
+          <label for="premiumSubs">Premium subscribers</label>
+          <input id="premiumSubs" type="number" value="2000" min="0">
+        </div>
+        <div>
+          <label for="vipSubs">VIP subscribers</label>
+          <input id="vipSubs" type="number" value="400" min="0">
+        </div>
+        <div>
+          <label for="multiple">ARR multiple</label>
+          <select id="multiple">
+            <option value="2.5">2.5x (base)</option>
+            <option value="4.0" selected>4.0x (growth)</option>
+            <option value="6.0">6.0x (premium)</option>
+            <option value="8.0">8.0x (strategic)</option>
+          </select>
+        </div>
+      </div>
+      <div id="calcOut" class="result"></div>
+      <p class="small">Tip: run scenarios monthly so pricing strategy and growth campaigns are tied directly to exit value.</p>
+    </section>
+
+    <section class="card" style="margin-top: 14px;">
+      <h2>Sale Data Room Checklist</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Must Have</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Financial</td>
+            <td>MRR/ARR trend, churn cohorts, CAC/LTV, monthly P&L</td>
+          </tr>
+          <tr>
+            <td>Product</td>
+            <td>Roadmap, feature adoption, retention by feature</td>
+          </tr>
+          <tr>
+            <td>Model Performance</td>
+            <td>ROI history, drawdown report, reproducible picks archive</td>
+          </tr>
+          <tr>
+            <td>Technical</td>
+            <td>Architecture docs, runbooks, incident log, deployment SOP</td>
+          </tr>
+          <tr>
+            <td>Legal</td>
+            <td>Terms, privacy policy, compliance notes, IP ownership proof</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card" style="margin-top: 14px;">
+      <h2>12-Month Exit Execution Plan</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Quarter</th>
+            <th>Primary Target</th>
+            <th>Success Criteria</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Q1</td>
+            <td>Trust foundation</td>
+            <td>Public ROI dashboard, no major outages, churn baseline measured</td>
+          </tr>
+          <tr>
+            <td>Q2</td>
+            <td>Subscriber growth</td>
+            <td>Paid subscribers +50%, VIP mix at 15%+, conversion above 5%</td>
+          </tr>
+          <tr>
+            <td>Q3</td>
+            <td>Profit quality</td>
+            <td>Net margin trend up, churn under 5%, strong 90-day ROI</td>
+          </tr>
+          <tr>
+            <td>Q4</td>
+            <td>Run sale process</td>
+            <td>Data room complete, teaser deck, shortlist of strategic buyers</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <p class="foot">This plan is for strategic planning only and not financial advice. Validate assumptions with your accountant/M&A advisor before formal sale discussions.</p>
+  </div>
+
+  <script>
+    (function () {
+      var premiumPrice = 9.99;
+      var vipPrice = 49.99;
+
+      var premiumInput = document.getElementById("premiumSubs");
+      var vipInput = document.getElementById("vipSubs");
+      var multipleInput = document.getElementById("multiple");
+      var out = document.getElementById("calcOut");
+
+      function money(n) {
+        return new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
+      }
+
+      function recalc() {
+        var premiumSubs = Number(premiumInput.value || 0);
+        var vipSubs = Number(vipInput.value || 0);
+        var multiple = Number(multipleInput.value || 0);
+
+        var mrr = (premiumSubs * premiumPrice) + (vipSubs * vipPrice);
+        var arr = mrr * 12;
+        var valuation = arr * multiple;
+
+        out.innerHTML = ""
+          + "<div><strong>MRR:</strong> " + money(mrr) + "</div>"
+          + "<div><strong>ARR:</strong> " + money(arr) + "</div>"
+          + "<div><strong>Indicative valuation:</strong> <span style='color:#5dd6ff;font-weight:700'>" + money(valuation) + "</span></div>";
+      }
+
+      premiumInput.addEventListener("input", recalc);
+      vipInput.addEventListener("input", recalc);
+      multipleInput.addEventListener("change", recalc);
+      recalc();
+    })();
+  </script>
+</body>
+</html>

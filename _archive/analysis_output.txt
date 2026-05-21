@@ -1,0 +1,824 @@
+
+[STAGE 1/5] Deep form enrichment ΓÇö 283 horses from Racing Post/SL...
+  [form] Fetching SL race URLs for 2026-04-01ΓÇª
+  [form] Found 16 race URLs across 7 venues
+  [form] Pre-fetched form for 77 horses across 3 venues
+  [1/283] Fern Hill: Γ£ô 6 runs
+  [2/283] Noche Negra: Γ£ô 6 runs
+  [3/283] Always Busy: Γ£ô 6 runs
+  [4/283] Hell Hound: Γ£ô 6 runs
+  [5/283] Queens Wish: Γ£ô 6 runs
+  [6/283] Le Beau Gosse: Γ£ô 6 runs
+  [7/283] Captain Cool: Γ£ô 6 runs
+  [8/283] Maple: Γ£ô 6 runs
+  [9/283] Diamond Jim: Γ£ô 4 runs
+  [10/283] Blackwater Lilly: Γ£ô 6 runs
+  [11/283] Belaya River: Γ£ô 6 runs
+  [12/283] Fine Point: Γ£ô 6 runs
+  [13/283] Ambassador: Γ£ô 6 runs
+  [14/283] Twist Of Fatecatch: Γ£ô 6 runs
+  [15/283] Calme Olympien: Γ£ô 6 runs
+  [16/283] Jukebox King: Γ£ô 3 runs
+  [17/283] Geezer Rockstar: Γ£ô 6 runs
+  [18/283] Gold Link: Γ£ô 6 runs
+  [19/283] Jena D'oudairies: Γ£ô 6 runs
+  [20/283] Matthias: Γ£ô 5 runs
+  [21/283] Wispit Twob: Γ£ô 4 runs
+  [22/283] Kayce Dutton: Γ£ô 6 runs
+  [23/283] Big Boy Barney: Γ£ô 6 runs
+  [24/283] Ukantango: Γ£ô 6 runs
+  [25/283] Intenzo: Γ£ô 5 runs
+  [26/283] Boston Boy: Γ£ô 6 runs
+  [27/283] Gilbertina: Γ£ô 6 runs
+  [28/283] Mountain Mike: Γ£ô 5 runs
+  [29/283] Realisation: Γ£ô 6 runs
+  [30/283] Stratagem: Γ£ô 6 runs
+  [31/283] Ailt An Chorrain: Γ£ô 6 runs
+  [32/283] Mary Stanford: Γ£ô 4 runs
+  [33/283] Loup De Maulde: Γ£ô 6 runs
+  [34/283] Golan Loop: Γ£ô 6 runs
+  [35/283] Broomfields Cave: Γ£ô 6 runs
+  [36/283] Muskoka: Γ£ô 6 runs
+  [37/283] Law Of Supply: Γ£ô 6 runs
+  [38/283] Ignore The Door: Γ£ô 4 runs
+  [39/283] Aunt Gallie: Γ£ù no data
+  [40/283] Briery Bluebelle: Γ£ù no data
+  [41/283] Frost Moon: Γ£ù no data
+  [42/283] Greyse: Γ£ù no data
+  [43/283] Queens Charm: Γ£ù no data
+  [44/283] Rose Of Knocknamoe: Γ£ù no data
+  [45/283] Rosie's Honour: Γ£ù no data
+  [46/283] Frandefo: Γ£ù no data
+  [47/283] Just Rizzo: Γ£ù no data
+  [48/283] No More Teardrops: Γ£ù no data
+  [49/283] Dixie Cowboy: Γ£ù no data
+  [50/283] Nonbinding: Γ£ù no data
+  [51/283] Beep Beep Becky: Γ£ù no data
+  [52/283] Natural Ability: Γ£ù no data
+  [53/283] Clean Getaway: Γ£ù no data
+  [54/283] Restandbethankful: Γ£ù no data
+  [55/283] Elusive Warrior: Γ£ù no data
+  [56/283] Myfavouritesister: Γ£ù no data
+  [57/283] It's A Breeze: Γ£ô 6 runs
+  [58/283] Harry Junior: Γ£ô 6 runs
+  [59/283] Lydeard Girl: Γ£ô 6 runs
+  [60/283] All Night Parking: Γ£ô 5 runs
+  [61/283] Walkinthepresent: Γ£ô 6 runs
+  [62/283] Square Du Roule: Γ£ô 6 runs
+  [63/283] Stage Show: Γ£ô 6 runs
+  [64/283] Corsican Caper: Γ£ù no data
+  [65/283] Lou Des Bordes: Γ£ù no data
+  [66/283] Papillondelumiere: Γ£ù no data
+  [67/283] Promethean: Γ£ù no data
+  [68/283] Road To Wembley: Γ£ù no data
+  [69/283] Top Coeur: Γ£ù no data
+  [70/283] Novelista: Γ£ù no data
+  [71/283] Paragon: Γ£ù no data
+  [72/283] Bright Legend: Γ£ù no data
+  [73/283] Fearless Dragon: Γ£ù no data
+  [74/283] Hay Max: Γ£ù no data
+  [75/283] Phantom Gold: Γ£ù no data
+  [76/283] Who's Glen: Γ£ù no data
+  [77/283] Monark Wood: Γ£ù no data
+  [78/283] Move With The Beat: Γ£ô 6 runs
+  [79/283] Kingcormac: Γ£ô 6 runs
+  [80/283] Rangatira Jack: Γ£ô 6 runs
+  [81/283] Applicationofcash: Γ£ô 6 runs
+  [82/283] Hatos: Γ£ô 6 runs
+  [83/283] Universal Secret: Γ£ô 6 runs
+  [84/283] My Rockstar: Γ£ô 6 runs
+  [85/283] El Galactico: Γ£ù no data
+  [86/283] Immortal Fame: Γ£ù no data
+  [87/283] Jubilant: Γ£ù no data
+  [88/283] Passing Pleasure: Γ£ù no data
+  [89/283] Ocean Conquest: Γ£ù no data
+  [90/283] Diamond Geezer: Γ£ù no data
+  [91/283] Campaign Trail: Γ£ù no data
+  [92/283] Moon Hunter: Γ£ù no data
+  [93/283] Achnamara: Γ£ù no data
+  [94/283] Byron Hill: Γ£ù no data
+  [95/283] Cosmic Soul: Γ£ù no data
+  [96/283] Swingforthefence: Γ£ù no data
+  [97/283] Top Flight Century: Γ£ù no data
+  [98/283] Seeyainthesuninn: Γ£ù no data
+  [99/283] Knacker Trapper: Γ£ù no data
+  [100/283] Kopa Kilana: Γ£ù no data
+  [101/283] Laddie Cooper Mia: Γ£ù no data
+  [102/283] Deauville Lady: Γ£ù no data
+  [103/283] Mr Globalist: Γ£ù no data
+  [104/283] Get In Order: Γ£ô 4 runs
+  [105/283] Lake Tiberias: Γ£ô 5 runs
+  [106/283] Victory Shout: Γ£ô 6 runs
+  [107/283] Prairie Diamond: Γ£ô 6 runs
+  [108/283] Bread And Butter: Γ£ô 6 runs
+  [109/283] Walk In The West: Γ£ô 6 runs
+  [110/283] Forest Hills: Γ£ô 6 runs
+  [111/283] Athena's Dream: Γ£ô 4 runs
+  [112/283] Prince Rhinegold: Γ£ô 6 runs
+  [113/283] Eric Gorcombe: Γ£ô 5 runs
+  [114/283] Mancero: Γ£ô 6 runs
+  [115/283] Sawpit Sienna: Γ£ô 6 runs
+  [116/283] Rosa Diaz: Γ£ô 4 runs
+  [117/283] Briery Butterfly: Γ£ù no data
+  [118/283] Princesse Milania: Γ£ù no data
+  [119/283] Venturevango: Γ£ù no data
+  [120/283] Belladinotte: Γ£ù no data
+  [121/283] Shorten Sassy: Γ£ù no data
+  [122/283] Mya Du Clos: Γ£ù no data
+  [123/283] Connells Cross: Γ£ù no data
+  [124/283] Hillsteels Blue: Γ£ù no data
+  [125/283] Scopic: Γ£ù no data
+  [126/283] The Gem State: Γ£ù no data
+  [127/283] Datstheholyallofit: Γ£ù no data
+  [128/283] Dolly Dior: Γ£ù no data
+  [129/283] Mords Lavie Spigao: Γ£ù no data
+  [130/283] Smart Order: Γ£ù no data
+  [131/283] Jordan Breeze: Γ£ù no data
+  [132/283] Bye Bye Now: Γ£ù no data
+  [133/283] Jazzit: Γ£ù no data
+  [134/283] Snowballs: Γ£ù no data
+  [135/283] Phil's Dream: Γ£ù no data
+  [136/283] An Laochmor: Γ£ù no data
+  [137/283] Sceitimini: Γ£ù no data
+  [138/283] Whats It All About: Γ£ù no data
+  [139/283] Cooee Call: Γ£ù no data
+  [140/283] She's A Gift: Γ£ù no data
+  [141/283] Queen Of Newark: Γ£ù no data
+  [142/283] Star Reign: Γ£ô 5 runs
+  [143/283] Beau Merle: Γ£ù no data
+  [144/283] Beau Speed: Γ£ô 1 runs
+  [145/283] Crock's Bottom: Γ£ù no data
+  [146/283] Posh Chick: Γ£ù no data
+  [147/283] Blackmore Jack: Γ£ù no data
+  [148/283] Lord Churchill: Γ£ù no data
+  [149/283] Martial Law: Γ£ù no data
+  [150/283] Lissahane Lass: Γ£ô 1 runs
+  [151/283] Divine Wish: Γ£ù no data
+  [152/283] Blue Birdie: Γ£ù no data
+  [153/283] Light Dreamer: Γ£ù no data
+  [154/283] Lightkiss: Γ£ù no data
+  [155/283] Music Academy: Γ£ù no data
+  [156/283] Nanoscience: Γ£ù no data
+  [157/283] Rajwaah: Γ£ù no data
+  [158/283] Society Charm: Γ£ù no data
+  [159/283] Inishfallen: Γ£ù no data
+  [160/283] Collective Power: Γ£ù no data
+  [161/283] Beauty Queen: Γ£ù no data
+  [162/283] Sporting Hero: Γ£ù no data
+  [163/283] Clonmacash: Γ£ù no data
+  [164/283] I Bid You Ajou: Γ£ù no data
+  [165/283] Dontspoilasale: Γ£ô 6 runs
+  [166/283] Rappell: Γ£ù no data
+  [167/283] Mc Loven: Γ£ô 6 runs
+  [168/283] I'm Spartacus: Γ£ù no data
+  [169/283] Amemri: Γ£ù no data
+  [170/283] Edmond Halley: Γ£ô 5 runs
+  [171/283] Magical Merlin: Γ£ù no data
+  [172/283] Caph Star: Γ£ù no data
+  [173/283] Nordic Norm: Γ£ù no data
+  [174/283] Penfolds Grange: Γ£ù no data
+  [175/283] Billy Mill: Γ£ù no data
+  [176/283] Havana Touch: Γ£ù no data
+  [177/283] King Of Charm: Γ£ù no data
+  [178/283] Beta Reader: Γ£ù no data
+  [179/283] Chico Dulce: Γ£ù no data
+  [180/283] Jampa Ling: Γ£ù no data
+  [181/283] Love Bomb: Γ£ô 6 runs
+  [182/283] One Cool Bear: Γ£ù no data
+  [183/283] Dream And Believe: Γ£ô 4 runs
+  [184/283] Faustyna: Γ£ù no data
+  [185/283] Stone Bear: Γ£ù no data
+  [186/283] Pretty Liz: Γ£ù no data
+  [187/283] Royal County Glory: Γ£ù no data
+  [188/283] Bullet Bourbon: Γ£ù no data
+  [189/283] Spirit Above: Γ£ô 3 runs
+  [190/283] Lady Landhort: Γ£ù no data
+  [191/283] Cause I Like You: Γ£ô 6 runs
+  [192/283] Dream Legend: Γ£ù no data
+  [193/283] Cribbins: Γ£ô 4 runs
+  [194/283] Pureis King: Γ£ô 4 runs
+  [195/283] West Hill Rosie: Γ£ù no data
+  [196/283] Winding Stream: Γ£ù no data
+  [197/283] Magic Trip: Γ£ù no data
+  [198/283] Balzac: Γ£ù no data
+  [199/283] Bu Hail: Γ£ù no data
+  [200/283] Alembic: Γ£ù no data
+  [201/283] Fizzy Bear: Γ£ù no data
+  [202/283] Claytons Kolatonic: Γ£ù no data
+  [203/283] Dijon Gone: Γ£ù no data
+  [204/283] Madame Passant: Γ£ù no data
+  [205/283] Tiny Tiger: Γ£ù no data
+  [206/283] Allsortz: Γ£ù no data
+  [207/283] Basilano: Γ£ù no data
+  [208/283] Dun Aonghasa: Γ£ù no data
+  [209/283] Green Amoro: Γ£ù no data
+  [210/283] Ocean's Breath: Γ£ù no data
+  [211/283] A Daughters Love: Γ£ù no data
+  [212/283] Falcon Queen: Γ£ù no data
+  [213/283] Hasita: Γ£ù no data
+  [214/283] Saint Agatha: Γ£ù no data
+  [215/283] Salama Blue Point: Γ£ù no data
+  [216/283] Deluded: Γ£ù no data
+  [217/283] Twilight Glow: Γ£ù no data
+  [218/283] Shafi: Γ£ù no data
+  [219/283] Pints In Peace: Γ£ù no data
+  [220/283] Ahead Of Fashion: Γ£ù no data
+  [221/283] Storm Point: Γ£ù no data
+  [222/283] Black Endeavour: Γ£ù no data
+  [223/283] Lion of Mali: Γ£ù no data
+  [224/283] Mehmar: Γ£ô 6 runs
+  [225/283] Comfort Line: Γ£ô 6 runs
+  [226/283] Star Mind: Γ£ô 6 runs
+  [227/283] Alex Belardo: Γ£ù no data
+  [228/283] Palazzo Persico: Γ£ô 6 runs
+  [229/283] Punk Poet: Γ£ù no data
+  [230/283] Kitty Bear: Γ£ù no data
+  [231/283] Deep Vein: Γ£ô 6 runs
+  [232/283] Master Garvey: Γ£ù no data
+  [233/283] Alto Sax: Γ£ù no data
+  [234/283] Hi George: Γ£ù no data
+  [235/283] Parisian Scholar: Γ£ù no data
+  [236/283] Moment Of Light: Γ£ù no data
+  [237/283] Devil's Peak: Γ£ù no data
+  [238/283] Starship Trooper: Γ£ù no data
+  [239/283] Green Falcon: Γ£ù no data
+  [240/283] Believed: Γ£ù no data
+  [241/283] Chicago Moon: Γ£ù no data
+  [242/283] Cosmetic: Γ£ù no data
+  [243/283] Emmeleia: Γ£ù no data
+  [244/283] Eretria: Γ£ù no data
+  [245/283] Ipanema Sunshine: Γ£ù no data
+  [246/283] Music And Song: Γ£ù no data
+  [247/283] Yousaynothingatall: Γ£ù no data
+  [248/283] Zitkala Sa: Γ£ù no data
+  [249/283] Lovethiswayagain: Γ£ù no data
+  [250/283] Arry Up: Γ£ù no data
+  [251/283] Uniter: Γ£ù no data
+  [252/283] Chhota Saab: Γ£ù no data
+  [253/283] Corniche Girl: Γ£ù no data
+  [254/283] Stock Market: Γ£ù no data
+  [255/283] Fullstop: Γ£ù no data
+  [256/283] Madman: Γ£ù no data
+  [257/283] Jungle Knight: Γ£ù no data
+  [258/283] Anorah Unleashed: Γ£ù no data
+  [259/283] Runamara: Γ£ù no data
+  [260/283] Derry Lad: Γ£ù no data
+  [261/283] Liberate: Γ£ù no data
+  [262/283] Timeless Charm: Γ£ù no data
+  [263/283] Sir Callisto: Γ£ù no data
+  [264/283] Yosemite Gold: Γ£ù no data
+  [265/283] Billie Frechette: Γ£ù no data
+  [266/283] Expound: Γ£ù no data
+  [267/283] Echinacea: Γ£ù no data
+  [268/283] Baila Conmigo: Γ£ù no data
+  [269/283] Beat The Devil: Γ£ù no data
+  [270/283] Brandon Creek: Γ£ù no data
+  [271/283] Breathe Again: Γ£ù no data
+  [272/283] Sarmiento Power: Γ£ô 6 runs
+  [273/283] Edge Of Darkness: Γ£ù no data
+  [274/283] Em Four: Γ£ù no data
+  [275/283] State Of Madness: Γ£ù no data
+  [276/283] Brazen Idol: Γ£ù no data
+  [277/283] True Promise: Γ£ù no data
+  [278/283] Ruby Red Gove: Γ£ù no data
+  [279/283] Alpine Girl: Γ£ù no data
+  [280/283] Serenity Dream: Γ£ù no data
+  [281/283] Middleton View: Γ£ù no data
+  [282/283] Expert Agent: Γ£ù no data
+  [283/283] Up The Anti: Γ£ù no data
+  [form] Enriched 83/283 runners with form data
+  Γ£ô Form enriched 83/283 horses (29%)
+
+====================================================================================================
+DAILY 3-PICK SELECTION ENGINE
+====================================================================================================
+  Races    : 32
+  Strategy : Best horse per race -> top 5 cross-race bests (min score 78)
+====================================================================================================
+
+[STAGE 2/5] Loading horse history from DynamoDB...
+Loading horse history from DynamoDB...
+  Horse history loaded: 36 horses tracked in DB
+[SKIP ΓÇö already started/imminent]  [Southwell  2026-04-01T13:30]
+[Sedgefield  2026-04-01T13:40]  7 runners
+
+================================================================================
+WEATHER-BASED GOING INFERENCE (3-Day Rainfall + Seasonal Factor)
+Current Month: April (Seasonal Bias: -2)
+Using weather API inference
+================================================================================
+
+Checking Carlisle (turf) - Weather API...
+  [RAIN] Rainfall: 14.2mm -> Going: Soft (Score: -7)
+     April typical: softer (-2)
+
+Checking Taunton (turf) - Weather API...
+  [CLOUD] Rainfall: 2.2mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Fairyhouse (turf) - Weather API...
+  [CLOUD] Rainfall: 3.9mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Wolverhampton (all-weather) - Weather API...
+  [CLOUD] Rainfall: 3.4mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Kempton (all-weather) - Weather API...
+  [SUN] Rainfall: 1.2mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Punchestown (turf) - Weather API...
+  [CLOUD] Rainfall: 6.7mm -> Going: Good to Soft (Score: -2)
+     April typical: softer (-2)
+
+Checking Ludlow (turf) - Weather API...
+  [CLOUD] Rainfall: 4.0mm -> Going: Good to Soft (Score: -2)
+     April typical: softer (-2)
+
+Checking Newcastle (all-weather) - Weather API...
+  [CLOUD] Rainfall: 5.4mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Sedgefield (turf) - Weather API...
+  [CLOUD] Rainfall: 5.8mm -> Going: Good to Soft (Score: -2)
+     April typical: softer (-2)
+
+Checking Ffos Las (turf) - Weather API...
+  [CLOUD] Rainfall: 7.9mm -> Going: Soft (Score: -4)
+     April typical: softer (-2)
+
+Checking Exeter (turf) - Weather API...
+  [CLOUD] Rainfall: 2.8mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Warwick (turf) - Weather API...
+  [CLOUD] Rainfall: 2.4mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Southwell (all-weather) - Weather API...
+  [CLOUD] Rainfall: 3.1mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Dundalk (all-weather) - Weather API...
+  [CLOUD] Rainfall: 5.0mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Doncaster (turf) - Weather API...
+  [CLOUD] Rainfall: 4.9mm -> Going: Good to Soft (Score: -2)
+     April typical: softer (-2)
+
+Checking Kelso (turf) - Weather API...
+  [CLOUD] Rainfall: 9.0mm -> Going: Soft (Score: -4)
+     April typical: softer (-2)
+
+Checking Navan (turf) - Weather API...
+  [CLOUD] Rainfall: 4.3mm -> Going: Good to Soft (Score: -2)
+     April typical: softer (-2)
+
+Checking Newbury (turf) - Weather API...
+  [SUN] Rainfall: 1.9mm -> Going: Good to Firm (Score: +6)
+     April typical: softer (-2)
+
+Checking Lingfield (all-weather) - Weather API...
+  [SUN] Rainfall: 0.7mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Cheltenham (turf) - Weather API...
+  [CLOUD] Rainfall: 3.0mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Ascot (turf) - Weather API...
+  [CLOUD] Rainfall: 2.1mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Sandown (turf) - Weather API...
+  [CLOUD] Rainfall: 2.2mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Haydock (turf) - Weather API...
+  [RAIN] Rainfall: 12.1mm -> Going: Soft (Score: -7)
+     April typical: softer (-2)
+
+Checking Leicester (turf) - Weather API...
+  [CLOUD] Rainfall: 3.1mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Leopardstown (turf) - Weather API...
+  [CLOUD] Rainfall: 3.1mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Naas (turf) - Weather API...
+  [CLOUD] Rainfall: 4.8mm -> Going: Good to Soft (Score: -2)
+     April typical: softer (-2)
+
+Checking Gowran Park (turf) - Weather API...
+  [CLOUD] Rainfall: 3.4mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Thurles (turf) - Weather API...
+  [CLOUD] Rainfall: 5.8mm -> Going: Good to Soft (Score: -2)
+     April typical: softer (-2)
+
+Checking Clonmel (turf) - Weather API...
+  [CLOUD] Rainfall: 4.9mm -> Going: Good to Soft (Score: -2)
+     April typical: softer (-2)
+
+Checking Limerick (turf) - Weather API...
+  [CLOUD] Rainfall: 8.0mm -> Going: Soft (Score: -4)
+     April typical: softer (-2)
+
+Checking Cork (turf) - Weather API...
+  [CLOUD] Rainfall: 3.0mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Galway (turf) - Weather API...
+  [RAIN] Rainfall: 10.1mm -> Going: Soft (Score: -7)
+     April typical: softer (-2)
+
+Checking Ayr (turf) - Weather API...
+  [RAIN] Rainfall: 17.5mm -> Going: Soft (Score: -7)
+     April typical: softer (-2)
+
+Checking Musselburgh (turf) - Weather API...
+  [RAIN] Rainfall: 15.7mm -> Going: Soft (Score: -7)
+     April typical: softer (-2)
+
+Checking Perth (turf) - Weather API...
+  [RAIN] Rainfall: 13.0mm -> Going: Soft (Score: -7)
+     April typical: softer (-2)
+
+Checking Huntingdon (turf) - Weather API...
+  [SUN] Rainfall: 1.9mm -> Going: Good to Firm (Score: +6)
+     April typical: softer (-2)
+
+Checking Market Rasen (turf) - Weather API...
+  [CLOUD] Rainfall: 2.3mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Wincanton (turf) - Weather API...
+  [CLOUD] Rainfall: 3.0mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Plumpton (turf) - Weather API...
+  [SUN] Rainfall: 0.9mm -> Going: Good to Firm (Score: +6)
+     April typical: softer (-2)
+
+Checking Fontwell (turf) - Weather API...
+  [CLOUD] Rainfall: 2.5mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Wetherby (turf) - Weather API...
+  [CLOUD] Rainfall: 6.2mm -> Going: Good to Soft (Score: -2)
+     April typical: softer (-2)
+
+Checking Bangor-on-Dee (turf) - Weather API...
+  [CLOUD] Rainfall: 5.0mm -> Going: Good to Soft (Score: -2)
+     April typical: softer (-2)
+
+Checking Stratford (turf) - Weather API...
+  [CLOUD] Rainfall: 2.3mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Worcester (turf) - Weather API...
+  [CLOUD] Rainfall: 2.8mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Hereford (turf) - Weather API...
+  [CLOUD] Rainfall: 3.7mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+Checking Chepstow (turf) - Weather API...
+  [CLOUD] Rainfall: 3.5mm -> Going: Good (Score: +2)
+     April typical: softer (-2)
+
+================================================================================
+
+  [trainer_form] Loaded stats: 174 trainers, 29 jockeys (30-day rolling window)
+[Wincanton  2026-04-01T13:50]  8 runners
+[Southwell  2026-04-01T14:00]  6 runners
+[Sedgefield  2026-04-01T14:10]  5 runners
+[Wincanton  2026-04-01T14:20]  6 runners
+[Southwell  2026-04-01T14:30]  10 runners
+[Sedgefield  2026-04-01T14:40]  8 runners
+[Wincanton  2026-04-01T14:50]  7 runners
+[Southwell  2026-04-01T15:00]  8 runners
+[Sedgefield  2026-04-01T15:10]  6 runners
+[Wincanton  2026-04-01T15:20]  7 runners
+[Southwell  2026-04-01T15:30]  8 runners
+[Sedgefield  2026-04-01T15:40]  11 runners
+[Wincanton  2026-04-01T15:50]  12 runners
+[Southwell  2026-04-01T16:02]  7 runners
+[Sedgefield  2026-04-01T16:10]  8 runners
+[Dundalk  2026-04-01T16:15]  12 runners
+[Wincanton  2026-04-01T16:20]  8 runners
+[Kempton  2026-04-01T16:30]  8 runners
+[Dundalk  2026-04-01T16:45]  12 runners
+[Kempton  2026-04-01T17:00]  9 runners
+[Dundalk  2026-04-01T17:15]  13 runners
+[Kempton  2026-04-01T17:30]  13 runners
+[Dundalk  2026-04-01T17:45]  10 runners
+[Kempton  2026-04-01T18:00]  8 runners
+[Dundalk  2026-04-01T18:15]  11 runners
+[Kempton  2026-04-01T18:30]  5 runners
+[Dundalk  2026-04-01T18:45]  9 runners
+[Kempton  2026-04-01T19:00]  11 runners
+[Dundalk  2026-04-01T19:15]  14 runners
+[Kempton  2026-04-01T19:30]  10 runners
+  [GATE-S4 REJECTED] Intenzo score=79: score_gap=7.0 < 8 (too tight, race is a coin-flip)
+
+====================================================================================================
+TOP 5 PICKS SELECTED
+====================================================================================================
+  #1  Moment Of Light               @ 2.20  Score: 106  [Kempton  2026-04-01T18:30]
+  #2  Golan Loop                    @ 3.75  Score: 100  [Wincanton  2026-04-01T14:20]
+  #3  I'm Spartacus                 @ 4.50  Score:  84  [Dundalk  2026-04-01T16:45]
+  #4  Baila Conmigo                 @ 6.00  Score:  80  [Dundalk  2026-04-01T19:15]
+  #5  Captain Cool                  @ 3.25  Score:  80  [Sedgefield  2026-04-01T13:40]
+====================================================================================================
+
+  >> PICK #5: Captain Cool                 @ 3.25  Score: 80  [Sedgefield]
+  -  Learning: Maple                        @ 9.00  Score: 56
+  -  Learning: Diamond Jim                  @ 5.50  Score: 60
+  -  Learning: Blackwater Lilly             @11.00  Score: 26
+  -  Learning: Belaya River                 @ 2.50  Score: 62
+  -  Learning: Fine Point                   @34.00  Score:  4
+  -  Learning: Ambassador                   @34.00  Score:-17
+  -  Learning: Twist Of Fatecatch           @13.00  Score:  7
+  -  Learning: Calme Olympien               @ 9.00  Score: 34
+  -  Learning: Jukebox King                 @ 3.50  Score: 75
+  -  Learning: Geezer Rockstar              @11.00  Score: 22
+  -  Learning: Gold Link                    @11.00  Score: 46
+  -  Learning: Jena D'oudairies             @ 5.50  Score: 38
+  -  Learning: Matthias                     @ 4.00  Score: 49
+  -  Learning: Wispit Twob                  @13.00  Score: 27
+  -  Learning: Kayce Dutton                 @ 5.00  Score: 47
+  -  Learning: Big Boy Barney               @ 3.25  Score: 72
+  -  Learning: Ukantango                    @ 6.50  Score: 70
+  -  Learning: Intenzo                      @ 4.33  Score: 79
+  -  Learning: Boston Boy                   @11.00  Score: 21
+  -  Learning: Gilbertina                   @ 7.00  Score: 29
+  -  Learning: Mountain Mike                @ 4.00  Score: 74
+  -  Learning: Realisation                  @ 2.38  Score: 69
+  -  Learning: Stratagem                    @ 4.00  Score: 32
+  -  Learning: Ailt An Chorrain             @ 9.00  Score: 21
+  -  Learning: Mary Stanford                @13.00  Score: 16
+  -  Learning: Loup De Maulde               @ 4.50  Score: 62
+  >> PICK #2: Golan Loop                   @ 3.75  Score:100  [Wincanton]
+  -  Learning: Broomfields Cave             @ 5.00  Score: 80
+  -  Learning: Muskoka                      @ 8.50  Score: 26
+  -  Learning: Law Of Supply                @ 3.25  Score: 59
+  -  Learning: Ignore The Door              @ 7.00  Score: 42
+  -  Learning: Aunt Gallie                  @17.00  Score:-38
+  -  Learning: Briery Bluebelle             @26.00  Score:-64
+  -  Learning: Frost Moon                   @ 5.50  Score:  9
+  -  Learning: Greyse                       @101.00  Score:-74
+  -  Learning: Queens Charm                 @ 2.50  Score: -3
+  -  Learning: Rose Of Knocknamoe           @ 6.50  Score:-28
+  -  Learning: Rosie's Honour               @ 7.00  Score: -6
+  -  Learning: Frandefo                     @26.00  Score:-62
+  -  Learning: Just Rizzo                   @26.00  Score:-62
+  -  Learning: No More Teardrops            @ 7.00  Score:-20
+  -  Learning: Dixie Cowboy                 @ 2.38  Score: 36
+  -  Learning: Nonbinding                   @51.00  Score:-56
+  -  Learning: Beep Beep Becky              @ 9.00  Score: 19
+  -  Learning: Natural Ability              @ 7.00  Score: 15
+  -  Learning: Clean Getaway                @15.00  Score:-26
+  -  Learning: Restandbethankful            @13.00  Score:-32
+  -  Learning: Elusive Warrior              @26.00  Score:-53
+  -  Learning: Myfavouritesister            @ 3.50  Score:  2
+  -  Learning: It's A Breeze                @ 4.00  Score:  6
+  -  Learning: Harry Junior                 @ 5.00  Score: 51
+  -  Learning: Lydeard Girl                 @ 7.50  Score:  6
+  -  Learning: All Night Parking            @101.00  Score:-54
+  -  Learning: Walkinthepresent             @ 2.50  Score: 46
+  -  Learning: Square Du Roule              @ 9.00  Score: 47
+  -  Learning: Stage Show                   @21.00  Score:-22
+  -  Learning: Corsican Caper               @ 7.50  Score: 22
+  -  Learning: Lou Des Bordes               @67.00  Score:-14
+  -  Learning: Papillondelumiere            @34.00  Score:-17
+  -  Learning: Promethean                   @34.00  Score:-14
+  -  Learning: Road To Wembley              @ 2.38  Score: 75
+  -  Learning: Top Coeur                    @ 3.25  Score: 60
+  -  Learning: Novelista                    @ 5.50  Score: 53
+  -  Learning: Paragon                      @21.00  Score:-12
+  -  Learning: Bright Legend                @ 2.38  Score: 33
+  -  Learning: Fearless Dragon              @26.00  Score:-18
+  -  Learning: Hay Max                      @ 8.00  Score: 37
+  -  Learning: Phantom Gold                 @ 6.50  Score: 31
+  -  Learning: Who's Glen                   @ 3.00  Score: 63
+  -  Learning: Monark Wood                  @17.00  Score: 10
+  -  Learning: Move With The Beat           @ 9.00  Score: 38
+  -  Learning: Kingcormac                   @ 3.25  Score: 80
+  -  Learning: Rangatira Jack               @13.00  Score:  0
+  -  Learning: Applicationofcash            @ 5.00  Score: 19
+  -  Learning: Hatos                        @ 5.50  Score: 17
+  -  Learning: Universal Secret             @ 4.50  Score: 41
+  -  Learning: My Rockstar                  @17.00  Score:  7
+  -  Learning: El Galactico                 @ 7.50  Score: 33
+  -  Learning: Immortal Fame                @ 7.50  Score: 17
+  -  Learning: Jubilant                     @11.00  Score: 32
+  -  Learning: Passing Pleasure             @ 2.38  Score: 65
+  -  Learning: Ocean Conquest               @ 9.00  Score: 40
+  -  Learning: Diamond Geezer               @ 9.00  Score: 74
+  -  Learning: Campaign Trail               @ 8.00  Score: 53
+  -  Learning: Moon Hunter                  @21.00  Score:-19
+  -  Learning: Achnamara                    @17.00  Score:-32
+  -  Learning: Byron Hill                   @13.00  Score:-31
+  -  Learning: Cosmic Soul                  @ 1.80  Score: 31
+  -  Learning: Swingforthefence             @17.00  Score:-18
+  -  Learning: Top Flight Century           @26.00  Score: -7
+  -  Learning: Seeyainthesuninn             @51.00  Score:-57
+  -  Learning: Knacker Trapper              @ 9.00  Score:-19
+  -  Learning: Kopa Kilana                  @26.00  Score:-54
+  -  Learning: Laddie Cooper Mia            @ 6.00  Score: -1
+  -  Learning: Deauville Lady               @17.00  Score:-18
+  -  Learning: Mr Globalist                 @21.00  Score:-53
+  -  Learning: Get In Order                 @21.00  Score:-53
+  -  Learning: Lake Tiberias                @13.00  Score:-13
+  -  Learning: Victory Shout                @ 3.50  Score: 38
+  -  Learning: Prairie Diamond              @ 9.00  Score: 36
+  -  Learning: Bread And Butter             @26.00  Score:-43
+  -  Learning: Walk In The West             @ 5.00  Score: 18
+  -  Learning: Forest Hills                 @21.00  Score:-45
+  -  Learning: Athena's Dream               @15.00  Score:-15
+  -  Learning: Prince Rhinegold             @ 6.00  Score: 23
+  -  Learning: Eric Gorcombe                @17.00  Score:-19
+  -  Learning: Mancero                      @11.00  Score: 12
+  -  Learning: Sawpit Sienna                @17.00  Score:-13
+  -  Learning: Rosa Diaz                    @ 8.50  Score:-17
+  -  Learning: Briery Butterfly             @ 3.75  Score:  3
+  -  Learning: Princesse Milania            @ 4.33  Score: 12
+  -  Learning: Venturevango                 @15.00  Score:-44
+  -  Learning: Belladinotte                 @ 7.50  Score:-22
+  -  Learning: Shorten Sassy                @ 9.00  Score:-25
+  -  Learning: Mya Du Clos                  @ 4.50  Score: 10
+  -  Learning: Connells Cross               @ 3.75  Score: 47
+  -  Learning: Hillsteels Blue              @34.00  Score:-57
+  -  Learning: Scopic                       @34.00  Score:-47
+  -  Learning: The Gem State                @ 1.73  Score:  7
+  -  Learning: Datstheholyallofit           @17.00  Score:-21
+  -  Learning: Dolly Dior                   @26.00  Score:-47
+  -  Learning: Mords Lavie Spigao           @ 8.00  Score: -8
+  -  Learning: Smart Order                  @26.00  Score:-47
+  -  Learning: Jordan Breeze                @11.00  Score: 40
+  -  Learning: Bye Bye Now                  @ 5.00  Score: 66
+  -  Learning: Jazzit                       @ 6.00  Score: 47
+  -  Learning: Snowballs                    @26.00  Score:-14
+  -  Learning: Phil's Dream                 @ 6.50  Score: 30
+  -  Learning: An Laochmor                  @ 3.50  Score: 63
+  -  Learning: Sceitimini                   @13.00  Score: 16
+  -  Learning: Whats It All About           @15.00  Score: 16
+  -  Learning: Cooee Call                   @34.00  Score:-12
+  -  Learning: She's A Gift                 @13.00  Score: 18
+  -  Learning: Queen Of Newark              @26.00  Score:-11
+  -  Learning: Star Reign                   @34.00  Score:-10
+  -  Learning: Beau Merle                   @ 7.00  Score: -5
+  -  Learning: Beau Speed                   @ 1.80  Score: 13
+  -  Learning: Crock's Bottom               @ 5.50  Score: 14
+  -  Learning: Posh Chick                   @ 8.00  Score: 16
+  -  Learning: Blackmore Jack               @34.00  Score:-47
+  -  Learning: Lord Churchill               @21.00  Score:-24
+  -  Learning: Martial Law                  @15.00  Score:-17
+  -  Learning: Lissahane Lass               @51.00  Score:-35
+  -  Learning: Divine Wish                  @ 7.00  Score: 24
+  -  Learning: Blue Birdie                  @34.00  Score: -2
+  -  Learning: Light Dreamer                @ 5.00  Score: 35
+  -  Learning: Lightkiss                    @ 3.50  Score: 51
+  -  Learning: Music Academy                @26.00  Score:-14
+  -  Learning: Nanoscience                  @ 6.00  Score: 71
+  -  Learning: Rajwaah                      @ 4.33  Score: 46
+  -  Learning: Society Charm                @13.00  Score: 16
+  -  Learning: Inishfallen                  @ 5.00  Score: 49
+  -  Learning: Collective Power             @11.00  Score: 32
+  -  Learning: Beauty Queen                 @34.00  Score:-14
+  -  Learning: Sporting Hero                @ 5.50  Score: 61
+  -  Learning: Clonmacash                   @ 7.00  Score: 59
+  -  Learning: I Bid You Ajou               @15.00  Score: 38
+  -  Learning: Dontspoilasale               @17.00  Score: 25
+  -  Learning: Rappell                      @11.00  Score: 43
+  -  Learning: Mc Loven                     @21.00  Score:  0
+  >> PICK #3: I'm Spartacus                @ 4.50  Score: 84  [Dundalk]
+  -  Learning: Amemri                       @11.00  Score: 32
+  -  Learning: Edmond Halley                @26.00  Score:-11
+  -  Learning: Magical Merlin               @ 5.50  Score: -8
+  -  Learning: Caph Star                    @13.00  Score:-17
+  -  Learning: Nordic Norm                  @ 5.00  Score: -6
+  -  Learning: Penfolds Grange              @ 4.00  Score:  5
+  -  Learning: Billy Mill                   @11.00  Score:-26
+  -  Learning: Havana Touch                 @ 7.50  Score:-18
+  -  Learning: King Of Charm                @21.00  Score:-58
+  -  Learning: Beta Reader                  @13.00  Score:-10
+  -  Learning: Chico Dulce                  @ 7.50  Score: -8
+  -  Learning: Jampa Ling                   @ 6.00  Score: 61
+  -  Learning: Love Bomb                    @21.00  Score:  2
+  -  Learning: One Cool Bear                @ 5.00  Score: 59
+  -  Learning: Dream And Believe            @15.00  Score: 16
+  -  Learning: Faustyna                     @ 5.50  Score: 68
+  -  Learning: Stone Bear                   @11.00  Score: 39
+  -  Learning: Pretty Liz                   @11.00  Score: 16
+  -  Learning: Royal County Glory           @ 7.00  Score: 41
+  -  Learning: Bullet Bourbon               @21.00  Score:-10
+  -  Learning: Spirit Above                 @34.00  Score:-14
+  -  Learning: Lady Landhort                @ 8.00  Score: 50
+  -  Learning: Cause I Like You             @21.00  Score:-12
+  -  Learning: Dream Legend                 @21.00  Score:-12
+  -  Learning: Cribbins                     @17.00  Score:  8
+  -  Learning: Pureis King                  @26.00  Score:-17
+  -  Learning: West Hill Rosie              @51.00  Score:  9
+  -  Learning: Winding Stream               @ 4.00  Score: 43
+  -  Learning: Magic Trip                   @ 5.50  Score: 55
+  -  Learning: Balzac                       @ 2.62  Score: 49
+  -  Learning: Bu Hail                      @17.00  Score: 12
+  -  Learning: Alembic                      @17.00  Score: 18
+  -  Learning: Fizzy Bear                   @17.00  Score: 12
+  -  Learning: Claytons Kolatonic           @17.00  Score: 26
+  -  Learning: Dijon Gone                   @15.00  Score: 18
+  -  Learning: Madame Passant               @34.00  Score:-12
+  -  Learning: Tiny Tiger                   @67.00  Score:-11
+  -  Learning: Allsortz                     @ 8.00  Score: 29
+  -  Learning: Basilano                     @151.00  Score:-14
+  -  Learning: Dun Aonghasa                 @11.00  Score: 16
+  -  Learning: Green Amoro                  @ 5.00  Score: 35
+  -  Learning: Ocean's Breath               @ 3.00  Score: 48
+  -  Learning: A Daughters Love             @151.00  Score:-14
+  -  Learning: Falcon Queen                 @ 9.00  Score: 25
+  -  Learning: Hasita                       @ 8.00  Score: 25
+  -  Learning: Saint Agatha                 @ 6.00  Score: 51
+  -  Learning: Salama Blue Point            @26.00  Score:-14
+  -  Learning: Deluded                      @ 5.50  Score:  2
+  -  Learning: Twilight Glow                @17.00  Score:-34
+  -  Learning: Shafi                        @ 4.50  Score: 27
+  -  Learning: Pints In Peace               @ 5.00  Score: 21
+  -  Learning: Ahead Of Fashion             @15.00  Score:-26
+  -  Learning: Storm Point                  @11.00  Score:-34
+  -  Learning: Black Endeavour              @ 7.00  Score:  0
+  -  Learning: Lion of Mali                 @ 5.00  Score: 30
+  -  Learning: Mehmar                       @ 9.00  Score: 16
+  -  Learning: Comfort Line                 @ 8.00  Score: 14
+  -  Learning: Star Mind                    @11.00  Score: 20
+  -  Learning: Alex Belardo                 @ 5.00  Score: 52
+  -  Learning: Palazzo Persico              @11.00  Score: 20
+  -  Learning: Punk Poet                    @11.00  Score:  1
+  -  Learning: Kitty Bear                   @ 4.00  Score: 74
+  -  Learning: Deep Vein                    @21.00  Score:-12
+  -  Learning: Master Garvey                @ 5.00  Score: 32
+  -  Learning: Alto Sax                     @21.00  Score:-12
+  -  Learning: Hi George                    @51.00  Score:-12
+  -  Learning: Parisian Scholar             @ 5.00  Score: 75
+  >> PICK #1: Moment Of Light              @ 2.20  Score:106  [Kempton]
+  -  Learning: Devil's Peak                 @ 9.00  Score: 57
+  -  Learning: Starship Trooper             @ 7.00  Score: 60
+  -  Learning: Green Falcon                 @ 5.00  Score: 63
+  -  Learning: Believed                     @11.00  Score: 16
+  -  Learning: Chicago Moon                 @11.00  Score: 51
+  -  Learning: Cosmetic                     @13.00  Score: 16
+  -  Learning: Emmeleia                     @ 2.00  Score: 43
+  -  Learning: Eretria                      @ 4.50  Score: 35
+  -  Learning: Ipanema Sunshine             @21.00  Score:-14
+  -  Learning: Music And Song               @151.00  Score:-14
+  -  Learning: Yousaynothingatall           @ 5.00  Score: 35
+  -  Learning: Zitkala Sa                   @21.00  Score:-14
+  -  Learning: Lovethiswayagain             @11.00  Score:-22
+  -  Learning: Arry Up                      @ 5.00  Score:  5
+  -  Learning: Uniter                       @17.00  Score:-18
+  -  Learning: Chhota Saab                  @21.00  Score:-52
+  -  Learning: Corniche Girl                @ 5.50  Score: -3
+  -  Learning: Stock Market                 @21.00  Score:-52
+  -  Learning: Fullstop                     @17.00  Score:-34
+  -  Learning: Madman                       @ 2.75  Score: 20
+  -  Learning: Jungle Knight                @11.00  Score:-34
+  -  Learning: Anorah Unleashed             @34.00  Score:-58
+  -  Learning: Runamara                     @17.00  Score:-30
+  -  Learning: Derry Lad                    @17.00  Score: -3
+  -  Learning: Liberate                     @26.00  Score: -6
+  -  Learning: Timeless Charm               @15.00  Score: 38
+  -  Learning: Sir Callisto                 @ 5.00  Score: 45
+  -  Learning: Yosemite Gold                @21.00  Score: -6
+  -  Learning: Billie Frechette             @13.00  Score: 46
+  -  Learning: Expound                      @11.00  Score: 18
+  -  Learning: Echinacea                    @ 7.00  Score: 49
+  >> PICK #4: Baila Conmigo                @ 6.00  Score: 80  [Dundalk]
+  -  Learning: Beat The Devil               @ 5.50  Score: 57
+  -  Learning: Brandon Creek                @13.00  Score: 39
+  -  Learning: Breathe Again                @26.00  Score: -7
+  -  Learning: Sarmiento Power              @ 7.50  Score: 66
+  -  Learning: Edge Of Darkness             @34.00  Score:-16
+  -  Learning: Em Four                      @ 5.00  Score: 16
+  -  Learning: State Of Madness             @ 3.00  Score: 28
+  -  Learning: Brazen Idol                  @ 7.50  Score: -5
+  -  Learning: True Promise                 @ 8.00  Score: -1
+  -  Learning: Ruby Red Gove                @11.00  Score:-12
+  -  Learning: Alpine Girl                  @67.00  Score:-54
+  -  Learning: Serenity Dream               @ 6.50  Score: 17
+  -  Learning: Middleton View               @34.00  Score:-56
+  -  Learning: Expert Agent                 @11.00  Score:-44
+  -  Learning: Up The Anti                  @34.00  Score:-19
+
+Saved 277 horses | 5 UI picks | 272 learning records
+
+[STAGE 5/5] Analysis manifest saved ΓÇö pipeline COMPLETE Γ£ô
+[WhatsApp] Sent to whatsapp:+353863896068  sid=SM1ad3fc9d5e7d1657462880e74de2ef44
+[WhatsApp] Sent to whatsapp:+353877620034  sid=SM174d062077a793cc36e7e58b4a63bdf8
+[WhatsApp] Notifications sent to 2 recipient(s)
+OK 5 picks ready - run 'python show_todays_ui_picks.py' to review

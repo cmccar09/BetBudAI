@@ -1,0 +1,1 @@
+[{"Id":"BettingPicksAPI","Arn":"arn:aws:lambda:eu-west-1:813281204422:function:BettingPicksAPI","Input":"{\"source\":\"aws.events\"}"}]

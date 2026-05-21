@@ -1,0 +1,140 @@
+# BetBudAI - Rebuilt from Scratch
+
+> A high-performance AI-powered horse racing picks platform, rebuilt with modular architecture and refined by 5+ months of live operation learnings.
+
+## Quick Start
+
+### Local Development
+```bash
+git clone https://github.com/your-org/BetBudAI.git
+cd BetBudAI
+
+# Backend
+python -m venv .venv && source .venv/bin/activate
+cd backend && pip install -r requirements.txt && flask run
+
+# Frontend (new terminal)
+cd frontend && npm install && npm start
+```
+
+Access at http://localhost:3000
+
+### Docker
+```bash
+docker-compose up
+```
+
+## Documentation
+
+- **[Architecture](./docs/ARCHITECTURE.md)** - System design, data flow, modularity improvements
+- **[API Reference](./docs/API.md)** - Complete REST API documentation  
+- **[Deployment Guide](./docs/DEPLOYMENT.md)** - AWS deployment & maintenance
+- **[Operational Learnings](./docs/LEARNINGS.md)** - 5+ months of live production insights
+- **[Troubleshooting](./docs/TROUBLESHOOTING.md)** - Common issues & fixes
+
+## What's New in v2.0
+
+### Modularity
+- ✅ **Separated concerns**: No more monolithic `lambda_api_picks.py`
+- ✅ **Modular Flask blueprints**: Picks, results, auth, admin in separate route files
+- ✅ **Component-based frontend**: Pages & components instead of 2800-line App.js
+- ✅ **Single source of truth**: No duplicate code between API, Lambda, and local scripts
+
+### Performance
+- ✅ **Dynamic configuration**: Model weights reload from DynamoDB without redeploy
+- ✅ **Unified caching**: Consistent cache strategy for API responses
+- ✅ **Hot reload support**: 5-minute TTL with fallback defaults
+- ✅ **Async processing**: Step Functions pipelines with parallel execution
+
+### Observability
+- ✅ **Structured logging**: JSON format for CloudWatch Insights
+- ✅ **Distributed tracing**: X-Ray integration for Lambda calls
+- ✅ **Custom metrics**: Per-stage pipeline monitoring
+- ✅ **Health endpoints**: Dedicated `/api/health` for uptime monitoring
+
+### Testing
+- ✅ **Unit tests**: Scoring signals, settlement logic
+- ✅ **Integration tests**: API routes, pipeline steps
+- ✅ **CI/CD pipeline**: GitHub Actions automation
+- ✅ **Fixtures & mocks**: Reusable test data
+
+## Key Features
+
+### AI Scoring Engine
+- 7-factor comprehensive scoring model
+- 50+ weighted signals refined through production learnings
+- Dynamic weight optimization (nightly learning pipeline)
+- Real-time market steam/drift detection
+
+### Settlement & Results
+- Dual-source reconciliation (Sporting Life + Betfair)
+- Exact winner verification against authoritative sources
+- Pre-race settlement guards (never settle before race starts)
+- Automatic P&L calculation per bet type (win/place/each-way)
+
+### Agentic AI
+- 5 specialist agents running in parallel
+- Each agent focuses on specific aspect (form, market, trainer, etc)
+- CloudWatch job tracking with TTL retention
+- Non-disruptive: fails open if agents error
+
+### Pipeline Orchestration
+- **Morning** (08:30 UTC): Fetch Betfair markets + run analysis
+- **Refresh** (every 2hrs): Validate picks + featured meeting analysis
+- **Evening** (20:00 UTC): Fetch results + settle picks + generate reports
+- **Learning** (22:00 UTC): Optimize weights based on performance
+
+## Technology Stack
+
+**Backend:**
+- Python 3.11 + Flask
+- AWS Lambda, DynamoDB, Step Functions, EventBridge
+- Betfair Exchange API, Sporting Life scraper
+- X-Ray, CloudWatch
+
+**Frontend:**
+- React 18, React Router
+- Axios for API client
+- AWS Amplify for deployment
+
+**Infrastructure:**
+- AWS CDK/Terraform (Infrastructure as Code)
+- Docker for local development
+- GitHub Actions for CI/CD
+
+## Deployment
+
+### AWS (Production)
+```bash
+cd backend/pipeline
+python deploy.py  # Deploy all Lambdas
+```
+
+See [Deployment Guide](./docs/DEPLOYMENT.md) for full instructions.
+
+### Amplify (Frontend)
+- Auto-deploys on push to `main` branch
+- Or manual: `cd frontend && npm run build && amplify publish`
+
+## Live Metrics
+
+- **Picks per day**: ~5 official + 2 watchlist
+- **Strike rate**: 35-45% (on official picks)
+- **ROI**: +2-5% monthly average
+- **Pipeline latency**: <5min morning analysis, <2min refresh cycles
+- **API response time**: <200ms (with caching)
+- **Agentic AI throughput**: 22 races/2min 40sec
+
+## License
+
+Proprietary - Charles McCarthy / BetBudAI
+
+## Support
+
+Issues & questions: charles.mccarthy@gmail.com
+
+---
+
+**Status**: ✅ Production-ready (May 2026)  
+**Version**: 2.0.0  
+**Last updated**: 2026-05-09

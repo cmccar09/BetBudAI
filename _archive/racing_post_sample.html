@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   Racing Results | Today's Horse Racing Results | Racing Post
+  </title>
+  <meta content="Today's latest racing results from every racecourse. Find full horse racing results and video replays for every race from the Racing Post results service." data-test-selector="block-metaTagDescription" name="description"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="initial-scale=1,width=device-width" name="viewport"/>
+  <link href="https://www.racingpost.com/results/" rel="canonical"/>
+  <base href="/results/"/>
+  <link href="https://www.rp-assets.com/results/assets/6.68.4/app.min.css" rel="stylesheet" type="text/css">
+   <script type="text/javascript">
+    var assetsURL = 'https://www.rp-assets.com/results/assets/6.68.4/';
+        window.isDiffusionIdleTimerEnabled = true;
+   </script>
+   <link href="/favicon.ico" rel="icon"/>
+   <link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+   <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+   <link href="/favicon-96x96.png" rel="icon" sizes="96x96" type="image/png"/>
+   <script type="application/ld+json">
+    {
+            "@context"  : "http://schema.org/",
+            "@type"     : "Organization",
+            "name"      : "Racing Post",
+            "url"       : "https://www.racingpost.com",
+            "logo"      : "https://www.rp-assets.com/Racing-Post-logo.png",
+            "sameAs"    : [
+                "https://www.facebook.com/racingpost",
+                "https://twitter.com/racingpost",
+                "https://www.youtube.com/user/racingpostdotcom",
+                "https://www.instagram.com/racingpost/"
+            ]
+        }
+   </script>
+   <!-- Init RP -->
+   <script>
+    'use strict';
+        !function initRp(global_)
+        {
+            var RP_CONFIG_NAME = window.RP_CONFIG_NAME || 'rp_config';
+        
+            initRpConfig();
+            initConsole();
+        
+            console.info('[INIT].initRp() -> RP_CONFIG_NAME: "' + RP_CONFIG_NAME + '"');
+        
+            function initRpConfig()
+            {
+                var rp_config_ = window[RP_CONFIG_NAME] = window[RP_CONFIG_NAME] || {};
+        
+                rp_config_.setPropertyValue         = setPropertyValue;
+                rp_config_.getPropertyValue         = getPropertyValue;
+                rp_config_.getRequiredPropertyValue = getRequiredPropertyValue;
+        
+                window.getRpConfig = getRpConfig;
+        
+                function getRpConfig()
+                {
+                    var rp_config_ = window[RP_CONFIG_NAME];
+        
+                    if (rp_config_ === undefined) console.error('.getRpConfig() -> window.' + RP_CONFIG_NAME + ' is not defined!');
+        
+                    return rp_config_;
+                }
+        
+                function setPropertyValue(property_path_, value_)
+                {
+                    var path_ = property_path_.split('.');
+        
+                    var property_       = getRpConfig();
+                    var sub_property_   = undefined;
+        
+                    var property_name_;
+        
+                    var index_;
+                    var length_ = path_.length - 1;
+        
+                    for(index_ = 0; index_ < length_; index_++)
+                    {
+                        property_name_  = path_[index_];
+                        sub_property_   = property_[property_name_];
+        
+                        if (sub_property_ instanceof Object) 
+                        {
+                            property_ = sub_property_;
+                            continue;
+                        }
+        
+                        if (sub_property_ === undefined)
+                        {
+                            property_ = sub_property_ = property_[property_name_] = {};
+                            continue;
+                        }
+        
+                        throw new Error(
+                            '.setPropertyValue("' + property_path_ + '"', value_, ')' +
+                            path_.slice(0, index_ + 1).join('.') +
+                            ' is already defined but not an object: ',
+                            property_
+                        );
+                    }
+        
+                    property_name_ = path_.pop();
+        
+                    if (property_.hasOwnProperty(property_name_)) console.warn(
+                        '.setPropertyValue("' + property_path_ + '")', '\n',
+                        'to value', value_, '\n',
+                        'was already set to: ', '\n',
+                        property_[property_name_], '\n',
+                        'and will be overridden!'
+                    );
+        
+                    property_[property_name_] = value_;
+                }
+        
+                function getPropertyValue(property_path_, default_value_, is_required_)
+                {
+                    var path_ = property_path_.split('.');
+        
+                    var property_       = getRpConfig();
+                    var sub_property_   = undefined;
+        
+                    var property_name_;
+        
+                    var index_;
+                    var length_ = path_.length;
+        
+                    for(index_ = 0; index_ < length_; index_++)
+                    {
+                        if (property_ === undefined) break;
+        
+                        property_name_  = path_[index_];
+                        sub_property_   = property_[property_name_];
+        
+                        if (!is_required_)
+                        {
+                            property_ = sub_property_;
+                            continue;
+                        }
+        
+                        if (property_.hasOwnProperty(property_name_))
+                        {
+                            property_ = sub_property_;
+                            continue;
+                        }
+        
+                        throw new Error(
+                            'undefined configuration property "' + path_[index_] + '" in "' + path_.slice(0, index_).join('.') + '"\n' +
+                            '.getRequiredPropertyValue("' + property_path_ + '") \n' +
+                            'window.getRpConfig() === window.' + RP_CONFIG_NAME + '\n'
+                        );
+                    }
+        
+                    var value_ = property_;
+        
+                    if (value_ === undefined) value_ = default_value_;
+        
+                    return value_;
+                }
+        
+                function getRequiredPropertyValue(property_path_)
+                {
+                    var is_required_    = true;
+                    var value_          = getPropertyValue(property_path_, undefined, is_required_);
+        
+                    return value_;
+                }
+            }
+        
+            function initConsole()
+            {
+                function doNothing() {}
+        
+                /* in IE console is not present and breaks unless dev tools are open */
+                var browser_console_ = global_.console = global_.console || {
+                    log         : doNothing,
+                    info        : doNothing,
+                    warn        : doNothing,
+                    error       : doNothing,
+                    is_debug    : false
+                };
+        
+                browser_console_.is_debug = browser_console_.is_debug || getRpConfig().is_debug;
+        
+                function logIfDebug()
+                {
+                    if (!browser_console_.is_debug) return;
+        
+                    var arguments_ = Array.prototype.slice.call(arguments);
+        
+                    browser_console_.log.apply(null, arguments_);
+                }
+        
+                function infoIfDebug()
+                {
+                    if (!browser_console_.is_debug) return;
+        
+                    var arguments_ = Array.prototype.slice.call(arguments);
+        
+                    browser_console_.info.apply( null, arguments_);
+                }
+        
+                var debug_console_ = { /* disable log and info messages unless is_debug */
+                    log     : logIfDebug,
+                    info    : infoIfDebug,
+                    warn    : browser_console_.warn,
+                    error   : browser_console_.error
+                };
+        
+                browser_console_.getCustom = getCustom;
+        
+                var custom_consoles_ = {};
+        
+                function getCustom(console_name_, is_debug_)
+                {
+                    if (!console_name_)     return debug_console_;
+        
+                    var custom_console_ = custom_consoles_[console_name_];
+        
+                    if (custom_console_)
+                    {
+                        custom_console_.is_debug = custom_console_;
+        
+                        return custom_console_;
+                    }
+        
+                    function isConsoleDebug()
+                    {
+                        var is_console_debug_ = custom_console_.is_debug && browser_console_.is_debug;
+        
+                        return is_console_debug_;
+                    }
+        
+                    function constructCustomConsoleArguments(arguments_)
+                    {
+                        arguments_ = Array.prototype.slice.call(arguments_);
+        
+                        arguments_ = ['[' + console_name_ + ']'].concat(arguments_);
+        
+                        return arguments_;
+                    }
+        
+                    function logIfDebugCustom()
+                    {
+                        if (!isConsoleDebug()) return;
+        
+                        var arguments_ = constructCustomConsoleArguments(arguments);
+        
+                        browser_console_.log.apply(null, arguments_);
+                    }
+        
+                    function infoIfDebugCustom()
+                    {
+                        if (!isConsoleDebug()) return;
+        
+                        var arguments_ = constructCustomConsoleArguments(arguments);
+        
+                        browser_console_.info.apply(null, arguments_);
+                    }
+        
+                    function warnCustom()
+                    {
+                        var arguments_ = constructCustomConsoleArguments(arguments);
+            
+                        browser_console_.warn.apply(null, arguments_);
+                    }
+        
+                    function errorCustom()
+                    {
+                        var arguments_ = constructCustomConsoleArguments(arguments);
+        
+                        browser_console_.error.apply(null, arguments_);
+                    }
+        
+                    var custom_console_ = {
+                        log         : logIfDebugCustom,
+                        info        : infoIfDebugCustom,
+                        warn        : warnCustom,
+                        error       : errorCustom,
+                        is_debug    : is_debug_
+                    };
+        
+                    custom_consoles_[console_name_] = custom_console_;
+        
+                    return custom_console_;
+                }
+            }
+        
+        }(window);
+   </script>
+   <!-- Init RP End -->
+   <!-- TrustArc -->
+   <script crossorigin="" type="text/javascript">
+    const environmentName = window.location.origin;
+    	const isStagingEnvironment =
+    		environmentName.includes("test1") ||
+    		environmentName.includes("uat") ||
+    		environmentName.includes("localhost") ||
+    		environmentName.includes("dev-beta");
+    
+    	const script = document.createElement("script");
+    	let trustArcSrc = null;
+    
+    	if (isStagingEnvironment) {
+    		trustArcSrc =
+    			"//consent.trustarc.com/notice?domain=racingpost-iabtest.com&c=teconsent&js=nj&noticeType=bb&text=true&gtm=1&language=en";
+    	} else {
+    		trustArcSrc =
+    			"//consent.trustarc.com/notice?domain=racingpost-iab.com&c=teconsent&js=nj&noticeType=bb&text=true&gtm=1&language=en";
+    	}
+    
+    	script.setAttribute("src", trustArcSrc);
+    	document.head.appendChild(script);
+   </script>
+   <script crossorigin="" type="text/javascript">
+    var __dispatched__ = {}; //Map of previously dispatched preference levels
+    	/*
+    	First step is to register with the CM API to receive callbacks when a preference update
+    	occurs. You must wait for the CM API (PrivacyManagerAPI object) to exist on the page
+    	before registering.
+    	*/
+    	var __i__ =
+    		self.postMessage &&
+    		setInterval(function () {
+    			if (self.PrivacyManagerAPI && __i__) {
+    				var apiObject = {
+    					PrivacyManagerAPI: {
+    						action: "getConsentDecision",
+    						timestamp: new Date().getTime(),
+    						self: self.location.host,
+    					},
+    				};
+    				self.top.postMessage(JSON.stringify(apiObject), "*");
+    				__i__ = clearInterval(__i__);
+    			}
+    		}, 50);
+    	/*
+    	Callbacks will occur in the form of a PostMessage event. This code listens for the
+    	appropriately formatted PostMessage event, gets the new consent decision, and then
+    	pushes the events into the GTM framework. Once the event is submitted, that consent
+    	decision is marked in the 'dispatched' map so it does not occur more than once.
+    	*/
+    	self.addEventListener("message", function (e, d) {
+    		try {
+    			if (
+    				e.data &&
+    				(d = JSON.parse(e.data)) &&
+    				(d = d.PrivacyManagerAPI) &&
+    				d.capabilities &&
+    				d.action == "getConsentDecision"
+    			) {
+    				var newDecision = self.PrivacyManagerAPI.callApi(
+    					"getGDPRConsentDecision",
+    					self.location.host
+    				).consentDecision;
+    				newDecision &&
+    					newDecision.forEach(function (label) {
+    						if (!__dispatched__[label]) {
+    							self.dataLayer &&
+    								self.dataLayer.push({ event: "GDPR Pref Allows " + label });
+    							__dispatched__[label] = 1;
+    						}
+    					});
+    			}
+    		} catch (xx) {
+    			/** not a cm api message **/
+    		}
+    	});
+   </script>
+   <script type="text/javascript">
+    //     (function() {
+    	//         const makeStub = () => {
+    	//         const TCF_LOCATOR_NAME = '__tcfapiLocator';
+    	//             const TCF_LOCATOR_ID = '__tcfapiTrustarc';
+    	//             const queue = [];
+    	//             let win = window;
+    	//             let cmpFrame;
+    	//             function addFrame() {
+    	//                 const doc = win.document;
+    	//                 const otherCMP = !!(win.frames[TCF_LOCATOR_NAME]);
+    	//                 if (!otherCMP) {
+    	//                     if (doc.body) {
+    	//                         const iframe = doc.createElement('iframe');
+    	//                         iframe.name = TCF_LOCATOR_NAME;
+    	//                         iframe.style.display = 'none';
+    	//                         iframe.id = TCF_LOCATOR_ID;
+    	//                         doc.body.appendChild(iframe);
+    	//                     } else {
+    	//                         setTimeout(addFrame, 5);
+    	//                     }
+    	//                 }
+    	//                 return !otherCMP;
+    	//             }
+    	//             function tcfAPIHandler(...args) {
+    	//                 let gdprApplies;
+    	//                 if (!args.length) {
+    	//                     /**
+    	//                     * shortcut to get the queue when the full CMP
+    	//                     * implementation loads; it can call tcfapiHandler()
+    	//                     * with no arguments to get the queued arguments
+    	//                     */
+    	//                     return queue;
+    	//                 } else if (args[0] === 'setGdprApplies') {
+    	//                     /**
+    	//                     * shortcut to set gdprApplies if the publisher
+    	//                     * knows that they apply GDPR rules to all
+    	//                     * traffic (see the section on "What does the
+    	//                     * gdprApplies value mean" for more
+    	//                     */
+    	//                     if (args.length > 3 && parseInt(args[1], 10) === 2 && typeof
+    	// args[3] === 'boolean') {
+    	//                         gdprApplies = args[3];
+    	//                         if (typeof args[2] === 'function') {
+    	//                             args[2]('set', true);
+    	//                         }
+    	//                     }
+    	// } else if (args[0] === 'ping') {
+    	//                     /**
+    	//                     * Only supported method; give PingReturn
+    	//                     * object as response
+    	//                     */
+    	//                     const retr = {
+    	//                         gdprApplies: gdprApplies,
+    	//                         cmpLoaded: false,
+    	//                         cmpStatus: 'stubCMP',
+    	//                         apiVersion: '2.0'
+    	//                     };
+    	//                     if (typeof args[2] === 'function') {
+    	//                         args[2](retr, true);
+    	//                     }
+    	//                 } else {
+    	//                      /**
+    	//                      * some other method, just queue it for the
+    	//                      * full CMP implementation to deal with
+    	//                      */
+    	//                      queue.push(args);
+    	//                  }
+    	//              }
+    	//              function postMessageEventHandler(event) {
+    	//                  const msgIsString = typeof event.data === 'string';
+    	//                  let json = {};
+    	//                  try {
+    	//                      /**
+    	//                      * Try to parse the data from the event. This is important
+    	//                      * to have in a try/catch because often messages may come
+    	//                      * through that are not JSON
+    	//                      */
+    	//                      if (msgIsString) {
+    	//                          json = JSON.parse(event.data);
+    	//                      } else {
+    	//                          json = event.data;
+    	//                  }
+    	//             } catch (ignore) {}
+    	//             const payload = json.__tcfapiCall;
+    	//             if (payload) {
+    	//                 window.__tcfapi(
+    	//                     payload.command,
+    	//                     payload.version,
+    	//                     function(retValue, success) {
+    	//                         let returnMsg = {
+    	//                             __tcfapiReturn: {
+    	//                                 returnValue: retValue,
+    	//                                 success: success,
+    	//                                 callId: payload.callId,
+    	//                             },
+    	//                         };
+    	//                         if (msgIsString) {
+    	//                             returnMsg = JSON.stringify(returnMsg);
+    	//  }
+    	//                         event.source.postMessage(returnMsg, '*');
+    	//                     },
+    	//                     payload.parameter
+    	//                 );
+    	//             }
+    	//         }
+    	//         /**
+    	//         * Iterate up to the top window checking for an already-created
+    	//         * "__tcfapilLocator" frame on every level. If one exists already then we are
+    	//         * not the master CMP and will not queue commands.
+    	//         */
+    	//             while (win) {
+    	//                 try {
+    	//                     if (win.frames[TCF_LOCATOR_NAME]) {
+    	//                         cmpFrame = win;
+    	//                         break;
+    	//                     }
+    	//                 } catch (ignore) {}
+    	//                 // if we're at the top and no cmpFrame
+    	//                 if (win === window.top) {
+    	//                     break;
+    	//                 }
+    	//                 // Move up
+    	//                 win = win.parent;
+    	//             }
+    	//             if (!cmpFrame) {
+    	//                 // we have recur'd up the windows and have found no __tcfapiLocator frame
+    	//                 addFrame();
+    	//                 win.__tcfapi = tcfAPIHandler;
+    	//                 win.addEventListener('message', postMessageEventHandler, false);
+    	//             }
+    	//         };
+    
+    	//         makeStub();
+    	//     }());
+    	(function () {
+    		const makeStub = () => {
+    			const TCF_LOCATOR_NAME = "__tcfapiLocator";
+    			const queue = [];
+    			const currentWindow = window;
+    			let frameLocator = currentWindow;
+    			let cmpFrame;
+    			let gdprApplies;
+    
+    			function addFrame() {
+    				const doc = currentWindow.document;
+    				const otherCMP = !!currentWindow.frames[TCF_LOCATOR_NAME];
+    
+    				if (!otherCMP) {
+    					if (doc.body) {
+    						const iframe = doc.createElement("iframe");
+    
+    						iframe.style.cssText = "display:none";
+    						iframe.name = TCF_LOCATOR_NAME;
+    						doc.body.appendChild(iframe);
+    					} else {
+    						setTimeout(addFrame, 5);
+    					}
+    				}
+    
+    				return !otherCMP;
+    			}
+    
+    			function tcfAPIHandler(...args) {
+    				if (!args.length) {
+    					/**
+    					 * shortcut to get the queue when the full CMP
+    					 * implementation loads; it can call tcfapiHandler()
+    					 * with no arguments to get the queued arguments
+    					 */
+    
+    					return queue;
+    				} else if (args[0] === "setGdprApplies") {
+    					/**
+    					 * shortcut to set gdprApplies if the publisher
+    					 * knows that they apply GDPR rules to all
+    					 * traffic (see the section on "What does the
+    					 * gdprApplies value mean" for more
+    					 */
+    					if (
+    						args.length > 3 &&
+    						parseInt(args[1], 10) === 2 &&
+    						typeof args[3] === "boolean"
+    					) {
+    						gdprApplies = args[3];
+    
+    						if (typeof args[2] === "function") {
+    							args[2]("set", true);
+    						}
+    					}
+    				} else if (args[0] === "ping") {
+    					/**
+    					 * Only supported method; give PingReturn
+    					 * object as response
+    					 */
+    					if (typeof args[2] === "function") {
+    						args[2]({
+    							gdprApplies: gdprApplies,
+    							cmpLoaded: false,
+    							cmpStatus: "stub",
+    						});
+    					}
+    				} else {
+    					/**
+    					 * some other method, just queue it for the
+    					 * full CMP implementation to deal with
+    					 */
+    					queue.push(args);
+    				}
+    			}
+    
+    			function postMessageEventHandler(event) {
+    				const msgIsString = typeof event.data === "string";
+    				let json = {};
+    
+    				if (msgIsString) {
+    					try {
+    						/**
+    						 * Try to parse the data from the event.  This is important
+    						 * to have in a try/catch because often messages may come
+    						 * through that are not JSON
+    						 */
+    						json = JSON.parse(event.data);
+    					} catch (ignore) {}
+    				} else {
+    					json = event.data;
+    				}
+    
+    				const payload =
+    					typeof json === "object" && json !== null ? json.__tcfapiCall : null;
+    
+    				if (payload) {
+    					window.__tcfapi(
+    						payload.command,
+    						payload.version,
+    						function (retValue, success) {
+    							let returnMsg = {
+    								__tcfapiReturn: {
+    									returnValue: retValue,
+    									success: success,
+    									callId: payload.callId,
+    								},
+    							};
+    
+    							if (event && event.source && event.source.postMessage) {
+    								event.source.postMessage(
+    									msgIsString ? JSON.stringify(returnMsg) : returnMsg,
+    									"*"
+    								);
+    							}
+    						},
+    						payload.parameter
+    					);
+    				}
+    			}
+    
+    			/**
+    			 * Iterate up to the top window checking for an already-created
+    			 * "__tcfapilLocator" frame on every level. If one exists already then we are
+    			 * not the master CMP and will not queue commands.
+    			 */
+    			while (frameLocator) {
+    				try {
+    					if (frameLocator.frames[TCF_LOCATOR_NAME]) {
+    						cmpFrame = frameLocator;
+    						break;
+    					}
+    				} catch (ignore) {}
+    
+    				// if we're at the top and no cmpFrame
+    				if (frameLocator === currentWindow.top) {
+    					break;
+    				}
+    
+    				// Move up
+    				frameLocator = frameLocator.parent;
+    			}
+    
+    			if (!cmpFrame) {
+    				// we have recur'd up the windows and have found no __tcfapiLocator frame
+    				addFrame();
+    				currentWindow.__tcfapi = tcfAPIHandler;
+    				currentWindow.addEventListener("message", postMessageEventHandler, false);
+    			}
+    		};
+    
+    		if (typeof module !== "undefined") {
+    			module.exports = makeStub;
+    		} else {
+    			makeStub();
+    		}
+    	})();
+   </script>
+   <script type="text/javascript">
+    //This is for the banner listener
+    
+    	document.body.addEventListener("click", function (event) {
+    		if (event && event.target && event.target.id === "truste-consent-button") {
+    			setTimeout(function () {
+    				window.location.reload();
+    			}, 1000);
+    		}
+    	});
+    
+    	//This is for the overlay listener
+    	var _STATE = {};
+    
+    	function runOnce() {
+    		if (!_STATE.hasRunOnce && window.truste && truste.eu && truste.eu.prefclose) {
+    			console.log("doing run once");
+    			_STATE.oldValue =
+    				truste.eu.bindMap.prefCookie &&
+    				truste.eu.bindMap.prefCookie.split(":")[0].replace(/[^\d.]/g, "-");
+    			_STATE.oldMethod = truste.eu.prefclose;
+    
+    			truste.eu.prefclose = function () {
+    				_STATE.oldMethod();
+    				if (
+    					truste.eu.bindMap.prefCookie &&
+    					truste.eu.bindMap.prefCookie.split(":")[0].replace(/[^\d.]/g, "-") !==
+    						_STATE.oldValue
+    				)
+    					setTimeout(function () {
+    						window.location.reload();
+    					}, 20);
+    			};
+    
+    			_STATE.hasRunOnce = true;
+    			_STATE.i && clearInterval(_STATE.i);
+    		}
+    	}
+    
+    	_STATE.i = setInterval(runOnce, 10);
+   </script>
+   <!-- TrustArc End -->
+   <!-- GTM Event Listener script /trustarc/ -->
+   <script>
+    var __dispatched__ = {};
+    
+      var __i__ = self.postMessage && setInterval(function() {
+          if (self.PrivacyManagerAPI && __i__) {
+              var apiObject = {
+                  PrivacyManagerAPI: {
+                      action: "getConsentDecision",
+                      timestamp: new Date().getTime(),
+                      self: self.location.host
+                  }
+              };
+              self.top.postMessage(JSON.stringify(apiObject), "*");
+              __i__ = clearInterval(__i__);
+          }
+      }, 50);
+    
+      self.addEventListener("message", function(e, d) {
+          try {
+              if (e.data && (d = JSON.parse(e.data)) && (d = d.PrivacyManagerAPI) && d.capabilities && d.action == "getConsentDecision") {
+                  var newDecision = self.PrivacyManagerAPI.callApi("getGDPRConsentDecision", self.location.host).consentDecision;
+                  newDecision && newDecision.forEach(function(label) {
+                      if (!__dispatched__[label]) {
+                          self.dataLayer && self.dataLayer.push({
+                              "event": "GDPR  Pref Allows " + label
+                          });
+                          __dispatched__[label] = 1;
+                      }
+                  });
+              }
+          } catch(xx){/** not a cm api message **/}
+      });
+   </script>
+   <!-- GTM Event Listener script /trustarc/ End -->
+   <!-- Segement Init -->
+   <script>
+    !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._loadOptions=e};analytics.SNIPPET_VERSION="4.13.1";
+      }}();
+   </script>
+   <script>
+    'use strict';
+        window.getRpConfig().setPropertyValue('analytics.segment.segment_key', 'YXytl93DqbW9pzIMLUfFgHKNCcZLYWon');
+   </script>
+   <!-- Segement Init End -->
+   <!-- Segement Load -->
+   <script>
+    'use strict';
+        !async function loadSegmentAnalytics(global_)
+        {
+            var console_ = global_.console.getCustom('segment', global_.getRpConfig().getPropertyValue('analytics.segment.is_debug'));
+        
+            var segment_key_ = getSegmentKey();
+        
+            console_.log('.loadSegmentAnalytics() -> segment_key: ' + segment_key_);
+        
+            if (!segment_key_) return console_.error('.loadSegmentAnalytics() -> no segment_key configured in window.getRpConfig().analytics.segment.segment_key');
+        
+            // segment trustarc
+            const OPT_IN = false; // false = only disable after opt out, can replace with a function such as inEU above
+            const DOMAIN = "racingpost.com"; // the hostname of your website
+            const WEBSITE_WRITE_KEY = segment_key_; // your segment website source write key
+            // const SEGMENT_MAPPING = 2;
+            const OTHER_WRITE_KEYS = []; // any other sources w destinations that you want to include in config
+        
+            // gets enabled destination configurations from across your source (and optionally other sources in workspace)
+            // promise wait for truste.cma.callapi to be available
+            await new Promise((resolve, reject) => {
+              let interval_ = setInterval(()=>{
+                if(window.truste && window.truste.cma && window.truste.cma.callApi){
+                  clearInterval(interval_);
+                  resolve();
+                }
+              }, 100);
+            }).then(() => {
+                return fetchDestinations([WEBSITE_WRITE_KEY, ...OTHER_WRITE_KEYS]);
+              })
+              .then((destinations) => {
+                const getTrustarcDecision = truste.cma.callApi("getConsentDecision", DOMAIN);
+                let setSegmentTrustarcPref = getTrustarcPrefs();
+        
+                const destinationPreferences = destinations
+                  .map(function(dest) {
+                    if(setSegmentTrustarcPref){
+                      if (getTrustarcDecision.consentDecision === 3) return { [dest.id]: true };
+                      if (getTrustarcDecision.consentDecision === 2) return { [dest.id]: dest.category === "Advertising" ? false : true };
+                      if (getTrustarcDecision.consentDecision === 1) return { [dest.id]: false };
+                      if (getTrustarcDecision.consentDecision === 0) return { [dest.id]: !OPT_IN };
+                    } else {
+                      return {[dest.id]: false};
+                    }
+                  })
+                  .reduce(
+                    (acc, val) => {
+                      return {
+                        ...val,
+                        ...acc
+                      };
+                    },
+                    { 
+                      "Segment.io": setSegmentTrustarcPref,
+                       "All": false 
+                    }
+                  );
+                conditionallyLoadAnalytics({
+                  writeKey: WEBSITE_WRITE_KEY,
+                  destinations,
+                  destinationPreferences,
+                  isConsentRequired: OPT_IN
+                });
+              })
+              .then(() => global_.analytics.ready(onAnalyticsReady));
+        
+            function getTrustarcPrefs(){
+              let getTrustarcPrefs_ = getCookie('notice_gdpr_prefs');
+        
+              return getTrustarcPrefs_ ? getTrustarcPrefs_.includes('1') : false;
+            }
+        
+            function getCookie(name) {
+              const value = `; ${document.cookie}`;
+              const parts = value.split(`; ${name}=`);
+              if (parts.length === 2) return parts.pop().split(';').shift();
+            }
+        
+            // @prefs array
+            // @return array
+            function modifyTrustarcPrefs(prefs){
+              let modifiedPrefs = new Array;
+        
+              prefs.forEach((pref) =>{ 
+                // .replace is intentional
+                let modPref = pref.replace(':', '').replace(':implied', '');
+                modifiedPrefs.push(modPref);
+              });
+        
+              return modifiedPrefs;
+            }
+        
+            function conditionallyLoadAnalytics({
+              writeKey,
+              destinations,
+              destinationPreferences,
+              isConsentRequired,
+              shouldReload = true // change if you dont want to reload on consent changes
+            }) {
+              let isAnythingEnabled = false;
+        
+              if (!destinationPreferences) {
+                if (isConsentRequired) {
+                  return;
+                }
+        
+                // Load a.js normally when consent isn't required and there's no preferences
+                if (!global_.analytics.initialized) {
+                  global_.analytics.load(writeKey);
+                }
+                return;
+              }
+        
+              for (const destination in destinationPreferences) {
+                const isEnabled = destinationPreferences[destination];
+                if (isEnabled) {
+                  isAnythingEnabled = true;
+                }
+              }
+        
+              // Reload the page if the trackers have already been initialised so that
+              // the user's new preferences can take affect
+              if (global_.analytics.initialized) {
+                if (shouldReload) {
+                  global_.location.reload();
+                }
+                return;
+              }
+        
+              // Don't load a.js at all if nothing has been enabled
+              if (isAnythingEnabled) {
+                console.log("Segment Integrations Object:", destinationPreferences);
+                global_.analytics.load(writeKey, { integrations: destinationPreferences });
+              }
+            }
+        
+            async function fetchDestinationForWriteKey(writeKey) {
+              const res = await global_.fetch(
+                `https://cdn.segment.com/v1/projects/${writeKey}/integrations`
+              );
+        
+              if (!res.ok) {
+                throw new Error(
+                  `Failed to fetch integrations for write key ${writeKey}: HTTP ${
+                    res.status
+                  } ${res.statusText}`
+                );
+              }
+        
+              const destinations = await res.json();
+        
+              // Rename creationName to id to abstract the weird data model
+              for (const destination of destinations) {
+                destination.id = destination.creationName;
+                delete destination.creationName;
+              }
+        
+              return destinations;
+            }
+        
+            async function fetchDestinations(...writeKeys) {
+              const destinationsRequests = [];
+              for (const writeKey of writeKeys) {
+                destinationsRequests.push(fetchDestinationForWriteKey(writeKey));
+              }
+        
+              let destinations = await Promise.all(destinationsRequests);
+        
+              // unique list of destination across all sources
+              destinations = [
+                ...destinations
+                  .reduce((a, b) => a.concat(b), []) // flatten multi-d array
+                  .filter(d => d.id !== "Repeater") // remove repeater
+                  .reduce((map, item) => {
+                    map.has(item["id"]) || map.set(item["id"], item);
+                    return map;
+                  }, new Map())
+                  .values()
+              ];
+        
+              return destinations;
+            }
+        
+            function onAnalyticsReady()
+            {
+                console_.log('.onAnalyticsReady()');
+        
+                if (!global_.mixpanel) return;
+        
+                console_.info('.onAnalyticsReady() -> Mixpanel integration (window.mixpanel) available, will use campaign parameters.');
+        
+                campaignParams();
+        
+                function getQueryParam(url_, param_)
+                {
+                    param_ = param_.replace(/[[]/, '\[').replace(/[]]/, '\]');
+        
+                    var regex_query_string_param_ = '[\?&]' + param_ + '=([^&#]*)';
+        
+                    var regex_      = new RegExp(regex_query_string_param_);
+                    var results_    = regex_.exec(url_);
+        
+                    if (results_ === null)                              return '';
+        
+                    var value_ = results_[1];
+        
+                    if (typeof(value_) !== 'string' && value_.length)   return '';
+        
+                    value_ = decodeURIComponent(value_).replace(/\W/gi, ' ');
+        
+                    return value_;
+                }
+        
+                function campaignParams()
+                {
+                    var campaign_keywords_  = 'utm_source utm_medium utm_campaign utm_content utm_term'.split(' ');
+                    var key_words_          = '';
+                    var params_             = {};
+                    var first_params_       = {};
+        
+                    var index_;
+                    var length_ = campaign_keywords_.length;
+        
+                    for (index_ = 0; index_ < length_; index_++)
+                    {
+                        key_words_ = getQueryParam(document_.URL, campaign_keywords_[index_]);
+        
+                        if (!key_words_.length) continue;
+        
+                        params_[campaign_keywords_[index_] + ' [last touch]'] = key_words_;
+                    }
+        
+                    for (index_ = 0; index_ < length_; index_++)
+                    {
+                        key_words_ = getQueryParam(document_.URL, campaign_keywords_[index_]);
+        
+                        if (!key_words_.length) continue;
+        
+                        first_params_[campaign_keywords_[index_] + ' [first touch]'] = key_words_;
+                    }
+        
+                    mixpanel.people.set(params_);
+                    mixpanel.people.set_once(first_params_);
+                    mixpanel.register(params_);
+                }
+            }
+        
+            function getSegmentKey()
+            {
+                var rp_config_      = global_.getRpConfig();
+        
+                var segment_key_    = rp_config_.getRequiredPropertyValue('analytics.segment.segment_key');
+        
+                return segment_key_;
+            }
+        
+        }(window);
+   </script>
+   <!-- Segement Load End -->
+   <!-- Google Analytics -->
+   <script>
+    'use strict';
+        window.getRpConfig().setPropertyValue('analytics.google.google_analytics_ua', 'UA-86306597-1');
+   </script>
+   <script>
+    'use strict';
+        !function initTrustarcCallbacks(window_)
+        {
+            var console_ = window_.console.getCustom('trustarc', window_.getRpConfig().getPropertyValue('trustarc.is_debug'));
+            
+            console_.log('.initTrustarcCallbacks()');
+        
+            window_.enableGoogleAnalytics = enableGoogleAnalytics;
+            window_.enableAdvertising     = enableAdvertising;
+            window_.addEventListener('RP_PAGE_VIEW', enableAdvertising);
+        
+            function initGoogleAnalytics()
+            {
+                console_.log('.initGoogleAnalytics()');
+        
+                window_.GoogleAnalyticsObject = 'ga';
+        
+                var ga_     = window_.ga = window_.ga || googleAnalytics;
+                var queue_  = ga_.q = ga_.q || [];
+                queue_;
+        
+                ga_.l  = 1*new Date();
+        
+                function googleAnalytics()
+                {
+                    console_.log('.googleAnalytics() -> ', arguments);
+        
+                    window_.ga.q.push(arguments);
+                };
+            }
+        
+            function enableGoogleAnalytics()
+            {
+                console_.warn('.enableGoogleAnalytics() -> when segment is disabled');
+        
+                var google_analytics_ua_    = getGoogleAnalyticsUA();
+        
+                if (!google_analytics_ua_)  return console_.warn('.enableGoogleAnalytics() -> no google_analytics_ua is configured, will not use GA');
+        
+                initGoogleAnalytics();
+                loadGoogleAnalytics();
+        
+                console_.warn('.enableGoogleAnalytics() -> google_analytics_ua: "' + google_analytics_ua_ + '"');
+        
+                ga('create' , google_analytics_ua_, 'auto');
+                ga('send'   , 'pageview');
+        
+                function getGoogleAnalyticsUA()
+                {
+                    var google_analytics_ua_ = window_.getRpConfig().getRequiredPropertyValue('analytics.google.google_analytics_ua');
+        
+                    return google_analytics_ua_;
+                }
+        
+                function loadGoogleAnalytics()
+                {
+                    console_.log('.loadGoogleAnalytics()');
+        
+                    var script_ = window_.document.createElement('script');
+        
+                    script_.async = true;
+                    script_.src   = 'https://www.google-analytics.com/analytics.js';
+        
+                    var first_script_ = window_.document.getElementsByTagName('script')[0];
+        
+                    first_script_.parentNode.insertBefore(script_, first_script_);
+                }
+            }
+        
+            function enableAdvertising()
+            {
+                if(!getTrustarcPrefs()) return;
+        
+                console_.log('.enableAdvertising()');
+                console.log('.enableAdvertising()');
+                /*window_.dispatchEvent(new Event('RP_ADVERTISING_ALLOWED')); / / IE does not work with this */
+                var event_ = window_.document.createEvent('Event');
+                event_.initEvent('RP_ADVERTISING_ALLOWED', false, true);
+        
+                window_.removeEventListener('RP_PAGE_VIEW', enableAdvertising);
+                window_.dispatchEvent(event_);
+            }
+        
+            function getTrustarcPrefs(){
+                let getTrustarcPrefs_ = getCookie('notice_gdpr_prefs');
+          
+                return getTrustarcPrefs_ ? getTrustarcPrefs_.includes('1') : true;
+            }
+          
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+            }
+        
+        /*
+            function trackPageTime()
+            {
+        
+                console_.log('.trackPageTime()');
+        
+                var has_ga_         = window_.ga;
+                var has_analytics_  = window_.analytics;
+        
+                if (!has_ga_ && !has_analytics_)
+                {
+                    console_.warn('.trackPageTime() -> globals "window.ga" for GA or "window.analytics" for Segment are missing, there will be no page view duration tracking!');
+        
+                    return;
+                }
+        
+                var timers_data_ = [
+                    { time: 0       , event: '0-10 seconds'     },
+                    { time: 11000   , event: '11-30 seconds'    },
+                    { time: 31000   , event: '31-60 seconds'    },
+                    { time: 61000   , event: '61-180 seconds'   },
+                    { time: 181000  , event: '181-600 seconds'  },
+                    { time: 601000  , event: '601-1800 seconds' },
+                    { time: 1801000 , event: '1801+ seconds'    }
+                ];
+        
+                function onPageViewDurationTimer(timer_index_, event_name_, time_)
+                {
+                    console_.log('.onPageViewDurationTimer() -> timer_index: ' + timer_index_+ ' event_name: ' + event_name_ + ' time: ' + time_ + ' ms');
+        
+                    if (has_ga_)
+                    {
+                        window_.ga('send', 'event', 'TimeOnPage', timer_index_, event_name_, { 'nonInteraction': 1 });
+        
+                        return;
+                    }
+        
+                    window_.analytics.track('TimeOnPage', {
+                        'index'         : timer_index_,
+                        'event_name'    : event_name_
+                    })
+                }
+        
+                function setPageViewDurationTimer(timer_index_)
+                {
+                    var timer_data_ = timers_data_[timer_index_];
+                    var event_name_ = timer_data_.event;
+                    var time_       = timer_data_.time;
+        
+                    console_.log('.setPageViewDurationTimer() -> timer_index: '+ timer_index_ + ' time: ' + time_);
+        
+                    setTimeout(
+                        function () {
+                            onPageViewDurationTimer(timer_index_, event_name_, time_);
+                        }, 
+                        time_
+                    );
+                }
+        
+                var timer_index_;
+        
+                for( timer_index_= 0; timer_index_ < timers_data_.length; timer_index_++)
+                {
+                    setPageViewDurationTimer(timer_index_);
+                }
+            }
+        */
+        
+        }(window);
+   </script>
+   <!-- Google Analytics End -->
+   <!-- Braze -->
+   <script>
+    'use strict';
+        !function initBrazeIntegation(window)
+        {
+            analytics.ready(onAnalyticsReady);
+        
+            /** 
+             * [JP-10492] Uncomment when we need or after st.leger
+            */
+        
+            // const BRAZE_PAGE_VIEWS = 'braze_page_views'
+            // const BRAZE_SOFT_PUSH_DAYS_DELAY = 'braze_soft_push_days_delay'
+            // const BRAZE_STAGE = 'braze_stage'
+        
+            // const BRAZE_STAGES = {
+            //     FIRST: 'first',
+            //     SECOND: 'second',
+            //     THIRD: 'third',
+            //     MORE_THAN_THREE: 'more_than_three'
+            // }
+        
+            const getBrazeInstance = () => {
+                return typeof window !== 'undefined' ? window.braze : null
+            }
+        
+            const initializeBraze = () => {
+                const braze = getBrazeInstance()
+                if (braze) {
+                    console.info('Braze is ready')
+        
+                    braze.subscribeToInAppMessage(handleBrazeMessage)
+                    braze.openSession()
+        
+                    // if (!getAppCookie(BRAZE_STAGE)) {
+                    //     setAppCookie(BRAZE_STAGE, BRAZE_STAGES.FIRST)
+                    // }
+        
+                    // if (!getAppCookie(BRAZE_PAGE_VIEWS)) {
+                    //     setAppCookie(BRAZE_PAGE_VIEWS, 1)
+                    // }
+                } else {
+                    console.log('Braze not loaded')
+                }
+            }
+        
+            const handleBrazeMessage = (inAppMessage) => {
+                const braze = getBrazeInstance()
+        
+                if (inAppMessage instanceof braze.InAppMessage) {
+                    // const keyValuePairs = inAppMessage.extras || {}
+        
+                    // const shouldHandlePushMessage =
+                    //     braze.isPushSupported() && !braze.isPushPermissionGranted() && !braze.isPushBlocked()
+        
+                    // push-primer is the push notification prompt
+                    // if (keyValuePairs['msg-id'] === 'push-primer' && shouldHandlePushMessage) {
+                    //     handlePushMessagePermissions(inAppMessage)
+                    // }
+        
+                    // show the in-app message now
+                    braze.showInAppMessage(inAppMessage)
+                }
+            }
+        
+            // const getCurrentStagePageViews = () => {
+            //     const currentStage = getAppCookie(BRAZE_STAGE)
+        
+            //     const stagePageViewsMapping = {
+            //         [BRAZE_STAGES.FIRST]: 8,
+            //         [BRAZE_STAGES.SECOND]: 4,
+            //         [BRAZE_STAGES.THIRD]: 4
+            //     }
+        
+            //     return stagePageViewsMapping[currentStage] || 4
+            // }
+        
+            // const getCurrentStageDaysDelay = () => {
+            //     const currentStage = getAppCookie(BRAZE_STAGE)
+        
+            //     const stageDaysDelayMapping = {
+            //         [BRAZE_STAGES.FIRST]: 7,
+            //         [BRAZE_STAGES.SECOND]: 5,
+            //         [BRAZE_STAGES.THIRD]: 5
+            //     }
+        
+            //     const currentStageDaysDelay = stageDaysDelayMapping[currentStage] || 7
+        
+            //     const date = new Date()
+            //     date.setDate(date.getDate() + currentStageDaysDelay)
+            //     return date
+            // }
+        

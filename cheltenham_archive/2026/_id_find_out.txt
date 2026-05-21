@@ -1,0 +1,152 @@
+=================================================================
+  SKY SPORTS HORSE ID FINDER ΓÇö Cheltenham 2026
+  Targets: 44 horses
+=================================================================
+
+  Loaded 0 known IDs from cache
+
+[Stage 1] Cheltenham 2025 Day 2 (confirmed IDs 1295281-1295287)
+
+  Scanning 7 IDs [Chelt25 Day2] | 44 horses still needed
+    Γ£ô Final Demand ΓåÆ id=1334278 (result 1295281)
+    Γ£ô Ballyburn ΓåÆ id=1243568 (result 1295282)
+    Γ£ô Lossiemouth ΓåÆ id=1026727 (result 1295283)
+    Γ£ô Chemical Energy ΓåÆ id=1122689 (result 1295284)
+    Γ£ô Energumene ΓåÆ id=1073254 (result 1295285)
+    Γ£ô Bambino Fever ΓåÆ id=1334636 (result 1295287)
+  Done: 7 IDs checked, 7 had horses, 6 matched
+
+[Stage 2] Cheltenham 2025 Day 1 estimate range
+
+  Scanning 116 IDs [Chelt25 Day1-est] | 38 horses still needed
+    Γ£ô Salvator Mundi ΓåÆ id=1250501 (result 1295138)
+    Γ£ô Kopek Des Bordes ΓåÆ id=1297916 (result 1295138)
+    Γ£ô Golden Ace ΓåÆ id=1233046 (result 1295142)
+    Γ£ô State Man ΓåÆ id=1091506 (result 1295142)
+    Γ£ô Constitution Hill ΓåÆ id=1185772 (result 1295142)
+    ... 100/116 checked | 100 with horses | 5 hits
+  Done: 116 IDs checked, 116 had horses, 5 matched
+
+[Stage 3] Cheltenham 2025 Days 3+4 estimate range
+
+  Scanning 305 IDs [Chelt25 Day3+4-est] | 33 horses still needed
+    Γ£ô Fact To File ΓåÆ id=1204301 (result 1295474)
+    Γ£ô Jungle Boogie ΓåÆ id=1046236 (result 1295474)
+    Γ£ô Il Est Francais ΓåÆ id=1178083 (result 1295474)
+    Γ£ô Jagwar ΓåÆ id=1229287 (result 1295476)
+    ... 100/305 checked | 100 with horses | 4 hits
+    ... 200/305 checked | 200 with horses | 4 hits
+    ... 300/305 checked | 296 with horses | 4 hits
+  Done: 305 IDs checked, 301 had horses, 4 matched
+
+[Stage 4] Cheltenham Jan 24, 2026 (confirmed IDs 1352950-1352957)
+
+  Scanning 8 IDs [CheltJan26] | 29 horses still needed
+    Γ£ô Favori De Champdou ΓåÆ id=1073529 (result 1352953)
+  Done: 8 IDs checked, 8 had horses, 1 matched
+
+[Stage 5] King George + Leopardstown Christmas 2025 estimate range
+
+  Scanning 800 IDs [KingGeorge+Leops Xmas25] | 28 horses still needed
+    ... 100/800 checked | 96 with horses | 0 hits
+    Γ£ô Galopin Des Champs ΓåÆ id=1166683 (result 1350558)
+    ... 200/800 checked | 195 with horses | 1 hits
+    Γ£ô Gaelic Warrior ΓåÆ id=1156344 (result 1350786)
+    ... 300/800 checked | 295 with horses | 2 hits
+    Γ£ô Roc Dino ΓåÆ id=1332967 (result 1350816)
+    Γ£ô Storm Heart ΓåÆ id=1226600 (result 1350848)
+    Γ£ô Majborough ΓåÆ id=1248413 (result 1350854)
+    Γ£ô Teahupoo ΓåÆ id=1127958 (result 1350966)
+    Γ£ô King Rasko Grey ΓåÆ id=1301447 (result 1350970)
+    Γ£ô Manlaga ΓåÆ id=1342637 (result 1350986)
+    ... 400/800 checked | 390 with horses | 8 hits
+    ... 500/800 checked | 490 with horses | 8 hits
+    Γ£ô Dinoblue ΓåÆ id=1144091 (result 1351296)
+    ... 600/800 checked | 582 with horses | 9 hits
+    ... 700/800 checked | 655 with horses | 9 hits
+    ... 800/800 checked | 730 with horses | 9 hits
+  Done: 800 IDs checked, 730 had horses, 9 matched
+
+[Stage 6] Leopardstown Feb 2026 (Irish Champion Hurdle)
+
+  Scanning 800 IDs [Leops Feb26] | 19 horses still needed
+    Γ£ô Waterford Whispers ΓåÆ id=1248279 (result 1353480)
+    Γ£ô Backmersackme ΓåÆ id=1298152 (result 1353480)
+    Γ£ô Murcia ΓåÆ id=1295470 (result 1353482)
+    ... 100/800 checked | 96 with horses | 3 hits
+    ... 200/800 checked | 191 with horses | 3 hits
+    ... 300/800 checked | 281 with horses | 3 hits
+    ... 400/800 checked | 375 with horses | 3 hits
+    ... 500/800 checked | 471 with horses | 3 hits
+    ... 600/800 checked | 564 with horses | 3 hits
+    ... 700/800 checked | 656 with horses | 3 hits
+    ... 800/800 checked | 756 with horses | 3 hits
+  Done: 800 IDs checked, 756 had horses, 3 matched
+
+[Stage 7] Spidering form profiles to find remaining targets ...
+  Still missing 16 horses, spidering ...
+  Spidered 205 unique race result IDs from form profiles
+
+  Scanning 205 IDs [profile-spider] | 16 horses still needed
+    Γ£ô Vauban ΓåÆ id=1155892 (result 1124960)
+    Γ£ô Fastorslow ΓåÆ id=1060265 (result 1126062)
+    Γ£ô Gaillard Du Mesnil ΓåÆ id=1065099 (result 1130969)
+    Γ£ô El Fabiolo ΓåÆ id=1117906 (result 1200503)
+    ... 100/205 checked | 100 with horses | 4 hits
+    Γ£ô Doctor Steinberg ΓåÆ id=1297913 (result 1222261)
+    Γ£ô Il Etait Temps ΓåÆ id=1156407 (result 1304106)
+    Γ£ô Down Memory Lane ΓåÆ id=1244299 (result 1324920)
+    ... 200/205 checked | 200 with horses | 7 hits
+  Done: 205 IDs checked, 205 had horses, 7 matched
+
+=================================================================
+  RESULTS: Found 35 horse IDs
+  Still missing (9):
+    Γ£ù Dance With Debon
+    Γ£ù Koktail Divin
+    Γ£ù Old Park Star
+    Γ£ù Poniros
+    Γ£ù Proactif
+    Γ£ù Sainte Sangria
+    Γ£ù Shantreusse
+    Γ£ù Sharp Secret
+    Γ£ù The Irish Avatar
+
+  Known horses:
+    backmersackme                       ΓåÆ id=1298152 | slug=backmersackme-ire
+    ballyburn                           ΓåÆ id=1243568 | slug=ballyburn-ire
+    bambino fever                       ΓåÆ id=1334636 | slug=bambino-fever-ire
+    chemical energy                     ΓåÆ id=1122689 | slug=chemical-energy-ire
+    constitution hill                   ΓåÆ id=1185772 | slug=constitution-hill
+    dinoblue                            ΓåÆ id=1144091 | slug=dinoblue-fr
+    doctor steinberg                    ΓåÆ id=1297913 | slug=doctor-steinberg-ire
+    down memory lane                    ΓåÆ id=1244299 | slug=down-memory-lane-ire
+    el fabiolo                          ΓåÆ id=1117906 | slug=el-fabiolo-fr
+    energumene                          ΓåÆ id=1073254 | slug=energumene-fr
+    fact to file                        ΓåÆ id=1204301 | slug=fact-to-file-fr
+    fastorslow                          ΓåÆ id=1060265 | slug=fastorslow-fr
+    favori de champdou                  ΓåÆ id=1073529 | slug=favori-de-champdou-fr
+    final demand                        ΓåÆ id=1334278 | slug=final-demand-ire
+    gaelic warrior                      ΓåÆ id=1156344 | slug=gaelic-warrior-ger
+    gaillard du mesnil                  ΓåÆ id=1065099 | slug=gaillard-du-mesnil-fr
+    galopin des champs                  ΓåÆ id=1166683 | slug=galopin-des-champs-fr
+    golden ace                          ΓåÆ id=1233046 | slug=golden-ace
+    il est francais                     ΓåÆ id=1178083 | slug=il-est-francais-fr
+    il etait temps                      ΓåÆ id=1156407 | slug=il-etait-temps-fr
+    jagwar                              ΓåÆ id=1229287 | slug=jagwar-fr
+    jungle boogie                       ΓåÆ id=1046236 | slug=jungle-boogie-ire
+    king rasko grey                     ΓåÆ id=1301447 | slug=king-rasko-grey-fr
+    kopek des bordes                    ΓåÆ id=1297916 | slug=kopek-des-bordes-fr
+    lossiemouth                         ΓåÆ id=1026727 | slug=lossiemouth
+    majborough                          ΓåÆ id=1248413 | slug=majborough-fr
+    manlaga                             ΓåÆ id=1342637 | slug=manlaga-ire
+    murcia                              ΓåÆ id=1295470 | slug=murcia-fr
+    roc dino                            ΓåÆ id=1332967 | slug=roc-dino-fr
+    salvator mundi                      ΓåÆ id=1250501 | slug=salvator-mundi-fr
+    state man                           ΓåÆ id=1091506 | slug=state-man-fr
+    storm heart                         ΓåÆ id=1226600 | slug=storm-heart-fr
+    teahupoo                            ΓåÆ id=1127958 | slug=teahupoo-fr
+    vauban                              ΓåÆ id=1155892 | slug=vauban-fr
+    waterford whispers                  ΓåÆ id=1248279 | slug=waterford-whispers-ire
+
+  Saved to: C:\Users\charl\OneDrive\futuregenAI\Betting\_skysports_horse_ids.json

@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    rows = sorted(r['Items'], key=lambda x: x['race_key'])
+  File "<string>", line 6, in <lambda>
+    rows = sorted(r['Items'], key=lambda x: x['race_key'])
+                                            ~^^^^^^^^^^^^
+KeyError: 'race_key'

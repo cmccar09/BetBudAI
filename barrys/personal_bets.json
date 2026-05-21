@@ -1,0 +1,274 @@
+{
+  "_note": "Personal betting selections for Gold Cup Day — 13 Mar 2026. Regenerated into HTML via update_barrys_html.py.",
+  "last_updated": "2026-03-13",
+  "betfair_checked": "2026-03-13 10:08 UTC",
+  "day": "Day 4 — Gold Cup Day (Soft going throughout)",
+  "races": [
+    {
+      "time": "13:20",
+      "race": "JCB Triumph Hurdle (2m1f Juvenile)",
+      "bets": [
+        {
+          "horse": "Highland Crystal",
+          "odds": "15/2",
+          "betfair_exchange": 8.4,
+          "betfair_note": "Exchange 7.4/1 — broadly matches bookie",
+          "type": "WIN",
+          "reason": "Saratoga connection — beat Saratoga at Naas Feb 7. Saratoga then WON the Fred Winter at this Festival on Tuesday. Only Festival-frankened form line in the race. Elliott/Kennedy. 3/3 unbeaten."
+        }
+      ],
+      "outsiders": []
+    },
+    {
+      "time": "14:00",
+      "race": "County Handicap Hurdle (2m1f)",
+      "bets": [
+        {
+          "horse": "Ndaawi",
+          "odds": "28/1",
+          "betfair_exchange": 48.0,
+          "betfair_note": "VALUE: Exchange 47/1 vs bookie 28/1 — USE BETFAIR",
+          "type": "EW",
+          "reason": "2nd in 2025 County Hurdle — the winner of that race was Kargese. Kargese WON the Arkle at this Festival on Tuesday. Identical franking chain to Highland Crystal/Saratoga. Won 2025 Galway Hurdle. Fit (AW Flat run Feb 2026). Elliott/Meyler."
+        }
+      ],
+      "outsiders": []
+    },
+    {
+      "time": "14:40",
+      "race": "Mrs Paddy Power Mares' Chase (2m4f)",
+      "bets": [
+        {
+          "horse": "Panic Attack",
+          "odds": "11/4",
+          "betfair_exchange": 3.85,
+          "betfair_note": "Exchange 2.85/1=11/4 — matches bookie; Dinoblue fav at 3.15",
+          "type": "WIN",
+          "reason": "Won EXACT C+D — Paddy Power Gold Cup Cheltenham 2m4f soft Nov 2025 (12 runners). 3/3 wins since including Coral Gold Cup at Newbury. Freshest specific C+D form in race. Skelton/Skelton firing."
+        },
+        {
+          "horse": "Telepathique",
+          "odds": "50/1",
+          "betfair_exchange": 55.0,
+          "betfair_note": "Exchange 54/1 — slightly better than bookie",
+          "type": "EW",
+          "reason": "IMPROVING OUTSIDER: 2nd to Spindleberry at Leopardstown Dec 2025 (race Spindleberry dominated). Gets 5lb better today. Soft ground specialist — all her best form on soft/heavy. 4 places paying. Wadham/Cannon sneaky each-way play."
+        }
+      ],
+      "outsiders": [
+        {
+          "horse": "Telepathique",
+          "arc": "2nd Leopardstown Dec 2025 (to Spindleberry) → drops back 5lb today",
+          "trend": "improving"
+        }
+      ]
+    },
+    {
+      "time": "15:20",
+      "race": "Albert Bartlett Novices' Hurdle (3m Grade 1)",
+      "bets": [
+        {
+          "horse": "Doctor Steinberg",
+          "odds": "3/1 (fav)",
+          "betfair_exchange": 3.9,
+          "betfair_note": "Exchange 2.9/1=3/1 — clear market fav",
+          "type": "WIN",
+          "reason": "BANKER — DB gap 27pts (largest of Festival). Won DRF Grade 1 by 8 lengths despite keenness. Townend rides over all other Mullins horses. Kazansky (2nd) is in today's field and confirmed the form."
+        },
+        {
+          "horse": "Moneygarrow",
+          "odds": "14/1",
+          "betfair_exchange": 16.5,
+          "betfair_note": "Exchange 15.5/1 — slightly bigger than bookie",
+          "type": "EW",
+          "reason": "IMPROVING OUTSIDER: 5th Cheltenham Nov 2025 → won Warwick 2m5f Dec → won Windsor 3m soft Jan 2026. Wind surgery unlocked improvement. COURSE FORM (ran at Cheltenham in November). 3m suits — stamina proven at Windsor. Skelton/Skelton firing. D symbol."
+        },
+        {
+          "horse": "Spinningayarn",
+          "odds": "16/1",
+          "betfair_exchange": 17.0,
+          "betfair_note": "Exchange 16/1 — matches bookie",
+          "type": "EW",
+          "reason": "IMPROVING OUTSIDER: 3rd Clonmel Dec → won Fairyhouse 2m4f Jan (18-runner) → won Punchestown 2m3f heavy Jan 2026. Unbeaten 3-run sequence. 'On pedigree and running style the step to 3m is a major plus' — unexposed at this trip. Elliott/Kennedy. 5 EW places."
+        },
+        {
+          "horse": "Ubatuba",
+          "odds": "33/1",
+          "betfair_exchange": 38.0,
+          "betfair_note": "VALUE: Exchange 37/1 vs bookie 33/1 — use exchange",
+          "type": "EW",
+          "reason": "IMPROVING OUTSIDER: won Leicester Dec → won Leicester Jan → 2nd Haydock 3m Grade 2 (Feb 14). Perfect 3-run arc, 'winner got first run and it could have been interesting'. Stamina proven in Grade 2, lightly raced 3m winner. Murphy/Sutton. 5 EW places."
+        }
+      ],
+      "outsiders": [
+        {
+          "horse": "Moneygarrow",
+          "arc": "5th Cheltenham Nov → 1st Warwick Dec → 1st Windsor 3m Jan",
+          "trend": "peaking"
+        },
+        {
+          "horse": "Spinningayarn",
+          "arc": "3rd Clonmel Dec → 1st Fairyhouse Jan (18-runner) → 1st Punchestown Jan",
+          "trend": "peaking"
+        },
+        {
+          "horse": "Ubatuba",
+          "arc": "1st Leicester Dec → 1st Leicester Jan → 2nd Haydock 3m G2 Feb",
+          "trend": "peaking"
+        }
+      ]
+    },
+    {
+      "time": "16:00",
+      "race": "Cheltenham Gold Cup (3m2f Grade 1)",
+      "bets": [
+        {
+          "horse": "Gaelic Warrior",
+          "odds": "7/2 (fav)",
+          "betfair_exchange": 4.4,
+          "betfair_note": "Exchange fav 3.4/1=7/2; Jango Baie 4.6, Jukebox Man 4.8",
+          "type": "WIN",
+          "reason": "Franking chain: beat Fact To File? No — was 2nd to Fact To File in Irish Gold Cup (Feb 2). Fact To File WON the Ryanair at this Festival YESTERDAY. DB pattern: Mullins Arkle winner → Gold Cup (Galopin Des Champs identical trajectory). Townend rides. Soft ground specialist. Finishing strongly despite keenness."
+        },
+        {
+          "horse": "Haiti Couleurs",
+          "odds": "7/1",
+          "betfair_exchange": 7.8,
+          "betfair_note": "Exchange 6.8/1=7/1 — confirmed solid EW price",
+          "type": "EW",
+          "reason": "IMPROVING OUTSIDER / PEAKING: won NHC Cheltenham Mar 2025 → won Welsh National Chepstow Dec → won Denman Chase Newbury Feb 2026. PERFECT 3-WIN PEAKING ARC. Denman Chase is the historic Gold Cup trial (Denman himself used it). 6-8 over fences. Sean Bowen. 3 places paying EW."
+        }
+      ],
+      "outsiders": [
+        {
+          "horse": "Haiti Couleurs",
+          "arc": "1st NHC Cheltenham Mar 25 → 1st Welsh National Dec → 1st Denman Chase Feb",
+          "trend": "peaking"
+        }
+      ]
+    },
+    {
+      "time": "16:40",
+      "race": "St James's Place Hunters' Chase (3m2f)",
+      "bets": [
+        {
+          "horse": "Its On The Line",
+          "odds": "5/1",
+          "betfair_exchange": 5.7,
+          "betfair_note": "SIGNAL: Exchange FAVOURITE at 4.7/1 — shorter than bookie 5/1",
+          "type": "WIN",
+          "reason": "Bridesmaid 3 years running (2023/24/25). Won Down Royal Dec 2025 (16-runner, beat Willitgoahead + Cons Roc — both in today's field). Same prep as last year when he pushed Wonderwall to a neck. 'All roads lead to this.' Emmet Mullins."
+        },
+        {
+          "horse": "Golden Son",
+          "odds": "14/1",
+          "betfair_exchange": 17.5,
+          "betfair_note": "Exchange 16.5/1 vs bookie 14/1 — use exchange",
+          "type": "EW",
+          "reason": "IMPROVING OUTSIDER: won Warwick 3m soft Jan 23 → won Taunton 2m7f heavy Feb 12. 2-win peaking arc, 'not remotely pressed' in either. Paul Nicholls has won this race FOUR TIMES. 8yo — young and unexposed in hunters. 4 places paying."
+        },
+        {
+          "horse": "Stattler",
+          "odds": "16/1",
+          "betfair_exchange": 19.5,
+          "betfair_note": "Exchange 18.5/1 vs bookie 16/1 — use exchange",
+          "type": "EW",
+          "reason": "IMPROVING OUTSIDER: 2nd Hereford Jan 26 → won Fakenham Feb 13. Won NHC AT THIS FESTIVAL (3m6f) 4 years ago. P. W. Mullins rides. Cheekpieces first time. Better than his small-field form figures suggest. 4 places."
+        },
+        {
+          "horse": "Panda Boy",
+          "odds": "11/2",
+          "betfair_exchange": 6.2,
+          "betfair_note": "Exchange 5.2/1 — slightly shorter than bookie 11/2",
+          "type": "EW",
+          "reason": "IMPROVING OUTSIDER: form 8/U/3/1/1 — dramatic peaking arc. Won Thurles Jan (13-runner) + Naas Feb (5-runner heavy). Former Grand National entry with class. High RPR at Naas. 4 places."
+        }
+      ],
+      "outsiders": [
+        {
+          "horse": "Golden Son",
+          "arc": "1st Warwick Jan → 1st Taunton Feb",
+          "trend": "peaking"
+        },
+        {
+          "horse": "Stattler",
+          "arc": "2nd Hereford Jan → 1st Fakenham Feb",
+          "trend": "peaking"
+        },
+        {
+          "horse": "Panda Boy",
+          "arc": "3rd Naas Mar 25 → 1st Thurles Jan → 1st Naas Feb",
+          "trend": "peaking"
+        }
+      ]
+    },
+    {
+      "time": "17:20",
+      "race": "Martin Pipe Handicap Hurdle (2m4f)",
+      "bets": [
+        {
+          "horse": "Kel Histoire",
+          "odds": "4/1",
+          "betfair_exchange": null,
+          "betfair_note": "Martin Pipe market suspended pre-race — use bookie 4/1",
+          "type": "WIN",
+          "reason": "Biggest market move of the race: 16/1 pre-Festival → 4/1 today. Mullins stable target. KEY ANGLE: all recent runs at 2m on heavy (two 5th places) — today steps to 2m4f for first time. Extra trip is the improvement trigger. Lightly raced 6yo (only 6 hurdle runs). Power Prices explicit win selection."
+        },
+        {
+          "horse": "Roc Dino",
+          "odds": "11/1",
+          "betfair_exchange": null,
+          "betfair_note": "Martin Pipe market suspended — use bookie 11/1",
+          "type": "EW",
+          "reason": "IMPROVING OUTSIDER: 2nd to horses who ran in the Supreme Novices' Hurdle on Tuesday. Festival-level form. OR 131 = lightest mark of main contenders. 11-2 weight — easiest task on paper. Unexposed at 2m4f. 5 places paying. Mullins. Remarkable value."
+        },
+        {
+          "horse": "Open Secret",
+          "odds": "25/1",
+          "betfair_exchange": null,
+          "betfair_note": "Martin Pipe market suspended — use bookie 25/1",
+          "type": "EW",
+          "reason": "IMPROVING OUTSIDER / HISTORICAL PATTERN: form 1/4/2 last 3 runs — won Naas Dec (20-runner), 4th Cheltenham Jan (C+D), 2nd Thurles Feb 19. The Thurles race is the EXACT prep race that produced Gordon Elliott's Martin Pipe WINNERS in 2017 AND 2018. Identical template. C+D form. 5 places."
+        },
+        {
+          "horse": "Stede Bonnet",
+          "odds": "20/1",
+          "betfair_exchange": null,
+          "betfair_note": "Martin Pipe market suspended — use bookie 20/1",
+          "type": "EW",
+          "reason": "IMPROVING OUTSIDER: won Tramore Jan → won Ayr Jan → 3rd Punchestown Listed Feb. 2-win peaking arc. Elliott. Bred for 2m4f (jumps wins at 2m1f — distance should suit today). HANDICAP DEBUT under Josh Williamson (1-1 record together). 5 places."
+        },
+        {
+          "horse": "Andashan",
+          "odds": "18/1",
+          "betfair_exchange": null,
+          "betfair_note": "Martin Pipe market suspended — use bookie 18/1",
+          "type": "EW",
+          "reason": "IMPROVING OUTSIDER: 2nd Haydock Nov → won Newbury 2m4f GS Dec (last run). Won last time out at the right trip. D symbol (distance winner). Improving 6yo off low mark (OR 133). Gordon/Chris Gordon yard — quiet but effective. 5 places."
+        }
+      ],
+      "outsiders": [
+        {
+          "horse": "Roc Dino",
+          "arc": "2nd Fairyhouse Jan (to Supreme horse) → 2nd Thurles Jan (to Supreme horse)",
+          "trend": "consistent — ready to win"
+        },
+        {
+          "horse": "Open Secret",
+          "arc": "1st Naas Dec (20-runner) → 4th Cheltenham C+D Jan → 2nd Thurles Feb (Elliott prep pattern)",
+          "trend": "peaking"
+        },
+        {
+          "horse": "Stede Bonnet",
+          "arc": "1st Tramore Jan → 1st Ayr Jan → 3rd Punchestown Listed Feb",
+          "trend": "peaking"
+        },
+        {
+          "horse": "Andashan",
+          "arc": "2nd Haydock Nov → 1st Newbury 2m4f Dec (last run)",
+          "trend": "peaking"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,636 @@
+{
+  "timestamp": "2026-01-12T11:02:22.469938",
+  "races_analyzed": 9,
+  "patterns": {
+    "favorites_won": 0,
+    "outsiders_won": 0,
+    "high_confidence_losses": 2
+  },
+  "recommendations": [],
+  "detailed_analysis": [
+    {
+      "market_id": "1.252580142",
+      "venue": "Yarmouth",
+      "race_time": "2026-01-11T13:51",
+      "race_type": "horse",
+      "our_selection": {
+        "horse": "Waikiki Sapphire",
+        "selection_id": "85602460",
+        "confidence": 48.0,
+        "odds": 2.0833333333333335,
+        "p_win": 0.48,
+        "final_sp": "N/A",
+        "result": "LOST"
+      },
+      "actual_winner": {
+        "selection_id": "93334894",
+        "final_sp": "N/A",
+        "last_traded": "N/A"
+      },
+      "all_runners": [
+        {
+          "selection_id": "93334893",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "90503842",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "93003646",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "85602460",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "93334894",
+          "status": "WINNER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": true
+        },
+        {
+          "selection_id": "84960228",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        }
+      ],
+      "insights": []
+    },
+    {
+      "market_id": "1.252580144",
+      "venue": "Yarmouth",
+      "race_time": "2026-01-11T14:07",
+      "race_type": "horse",
+      "our_selection": {
+        "horse": "Somersham Wolf",
+        "selection_id": "88850514",
+        "confidence": 48.0,
+        "odds": 2.0833333333333335,
+        "p_win": 0.48,
+        "final_sp": "N/A",
+        "result": "LOST"
+      },
+      "actual_winner": {
+        "selection_id": "57745970",
+        "final_sp": "N/A",
+        "last_traded": "N/A"
+      },
+      "all_runners": [
+        {
+          "selection_id": "67994052",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "88850514",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "57745970",
+          "status": "WINNER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": true
+        },
+        {
+          "selection_id": "73597991",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "92548854",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "87431577",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        }
+      ],
+      "insights": []
+    },
+    {
+      "market_id": "1.252582782",
+      "venue": "Chelmsford City",
+      "race_time": "2026-01-11T16:12",
+      "race_type": "horse",
+      "our_selection": {
+        "horse": "Secret Road",
+        "selection_id": "36923746",
+        "confidence": 28.0,
+        "odds": 4.2,
+        "p_win": 0.28,
+        "final_sp": "N/A",
+        "result": "LOST"
+      },
+      "actual_winner": {
+        "selection_id": "74312532",
+        "final_sp": "N/A",
+        "last_traded": "N/A"
+      },
+      "all_runners": [
+        {
+          "selection_id": "36923746",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "25995427",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "85556645",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "1133119",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "11294741",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "80070095",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "64589529",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "74312532",
+          "status": "WINNER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": true
+        },
+        {
+          "selection_id": "79538726",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "68330701",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "4678590",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        }
+      ],
+      "insights": []
+    },
+    {
+      "market_id": "1.252583047",
+      "venue": "Towcester",
+      "race_time": "2026-01-11T16:28",
+      "race_type": "horse",
+      "our_selection": {
+        "horse": "Camp Charlie",
+        "selection_id": "74505747",
+        "confidence": 48.0,
+        "odds": 2.0833333333333335,
+        "p_win": 0.48,
+        "final_sp": "N/A",
+        "result": "LOST"
+      },
+      "actual_winner": {
+        "selection_id": "71695908",
+        "final_sp": "N/A",
+        "last_traded": "N/A"
+      },
+      "all_runners": [
+        {
+          "selection_id": "80452188",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "63094595",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "87877273",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "71695908",
+          "status": "WINNER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": true
+        },
+        {
+          "selection_id": "74505747",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        }
+      ],
+      "insights": []
+    },
+    {
+      "market_id": "1.252582678",
+      "venue": "Chelmsford City",
+      "race_time": "2026-01-11T16:42",
+      "race_type": "horse",
+      "our_selection": {
+        "horse": "Brinton",
+        "selection_id": "24023",
+        "confidence": 15.0,
+        "odds": 11.5,
+        "p_win": 0.15,
+        "final_sp": "N/A",
+        "result": "LOST"
+      },
+      "actual_winner": {
+        "selection_id": "36909781",
+        "final_sp": "N/A",
+        "last_traded": "N/A"
+      },
+      "all_runners": [
+        {
+          "selection_id": "44899806",
+          "status": "REMOVED",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "80106026",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "36909781",
+          "status": "WINNER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": true
+        },
+        {
+          "selection_id": "2608708",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "28552",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "24023",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "53776954",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "1462845",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "80311339",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        }
+      ],
+      "insights": []
+    },
+    {
+      "market_id": "1.252583051",
+      "venue": "Towcester",
+      "race_time": "2026-01-11T17:06",
+      "race_type": "horse",
+      "our_selection": {
+        "horse": "Flitwick Girl",
+        "selection_id": "86158219",
+        "confidence": 42.0,
+        "odds": 2.380952380952381,
+        "p_win": 0.42,
+        "final_sp": "N/A",
+        "result": "LOST"
+      },
+      "actual_winner": {
+        "selection_id": "78107736",
+        "final_sp": "N/A",
+        "last_traded": "N/A"
+      },
+      "all_runners": [
+        {
+          "selection_id": "89123535",
+          "status": "REMOVED",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "71448066",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "78107736",
+          "status": "WINNER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": true
+        },
+        {
+          "selection_id": "86158219",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "85031053",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "90901358",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        }
+      ],
+      "insights": []
+    },
+    {
+      "market_id": "1.252583053",
+      "venue": "Towcester",
+      "race_time": "2026-01-11T17:24",
+      "race_type": "horse",
+      "our_selection": {
+        "horse": "Bower Aoibhin",
+        "selection_id": "93624624",
+        "confidence": 75.0,
+        "odds": 1.3333333333333333,
+        "p_win": 0.75,
+        "final_sp": "N/A",
+        "result": "LOST"
+      },
+      "actual_winner": {
+        "selection_id": "93624625",
+        "final_sp": "N/A",
+        "last_traded": "N/A"
+      },
+      "all_runners": [
+        {
+          "selection_id": "79908657",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "72651600",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "93624624",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "93624625",
+          "status": "WINNER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": true
+        },
+        {
+          "selection_id": "93473801",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "93624626",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        }
+      ],
+      "insights": [
+        "HIGH CONFIDENCE LOSS: We were 75.0% confident but lost. AI was overconfident."
+      ]
+    },
+    {
+      "market_id": "1.252583055",
+      "venue": "Towcester",
+      "race_time": "2026-01-11T17:43",
+      "race_type": "horse",
+      "our_selection": {
+        "horse": "Not So Steady",
+        "selection_id": "83995980",
+        "confidence": 71.0,
+        "odds": 1.4084507042253522,
+        "p_win": 0.71,
+        "final_sp": "N/A",
+        "result": "LOST"
+      },
+      "actual_winner": {
+        "selection_id": "82430021",
+        "final_sp": "N/A",
+        "last_traded": "N/A"
+      },
+      "all_runners": [
+        {
+          "selection_id": "91937195",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "93071647",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "92837771",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "83995980",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "82430021",
+          "status": "WINNER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": true
+        }
+      ],
+      "insights": [
+        "HIGH CONFIDENCE LOSS: We were 71.0% confident but lost. AI was overconfident."
+      ]
+    },
+    {
+      "market_id": "1.252583057",
+      "venue": "Towcester",
+      "race_time": "2026-01-11T18:02",
+      "race_type": "horse",
+      "our_selection": {
+        "horse": "Flitwick Del Boy",
+        "selection_id": "80452192",
+        "confidence": 43.0,
+        "odds": 2.3255813953488373,
+        "p_win": 0.43,
+        "final_sp": "N/A",
+        "result": "LOST"
+      },
+      "actual_winner": {
+        "selection_id": "54746100",
+        "final_sp": "N/A",
+        "last_traded": "N/A"
+      },
+      "all_runners": [
+        {
+          "selection_id": "54746100",
+          "status": "WINNER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": true
+        },
+        {
+          "selection_id": "61419236",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "70218225",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "80452192",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        },
+        {
+          "selection_id": "57965698",
+          "status": "LOSER",
+          "sp": 0,
+          "last_traded": 0,
+          "was_winner": false
+        }
+      ],
+      "insights": []
+    }
+  ]
+}

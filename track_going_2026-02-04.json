@@ -1,0 +1,47 @@
+{
+  "date": "2026-02-04",
+  "source": "Official track declarations",
+  "tracks": {
+    "Kempton": {
+      "going": "Standard / Slow",
+      "surface": "all-weather",
+      "adjustment": -2,
+      "note": "Slower than typical all-weather"
+    },
+    "Ludlow": {
+      "going": "Soft",
+      "surface": "turf",
+      "adjustment": -5,
+      "note": "Soft ground favors stamina"
+    },
+    "Newcastle": {
+      "going": "Standard",
+      "surface": "all-weather",
+      "adjustment": 0,
+      "note": "Normal all-weather conditions"
+    },
+    "Punchestown": {
+      "going": "Soft to Heavy (Heavy in places)",
+      "surface": "turf",
+      "adjustment": -8,
+      "note": "Very testing conditions, deep ground"
+    },
+    "Sedgefield": {
+      "going": "Good to Soft (Good in places)",
+      "surface": "turf",
+      "adjustment": -3,
+      "note": "Mixed conditions, mostly soft"
+    }
+  },
+  "going_scale": {
+    "Heavy": -10,
+    "Soft to Heavy": -8,
+    "Soft": -5,
+    "Good to Soft": -3,
+    "Good": 0,
+    "Good to Firm": 3,
+    "Firm": 5,
+    "Standard (AW)": 0,
+    "Slow (AW)": -2
+  }
+}

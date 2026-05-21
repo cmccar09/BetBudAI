@@ -1,0 +1,134 @@
+{
+  "lambda_functions": [
+    {
+      "name": "betbudai-morning",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "betbudai-refresh",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "betbudai-evening",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "surebet-betfair-fetch",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "surebet-analysis",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "surebet-validate",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "surebet-featured-meeting",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "surebet-notify",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "surebet-free-feeds",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "surebet-sl-results",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "surebet-fav-results",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "surebet-results-fetch",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "surebet-loss-report",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "surebet-cache-roi",
+      "status": "OK",
+      "state": "Active"
+    },
+    {
+      "name": "surebet-learning",
+      "status": "OK",
+      "state": "Active"
+    }
+  ],
+  "eventbridge_rules": [
+    {
+      "name": "betbudai-morning-trigger",
+      "status": "OK",
+      "state": "ENABLED",
+      "schedule": "cron(30 8 * * ? *)"
+    },
+    {
+      "name": "betbudai-refresh-12-trigger",
+      "status": "OK",
+      "state": "ENABLED",
+      "schedule": "cron(0 12 * * ? *)"
+    },
+    {
+      "name": "betbudai-featured-lock-trigger",
+      "status": "OK",
+      "state": "ENABLED",
+      "schedule": "cron(30 13 * * ? *)"
+    },
+    {
+      "name": "betbudai-refresh-14-30-trigger",
+      "status": "OK",
+      "state": "ENABLED",
+      "schedule": "cron(30 14 * * ? *)"
+    },
+    {
+      "name": "betbudai-refresh-16-trigger",
+      "status": "OK",
+      "state": "ENABLED",
+      "schedule": "cron(0 16 * * ? *)"
+    },
+    {
+      "name": "betbudai-refresh-17-30-trigger",
+      "status": "OK",
+      "state": "ENABLED",
+      "schedule": "cron(30 17 * * ? *)"
+    },
+    {
+      "name": "betbudai-evening-trigger",
+      "status": "OK",
+      "state": "ENABLED",
+      "schedule": "cron(0 20 * * ? *)"
+    }
+  ],
+  "dynamodb_tables": [
+    {
+      "name": "SureBetBets",
+      "status": "OK",
+      "state": "ACTIVE",
+      "items": 52706
+    }
+  ],
+  "step_functions": [],
+  "errors": [],
+  "warnings": []
+}

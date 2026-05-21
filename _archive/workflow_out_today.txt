@@ -1,0 +1,376 @@
+
+================================================================================
+COMPREHENSIVE BETTING WORKFLOW
+================================================================================
+Started: 2026-03-22 14:27:36
+Analysis: 7-factor comprehensive (minimum 60/100)
+================================================================================
+
+Γ£ô Loaded intraday learnings from earlier races
+
+Found 17 upcoming races
+
+Fetching detailed form history from Racing Post (cached)...
+
+Building meeting context...
+  Meeting context: 94 trainer(s) and 82 jockey(s) focused on a single meeting today
+  New trainer debuts detected: 3
+
+
+================================================================================
+ANALYZING: 2026-03-22T14:32:00+00:00 - Exeter - Guildhall Shopping Celebrating 5 Decades Maiden Hurdle (GBB Race)
+Runners: 3
+================================================================================
+
+================================================================================
+WEATHER-BASED GOING INFERENCE (3-Day Rainfall + Seasonal Factor)
+Current Month: March (Seasonal Bias: -3)
+Using weather API inference
+================================================================================
+
+Checking Carlisle (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Taunton (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Fairyhouse (turf) - Weather API...
+  [SUN] Rainfall: 0.2mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Wolverhampton (all-weather) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Kempton (all-weather) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Punchestown (turf) - Weather API...
+  [SUN] Rainfall: 0.8mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Ludlow (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Newcastle (all-weather) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Sedgefield (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Ffos Las (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Exeter (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Warwick (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Southwell (all-weather) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Dundalk (all-weather) - Weather API...
+  [SUN] Rainfall: 0.2mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Doncaster (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Kelso (turf) - Weather API...
+  [SUN] Rainfall: 0.3mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Navan (turf) - Weather API...
+  [SUN] Rainfall: 0.2mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Newbury (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Lingfield (all-weather) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Cheltenham (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Ascot (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Sandown (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Haydock (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Leicester (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Leopardstown (turf) - Weather API...
+  [SUN] Rainfall: 0.4mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Naas (turf) - Weather API...
+  [SUN] Rainfall: 0.4mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Gowran Park (turf) - Weather API...
+  [SUN] Rainfall: 0.1mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Thurles (turf) - Weather API...
+  [SUN] Rainfall: 0.3mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Clonmel (turf) - Weather API...
+  [SUN] Rainfall: 0.4mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Limerick (turf) - Weather API...
+  [SUN] Rainfall: 0.7mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Cork (turf) - Weather API...
+  [SUN] Rainfall: 0.4mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Galway (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Ayr (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Musselburgh (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Perth (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Huntingdon (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Market Rasen (turf) - Weather API...
+  [SUN] Rainfall: 0.2mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Wincanton (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Plumpton (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Fontwell (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Wetherby (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Bangor-on-Dee (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Stratford (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Worcester (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Hereford (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Chepstow (turf) - Weather API...
+  [SUN] Rainfall: 0.0mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+================================================================================
+
+
+[REJECTED] Kildinan Prince
+   Score too low (29/100) - minimum 65 required
+
+================================================================================
+ANALYZING: 2026-03-22T14:40:00+00:00 - Naas - Space Traveller At Compas Stallions (C & G) Maiden
+Runners: 7
+================================================================================
+
+[REJECTED] Sindagan
+   Score too low (35/100) - minimum 65 required
+
+[SKIP] 2026-03-22T14:45:00+00:00 Carlisle | Mark Nield Wealth Management Handicap Hurdle
+   Reason: Class 5 handicap - skipped (unpredictable by design)
+
+[SKIP] 2026-03-22T15:02:00+00:00 Exeter | Guildhall Shopping Exeter 50th Anniversary Handicap Chase (GBB Race)
+   Reason: Class 3 handicap - skipped (unpredictable by design)
+
+================================================================================
+ANALYZING: 2026-03-22T15:12:00+00:00 - Naas - Colm White Bookmaker Handicap
+Runners: 12
+================================================================================
+
+[APPROVED] Quatre Bras @ 5.0
+   Score: 96/100
+   Reasoning: Sweet spot (3-9 odds): 12pts...
++ APPROVED: Quatre Bras @ 5.0
+   Score: 96/100 - VERY_HIGH
+   Reasoning: Sweet spot (3-9 odds): 12pts, Near optimal odds (4.65): 10pts, 2 total wins: 16p...
+
+================================================================================
+ANALYZING: 2026-03-22T15:17:00+00:00 - Carlisle - Mark Nield Wealth Management Go North One Man Series Final Handicap Chase (GBB Race)
+Runners: 12
+================================================================================
+
+[APPROVED] Marty Mcfly @ 5.5
+   Score: 103/100
+   Reasoning: Sweet spot (3-9 odds): 12pts...
++ APPROVED: Marty Mcfly @ 5.5
+   Score: 103/100 - VERY_HIGH
+   Reasoning: Sweet spot (3-9 odds): 12pts, Near optimal odds (4.65): 10pts, 3 total wins: 24p...
+
+[SKIP] 2026-03-22T15:37:00+00:00 Exeter | Barry Johnson Memorial Mares' Handicap Chase
+   Reason: Class 5 handicap - skipped (unpredictable by design)
+
+================================================================================
+ANALYZING: 2026-03-22T15:47:00+00:00 - Naas - Irish Racing Writers Association Madrid Handicap (Premier Handicap)
+Runners: 14
+================================================================================
+
+[APPROVED] Flanker Jet @ 11.0
+   Score: 80/100
+   Reasoning: Medium outsider (9-15): 6pts...
++ APPROVED: Flanker Jet @ 11.0
+   Score: 80/100 - HIGH
+   Reasoning: Medium outsider (9-15): 6pts, 2 total wins: 16pts, 3 places (2nd/3rd): 12pts...
+
+================================================================================
+ANALYZING: 2026-03-22T15:52:00+00:00 - Carlisle - Mark Nield Wealth Management Go North Red Rum Series Final Handicap Chase (GBB Race)
+Runners: 14
+================================================================================
+
+[APPROVED] Upfordebate @ 13.0
+   Score: 92/100
+   Reasoning: Medium outsider (9-15): 6pts...
++ APPROVED: Upfordebate @ 13.0
+   Score: 92/100 - VERY_HIGH
+   Reasoning: Medium outsider (9-15): 6pts, 3 total wins: 24pts, Proven/suited to Good to Firm...
+
+================================================================================
+ANALYZING: 2026-03-22T16:12:00+00:00 - Exeter - Guildhall Exeter, Shop, Eat, Play EBF Junior 'National Hunt' Hurdle (GBB Race)
+Runners: 10
+================================================================================
+
+[REJECTED] Dakota Star
+   Score too low (62/100) - minimum 65 required
+
+================================================================================
+ANALYZING: 2026-03-22T16:22:00+00:00 - Naas - Irish Stallion Farms EBF Devoy Stakes (Listed)
+Runners: 8
+================================================================================
+  ΓÜá∩╕Å  RACE SKIPPED: 4 horses scored 85+ (too close to call)
+     - Ribee: 146/100
+     - Shaool: 120/100
+     - Beset: 88/100
+     - Iowa City: 86/100
+
+[SKIPPED] No horses meet comprehensive criteria
+
+================================================================================
+ANALYZING: 2026-03-22T16:27:00+00:00 - Carlisle - Racing Post+ Subscription Go North Monet's Garden Series Final Handicap Chase (GBB Race)
+Runners: 13
+================================================================================
+
+[APPROVED] Hello Judge @ 6.5
+   Score: 97/100
+   Reasoning: Sweet spot (3-9 odds): 12pts...
++ APPROVED: Hello Judge @ 6.5
+   Score: 97/100 - VERY_HIGH
+   Reasoning: Sweet spot (3-9 odds): 12pts, Good odds position: 5pts, 3 total wins: 24pts...
+
+[SKIP] 2026-03-22T16:47:00+00:00 Exeter | Guildhall Exeter Style, Favour, Fun Handicap Hurdle
+   Reason: Class 4 handicap - skipped (unpredictable by design)
+
+================================================================================
+ANALYZING: 2026-03-22T16:57:00+00:00 - Naas - Aesop's Fables At Compas Stallions Irish EBF Fillies Maiden
+Runners: 10
+================================================================================
+
+[REJECTED] Sanctijude
+   Score too low (62/100) - minimum 65 required
+
+================================================================================
+ANALYZING: 2026-03-22T17:02:00+00:00 - Carlisle - Next Meeting Easter Saturday 4th April Open NH Flat Race (GBB Race)
+Runners: 4
+================================================================================
+
+[REJECTED] Red Acres Max
+   Score too low (27/100) - minimum 65 required
+
+================================================================================
+ANALYZING: 2026-03-22T17:22:00+00:00 - Exeter - Greendale Farm Shop Point-To-Point Bumper Maiden NH Flat Race (Amateur Jockeys) (GBB Race)
+Runners: 7
+================================================================================
+
+[REJECTED] Henriettaredheart
+   Score too low (32/100) - minimum 65 required
+
+================================================================================
+ANALYZING: 2026-03-22T17:30:00+00:00 - Naas - TRM Nutrition Best-Turned-Out Series Back For 2026 Race
+Runners: 3
+================================================================================
+
+[REJECTED] Take Charge Star
+   Score too low (56/100) - minimum 65 required
+
+================================================================================
+WORKFLOW COMPLETE
+================================================================================
+Races analyzed: 17
+Picks approved: 5
+Picks rejected: 12
+
+APPROVED PICKS (added to UI):
+  + Quatre Bras @ 5.0 - 96/100
+  + Marty Mcfly @ 5.5 - 103/100
+  + Flanker Jet @ 11.0 - 80/100
+  + Upfordebate @ 13.0 - 92/100
+  + Hello Judge @ 6.5 - 97/100
+
+================================================================================
++ All UI picks passed comprehensive analysis
++ No odds-only picks allowed
+================================================================================
+
+Converting SL racecard for 2026-03-22...
+  Courses: Carlisle, Exeter, Naas
+  Total races: 21
+  Written 21 races (17 upcoming) ΓåÆ response_horses.json
+

@@ -1,0 +1,83 @@
+{
+    "Items": [
+        {
+            "race_time": {
+                "S": "2026-05-13T13:40:00+00:00"
+            },
+            "show_in_ui": {
+                "BOOL": false
+            },
+            "comprehensive_score": {
+                "N": "130"
+            },
+            "bet_date": {
+                "S": "2026-05-13"
+            },
+            "course": {
+                "S": "Yarmouth"
+            },
+            "odds": {
+                "N": "2.38"
+            },
+            "market_rank": {
+                "N": "1"
+            },
+            "bet_id": {
+                "S": "2026-05-13T134000+0000_Yarmouth_Kinswoman"
+            },
+            "outcome": {
+                "S": "placed"
+            },
+            "free_phase2_adjustment": {
+                "N": "0"
+            },
+            "horse": {
+                "S": "Kinswoman"
+            },
+            "comprehensive_score_adjusted": {
+                "N": "130"
+            }
+        },
+        {
+            "race_time": {
+                "S": "2026-05-13T13:40:00+00:00"
+            },
+            "show_in_ui": {
+                "BOOL": false
+            },
+            "comprehensive_score": {
+                "N": "119"
+            },
+            "bet_date": {
+                "S": "2026-05-12"
+            },
+            "course": {
+                "S": "Yarmouth"
+            },
+            "odds": {
+                "N": "2.92"
+            },
+            "market_rank": {
+                "N": "1"
+            },
+            "bet_id": {
+                "S": "2026-05-13T134000+0000_Yarmouth_Kinswoman"
+            },
+            "outcome": {
+                "S": "pending"
+            },
+            "free_phase2_adjustment": {
+                "N": "3"
+            },
+            "horse": {
+                "S": "Kinswoman"
+            },
+            "comprehensive_score_adjusted": {
+                "N": "122"
+            }
+        }
+    ],
+    "Count": 2,
+    "ScannedCount": 46891,
+    "ConsumedCapacity": null
+}

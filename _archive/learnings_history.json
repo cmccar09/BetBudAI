@@ -1,0 +1,49 @@
+{
+  "learning_history": [
+    {
+      "date": "2026-02-01",
+      "race": "Musselburgh 13:55",
+      "race_type": "Class 3, Good to Soft, 5 runners",
+      "our_selection": {
+        "horse": "Koukeo",
+        "odds": 2.2,
+        "value_score": 7,
+        "edge_percentage": 14.4,
+        "form_score": 9,
+        "course_wins": 1,
+        "result": "LOST"
+      },
+      "actual_winner": {
+        "horse": "Pure Carbon",
+        "odds": 3.25,
+        "value_score": 9,
+        "edge_percentage": 23.5,
+        "form_score": 8,
+        "course_wins": 0,
+        "result": "WON"
+      },
+      "mistake_type": "value_score_underweight",
+      "mistake_category": "weighting_error",
+      "severity": "HIGH",
+      "pattern_identified": "Over-weighted course experience (1 win) over superior value metrics (9 vs 7 score, 23.5% vs 14.4% edge)",
+      "learnings": [
+        "Value score should be PRIMARY factor (40% weight)",
+        "Edge percentage >8% difference requires favoring higher value",
+        "Progressive form (U-2-1) can beat plateau form (1-1-X)",
+        "Small fields (≤5): favorites often over-bet, favor value at 3-5 odds",
+        "Course wins helpful but NOT decisive when value gap is significant"
+      ],
+      "corrections_applied": [
+        "Increased value_score weight: 30% → 40%",
+        "Reduced class/course weight: 40% → 30%",
+        "Added small field value rule",
+        "Added progressive form recognition",
+        "Updated tiebreaker: value > course experience"
+      ],
+      "expected_impact": "Should now select horses with superior value metrics over favorites with course advantages",
+      "verification_metric": "Track if future picks favor value_score 9 over value_score 7 regardless of course wins"
+    }
+  ],
+  "version": "2.0",
+  "last_updated": "2026-02-01T14:00:00Z"
+}

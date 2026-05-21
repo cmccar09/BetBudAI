@@ -1,0 +1,60 @@
+{
+  "Comment": "SureBet Learning Pipeline — 21:00 UTC nightly. Scans 7 days of settled picks and updates the scoring model with performance insights.",
+  "StartAt": "InjectDate",
+  "States": {
+
+    "InjectDate": {
+      "Type": "Pass",
+      "Parameters": {
+        "date.$": "States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'), 0)"
+      },
+      "Next": "RunLearningCycle"
+    },
+
+    "RunLearningCycle": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-learning",
+        "Payload.$": "$"
+      },
+      "ResultSelector": {
+        "results_scanned.$": "$.Payload.results_scanned",
+        "patterns_found.$":  "$.Payload.patterns_found",
+        "insights.$":        "$.Payload.insights",
+        "success.$":         "$.Payload.success"
+      },
+      "ResultPath": "$.learningResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 60,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "LearningFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "LearningComplete"
+    },
+
+    "LearningComplete": {
+      "Type": "Succeed"
+    },
+
+    "LearningFailed": {
+      "Type": "Fail",
+      "Error": "LearningCycleFailed",
+      "Cause": "Learning cycle Lambda failed — check CloudWatch Logs"
+    }
+  }
+}

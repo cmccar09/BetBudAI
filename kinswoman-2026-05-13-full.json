@@ -1,0 +1,654 @@
+{
+    "Item": {
+        "actual_result": {
+            "S": "PLACED"
+        },
+        "age": {
+            "S": "4"
+        },
+        "all_horses": {
+            "L": [
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Kinswoman"
+                        },
+                        "score": {
+                            "N": "130"
+                        },
+                        "jockey": {
+                            "S": "Cieren Fallon"
+                        },
+                        "trainer": {
+                            "S": "William Haggas"
+                        },
+                        "odds": {
+                            "N": "2.38"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Grandlad"
+                        },
+                        "score": {
+                            "N": "94"
+                        },
+                        "jockey": {
+                            "S": "George Wood"
+                        },
+                        "trainer": {
+                            "S": "James Horton"
+                        },
+                        "odds": {
+                            "N": "18.5"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Naanas Sparkle"
+                        },
+                        "score": {
+                            "N": "83"
+                        },
+                        "jockey": {
+                            "S": "Kieran O'Neill"
+                        },
+                        "trainer": {
+                            "S": "Lemos De Souza"
+                        },
+                        "odds": {
+                            "N": "9.8"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Almaty Star"
+                        },
+                        "score": {
+                            "N": "65"
+                        },
+                        "jockey": {
+                            "S": "Jack Mitchell"
+                        },
+                        "trainer": {
+                            "S": "Robert Cowell"
+                        },
+                        "odds": {
+                            "N": "9.2"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Nogos Dream"
+                        },
+                        "score": {
+                            "N": "36"
+                        },
+                        "jockey": {
+                            "S": "Hector Crouch"
+                        },
+                        "trainer": {
+                            "S": "Richard Hughes"
+                        },
+                        "odds": {
+                            "N": "0"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Rocking Ends"
+                        },
+                        "score": {
+                            "N": "33"
+                        },
+                        "jockey": {
+                            "S": "Daniel Muscutt"
+                        },
+                        "trainer": {
+                            "S": "Tom Clover"
+                        },
+                        "odds": {
+                            "N": "12"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Forager"
+                        },
+                        "score": {
+                            "N": "26"
+                        },
+                        "jockey": {
+                            "S": "Pat Cosgrave"
+                        },
+                        "trainer": {
+                            "S": "Simon Pearce"
+                        },
+                        "odds": {
+                            "N": "36"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Alondra"
+                        },
+                        "score": {
+                            "N": "25"
+                        },
+                        "jockey": {
+                            "S": "David Probert"
+                        },
+                        "trainer": {
+                            "S": "Scott Dixon"
+                        },
+                        "odds": {
+                            "N": "34"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Cressida Wildes"
+                        },
+                        "score": {
+                            "N": "24"
+                        },
+                        "jockey": {
+                            "S": "Connor Planas"
+                        },
+                        "trainer": {
+                            "S": "Phil McEntee"
+                        },
+                        "odds": {
+                            "N": "0"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Mesaafi"
+                        },
+                        "score": {
+                            "N": "16"
+                        },
+                        "jockey": {
+                            "S": "David Egan"
+                        },
+                        "trainer": {
+                            "S": "Ross Burdon"
+                        },
+                        "odds": {
+                            "N": "13.5"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Existent"
+                        },
+                        "score": {
+                            "N": "10"
+                        },
+                        "jockey": {
+                            "S": "Jack Nicholls"
+                        },
+                        "trainer": {
+                            "S": "Stuart Williams"
+                        },
+                        "odds": {
+                            "N": "17.5"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Twilight Fun"
+                        },
+                        "score": {
+                            "N": "7"
+                        },
+                        "jockey": {
+                            "S": "Joey Haynes"
+                        },
+                        "trainer": {
+                            "S": "Chelsea Banham"
+                        },
+                        "odds": {
+                            "N": "48"
+                        }
+                    }
+                },
+                {
+                    "M": {
+                        "horse": {
+                            "S": "Michaelas Boy"
+                        },
+                        "score": {
+                            "N": "-5"
+                        },
+                        "jockey": {
+                            "S": "Jack Callan"
+                        },
+                        "trainer": {
+                            "S": "Robert Cowell"
+                        },
+                        "odds": {
+                            "N": "19.5"
+                        }
+                    }
+                }
+            ]
+        },
+        "analysis_type": {
+            "S": "comprehensive_7factor"
+        },
+        "bet_date": {
+            "S": "2026-05-13"
+        },
+        "combined_confidence": {
+            "N": "130"
+        },
+        "comprehensive_score": {
+            "N": "130"
+        },
+        "comprehensive_score_adjusted": {
+            "N": "130"
+        },
+        "confidence_color": {
+            "S": "green"
+        },
+        "confidence_grade": {
+            "S": "ELITE (Top-tier confidence)"
+        },
+        "confidence_level": {
+            "S": "ELITE"
+        },
+        "course": {
+            "S": "Yarmouth"
+        },
+        "created_at": {
+            "S": "2026-05-13T13:02:45.481704+00:00"
+        },
+        "decimal_odds": {
+            "N": "2.38"
+        },
+        "distance_result": {
+            "S": "5f 42y"
+        },
+        "draw": {
+            "S": "5"
+        },
+        "expected_value": {
+            "N": "-0.0956"
+        },
+        "fav_outcome": {
+            "S": "loss"
+        },
+        "finish_position": {
+            "N": "2"
+        },
+        "form": {
+            "S": "33221121-"
+        },
+        "free_phase1_market_context": {
+            "M": {
+                "runner_decimal_odds": {
+                    "N": "2.38"
+                },
+                "market_position_bucket": {
+                    "S": "short"
+                },
+                "field_median_odds": {
+                    "N": "17.5"
+                },
+                "relative_value_vs_field_median": {
+                    "N": "0.136"
+                }
+            }
+        },
+        "free_phase1_weather": {
+            "M": {
+                "rain_next_3h_mm": {
+                    "N": "0"
+                },
+                "max_wind_next_3h_kmh": {
+                    "N": "15.8"
+                },
+                "avg_temp_next_3h_c": {
+                    "N": "5.5"
+                },
+                "weather_volatility_score": {
+                    "N": "0"
+                }
+            }
+        },
+        "free_phase2_adjustment": {
+            "N": "0"
+        },
+        "free_phase_updated_at": {
+            "S": "2026-05-13T13:35:11.234261+00:00"
+        },
+        "history_runs": {
+            "N": "0"
+        },
+        "history_win_rate": {
+            "N": "0"
+        },
+        "history_wins": {
+            "N": "0"
+        },
+        "horse": {
+            "S": "Kinswoman"
+        },
+        "is_dropped": {
+            "BOOL": true
+        },
+        "is_hot_prospect": {
+            "BOOL": false
+        },
+        "is_intraday": {
+            "BOOL": false
+        },
+        "is_learning_pick": {
+            "BOOL": false
+        },
+        "is_watchlist": {
+            "BOOL": true
+        },
+        "jockey": {
+            "S": "Cieren Fallon"
+        },
+        "kelly_fraction": {
+            "N": "0"
+        },
+        "market_id": {
+            "S": "1.258066662"
+        },
+        "market_name": {
+            "S": "5f Hcap"
+        },
+        "market_rank": {
+            "N": "1"
+        },
+        "missing_runners": {
+            "N": "0"
+        },
+        "model_rank": {
+            "N": "1"
+        },
+        "non_runners_count": {
+            "N": "5"
+        },
+        "odds": {
+            "N": "2.38"
+        },
+        "official_rating": {
+            "S": "88"
+        },
+        "opening_price": {
+            "N": "2.38"
+        },
+        "outcome": {
+            "S": "placed"
+        },
+        "pick_rank": {
+            "N": "0"
+        },
+        "pick_type": {
+            "S": "dropped"
+        },
+        "potential_improver_flag": {
+            "S": "[POTENTIAL_IMPROVER]: Grandlad - profile suggests improvement likely based on trip suitability, going suitability/history. Could outrun current mark."
+        },
+        "potential_improver_horse": {
+            "S": "Grandlad"
+        },
+        "potential_improver_race": {
+            "BOOL": true
+        },
+        "profit": {
+            "N": "-6"
+        },
+        "race_analyzed_count": {
+            "N": "13"
+        },
+        "race_class_result": {
+            "S": "3"
+        },
+        "race_course": {
+            "S": "Yarmouth"
+        },
+        "race_coverage_pct": {
+            "N": "100"
+        },
+        "race_name_result": {
+            "S": "Bodhi Solutions Handicap"
+        },
+        "race_potential_improver": {
+            "BOOL": true
+        },
+        "race_potential_improver_horse": {
+            "S": "Grandlad"
+        },
+        "race_potential_improver_message": {
+            "S": "[POTENTIAL_IMPROVER]: Grandlad - profile suggests improvement likely based on trip suitability, going suitability/history. Could outrun current mark."
+        },
+        "race_time": {
+            "S": "2026-05-13T13:40:00+00:00"
+        },
+        "race_total_count": {
+            "N": "13"
+        },
+        "race_winner_name": {
+            "S": "Naana's Sparkle"
+        },
+        "recommended_bet": {
+            "BOOL": false
+        },
+        "result_analysis": {
+            "S": "2nd of 2, winner: Naana's Sparkle"
+        },
+        "result_emoji": {
+            "S": "PLACED"
+        },
+        "result_winner_name": {
+            "S": "Naana's Sparkle"
+        },
+        "saver_candidates": {
+            "L": [
+                {
+                    "S": "Almaty Star"
+                }
+            ]
+        },
+        "score_breakdown": {
+            "M": {
+                "jockey_quality": {
+                    "N": "6"
+                },
+                "official_rating_bonus": {
+                    "N": "0"
+                },
+                "optimal_odds": {
+                    "N": "8"
+                },
+                "current_form_edge": {
+                    "N": "8"
+                },
+                "total_wins": {
+                    "N": "24"
+                },
+                "deep_form": {
+                    "N": "0"
+                },
+                "bounce_back": {
+                    "N": "0"
+                },
+                "jockey_course_bonus": {
+                    "N": "0"
+                },
+                "irish_handicap_penalty": {
+                    "N": "0"
+                },
+                "pu_winner_bounce": {
+                    "N": "0"
+                },
+                "consistency": {
+                    "N": "18"
+                },
+                "age_bonus": {
+                    "N": "7"
+                },
+                "timeform_stars": {
+                    "N": "12"
+                },
+                "trainer_combo": {
+                    "N": "0"
+                },
+                "score_cap": {
+                    "N": "-17"
+                },
+                "market_leader": {
+                    "N": "10"
+                },
+                "claiming_jockey": {
+                    "N": "0"
+                },
+                "meeting_focus": {
+                    "N": "0"
+                },
+                "distance_suitability": {
+                    "N": "10"
+                },
+                "small_field_bonus": {
+                    "N": "0"
+                },
+                "pace_profile": {
+                    "N": "0"
+                },
+                "recent_win": {
+                    "N": "0"
+                },
+                "recent_non_completion_penalty": {
+                    "N": "0"
+                },
+                "track_pattern_bonus": {
+                    "N": "0"
+                },
+                "cheltenham_festival": {
+                    "N": "0"
+                },
+                "weight_penalty": {
+                    "N": "0"
+                },
+                "short_form_improvement": {
+                    "N": "0"
+                },
+                "draw_bias": {
+                    "N": "0"
+                },
+                "trainer_course_bonus": {
+                    "N": "0"
+                },
+                "jockey_hot_form": {
+                    "N": "6"
+                },
+                "going_suitability": {
+                    "N": "10"
+                },
+                "market_steam": {
+                    "N": "0"
+                },
+                "heavy_going_penalty": {
+                    "N": "0"
+                },
+                "database_history": {
+                    "N": "0"
+                },
+                "trainer_reputation": {
+                    "N": "16"
+                },
+                "trainer_hot_form": {
+                    "N": "0"
+                },
+                "sweet_spot": {
+                    "N": "8"
+                },
+                "unexposed_bonus": {
+                    "N": "0"
+                },
+                "novice_penalty": {
+                    "N": "0"
+                },
+                "aw_low_class_penalty": {
+                    "N": "0"
+                },
+                "favorite_correction": {
+                    "N": "4"
+                },
+                "unknown_trainer_penalty": {
+                    "N": "0"
+                },
+                "track_handedness": {
+                    "N": "0"
+                },
+                "aw_evening_penalty": {
+                    "N": "0"
+                },
+                "large_field_penalty": {
+                    "N": "0"
+                },
+                "course_performance": {
+                    "N": "0"
+                },
+                "price_steam": {
+                    "N": "0"
+                }
+            }
+        },
+        "score_gap": {
+            "N": "36"
+        },
+        "selection_flags": {
+            "L": []
+        },
+        "selection_id": {
+            "N": "81280710"
+        },
+        "selection_policy": {
+            "S": "model_top_score"
+        },
+        "selection_reasons": {
+            "L": [
+                {
+                    "S": "Strong odds range (2-3, highest SR): 8pts"
+                },
+                {
+                    "S": "Near optimal odds (3.8): 8pts"
+                },
+                {
+                    "S": "3 total wins: 24pts"
+                },
+                {
+                    "S": "5 places (2nd/3rd): 18pts (capped at 3)"
+                },
+                {
+                    "S": 

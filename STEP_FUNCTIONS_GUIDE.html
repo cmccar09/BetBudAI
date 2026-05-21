@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SureBet — AWS Step Functions Orchestration</title>
+  <style>
+    :root {
+      --bg:       #0f1117;
+      --surface:  #1a1d27;
+      --surface2: #151823;
+      --border:   #2e3245;
+      --accent:   #4f8ef7;
+      --green:    #34d399;
+      --yellow:   #fbbf24;
+      --red:      #f87171;
+      --purple:   #a78bfa;
+      --cyan:     #22d3ee;
+      --text:     #e2e8f0;
+      --muted:    #8892a4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.65;
+      padding: 32px 24px;
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+
+    /* ─── Header ──────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #1b2038 0%, #1e2a40 100%);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px 36px;
+      margin-bottom: 36px;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    header .logo { font-size: 42px; flex-shrink: 0; }
+    header h1   { font-size: 24px; font-weight: 800; color: #fff; line-height: 1.2; }
+    header .sub { color: var(--muted); font-size: 13px; margin-top: 6px; }
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+    .badge.green  { background: #065f46; color: var(--green); }
+    .badge.purple { background: #3b1f6e; color: var(--purple); }
+
+    /* ─── Section titles ──────────────────────────────── */
+    h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2 .pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: #1e2a45;
+      color: var(--accent);
+      letter-spacing: .4px;
+    }
+    h3 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+
+    /* ─── Cards ───────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+    .card.highlight { border-color: #2d3f6a; background: #151d30; }
+
+    /* ─── Timeline ─────────────────────────────────────── */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-item {
+      display: flex;
+      gap: 0;
+      position: relative;
+    }
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: 39px;
+      top: 52px;
+      bottom: -1px;
+      width: 2px;
+      background: var(--border);
+    }
+    .tl-item:last-child::before { display: none; }
+    .tl-left {
+      width: 80px;
+      flex-shrink: 0;
+      text-align: right;
+      padding-right: 20px;
+      padding-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .3px;
+    }
+    .tl-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 2px solid var(--accent);
+      flex-shrink: 0;
+      margin-top: 14px;
+      z-index: 1;
+    }
+    .tl-dot.green  { border-color: var(--green); }
+    .tl-dot.yellow { border-color: var(--yellow); }
+    .tl-dot.purple { border-color: var(--purple); }
+    .tl-dot.cyan   { border-color: var(--cyan); }
+    .tl-body {
+      flex: 1;
+      padding: 12px 0 24px 20px;
+    }
+    .tl-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .tl-desc { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+
+    /* ─── Step chain ───────────────────────────────────── */
+    .step-chain {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .step {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .step .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    .step .dot.green  { background: var(--green); }
+    .step .dot.yellow { background: var(--yellow); }
+    .step .dot.red    { background: var(--red); }
+    .step .dot.purple { background: var(--purple); }
+    .step .dot.cyan   { background: var(--cyan); }
+    .arrow { color: var(--muted); font-size: 16px; }
+    .step-note { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+    /* ─── Lambda table ─────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+    }
+    td {
+      padding: 9px 12px;
+      font-size: 13px;
+      border-bottom: 1px solid #1e2235;
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1c2035; }
+    td code {
+      background: #0e1220;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 12px;
+      color: var(--cyan);
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      margin: 1px;
+      text-transform: uppercase;
+      letter-spacing: .3px;
+    }
+    .tag.blue   { background: #1a2e52; color: var(--accent); }
+    .tag.green  { background: #064e38; color: var(--green); }
+    .tag.yellow { background: #4a3200; color: var(--yellow); }
+    .tag.purple { background: #2e1a5c; color: var(--purple); }
+    .tag.cyan   { background: #033d4a; color: var(--cyan); }
+
+    /* ─── Guarantee boxes ─────────────────────────────── */
+    .guarantee-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+      gap: 14px;
+      margin-top: 4px;
+    }
+    .gbox {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .gbox .icon { font-size: 22px; margin-bottom: 8px; }
+    .gbox h4 { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .gbox p  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* ─── Failure flow ─────────────────────────────────── */
+    .flow-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .fbox {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .fbox.fail { border-color: #6b1d1d; background: #1c0e0e; color: var(--red); }
+    .fbox.ok   { border-color: #1a4a32; background: #0e1e14; color: var(--green); }
+    .fbox.warn { border-color: #4a3200; background: #1c1400; color: var(--yellow); }
+
+    /* ─── Cost pill ────────────────────────────────────── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .info-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      text-align: center;
+    }
+    .info-box .val { font-size: 20px; font-weight: 800; color: #fff; }
+    .info-box .lbl { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* ─── Misc ─────────────────────────────────────────── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ HEADER ══════════════════════════════════════════════════════ -->
+<header>
+  <div class="logo">⚙️</div>
+  <div>
+    <h1>SureBet — AWS Step Functions Orchestration</h1>
+    <div class="sub">Cloud-native pipeline that runs every step, every day — automatically</div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <span class="badge">AWS Step Functions</span>
+      <span class="badge green">Deployed eu-west-1</span>
+      <span class="badge purple">7 Lambdas Live</span>
+    </div>
+  </div>
+</header>
+
+
+<!-- ══════════ WHAT IT DOES ════════════════════════════════════════════════ -->
+<div class="card highlight">
+  <h2>What Step Functions Does <span class="pill">Overview</span></h2>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:20px">
+    Before Step Functions, the daily pipeline relied on a script running on a local PC.
+    If the PC was off, a step failed silently, or the script was never started, picks were missed.
+    Step Functions replaces this with a <strong style="color:#fff">fully managed AWS orchestration layer</strong>
+    that launches automatically via EventBridge — even if your laptop is off — and retries,
+    checks, and reports on every step.
+  </p>
+  <div class="guarantee-grid">
+    <div class="gbox">
+      <div class="icon">🕐</div>
+      <h4>Runs on a Schedule</h4>
+      <p>EventBridge triggers each pipeline at the configured UTC time. No manual intervention needed.</p>
+    </div>
+    <div class="gbox">
+      <div class="icon">🔁</div>
+      <h4>Auto-Retries on Failure</h4>
+      <p>Each step has retry rules. Transient AWS or network errors automatically retry up to 2×.</p>
+    </div>
+    <div class="gbox">
+      <div class="icon">🛑</div>
+      <h4>Hard Stops on Bad Data</h4>
+      <p>If validation fails (bad picks, 0 runners), the pipeline aborts — no junk is notified.</p>
+    </div>
+    <div class="gbox">
+      <div class="icon">📊</div>
+      <h4>Full Execution History</h4>
+      <p>Every execution, step duration, input/output and error is visible in AWS Console.</p>
+    </div>
+    <div class="gbox">
+      <div class="icon">📧</div>
+      <h4>Evening Report Email</h4>
+      <p>Automated HTML P&L report emailed via SES every night — no manual reports needed.</p>
+    </div>
+    <div class="gbox">
+      <div class="icon">🧠</div>
+      <h4>Nightly Self-Learning</h4>
+      <p>Scoring weights are updated automatically from 7 days of settled results every night.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ DAILY TIMELINE ══════════════════════════════════════════════ -->
+<div class="card">
+  <h2>Daily Schedule <span class="pill">UTC Times</span></h2>
+
+  <div class="timeline">
+
+    <!-- 08:30 Morning -->
+    <div class="tl-item">
+      <div class="tl-left">08:30</div>
+      <div class="tl-dot"></div>
+      <div class="tl-body">
+        <div class="tl-title">🌅 SureBet-Morning Pipeline</div>
+        <div class="tl-desc">First run of the day. Fetches today's UK/IRE markets, scores every horse, selects the top 5 picks, validates and sends the morning WhatsApp notification.</div>
+        <div class="step-chain">
+          <div class="step"><div class="dot"></div>Fetch Betfair Odds</div>
+          <div class="arrow">→</div>
+          <div class="step"><div class="dot yellow"></div>Score All Horses</div>
+          <div class="arrow">→</div>
+          <div class="step"><div class="dot green"></div>Validate Picks</div>
+          <div class="arrow">→</div>
+          <div class="step"><div class="dot purple"></div>WhatsApp Notify</div>
+        </div>
+        <div class="step-note">⚡ surebet-betfair-fetch → surebet-analysis → surebet-validate → surebet-notify</div>
+      </div>
+    </div>
+
+    <!-- 12:00 - 18:00 Refresh -->
+    <div class="tl-item">
+      <div class="tl-left">12 / 14<br>16 / 18</div>
+      <div class="tl-dot cyan"></div>
+      <div class="tl-body">
+        <div class="tl-title">🔄 SureBet-Refresh Pipeline ×4</div>
+        <div class="tl-desc">Re-fetches updated odds and re-scores every 2 hours. Picks that change significantly are re-validated. WhatsApp only fires if the pick set has changed (deduplication via DynamoDB hash).</div>
+        <div class="step-chain">
+          <div class="step"><div class="dot cyan"></div>Refresh Odds</div>
+          <div class="arrow">→</div>
+          <div class="step"><div class="dot yellow"></div>Re-Score</div>
+          <div class="arrow">→</div>
+          <div class="step"><div class="dot green"></div>Validate</div>
+          <div class="arrow">→</div>
+          <div class="step"><div class="dot purple"></div>Notify (if changed)</div>
+        </div>
+        <div class="step-note">⚡ Same Lambda chain as Morning — notification skipped if picks unchanged</div>
+      </div>
+    </div>
+
+    <!-- 20:00 Evening -->
+    <div class="tl-item">
+      <div class="tl-left">20:00</div>
+      <div class="tl-dot green"></div>
+      <div class="tl-body">
+        <div class="tl-title">🌙 SureBet-Evening Pipeline</div>
+        <div class="tl-desc">Fetches settlement data from Betfair Exchange, updates DynamoDB picks with WIN/LOSS outcomes, then generates and emails a polished HTML performance report.</div>
+        <div class="step-chain">
+          <div class="step"><div class="dot"></div>Fetch Settled Results</div>
+          <div class="arrow">→</div>
+          <div class="step"><div class="dot green"></div>Update DynamoDB</div>
+          <div class="arrow">→</div>
+          <div class="step"><div class="dot yellow"></div>Generate Report</div>
+          <div class="arrow">→</div>
+          <div class="step"><div class="dot green"></div>Email via SES</div>
+        </div>
+        <div class="step-note">⚡ surebet-results-fetch → surebet-loss-report. Report also saved to S3.</div>
+      </div>
+    </div>
+
+    <!-- 21:00 Learning -->
+    <div class="tl-item">
+      <div class="tl-left">21:00</div>
+      <div class="tl-dot purple"></div>
+      <div class="tl-body">
+        <div class="tl-title">🧠 SureBet-Learning Pipeline</div>
+        <div class="tl-desc">Scans the last 7 days of settled bets from DynamoDB, identifies performance patterns (win rate by odds band, course, going), generates new weight insights and persists them back to DynamoDB for tomorrow's scoring engine.</div>
+        <div class="step-chain">
+          <div class="step"><div class="dot purple"></div>Scan 7-Day Results</div>
+          <div class="arrow">→</div>
+          <div class="step"><div class="dot purple"></div>Analyse Patterns</div>
+          <div class="arrow">→</div>
+          <div class="step"><div class="dot green"></div>Persist Insights</div>
+        </div>
+        <div class="step-note">⚡ surebet-learning. Insights stored under DynamoDB bet_date='LEARNING_INSIGHTS'.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════ LAMBDA FUNCTIONS ════════════════════════════════════════════ -->
+<div class="card">
+  <h2>Lambda Functions <span class="pill">7 Deployed</span></h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Function</th>
+        <th>Timeout</th>
+        <th>Memory</th>
+        <th>What it does</th>
+        <th>Used by</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>surebet-betfair-fetch</code></td>
+        <td>120s</td>
+        <td>256 MB</td>
+        <td>Authenticates with Betfair (Secrets Manager), fetches next-24h UK/IRE WIN markets, writes <code>response_horses.json</code> to S3</td>
+        <td><span class="tag blue">Morning</span><span class="tag cyan">Refresh</span></td>
+      </tr>
+      <tr>
+        <td><code>surebet-analysis</code></td>
+        <td>600s</td>
+        <td>512 MB</td>
+        <td>Downloads races from S3, runs the 7-factor comprehensive scoring engine on every runner, selects top-5 picks, saves all data to DynamoDB</td>
+        <td><span class="tag blue">Morning</span><span class="tag cyan">Refresh</span></td>
+      </tr>
+      <tr>
+        <td><code>surebet-validate</code></td>
+        <td>30s</td>
+        <td>128 MB</td>
+        <td>Reads today's picks from DynamoDB. Asserts every pick has ≥2 runners in all_horses, a non-zero score and valid odds. <strong>Fails the pipeline if any pick is invalid</strong> — preventing bad notifcations</td>
+        <td><span class="tag blue">Morning</span><span class="tag cyan">Refresh</span></td>
+      </tr>
+      <tr>
+        <td><code>surebet-notify</code></td>
+        <td>60s</td>
+        <td>128 MB</td>
+        <td>Loads picks from DynamoDB, builds a WhatsApp message, sends via Twilio REST API. Hash deduplication (stored in DynamoDB) prevents repeat blasts for unchanged picks</td>
+        <td><span class="tag blue">Morning</span><span class="tag cyan">Refresh</span></td>
+      </tr>
+      <tr>
+        <td><code>surebet-results-fetch</code></td>
+        <td>120s</td>
+        <td>256 MB</td>
+        <td>Queries Betfair Exchange for CLOSED/SETTLED WIN markets, finds the winner for each race, and updates DynamoDB picks with outcome, result_won, result_winner_name</td>
+        <td><span class="tag green">Evening</span></td>
+      </tr>
+      <tr>
+        <td><code>surebet-loss-report</code></td>
+        <td>60s</td>
+        <td>256 MB</td>
+        <td>Queries DynamoDB for today's picks, generates a polished HTML P&L report with score breakdowns, saves to S3, and emails to charles.mccarthy@gmail.com via SES</td>
+        <td><span class="tag green">Evening</span></td>
+      </tr>
+      <tr>
+        <td><code>surebet-learning</code></td>
+        <td>300s</td>
+        <td>256 MB</td>
+        <td>Scans 7 days of settled picks from DynamoDB, calls the learning engine to identify performance patterns by odds band, course, going, and persists updated insights to DynamoDB</td>
+        <td><span class="tag purple">Learning</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════ HOW FAILURE IS HANDLED ══════════════════════════════════════ -->
+<div class="card">
+  <h2>How Failures Are Handled <span class="pill">Retry &amp; Abort Logic</span></h2>
+
+  <h3 style="margin-bottom:12px">Automatic Retries</h3>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:16px">
+    Every Lambda task in the state machines has a <strong style="color:#fff">Retry block</strong> for transient errors.
+    AWS automatically re-invokes the function before passing control to the Catch handler.
+  </p>
+
+  <div class="flow-row">
+    <div class="fbox">Lambda timeout / throttle / 500</div>
+    <div class="arrow" style="color:var(--yellow)">→</div>
+    <div class="fbox warn">Wait 30s → Retry (×2)</div>
+    <div class="arrow" style="color:var(--yellow)">→</div>
+    <div class="fbox warn">Backoff ×2</div>
+    <div class="arrow" style="color:var(--red)">→</div>
+    <div class="fbox fail">Catch → Pipeline Failed state</div>
+  </div>
+
+  <hr>
+  <h3 style="margin-bottom:12px">Validation Hard Stop</h3>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:16px">
+    If <code style="color:var(--cyan);background:#0e1220;padding:2px 6px;border-radius:4px">surebet-validate</code>
+    finds a pick with empty runners, 0 score, or odds ≤ 1 — it raises an exception.
+    Step Functions catches this and the WhatsApp notification step is <strong style="color:var(--red)">never reached</strong>.
+  </p>
+  <div class="flow-row">
+    <div class="fbox">Analysis saves picks</div>
+    <div class="arrow" style="color:var(--green)">→</div>
+    <div class="fbox">Validate checks each pick</div>
+    <div class="arrow" style="color:var(--red)">→</div>
+    <div class="fbox fail">❌ Bad pick found → exception</div>
+    <div class="arrow" style="color:var(--red)">→</div>
+    <div class="fbox fail">Pipeline FAILED — no notification</div>
+  </div>
+  <div class="flow-row" style="margin-top:8px">
+    <div class="fbox">Validate checks each pick</div>
+    <div class="arrow" style="color:var(--green)">→</div>
+    <div class="fbox ok">✅ All picks valid</div>
+    <div class="arrow" style="color:var(--green)">→</div>
+    <div class="fbox ok">Notify via WhatsApp</div>
+  </div>
+
+  <hr>
+  <h3 style="margin-bottom:12px">Non-Fatal Steps (Catch without Fail)</h3>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:12px">
+    Some steps are important but must not kill the whole pipeline if they fail:
+  </p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="gbox">
+      <h4>📱 WhatsApp Notify</h4>
+      <p>If Twilio fails (outage, invalid creds), the pipeline still marks itself SUCCEEDED. You won't get a message but picks are still saved and visible on the UI.</p>
+    </div>
+    <div class="gbox">
+      <h4>🌙 Betfair Results Fetch</h4>
+      <p>If the results aren't settled yet at 20:00, the pipeline continues to generate and send the evening report based on whatever outcomes are already in DynamoDB.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ INFRASTRUCTURE MAP ══════════════════════════════════════════ -->
+<div class="card">
+  <h2>Infrastructure Map <span class="pill">eu-west-1</span></h2>
+
+  <div class="info-grid" style="margin-bottom:20px">
+    <div class="info-box">
+      <div class="val">4</div>
+      <div class="lbl">State Machines</div>
+    </div>
+    <div class="info-box">
+      <div class="val">7</div>
+      <div class="lbl">Lambda Functions</div>
+    </div>
+    <div class="info-box">
+      <div class="val">7</div>
+      <div class="lbl">EventBridge Rules</div>
+    </div>
+    <div class="info-box">
+      <div class="val">3</div>
+      <div class="lbl">IAM Roles</div>
+    </div>
+    <div class="info-box">
+      <div class="val">1</div>
+      <div class="lbl">S3 Bucket (versioned)</div>
+    </div>
+    <div class="info-box">
+      <div class="val">2</div>
+      <div class="lbl">Secrets Manager secrets</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Resource</th>
+        <th>Name / ARN</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="tag blue">State Machine</span></td>
+        <td><code>SureBet-Morning</code></td>
+        <td>Fetch → Analyse → Validate → Notify — 08:30 UTC</td>
+      </tr>
+      <tr>
+        <td><span class="tag cyan">State Machine</span></td>
+        <td><code>SureBet-Refresh</code></td>
+        <td>Same chain, runs at 12/14/16/18:00 UTC, deduped notifications</td>
+      </tr>
+      <tr>
+        <td><span class="tag green">State Machine</span></td>
+        <td><code>SureBet-Evening</code></td>
+        <td>Results → Report email — 20:00 UTC</td>
+      </tr>
+      <tr>
+        <td><span class="tag purple">State Machine</span></td>
+        <td><code>SureBet-Learning</code></td>
+        <td>Nightly learning cycle — 21:00 UTC</td>
+      </tr>
+      <tr>
+        <td><span class="tag yellow">S3 Bucket</span></td>
+        <td><code>surebet-pipeline-data</code></td>
+        <td>Stores <code>daily/{date}/response_horses.json</code> between Fetch and Analysis Lambdas. Also stores <code>reports/{date}.html</code></td>
+      </tr>
+      <tr>
+        <td><span class="tag yellow">IAM Role</span></td>
+        <td><code>SureBetLambdaRole</code></td>
+        <td>Grants all 7 Lambdas: DynamoDB (SureBetBets), S3 (surebet-pipeline-data), SecretsManager (betfair-credentials, twilio-credentials), SES</td>
+      </tr>
+      <tr>
+        <td><span class="tag yellow">IAM Role</span></td>
+        <td><code>SureBetStepFunctionsRole</code></td>
+        <td>Grants Step Functions: Lambda invoke on surebet-* functions</td>
+      </tr>
+      <tr>
+        <td><span class="tag yellow">IAM Role</span></td>
+        <td><code>SureBetEventBridgeRole</code></td>
+        <td>Grants EventBridge: StartExecution on SureBet-* state machines</td>
+      </tr>
+      <tr>
+        <td><span class="tag green">Secret</span></td>
+        <td><code>betfair-credentials</code></td>
+        <td><code>{username, password, app_key}</code> — used by Betfair fetch and results Lambdas</td>
+      </tr>
+      <tr>
+        <td><span class="tag green">Secret</span></td>
+        <td><code>twilio-credentials</code></td>
+        <td><code>{account_sid, auth_token, from_number, to_numbers}</code> — WhatsApp notifications</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════ DATA FLOW ════════════════════════════════════════════════════ -->
+<div class="card">
+  <h2>Data Flow Between Steps</h2>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:16px">
+    Step Functions passes a JSON object from step to step. Each Lambda reads it, does work,
+    and returns its own JSON — which gets merged in via <code style="color:var(--cyan);background:#0e1220;padding:2px 6px;border-radius:4px">ResultPath</code>.
+    No step can accidentally overwrite another's data.
+  </p>
+
+  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;font-family:'Cascadia Code','Consolas',monospace;font-size:12px;color:var(--muted);line-height:2">
+    <span style="color:#6b7db8">// Step Functions state object as it flows through Morning pipeline</span><br>
+    {<br>
+    &nbsp;&nbsp;<span style="color:var(--cyan)">"date"</span>: <span style="color:var(--green)">"2026-04-04"</span>,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#6b7db8">← injected by InjectDate state</span><br>
+    &nbsp;&nbsp;<span style="color:var(--cyan)">"fetchResult"</span>: {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--cyan)">"race_count"</span>: <span style="color:var(--yellow)">42</span>,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--cyan)">"s3_key"</span>: <span style="color:var(--green)">"daily/2026-04-04/response_horses.json"</span>&nbsp;&nbsp;<span style="color:#6b7db8">← from surebet-betfair-fetch</span><br>
+    &nbsp;&nbsp;},<br>
+    &nbsp;&nbsp;<span style="color:var(--cyan)">"analysisResult"</span>: {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--cyan)">"picks_count"</span>: <span style="color:var(--yellow)">5</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#6b7db8">← from surebet-analysis</span><br>
+    &nbsp;&nbsp;},<br>
+    &nbsp;&nbsp;<span style="color:var(--cyan)">"validateResult"</span>: {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--cyan)">"valid_picks"</span>: <span style="color:var(--yellow)">5</span>, <span style="color:var(--cyan)">"errors"</span>: []&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#6b7db8">← from surebet-validate</span><br>
+    &nbsp;&nbsp;},<br>
+    &nbsp;&nbsp;<span style="color:var(--cyan)">"notifyResult"</span>: {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--cyan)">"notifications_sent"</span>: <span style="color:var(--yellow)">2</span>, <span style="color:var(--cyan)">"skipped"</span>: <span style="color:var(--red)">false</span>&nbsp;&nbsp;<span style="color:#6b7db8">← from surebet-notify</span><br>
+    &nbsp;&nbsp;}<br>
+    }
+  </div>
+</div>
+
+
+<!-- ══════════ HOW TO OPERATE ═══════════════════════════════════════════════ -->
+<div class="card">
+  <h2>Day-to-Day Operations</h2>
+
+  <h3 style="margin-bottom:10px">Check if today's pipeline ran</h3>
+  <div style="background:#0e1120;border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-family:'Cascadia Code','Consolas',monospace;font-size:12px;color:var(--cyan);margin-bottom:18px">
+    python deploy_step_functions.py --status
+  </div>
+
+  <h3 style="margin-bottom:10px">Manually trigger the morning pipeline</h3>
+  <div style="background:#0e1120;border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-family:'Cascadia Code','Consolas',monospace;font-size:12px;color:var(--cyan);margin-bottom:18px">
+    aws stepfunctions start-execution --region eu-west-1 \<br>
+    &nbsp;&nbsp;--state-machine-arn arn:aws:states:eu-west-1:813281204422:stateMachine:SureBet-Morning \<br>
+    &nbsp;&nbsp;--input '{"date":"2026-04-05"}'
+  </div>
+
+  <h3 style="margin-bottom:10px">Redeploy Lambda code after a code change</h3>
+  <div style="background:#0e1120;border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-family:'Cascadia Code','Consolas',monospace;font-size:12px;color:var(--cyan);margin-bottom:18px">
+    python deploy_step_functions.py --lambdas
+  </div>
+
+  <h3 style="margin-bottom:10px">Full redeploy (infrastructure + code)</h3>
+  <div style="background:#0e1120;border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-family:'Cascadia Code','Consolas',monospace;font-size:12px;color:var(--cyan);margin-bottom:18px">
+    python deploy_step_functions.py
+  </div>
+
+  <h3 style="margin-bottom:10px">View execution logs in CloudWatch</h3>
+  <div style="background:#0e1120;border:1px solid var(--border);border-radius:8px;padding:14px 18px;font-family:'Cascadia Code','Consolas',monospace;font-size:12px;color:var(--cyan)">
+    aws logs tail /aws/lambda/surebet-analysis --region eu-west-1 --since 1h<br>
+    aws logs tail /aws/lambda/surebet-betfair-fetch --region eu-west-1 --since 1h
+  </div>
+</div>
+
+
+<!-- ══════════ GUARANTEE SUMMARY ═══════════════════════════════════════════ -->
+<div class="card highlight">
+  <h2>Daily Guarantee Summary</h2>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:18px">
+    These guarantees hold every day without any manual action:
+  </p>
+  <table>
+    <thead>
+      <tr><th>Guarantee</th><th>How it's enforced</th><th>If it fails</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>✅ Picks are fetched from Betfair daily</td>
+        <td>EventBridge 08:30 → SureBet-Morning</td>
+        <td>Lambda retries ×2, then pipeline FAILS (CloudWatch alert)</td>
+      </tr>
+      <tr>
+        <td>✅ Every horse in every UK/IRE race is scored</td>
+        <td>surebet-analysis processes all runners from S3 JSON</td>
+        <td>Analysis Lambda retries ×1, then FAIL + no notification</td>
+      </tr>
+      <tr>
+        <td>✅ Picks with bad data are never notified</td>
+        <td>surebet-validate: runners ≥2, score &gt;0, odds &gt;1</td>
+        <td>Pipeline hard-stops at validate step</td>
+      </tr>
+      <tr>
+        <td>✅ No duplicate WhatsApp notifications</td>
+        <td>Hash of picks stored in DynamoDB per day</td>
+        <td>If hash matches, notify Lambda exits gracefully</td>
+      </tr>
+      <tr>
+        <td>✅ Race results recorded by 21:00</td>
+        <td>EventBridge 20:00 → SureBet-Evening</td>
+        <td>Partial results saved; report still sent</td>
+      </tr>
+      <tr>
+        <td>✅ P&L report emailed every evening</td>
+        <td>surebet-loss-report → SES email</td>
+        <td>Report saved to S3 regardless of email status</td>
+      </tr>
+      <tr>
+        <td>✅ Scoring model updated nightly</td>
+        <td>EventBridge 21:00 → SureBet-Learning</td>
+        <td>Learning Lambda retries ×2; previous insights remain active</td>
+      </tr>
+      <tr>
+        <td>✅ Picks refresh every 2 hours until 18:00</td>
+        <td>EventBridge 12/14/16/18:00 → SureBet-Refresh</td>
+        <td>Previous picks remain on UI; individual refresh retries ×2</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<footer>
+  SureBet AWS Step Functions Orchestration — deployed April 4, 2026 — eu-west-1 (813281204422)
+</footer>
+
+</body>
+</html>

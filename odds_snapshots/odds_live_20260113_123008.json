@@ -1,0 +1,6977 @@
+{
+  "timestamp": "2026-01-13T12:30:08.017686Z",
+  "races": [
+    {
+      "market_id": "1.252619828",
+      "market_name": "2m Nov Hrd",
+      "venue": "Ayr",
+      "course": "Ayr",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T12:48:00.000Z",
+      "runners": [
+        {
+          "name": "Bras Dor",
+          "selectionId": 10220285,
+          "odds": 2.48,
+          "trap": "4",
+          "form": "P22-52",
+          "trainer": "D Pipe",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 2.48,
+              "size": 211.59
+            },
+            {
+              "price": 2.46,
+              "size": 251.22
+            },
+            {
+              "price": 2.44,
+              "size": 265.12
+            }
+          ]
+        },
+        {
+          "name": "Next Twist",
+          "selectionId": 76118983,
+          "odds": 2.84,
+          "trap": "1",
+          "form": "43-61",
+          "trainer": "O Murphy",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 2.84,
+              "size": 131.3
+            },
+            {
+              "price": 2.82,
+              "size": 87.72
+            },
+            {
+              "price": 2.8,
+              "size": 110.14
+            }
+          ]
+        },
+        {
+          "name": "Triple Crown Ted",
+          "selectionId": 79170089,
+          "odds": 7.2,
+          "trap": "2",
+          "form": "22-31",
+          "trainer": "L Russell & M Scudamore",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 7.2,
+              "size": 117.51
+            },
+            {
+              "price": 7.0,
+              "size": 214.95
+            },
+            {
+              "price": 6.8,
+              "size": 42.21
+            }
+          ]
+        },
+        {
+          "name": "Kilnesare Flight",
+          "selectionId": 91937213,
+          "odds": 11.5,
+          "trap": "7",
+          "form": "2-2",
+          "trainer": "D McCain Jnr",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 11.5,
+              "size": 60.11
+            },
+            {
+              "price": 11.0,
+              "size": 88.6
+            },
+            {
+              "price": 10.5,
+              "size": 102.08
+            }
+          ]
+        },
+        {
+          "name": "Luckie Devil",
+          "selectionId": 80784714,
+          "odds": 50.0,
+          "trap": "8",
+          "form": "2-4",
+          "trainer": "N G Richards",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 50.0,
+              "size": 21.76
+            },
+            {
+              "price": 46.0,
+              "size": 25.74
+            },
+            {
+              "price": 42.0,
+              "size": 19.56
+            }
+          ]
+        },
+        {
+          "name": "Coylton King",
+          "selectionId": 78627605,
+          "odds": 170.0,
+          "trap": "6",
+          "form": "64-88F",
+          "trainer": "I A Duncan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 170.0,
+              "size": 23.34
+            },
+            {
+              "price": 130.0,
+              "size": 34.14
+            },
+            {
+              "price": 100.0,
+              "size": 15.26
+            }
+          ]
+        },
+        {
+          "name": "Belvedere Bhoy",
+          "selectionId": 90808396,
+          "odds": 300.0,
+          "trap": "3",
+          "form": "68F",
+          "trainer": "L Russell & M Scudamore",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 300.0,
+              "size": 11.68
+            },
+            {
+              "price": 170.0,
+              "size": 32.89
+            },
+            {
+              "price": 50.0,
+              "size": 12.25
+            }
+          ]
+        },
+        {
+          "name": "Bennys Jenny",
+          "selectionId": 75281284,
+          "odds": 300.0,
+          "trap": "9",
+          "form": "3P1/07-5",
+          "trainer": "N W Alexander",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 300.0,
+              "size": 12.81
+            },
+            {
+              "price": 270.0,
+              "size": 13.48
+            },
+            {
+              "price": 170.0,
+              "size": 34.19
+            }
+          ]
+        },
+        {
+          "name": "Ck Omara",
+          "selectionId": 90579979,
+          "odds": 1000.0,
+          "trap": "5",
+          "form": "09",
+          "trainer": "R M Smith",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1000.0,
+              "size": 275.53
+            },
+            {
+              "price": 300.0,
+              "size": 15.07
+            },
+            {
+              "price": 170.0,
+              "size": 15.01
+            }
+          ]
+        },
+        {
+          "name": "Breaking Ground",
+          "selectionId": 13168799,
+          "odds": 1000.0,
+          "trap": "10",
+          "form": "63-50",
+          "trainer": "R M Smith",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1000.0,
+              "size": 30.66
+            },
+            {
+              "price": 480.0,
+              "size": 12.46
+            },
+            {
+              "price": 340.0,
+              "size": 12.32
+            }
+          ]
+        }
+      ],
+      "total_runners": 10,
+      "distance": "WIN",
+      "race_type": "Hurdle"
+    },
+    {
+      "market_id": "1.252619834",
+      "market_name": "2m4f Nov Hrd",
+      "venue": "Ayr",
+      "course": "Ayr",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T13:18:00.000Z",
+      "runners": [
+        {
+          "name": "Dream Shadow",
+          "selectionId": 52480620,
+          "odds": 1.37,
+          "trap": "2",
+          "form": "3/132-21",
+          "trainer": "F O'Brien",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.37,
+              "size": 102.75
+            },
+            {
+              "price": 1.36,
+              "size": 524.13
+            },
+            {
+              "price": 1.35,
+              "size": 432.17
+            }
+          ]
+        },
+        {
+          "name": "Just Her Type",
+          "selectionId": 78627599,
+          "odds": 5.9,
+          "trap": "1",
+          "form": "52-6131",
+          "trainer": "M Comley",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 5.9,
+              "size": 12.56
+            },
+            {
+              "price": 5.8,
+              "size": 17.67
+            },
+            {
+              "price": 5.7,
+              "size": 55.96
+            }
+          ]
+        },
+        {
+          "name": "Lets Mingle",
+          "selectionId": 75497744,
+          "odds": 11.5,
+          "trap": "4",
+          "form": "833-124",
+          "trainer": "L Russell & M Scudamore",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 11.5,
+              "size": 30.82
+            },
+            {
+              "price": 11.0,
+              "size": 50.13
+            },
+            {
+              "price": 10.5,
+              "size": 48.37
+            }
+          ]
+        },
+        {
+          "name": "Just An Artist",
+          "selectionId": 46427090,
+          "odds": 65.0,
+          "trap": "3",
+          "form": "5P-1P",
+          "trainer": "N W Alexander",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 65.0,
+              "size": 21.5
+            },
+            {
+              "price": 55.0,
+              "size": 11.68
+            },
+            {
+              "price": 50.0,
+              "size": 15.04
+            }
+          ]
+        },
+        {
+          "name": "Largy Rose",
+          "selectionId": 93729841,
+          "odds": 160.0,
+          "trap": "6",
+          "form": "2",
+          "trainer": "R M Smith",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 160.0,
+              "size": 11.56
+            },
+            {
+              "price": 90.0,
+              "size": 24.1
+            },
+            {
+              "price": 75.0,
+              "size": 13.17
+            }
+          ]
+        }
+      ],
+      "total_runners": 5,
+      "distance": "WIN",
+      "race_type": "Hurdle"
+    },
+    {
+      "market_id": "1.252622137",
+      "market_name": "1m4f Mdn",
+      "venue": "Dundalk",
+      "course": "Dundalk",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T13:30:00.000Z",
+      "runners": [
+        {
+          "name": "Dancingondiamonds",
+          "selectionId": 83539355,
+          "odds": 1.95,
+          "trap": "7",
+          "form": "5-",
+          "trainer": "Joseph Patrick O'Brien",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.95,
+              "size": 31.39
+            },
+            {
+              "price": 1.94,
+              "size": 19.54
+            },
+            {
+              "price": 1.93,
+              "size": 48.54
+            }
+          ]
+        },
+        {
+          "name": "Soaring Sun",
+          "selectionId": 88302244,
+          "odds": 2.84,
+          "trap": "5",
+          "form": "950323-",
+          "trainer": "Patrick J. Flynn",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 2.84,
+              "size": 69.16
+            },
+            {
+              "price": 2.8,
+              "size": 18.26
+            },
+            {
+              "price": 2.74,
+              "size": 48.85
+            }
+          ]
+        },
+        {
+          "name": "Kidam Roque",
+          "selectionId": 69333635,
+          "odds": 20.0,
+          "trap": "3",
+          "form": "5-",
+          "trainer": "Eoin Griffin",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 20.0,
+              "size": 17.95
+            },
+            {
+              "price": 19.5,
+              "size": 17.88
+            },
+            {
+              "price": 18.5,
+              "size": 15.19
+            }
+          ]
+        },
+        {
+          "name": "Battling Siki",
+          "selectionId": 93729858,
+          "odds": 30.0,
+          "trap": "6",
+          "form": "0",
+          "trainer": "Mark Fahey",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 30.0,
+              "size": 14.59
+            },
+            {
+              "price": 28.0,
+              "size": 13.12
+            },
+            {
+              "price": 25.0,
+              "size": 13.07
+            }
+          ]
+        },
+        {
+          "name": "Kings Gesture",
+          "selectionId": 84038875,
+          "odds": 32.0,
+          "trap": "4",
+          "form": "55-",
+          "trainer": "Michael P Ryan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 32.0,
+              "size": 13.45
+            },
+            {
+              "price": 29.0,
+              "size": 11.57
+            },
+            {
+              "price": 26.0,
+              "size": 35.37
+            }
+          ]
+        },
+        {
+          "name": "Tyraxes",
+          "selectionId": 88896754,
+          "odds": 44.0,
+          "trap": "9",
+          "form": "340-",
+          "trainer": "Denis Hogan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 44.0,
+              "size": 12.64
+            },
+            {
+              "price": 30.0,
+              "size": 16.27
+            },
+            {
+              "price": 28.0,
+              "size": 13.03
+            }
+          ]
+        },
+        {
+          "name": "Jet Renegade",
+          "selectionId": 89558336,
+          "odds": 46.0,
+          "trap": "2",
+          "form": "0",
+          "trainer": "Andrew Kinirons",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 46.0,
+              "size": 21.13
+            },
+            {
+              "price": 40.0,
+              "size": 25.46
+            },
+            {
+              "price": 34.0,
+              "size": 11.75
+            }
+          ]
+        },
+        {
+          "name": "Miners Cabin",
+          "selectionId": 89760609,
+          "odds": 50.0,
+          "trap": "8",
+          "form": "0",
+          "trainer": "Kevin Thomas Coleman",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 50.0,
+              "size": 11.69
+            },
+            {
+              "price": 38.0,
+              "size": 30.08
+            },
+            {
+              "price": 30.0,
+              "size": 14.34
+            }
+          ]
+        },
+        {
+          "name": "Crab Road",
+          "selectionId": 81788396,
+          "odds": 190.0,
+          "trap": "1",
+          "form": "0",
+          "trainer": "John Joseph Hanlon",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 190.0,
+              "size": 19.09
+            },
+            {
+              "price": 100.0,
+              "size": 12.53
+            },
+            {
+              "price": 95.0,
+              "size": 12.7
+            }
+          ]
+        }
+      ],
+      "total_runners": 9,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619695",
+      "market_name": "2m Hcap",
+      "venue": "Newcastle",
+      "course": "Newcastle",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T13:38:00.000Z",
+      "runners": [
+        {
+          "name": "Arcimboldo",
+          "selectionId": 82997536,
+          "odds": 4.3,
+          "trap": "8",
+          "form": "47323-5",
+          "trainer": "M E Sowersby",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.3,
+              "size": 25.57
+            },
+            {
+              "price": 4.2,
+              "size": 127.43
+            },
+            {
+              "price": 4.1,
+              "size": 36.31
+            }
+          ]
+        },
+        {
+          "name": "Billy Bathgate",
+          "selectionId": 27718214,
+          "odds": 4.6,
+          "trap": "2",
+          "form": "382155-",
+          "trainer": "Ewan Whillans",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.6,
+              "size": 45.69
+            },
+            {
+              "price": 4.5,
+              "size": 170.68
+            },
+            {
+              "price": 4.4,
+              "size": 76.87
+            }
+          ]
+        },
+        {
+          "name": "Dollars Dream",
+          "selectionId": 81825076,
+          "odds": 6.4,
+          "trap": "4",
+          "form": "4775-",
+          "trainer": "P A Kirby",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.4,
+              "size": 18.37
+            },
+            {
+              "price": 6.2,
+              "size": 32.67
+            },
+            {
+              "price": 6.0,
+              "size": 72.61
+            }
+          ]
+        },
+        {
+          "name": "Tupero",
+          "selectionId": 83942399,
+          "odds": 6.8,
+          "trap": "6",
+          "form": "586-",
+          "trainer": "D O'Meara",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.8,
+              "size": 52.85
+            },
+            {
+              "price": 6.6,
+              "size": 33.03
+            },
+            {
+              "price": 6.4,
+              "size": 169.69
+            }
+          ]
+        },
+        {
+          "name": "Young Merlin",
+          "selectionId": 20473743,
+          "odds": 8.0,
+          "trap": "5",
+          "form": "6-23522",
+          "trainer": "R Menzies",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 8.0,
+              "size": 13.6
+            },
+            {
+              "price": 7.6,
+              "size": 35.22
+            },
+            {
+              "price": 7.4,
+              "size": 25.73
+            }
+          ]
+        },
+        {
+          "name": "Tarbat Ness",
+          "selectionId": 43387584,
+          "odds": 11.0,
+          "trap": "1",
+          "form": "6221/21-",
+          "trainer": "John Berry",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 11.0,
+              "size": 35.18
+            },
+            {
+              "price": 10.5,
+              "size": 13.59
+            },
+            {
+              "price": 10.0,
+              "size": 33.62
+            }
+          ]
+        },
+        {
+          "name": "Inspire Hope",
+          "selectionId": 70085625,
+          "odds": 38.0,
+          "trap": "3",
+          "form": "64/4458-",
+          "trainer": "R Menzies",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 38.0,
+              "size": 11.98
+            },
+            {
+              "price": 32.0,
+              "size": 20.86
+            },
+            {
+              "price": 30.0,
+              "size": 17.3
+            }
+          ]
+        },
+        {
+          "name": "Khangai",
+          "selectionId": 47704053,
+          "odds": 48.0,
+          "trap": "7",
+          "form": "34808-5",
+          "trainer": "T Coyle & K Wood",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 48.0,
+              "size": 13.87
+            },
+            {
+              "price": 44.0,
+              "size": 14.5
+            },
+            {
+              "price": 40.0,
+              "size": 36.22
+            }
+          ]
+        }
+      ],
+      "total_runners": 8,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619846",
+      "market_name": "3m Hcap Hrd",
+      "venue": "Ayr",
+      "course": "Ayr",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T13:48:00.000Z",
+      "runners": [
+        {
+          "name": "Kelvin Forlonge",
+          "selectionId": 74861738,
+          "odds": 4.7,
+          "trap": "1",
+          "form": "354-551",
+          "trainer": "L Russell & M Scudamore",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.7,
+              "size": 16.49
+            },
+            {
+              "price": 4.6,
+              "size": 28.34
+            },
+            {
+              "price": 4.5,
+              "size": 80.78
+            }
+          ]
+        },
+        {
+          "name": "Gather Yourself",
+          "selectionId": 69213040,
+          "odds": 4.6,
+          "trap": "5",
+          "form": "0-04P53",
+          "trainer": "C Collins",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.6,
+              "size": 23.97
+            },
+            {
+              "price": 4.5,
+              "size": 76.08
+            },
+            {
+              "price": 4.4,
+              "size": 68.27
+            }
+          ]
+        },
+        {
+          "name": "Holly Bird",
+          "selectionId": 35882299,
+          "odds": 9.6,
+          "trap": "7",
+          "form": "4P5-532",
+          "trainer": "A M Thomson",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.6,
+              "size": 55.02
+            },
+            {
+              "price": 9.4,
+              "size": 24.02
+            },
+            {
+              "price": 9.0,
+              "size": 50.14
+            }
+          ]
+        },
+        {
+          "name": "Shoeshine Boy",
+          "selectionId": 545,
+          "odds": 10.0,
+          "trap": "4",
+          "form": "79-832F",
+          "trainer": "D W Whillans",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 10.0,
+              "size": 62.21
+            },
+            {
+              "price": 9.8,
+              "size": 14.94
+            },
+            {
+              "price": 9.6,
+              "size": 37.68
+            }
+          ]
+        },
+        {
+          "name": "Better Be Definite",
+          "selectionId": 50862486,
+          "odds": 11.0,
+          "trap": "8",
+          "form": "91/210-4",
+          "trainer": "N W Alexander",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 11.0,
+              "size": 40.2
+            },
+            {
+              "price": 10.5,
+              "size": 34.21
+            },
+            {
+              "price": 10.0,
+              "size": 48.47
+            }
+          ]
+        },
+        {
+          "name": "Maura Jeanne",
+          "selectionId": 38941580,
+          "odds": 11.5,
+          "trap": "6",
+          "form": "534-626",
+          "trainer": "I A Duncan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 11.5,
+              "size": 96.04
+            },
+            {
+              "price": 11.0,
+              "size": 13.51
+            },
+            {
+              "price": 10.5,
+              "size": 13.59
+            }
+          ]
+        },
+        {
+          "name": "Monsieur Le Fuzz",
+          "selectionId": 75366221,
+          "odds": 11.0,
+          "trap": "3",
+          "form": "4961-46",
+          "trainer": "R Menzies",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 11.0,
+              "size": 24.57
+            },
+            {
+              "price": 10.5,
+              "size": 21.34
+            },
+            {
+              "price": 10.0,
+              "size": 131.04
+            }
+          ]
+        },
+        {
+          "name": "Piaff Bubbles",
+          "selectionId": 37337524,
+          "odds": 12.5,
+          "trap": "2",
+          "form": "5344-3P",
+          "trainer": "R Menzies",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 12.5,
+              "size": 26.87
+            },
+            {
+              "price": 12.0,
+              "size": 35.12
+            },
+            {
+              "price": 11.0,
+              "size": 19.08
+            }
+          ]
+        },
+        {
+          "name": "Blue Indigo",
+          "selectionId": 87092387,
+          "odds": 48.0,
+          "trap": "9",
+          "form": "S-64P6P",
+          "trainer": "Gary Rutherford",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 48.0,
+              "size": 12.64
+            },
+            {
+              "price": 34.0,
+              "size": 39.76
+            },
+            {
+              "price": 29.0,
+              "size": 19.17
+            }
+          ]
+        },
+        {
+          "name": "Nae Bother At A",
+          "selectionId": 54795450,
+          "odds": 55.0,
+          "trap": "10",
+          "form": "68/P68-8",
+          "trainer": "N W Alexander",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 55.0,
+              "size": 13.39
+            },
+            {
+              "price": 50.0,
+              "size": 16.26
+            },
+            {
+              "price": 44.0,
+              "size": 12.88
+            }
+          ]
+        }
+      ],
+      "total_runners": 10,
+      "distance": "WIN",
+      "race_type": "Hurdle"
+    },
+    {
+      "market_id": "1.252622142",
+      "market_name": "1m Hcap",
+      "venue": "Dundalk",
+      "course": "Dundalk",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T14:00:00.000Z",
+      "runners": [
+        {
+          "name": "Moyassr",
+          "selectionId": 59363417,
+          "odds": 3.65,
+          "trap": "8",
+          "form": "000123-",
+          "trainer": "Paul W. Flynn",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.65,
+              "size": 13.69
+            },
+            {
+              "price": 3.5,
+              "size": 11.68
+            },
+            {
+              "price": 3.4,
+              "size": 24.29
+            }
+          ]
+        },
+        {
+          "name": "Daonethatgotaway",
+          "selectionId": 52680349,
+          "odds": 4.3,
+          "trap": "4",
+          "form": "090732-",
+          "trainer": "Mark Fahey",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.3,
+              "size": 11.77
+            },
+            {
+              "price": 4.1,
+              "size": 18.17
+            },
+            {
+              "price": 4.0,
+              "size": 17.88
+            }
+          ]
+        },
+        {
+          "name": "Una Matata",
+          "selectionId": 61902978,
+          "odds": 6.6,
+          "trap": "5",
+          "form": "332512-",
+          "trainer": "Adrian McGuinness",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.6,
+              "size": 12.79
+            },
+            {
+              "price": 6.2,
+              "size": 22.06
+            },
+            {
+              "price": 5.9,
+              "size": 28.63
+            }
+          ]
+        },
+        {
+          "name": "Lahore Da King",
+          "selectionId": 84639420,
+          "odds": 9.6,
+          "trap": "7",
+          "form": "877511-",
+          "trainer": "Anthony Mullins",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.6,
+              "size": 22.94
+            },
+            {
+              "price": 8.8,
+              "size": 14.66
+            },
+            {
+              "price": 8.4,
+              "size": 21.6
+            }
+          ]
+        },
+        {
+          "name": "Bint Majestic Roi",
+          "selectionId": 71383680,
+          "odds": 14.0,
+          "trap": "9",
+          "form": "988901-",
+          "trainer": "A. Slattery",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 14.0,
+              "size": 14.92
+            },
+            {
+              "price": 12.5,
+              "size": 19.64
+            },
+            {
+              "price": 12.0,
+              "size": 12.22
+            }
+          ]
+        },
+        {
+          "name": "Johnnys Oasis",
+          "selectionId": 75227897,
+          "odds": 13.0,
+          "trap": "11",
+          "form": "315185-",
+          "trainer": "Adrian McGuinness",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 13.0,
+              "size": 14.95
+            },
+            {
+              "price": 11.5,
+              "size": 13.81
+            },
+            {
+              "price": 11.0,
+              "size": 12.53
+            }
+          ]
+        },
+        {
+          "name": "Magna Gee Gee",
+          "selectionId": 73892335,
+          "odds": 21.0,
+          "trap": "14",
+          "form": "400355-",
+          "trainer": "Patrick J. Flynn",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 21.0,
+              "size": 13.98
+            },
+            {
+              "price": 19.5,
+              "size": 12.15
+            },
+            {
+              "price": 18.0,
+              "size": 12.93
+            }
+          ]
+        },
+        {
+          "name": "Aratayvo",
+          "selectionId": 59240463,
+          "odds": 26.0,
+          "trap": "3",
+          "form": "0721/07-",
+          "trainer": "D. K. Weld",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 26.0,
+              "size": 14.98
+            },
+            {
+              "price": 22.0,
+              "size": 14.93
+            },
+            {
+              "price": 19.0,
+              "size": 27.66
+            }
+          ]
+        },
+        {
+          "name": "Comfort Line",
+          "selectionId": 26411954,
+          "odds": 29.0,
+          "trap": "10",
+          "form": "304277-",
+          "trainer": "Denis Hogan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 29.0,
+              "size": 12.78
+            },
+            {
+              "price": 26.0,
+              "size": 22.82
+            },
+            {
+              "price": 23.0,
+              "size": 14.42
+            }
+          ]
+        },
+        {
+          "name": "Hurricane Helen",
+          "selectionId": 15844111,
+          "odds": 36.0,
+          "trap": "6",
+          "form": "871608-",
+          "trainer": "Ross O'Sullivan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 36.0,
+              "size": 15.71
+            },
+            {
+              "price": 34.0,
+              "size": 18.47
+            },
+            {
+              "price": 29.0,
+              "size": 12.82
+            }
+          ]
+        },
+        {
+          "name": "Smaoineamh Sile",
+          "selectionId": 36324322,
+          "odds": 48.0,
+          "trap": "16",
+          "form": "07208-0",
+          "trainer": "Conor David Maxwell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 48.0,
+              "size": 14.13
+            },
+            {
+              "price": 42.0,
+              "size": 21.81
+            },
+            {
+              "price": 34.0,
+              "size": 12.06
+            }
+          ]
+        },
+        {
+          "name": "Urban War",
+          "selectionId": 35415055,
+          "odds": 75.0,
+          "trap": "2",
+          "form": "1284",
+          "trainer": "John Joseph Hanlon",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 75.0,
+              "size": 12.67
+            },
+            {
+              "price": 70.0,
+              "size": 18.14
+            },
+            {
+              "price": 50.0,
+              "size": 76.18
+            }
+          ]
+        },
+        {
+          "name": "March To The Band",
+          "selectionId": 76676756,
+          "odds": 80.0,
+          "trap": "12",
+          "form": "940/597-",
+          "trainer": "John S. O'Donoghue",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 80.0,
+              "size": 11.59
+            },
+            {
+              "price": 70.0,
+              "size": 13.55
+            },
+            {
+              "price": 50.0,
+              "size": 26.43
+            }
+          ]
+        },
+        {
+          "name": "Stonking",
+          "selectionId": 47470007,
+          "odds": 80.0,
+          "trap": "1",
+          "form": "9/",
+          "trainer": "John Joseph Hanlon",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 80.0,
+              "size": 11.77
+            },
+            {
+              "price": 48.0,
+              "size": 11.98
+            },
+            {
+              "price": 34.0,
+              "size": 19.1
+            }
+          ]
+        }
+      ],
+      "total_runners": 14,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619707",
+      "market_name": "6f Hcap",
+      "venue": "Newcastle",
+      "course": "Newcastle",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T14:08:00.000Z",
+      "runners": [
+        {
+          "name": "Penny Mountain",
+          "selectionId": 2305125,
+          "odds": 4.0,
+          "trap": "5",
+          "form": "0704-13",
+          "trainer": "Gary Rutherford",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.0,
+              "size": 20.0
+            },
+            {
+              "price": 3.95,
+              "size": 20.02
+            },
+            {
+              "price": 3.9,
+              "size": 14.93
+            }
+          ]
+        },
+        {
+          "name": "Profit Street",
+          "selectionId": 13395021,
+          "odds": 4.2,
+          "trap": "3",
+          "form": "605132-",
+          "trainer": "James Owen",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.2,
+              "size": 39.58
+            },
+            {
+              "price": 4.1,
+              "size": 20.97
+            },
+            {
+              "price": 4.0,
+              "size": 28.97
+            }
+          ]
+        },
+        {
+          "name": "Teardrops",
+          "selectionId": 8087627,
+          "odds": 6.2,
+          "trap": "4",
+          "form": "963115-",
+          "trainer": "R Spencer",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.2,
+              "size": 41.85
+            },
+            {
+              "price": 6.0,
+              "size": 39.85
+            },
+            {
+              "price": 5.9,
+              "size": 42.92
+            }
+          ]
+        },
+        {
+          "name": "Bad Habits",
+          "selectionId": 28368872,
+          "odds": 8.6,
+          "trap": "7",
+          "form": "53351-4",
+          "trainer": "Mrs R Carr",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 8.6,
+              "size": 14.03
+            },
+            {
+              "price": 8.4,
+              "size": 18.21
+            },
+            {
+              "price": 8.2,
+              "size": 33.69
+            }
+          ]
+        },
+        {
+          "name": "Spun To Gold",
+          "selectionId": 59626707,
+          "odds": 9.8,
+          "trap": "2",
+          "form": "111696-",
+          "trainer": "J S Goldie",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.8,
+              "size": 13.4
+            },
+            {
+              "price": 9.6,
+              "size": 12.38
+            },
+            {
+              "price": 9.2,
+              "size": 23.68
+            }
+          ]
+        },
+        {
+          "name": "Sibyl Charm",
+          "selectionId": 47704265,
+          "odds": 11.0,
+          "trap": "1",
+          "form": "943738-",
+          "trainer": "I Jardine",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 11.0,
+              "size": 41.73
+            },
+            {
+              "price": 10.5,
+              "size": 11.94
+            },
+            {
+              "price": 10.0,
+              "size": 44.96
+            }
+          ]
+        },
+        {
+          "name": "Court Of Session",
+          "selectionId": 40920672,
+          "odds": 18.5,
+          "trap": "6",
+          "form": "95084-2",
+          "trainer": "P S McEntee",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 18.5,
+              "size": 13.8
+            },
+            {
+              "price": 17.0,
+              "size": 18.04
+            },
+            {
+              "price": 16.0,
+              "size": 97.72
+            }
+          ]
+        }
+      ],
+      "total_runners": 7,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619840",
+      "market_name": "2m Nov Chs",
+      "venue": "Ayr",
+      "course": "Ayr",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T14:18:00.000Z",
+      "runners": [
+        {
+          "name": "Fingle Bridge",
+          "selectionId": 46175332,
+          "odds": 1.89,
+          "trap": "1",
+          "form": "1/111-21",
+          "trainer": "O Murphy",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.89,
+              "size": 108.39
+            },
+            {
+              "price": 1.88,
+              "size": 56.12
+            },
+            {
+              "price": 1.87,
+              "size": 197.28
+            }
+          ]
+        },
+        {
+          "name": "Meetmebythesea",
+          "selectionId": 76835905,
+          "odds": 2.64,
+          "trap": "2",
+          "form": "2/1113-1",
+          "trainer": "B Pauling",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 2.64,
+              "size": 38.73
+            },
+            {
+              "price": 2.62,
+              "size": 42.01
+            },
+            {
+              "price": 2.6,
+              "size": 22.65
+            }
+          ]
+        },
+        {
+          "name": "Dedicated Hero",
+          "selectionId": 61833082,
+          "odds": 15.5,
+          "trap": "4",
+          "form": "115-678",
+          "trainer": "A M Thomson",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 15.5,
+              "size": 21.78
+            },
+            {
+              "price": 14.5,
+              "size": 29.33
+            },
+            {
+              "price": 13.5,
+              "size": 30.0
+            }
+          ]
+        },
+        {
+          "name": "From The Clouds",
+          "selectionId": 13362661,
+          "odds": 40.0,
+          "trap": "5",
+          "form": "2411U/2",
+          "trainer": "L Russell & M Scudamore",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 40.0,
+              "size": 12.21
+            },
+            {
+              "price": 36.0,
+              "size": 12.83
+            },
+            {
+              "price": 34.0,
+              "size": 11.74
+            }
+          ]
+        },
+        {
+          "name": "Big John Wayne",
+          "selectionId": 65071244,
+          "odds": 55.0,
+          "trap": "3",
+          "form": "F13F/2-",
+          "trainer": "L Russell & M Scudamore",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 55.0,
+              "size": 16.01
+            },
+            {
+              "price": 48.0,
+              "size": 14.38
+            },
+            {
+              "price": 42.0,
+              "size": 13.48
+            }
+          ]
+        }
+      ],
+      "total_runners": 5,
+      "distance": "WIN",
+      "race_type": "Chase"
+    },
+    {
+      "market_id": "1.252622147",
+      "market_name": "1m Hcap",
+      "venue": "Dundalk",
+      "course": "Dundalk",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T14:30:00.000Z",
+      "runners": [
+        {
+          "name": "Apiary",
+          "selectionId": 12467598,
+          "odds": 3.75,
+          "trap": "7",
+          "form": "8762-",
+          "trainer": "Kevin Thomas Coleman",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.75,
+              "size": 38.86
+            },
+            {
+              "price": 3.7,
+              "size": 22.81
+            },
+            {
+              "price": 3.65,
+              "size": 12.23
+            }
+          ]
+        },
+        {
+          "name": "Divelment",
+          "selectionId": 83498277,
+          "odds": 5.2,
+          "trap": "2",
+          "form": "43605-",
+          "trainer": "Jack W. Davison",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 5.2,
+              "size": 13.47
+            },
+            {
+              "price": 5.0,
+              "size": 15.18
+            },
+            {
+              "price": 4.7,
+              "size": 17.63
+            }
+          ]
+        },
+        {
+          "name": "Arcabulle",
+          "selectionId": 90467946,
+          "odds": 8.0,
+          "trap": "1",
+          "form": "369-",
+          "trainer": "Gavin Patrick Cromwell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 8.0,
+              "size": 19.39
+            },
+            {
+              "price": 7.6,
+              "size": 19.72
+            },
+            {
+              "price": 7.2,
+              "size": 19.82
+            }
+          ]
+        },
+        {
+          "name": "Sapphire Dream",
+          "selectionId": 788223,
+          "odds": 9.0,
+          "trap": "11",
+          "form": "980784-",
+          "trainer": "A. Slattery",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.0,
+              "size": 25.41
+            },
+            {
+              "price": 8.2,
+              "size": 15.23
+            },
+            {
+              "price": 7.8,
+              "size": 19.78
+            }
+          ]
+        },
+        {
+          "name": "Grey Sands",
+          "selectionId": 90811673,
+          "odds": 10.0,
+          "trap": "10",
+          "form": "007-",
+          "trainer": "Joseph Patrick O'Brien",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 10.0,
+              "size": 24.34
+            },
+            {
+              "price": 9.6,
+              "size": 33.19
+            },
+            {
+              "price": 9.0,
+              "size": 18.84
+            }
+          ]
+        },
+        {
+          "name": "Guildhall Graduate",
+          "selectionId": 87740528,
+          "odds": 14.0,
+          "trap": "6",
+          "form": "5475-",
+          "trainer": "Gavin Patrick Cromwell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 14.0,
+              "size": 13.62
+            },
+            {
+              "price": 13.0,
+              "size": 14.03
+            },
+            {
+              "price": 12.5,
+              "size": 11.56
+            }
+          ]
+        },
+        {
+          "name": "Stolen Treasure",
+          "selectionId": 59153934,
+          "odds": 15.0,
+          "trap": "9",
+          "form": "08005-",
+          "trainer": "J. G. Coogan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 15.0,
+              "size": 22.66
+            },
+            {
+              "price": 13.0,
+              "size": 13.06
+            },
+            {
+              "price": 12.5,
+              "size": 15.28
+            }
+          ]
+        },
+        {
+          "name": "Another Day Done",
+          "selectionId": 13139054,
+          "odds": 13.5,
+          "trap": "4",
+          "form": "7607-",
+          "trainer": "Joseph Patrick O'Brien",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 13.5,
+              "size": 17.03
+            },
+            {
+              "price": 12.0,
+              "size": 14.99
+            },
+            {
+              "price": 11.0,
+              "size": 22.55
+            }
+          ]
+        },
+        {
+          "name": "Dawn Flame",
+          "selectionId": 87221735,
+          "odds": 21.0,
+          "trap": "5",
+          "form": "070-",
+          "trainer": "Paul W. Flynn",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 21.0,
+              "size": 13.96
+            },
+            {
+              "price": 20.0,
+              "size": 11.55
+            },
+            {
+              "price": 18.0,
+              "size": 12.75
+            }
+          ]
+        },
+        {
+          "name": "No More Hiding",
+          "selectionId": 91700172,
+          "odds": 65.0,
+          "trap": "3",
+          "form": "070-",
+          "trainer": "Andrew Oliver",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 65.0,
+              "size": 11.97
+            },
+            {
+              "price": 44.0,
+              "size": 15.45
+            },
+            {
+              "price": 34.0,
+              "size": 12.35
+            }
+          ]
+        },
+        {
+          "name": "Irynas Star",
+          "selectionId": 92094558,
+          "odds": 65.0,
+          "trap": "8",
+          "form": "509-",
+          "trainer": "Michael Mulvany",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 65.0,
+              "size": 11.87
+            },
+            {
+              "price": 38.0,
+              "size": 26.29
+            },
+            {
+              "price": 29.0,
+              "size": 11.9
+            }
+          ]
+        }
+      ],
+      "total_runners": 11,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619702",
+      "market_name": "7f Mdn Stks",
+      "venue": "Newcastle",
+      "course": "Newcastle",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T14:38:00.000Z",
+      "runners": [
+        {
+          "name": "Lakota Chief",
+          "selectionId": 93729835,
+          "odds": 2.14,
+          "trap": "4",
+          "form": "0",
+          "trainer": "A Watson",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 2.14,
+              "size": 12.19
+            },
+            {
+              "price": 2.12,
+              "size": 29.09
+            },
+            {
+              "price": 2.1,
+              "size": 924.35
+            }
+          ]
+        },
+        {
+          "name": "Star Of Emerald",
+          "selectionId": 93729838,
+          "odds": 6.4,
+          "trap": "6",
+          "form": "0",
+          "trainer": "E Bethell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.4,
+              "size": 11.96
+            },
+            {
+              "price": 6.2,
+              "size": 29.47
+            },
+            {
+              "price": 6.0,
+              "size": 68.66
+            }
+          ]
+        },
+        {
+          "name": "Clonquest",
+          "selectionId": 92058224,
+          "odds": 7.2,
+          "trap": "2",
+          "form": "5-",
+          "trainer": "T D Barron",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 7.2,
+              "size": 22.44
+            },
+            {
+              "price": 7.0,
+              "size": 20.22
+            },
+            {
+              "price": 6.8,
+              "size": 38.8
+            }
+          ]
+        },
+        {
+          "name": "Somebody",
+          "selectionId": 13133190,
+          "odds": 10.5,
+          "trap": "5",
+          "form": "69223-4",
+          "trainer": "R Spencer",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 10.5,
+              "size": 44.41
+            },
+            {
+              "price": 10.0,
+              "size": 25.49
+            },
+            {
+              "price": 9.8,
+              "size": 12.36
+            }
+          ]
+        },
+        {
+          "name": "Maria Da Silva",
+          "selectionId": 89293563,
+          "odds": 12.5,
+          "trap": "8",
+          "form": "06-",
+          "trainer": "A M Balding",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 12.5,
+              "size": 20.62
+            },
+            {
+              "price": 11.5,
+              "size": 36.53
+            },
+            {
+              "price": 10.5,
+              "size": 23.97
+            }
+          ]
+        },
+        {
+          "name": "Evolve",
+          "selectionId": 1455124,
+          "odds": 18.5,
+          "trap": "3",
+          "form": "7-4",
+          "trainer": "R A Fahey",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 18.5,
+              "size": 11.81
+            },
+            {
+              "price": 17.0,
+              "size": 24.46
+            },
+            {
+              "price": 16.0,
+              "size": 21.96
+            }
+          ]
+        },
+        {
+          "name": "Populus",
+          "selectionId": 91596648,
+          "odds": 44.0,
+          "trap": "9",
+          "form": "95-",
+          "trainer": "S Hanlon",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 44.0,
+              "size": 12.85
+            },
+            {
+              "price": 38.0,
+              "size": 18.43
+            },
+            {
+              "price": 36.0,
+              "size": 12.6
+            }
+          ]
+        },
+        {
+          "name": "Spirit Of Tokyo",
+          "selectionId": 93729836,
+          "odds": 140.0,
+          "trap": "10",
+          "form": "0",
+          "trainer": "P A Kirby",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 140.0,
+              "size": 11.72
+            },
+            {
+              "price": 80.0,
+              "size": 14.89
+            },
+            {
+              "price": 30.0,
+              "size": 12.54
+            }
+          ]
+        },
+        {
+          "name": "Evelyns Garden",
+          "selectionId": 93729839,
+          "odds": 100.0,
+          "trap": "7",
+          "form": "0",
+          "trainer": "K Scott",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 100.0,
+              "size": 19.32
+            },
+            {
+              "price": 34.0,
+              "size": 14.14
+            },
+            {
+              "price": 24.0,
+              "size": 16.06
+            }
+          ]
+        },
+        {
+          "name": "Thependleburyfox",
+          "selectionId": 92754396,
+          "odds": 100.0,
+          "trap": "11",
+          "form": "0-",
+          "trainer": "G Tutty",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 100.0,
+              "size": 20.16
+            },
+            {
+              "price": 34.0,
+              "size": 13.46
+            },
+            {
+              "price": 24.0,
+              "size": 15.03
+            }
+          ]
+        },
+        {
+          "name": "Chin Chin Ginny",
+          "selectionId": 76728402,
+          "odds": 210.0,
+          "trap": "1",
+          "form": "7/",
+          "trainer": "K Scott",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 210.0,
+              "size": 12.47
+            },
+            {
+              "price": 80.0,
+              "size": 12.33
+            },
+            {
+              "price": 32.0,
+              "size": 12.23
+            }
+          ]
+        }
+      ],
+      "total_runners": 11,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619853",
+      "market_name": "3m Hcap Chs",
+      "venue": "Ayr",
+      "course": "Ayr",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T14:48:00.000Z",
+      "runners": [
+        {
+          "name": "Big Zouk",
+          "selectionId": 77441859,
+          "odds": 3.45,
+          "trap": "2",
+          "form": "1/4P-53",
+          "trainer": "N G Richards",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.45,
+              "size": 27.04
+            },
+            {
+              "price": 3.35,
+              "size": 115.68
+            },
+            {
+              "price": 3.3,
+              "size": 52.06
+            }
+          ]
+        },
+        {
+          "name": "Jirko",
+          "selectionId": 64669414,
+          "odds": 4.2,
+          "trap": "4",
+          "form": "8780-32",
+          "trainer": "N W Alexander",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.2,
+              "size": 69.69
+            },
+            {
+              "price": 4.1,
+              "size": 23.69
+            },
+            {
+              "price": 4.0,
+              "size": 94.68
+            }
+          ]
+        },
+        {
+          "name": "Rob Roy Macgregor",
+          "selectionId": 53457967,
+          "odds": 4.8,
+          "trap": "5",
+          "form": "PP3-487",
+          "trainer": "A M Thomson",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.8,
+              "size": 26.02
+            },
+            {
+              "price": 4.7,
+              "size": 42.83
+            },
+            {
+              "price": 4.6,
+              "size": 68.99
+            }
+          ]
+        },
+        {
+          "name": "Torosay",
+          "selectionId": 337312,
+          "odds": 7.2,
+          "trap": "3",
+          "form": "6U37-27",
+          "trainer": "L Russell & M Scudamore",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 7.2,
+              "size": 40.23
+            },
+            {
+              "price": 7.0,
+              "size": 15.79
+            },
+            {
+              "price": 6.8,
+              "size": 18.34
+            }
+          ]
+        },
+        {
+          "name": "Euchan Falls",
+          "selectionId": 41439007,
+          "odds": 13.5,
+          "trap": "8",
+          "form": "8-27PPP",
+          "trainer": "R M Smith",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 13.5,
+              "size": 23.07
+            },
+            {
+              "price": 13.0,
+              "size": 41.46
+            },
+            {
+              "price": 12.5,
+              "size": 45.27
+            }
+          ]
+        },
+        {
+          "name": "Maid Of Houxty",
+          "selectionId": 37471782,
+          "odds": 16.0,
+          "trap": "6",
+          "form": "2431/PP",
+          "trainer": "D W Whillans",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 16.0,
+              "size": 18.98
+            },
+            {
+              "price": 15.5,
+              "size": 11.75
+            },
+            {
+              "price": 14.5,
+              "size": 30.5
+            }
+          ]
+        },
+        {
+          "name": "Muroor",
+          "selectionId": 10304516,
+          "odds": 100.0,
+          "trap": "9",
+          "form": "P-52600",
+          "trainer": "Lizzie Quinlan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 100.0,
+              "size": 15.13
+            },
+            {
+              "price": 95.0,
+              "size": 13.19
+            },
+            {
+              "price": 80.0,
+              "size": 17.28
+            }
+          ]
+        }
+      ],
+      "total_runners": 7,
+      "distance": "WIN",
+      "race_type": "Chase"
+    },
+    {
+      "market_id": "1.252622152",
+      "market_name": "6f Hcap",
+      "venue": "Dundalk",
+      "course": "Dundalk",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T15:00:00.000Z",
+      "runners": [
+        {
+          "name": "An Laochmor",
+          "selectionId": 70395953,
+          "odds": 5.1,
+          "trap": "11",
+          "form": "837679-",
+          "trainer": "Daniel James Murphy",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 5.1,
+              "size": 18.91
+            },
+            {
+              "price": 4.5,
+              "size": 14.71
+            },
+            {
+              "price": 4.4,
+              "size": 13.25
+            }
+          ]
+        },
+        {
+          "name": "Mount Ruapehu",
+          "selectionId": 45744184,
+          "odds": 5.0,
+          "trap": "3",
+          "form": "900401-",
+          "trainer": "Mark Fahey",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 5.0,
+              "size": 13.96
+            },
+            {
+              "price": 4.7,
+              "size": 24.38
+            },
+            {
+              "price": 4.4,
+              "size": 13.47
+            }
+          ]
+        },
+        {
+          "name": "Sovereign Banter",
+          "selectionId": 70395962,
+          "odds": 6.0,
+          "trap": "4",
+          "form": "241722-",
+          "trainer": "A. Slattery",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.0,
+              "size": 11.77
+            },
+            {
+              "price": 5.8,
+              "size": 79.24
+            },
+            {
+              "price": 5.2,
+              "size": 28.97
+            }
+          ]
+        },
+        {
+          "name": "Ballymagreehan",
+          "selectionId": 75061129,
+          "odds": 7.2,
+          "trap": "1",
+          "form": "813233-",
+          "trainer": "David Marnane",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 7.2,
+              "size": 12.2
+            },
+            {
+              "price": 6.6,
+              "size": 17.49
+            },
+            {
+              "price": 6.4,
+              "size": 15.33
+            }
+          ]
+        },
+        {
+          "name": "Jackie Brown",
+          "selectionId": 45929505,
+          "odds": 10.5,
+          "trap": "9",
+          "form": "807533-",
+          "trainer": "A. J. Martin",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 10.5,
+              "size": 17.05
+            },
+            {
+              "price": 9.8,
+              "size": 17.42
+            },
+            {
+              "price": 9.6,
+              "size": 14.03
+            }
+          ]
+        },
+        {
+          "name": "Platino Bianco",
+          "selectionId": 58351468,
+          "odds": 10.5,
+          "trap": "5",
+          "form": "003601-",
+          "trainer": "Conor David Maxwell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 10.5,
+              "size": 16.47
+            },
+            {
+              "price": 10.0,
+              "size": 12.29
+            },
+            {
+              "price": 9.4,
+              "size": 13.37
+            }
+          ]
+        },
+        {
+          "name": "Charanda",
+          "selectionId": 67168374,
+          "odds": 18.0,
+          "trap": "8",
+          "form": "577560-",
+          "trainer": "Robson Aguiar",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 18.0,
+              "size": 38.28
+            },
+            {
+              "price": 16.0,
+              "size": 20.9
+            },
+            {
+              "price": 14.0,
+              "size": 19.25
+            }
+          ]
+        },
+        {
+          "name": "Winemaker",
+          "selectionId": 47704274,
+          "odds": 18.0,
+          "trap": "7",
+          "form": "9/75485-",
+          "trainer": "H. D. McGuigan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 18.0,
+              "size": 13.63
+            },
+            {
+              "price": 14.0,
+              "size": 25.69
+            },
+            {
+              "price": 11.5,
+              "size": 12.49
+            }
+          ]
+        },
+        {
+          "name": "Star Allure",
+          "selectionId": 69520151,
+          "odds": 30.0,
+          "trap": "6",
+          "form": "543773-",
+          "trainer": "Ms Claire O'Connell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 30.0,
+              "size": 12.9
+            },
+            {
+              "price": 26.0,
+              "size": 11.56
+            },
+            {
+              "price": 23.0,
+              "size": 11.82
+            }
+          ]
+        },
+        {
+          "name": "Moonhall Lass",
+          "selectionId": 69652937,
+          "odds": 29.0,
+          "trap": "10",
+          "form": "400076-",
+          "trainer": "P. J. F. Murphy",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 29.0,
+              "size": 14.29
+            },
+            {
+              "price": 21.0,
+              "size": 24.59
+            },
+            {
+              "price": 17.0,
+              "size": 22.2
+            }
+          ]
+        },
+        {
+          "name": "Fort Star",
+          "selectionId": 73805108,
+          "odds": 48.0,
+          "trap": "13",
+          "form": "00/9007-",
+          "trainer": "Ms Sheila Lavery",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 48.0,
+              "size": 12.84
+            },
+            {
+              "price": 38.0,
+              "size": 13.17
+            },
+            {
+              "price": 27.0,
+              "size": 11.83
+            }
+          ]
+        },
+        {
+          "name": "Spirit Of Eagles",
+          "selectionId": 47826499,
+          "odds": 55.0,
+          "trap": "14",
+          "form": "746050-",
+          "trainer": "Thomas Dowling",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 55.0,
+              "size": 11.92
+            },
+            {
+              "price": 46.0,
+              "size": 11.71
+            },
+            {
+              "price": 44.0,
+              "size": 19.4
+            }
+          ]
+        },
+        {
+          "name": "Greek Gift",
+          "selectionId": 69005908,
+          "odds": 80.0,
+          "trap": "2",
+          "form": "2469/00-",
+          "trainer": "Denis Hogan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 80.0,
+              "size": 13.27
+            },
+            {
+              "price": 55.0,
+              "size": 12.57
+            },
+            {
+              "price": 40.0,
+              "size": 24.62
+            }
+          ]
+        },
+        {
+          "name": "Carmina Burana",
+          "selectionId": 13332479,
+          "odds": 50.0,
+          "trap": "12",
+          "form": "588469-",
+          "trainer": "Andrew Kinirons",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 50.0,
+              "size": 16.06
+            },
+            {
+              "price": 44.0,
+              "size": 19.57
+            },
+            {
+              "price": 32.0,
+              "size": 17.66
+            }
+          ]
+        }
+      ],
+      "total_runners": 14,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619713",
+      "market_name": "5f Hcap",
+      "venue": "Newcastle",
+      "course": "Newcastle",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T15:08:00.000Z",
+      "runners": [
+        {
+          "name": "Digital",
+          "selectionId": 55342,
+          "odds": 3.15,
+          "trap": "2",
+          "form": "07861-2",
+          "trainer": "Mrs R Carr",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.15,
+              "size": 18.12
+            },
+            {
+              "price": 3.1,
+              "size": 45.91
+            },
+            {
+              "price": 3.05,
+              "size": 69.99
+            }
+          ]
+        },
+        {
+          "name": "Azucena",
+          "selectionId": 46977055,
+          "odds": 6.2,
+          "trap": "5",
+          "form": "304054-",
+          "trainer": "S Hanlon",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.2,
+              "size": 12.79
+            },
+            {
+              "price": 6.0,
+              "size": 51.18
+            },
+            {
+              "price": 5.9,
+              "size": 13.57
+            }
+          ]
+        },
+        {
+          "name": "Em Jay Kay",
+          "selectionId": 42465989,
+          "odds": 6.2,
+          "trap": "1",
+          "form": "313738-",
+          "trainer": "P S McEntee",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.2,
+              "size": 19.5
+            },
+            {
+              "price": 6.0,
+              "size": 44.75
+            },
+            {
+              "price": 5.9,
+              "size": 28.92
+            }
+          ]
+        },
+        {
+          "name": "Hes An Angel",
+          "selectionId": 46065550,
+          "odds": 6.6,
+          "trap": "4",
+          "form": "500/493-",
+          "trainer": "K Frost",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.6,
+              "size": 18.52
+            },
+            {
+              "price": 6.4,
+              "size": 42.27
+            },
+            {
+              "price": 6.2,
+              "size": 48.78
+            }
+          ]
+        },
+        {
+          "name": "La Rochette",
+          "selectionId": 3138929,
+          "odds": 7.6,
+          "trap": "3",
+          "form": "97090-3",
+          "trainer": "Miss Tracy Waggott",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 7.6,
+              "size": 27.11
+            },
+            {
+              "price": 7.4,
+              "size": 11.56
+            },
+            {
+              "price": 7.0,
+              "size": 54.01
+            }
+          ]
+        },
+        {
+          "name": "Classy Clarets",
+          "selectionId": 54881218,
+          "odds": 9.4,
+          "trap": "6",
+          "form": "79969-7",
+          "trainer": "I Jardine",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.4,
+              "size": 28.1
+            },
+            {
+              "price": 9.2,
+              "size": 20.84
+            },
+            {
+              "price": 9.0,
+              "size": 139.79
+            }
+          ]
+        }
+      ],
+      "total_runners": 6,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619860",
+      "market_name": "2m Hcap Hrd",
+      "venue": "Ayr",
+      "course": "Ayr",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T15:18:00.000Z",
+      "runners": [
+        {
+          "name": "Hes Bresilian",
+          "selectionId": 75061373,
+          "odds": 3.15,
+          "trap": "2",
+          "form": "332-361",
+          "trainer": "Jedd O'Keeffe",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.15,
+              "size": 15.8
+            },
+            {
+              "price": 3.1,
+              "size": 39.97
+            },
+            {
+              "price": 3.05,
+              "size": 26.96
+            }
+          ]
+        },
+        {
+          "name": "Platin Moon",
+          "selectionId": 72445775,
+          "odds": 4.7,
+          "trap": "10",
+          "form": "652-465",
+          "trainer": "N W Alexander",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.7,
+              "size": 11.76
+            },
+            {
+              "price": 4.6,
+              "size": 31.73
+            },
+            {
+              "price": 4.5,
+              "size": 17.46
+            }
+          ]
+        },
+        {
+          "name": "Tread Softly Now",
+          "selectionId": 55214123,
+          "odds": 5.9,
+          "trap": "7",
+          "form": "6921P2",
+          "trainer": "I A Duncan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 5.9,
+              "size": 23.01
+            },
+            {
+              "price": 5.7,
+              "size": 27.9
+            },
+            {
+              "price": 5.6,
+              "size": 25.98
+            }
+          ]
+        },
+        {
+          "name": "Two Auld Pals",
+          "selectionId": 7374621,
+          "odds": 6.8,
+          "trap": "5",
+          "form": "31/65-36",
+          "trainer": "L Russell & M Scudamore",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.8,
+              "size": 20.81
+            },
+            {
+              "price": 6.4,
+              "size": 47.22
+            },
+            {
+              "price": 6.2,
+              "size": 19.19
+            }
+          ]
+        },
+        {
+          "name": "Thereisnodoubt",
+          "selectionId": 13429471,
+          "odds": 12.5,
+          "trap": "1",
+          "form": "4531-95",
+          "trainer": "L Russell & M Scudamore",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 12.5,
+              "size": 11.84
+            },
+            {
+              "price": 11.0,
+              "size": 50.49
+            },
+            {
+              "price": 10.5,
+              "size": 33.2
+            }
+          ]
+        },
+        {
+          "name": "Mr Lincoln",
+          "selectionId": 41844012,
+          "odds": 22.0,
+          "trap": "6",
+          "form": "29/3-58",
+          "trainer": "I Jardine",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 22.0,
+              "size": 11.75
+            },
+            {
+              "price": 19.0,
+              "size": 23.92
+            },
+            {
+              "price": 17.5,
+              "size": 18.09
+            }
+          ]
+        },
+        {
+          "name": "Jiair Madrik",
+          "selectionId": 64421790,
+          "odds": 42.0,
+          "trap": "4",
+          "form": "12342/8",
+          "trainer": "D McCain Jnr",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 42.0,
+              "size": 14.78
+            },
+            {
+              "price": 36.0,
+              "size": 16.53
+            },
+            {
+              "price": 30.0,
+              "size": 14.17
+            }
+          ]
+        },
+        {
+          "name": "Don Occhetti",
+          "selectionId": 61638832,
+          "odds": 46.0,
+          "trap": "9",
+          "form": "70/231-P",
+          "trainer": "W Young Jnr",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 46.0,
+              "size": 12.83
+            },
+            {
+              "price": 40.0,
+              "size": 27.89
+            },
+            {
+              "price": 32.0,
+              "size": 15.89
+            }
+          ]
+        },
+        {
+          "name": "Sao Carlos",
+          "selectionId": 51220670,
+          "odds": 65.0,
+          "trap": "8",
+          "form": "33U5-P8",
+          "trainer": "Lizzie Quinlan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 65.0,
+              "size": 32.3
+            },
+            {
+              "price": 50.0,
+              "size": 52.31
+            },
+            {
+              "price": 44.0,
+              "size": 16.99
+            }
+          ]
+        }
+      ],
+      "total_runners": 9,
+      "distance": "WIN",
+      "race_type": "Hurdle"
+    },
+    {
+      "market_id": "1.252622157",
+      "market_name": "6f Stks",
+      "venue": "Dundalk",
+      "course": "Dundalk",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T15:30:00.000Z",
+      "runners": [
+        {
+          "name": "This Guy",
+          "selectionId": 9992777,
+          "odds": 1.45,
+          "trap": "4",
+          "form": "267322-",
+          "trainer": "Daniel James Murphy",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.45,
+              "size": 158.06
+            },
+            {
+              "price": 1.44,
+              "size": 24.45
+            },
+            {
+              "price": 1.41,
+              "size": 69.38
+            }
+          ]
+        },
+        {
+          "name": "Passage Of Power",
+          "selectionId": 10072691,
+          "odds": 6.0,
+          "trap": "3",
+          "form": "0",
+          "trainer": "Joseph Patrick O'Brien",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.0,
+              "size": 14.03
+            },
+            {
+              "price": 5.8,
+              "size": 15.33
+            },
+            {
+              "price": 5.5,
+              "size": 18.79
+            }
+          ]
+        },
+        {
+          "name": "Chirac",
+          "selectionId": 952925,
+          "odds": 16.5,
+          "trap": "2",
+          "form": "0-",
+          "trainer": "J. J. Feane",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 16.5,
+              "size": 14.5
+            },
+            {
+              "price": 15.5,
+              "size": 14.64
+            },
+            {
+              "price": 13.5,
+              "size": 27.98
+            }
+          ]
+        },
+        {
+          "name": "Lockd Up Lane",
+          "selectionId": 89407927,
+          "odds": 22.0,
+          "trap": "7",
+          "form": "0-",
+          "trainer": "Diego Dias",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 22.0,
+              "size": 17.61
+            },
+            {
+              "price": 20.0,
+              "size": 29.49
+            },
+            {
+              "price": 18.5,
+              "size": 21.43
+            }
+          ]
+        },
+        {
+          "name": "Two And Two",
+          "selectionId": 92470730,
+          "odds": 28.0,
+          "trap": "11",
+          "form": "8-",
+          "trainer": "Daniel McLoughlin",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 28.0,
+              "size": 17.95
+            },
+            {
+              "price": 23.0,
+              "size": 25.88
+            },
+            {
+              "price": 19.5,
+              "size": 14.84
+            }
+          ]
+        },
+        {
+          "name": "Cash On Black",
+          "selectionId": 92754692,
+          "odds": 25.0,
+          "trap": "1",
+          "form": "6-",
+          "trainer": "Miss Jennifer Anne Lynch",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 25.0,
+              "size": 20.66
+            },
+            {
+              "price": 21.0,
+              "size": 12.88
+            },
+            {
+              "price": 20.0,
+              "size": 19.61
+            }
+          ]
+        },
+        {
+          "name": "Princess Chloe",
+          "selectionId": 55921,
+          "odds": 48.0,
+          "trap": "8",
+          "form": "0",
+          "trainer": "Daniel James Murphy",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 48.0,
+              "size": 28.19
+            },
+            {
+              "price": 40.0,
+              "size": 11.93
+            },
+            {
+              "price": 30.0,
+              "size": 13.59
+            }
+          ]
+        },
+        {
+          "name": "Sunflower Lady",
+          "selectionId": 93729860,
+          "odds": 70.0,
+          "trap": "10",
+          "form": "0",
+          "trainer": "Diego Dias",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 70.0,
+              "size": 23.49
+            },
+            {
+              "price": 50.0,
+              "size": 12.7
+            },
+            {
+              "price": 48.0,
+              "size": 39.29
+            }
+          ]
+        },
+        {
+          "name": "Double Clutching",
+          "selectionId": 92470732,
+          "odds": 60.0,
+          "trap": "5",
+          "form": "0-",
+          "trainer": "Thomas Coyle",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 60.0,
+              "size": 13.33
+            },
+            {
+              "price": 55.0,
+              "size": 17.53
+            },
+            {
+              "price": 44.0,
+              "size": 12.65
+            }
+          ]
+        },
+        {
+          "name": "Raysagold",
+          "selectionId": 93729862,
+          "odds": 50.0,
+          "trap": "9",
+          "form": "0",
+          "trainer": "Diego Dias",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 50.0,
+              "size": 20.67
+            },
+            {
+              "price": 40.0,
+              "size": 28.89
+            },
+            {
+              "price": 30.0,
+              "size": 12.09
+            }
+          ]
+        }
+      ],
+      "total_runners": 10,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619719",
+      "market_name": "1m Hcap",
+      "venue": "Newcastle",
+      "course": "Newcastle",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T15:40:00.000Z",
+      "runners": [
+        {
+          "name": "The Green Man",
+          "selectionId": 886325,
+          "odds": 3.3,
+          "trap": "4",
+          "form": "11541-3",
+          "trainer": "P A Kirby",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.3,
+              "size": 57.41
+            },
+            {
+              "price": 3.25,
+              "size": 25.04
+            },
+            {
+              "price": 3.2,
+              "size": 21.51
+            }
+          ]
+        },
+        {
+          "name": "Flying Fletcher",
+          "selectionId": 57926081,
+          "odds": 4.6,
+          "trap": "3",
+          "form": "32952-2",
+          "trainer": "R A Fahey",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.6,
+              "size": 20.02
+            },
+            {
+              "price": 4.5,
+              "size": 47.34
+            },
+            {
+              "price": 4.4,
+              "size": 55.2
+            }
+          ]
+        },
+        {
+          "name": "Criminal Shore",
+          "selectionId": 75229552,
+          "odds": 8.0,
+          "trap": "2",
+          "form": "346262-",
+          "trainer": "D O'Meara",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 8.0,
+              "size": 71.64
+            },
+            {
+              "price": 7.8,
+              "size": 32.27
+            },
+            {
+              "price": 7.6,
+              "size": 45.14
+            }
+          ]
+        },
+        {
+          "name": "Eves Boy",
+          "selectionId": 69878541,
+          "odds": 8.4,
+          "trap": "5",
+          "form": "87535-7",
+          "trainer": "M Dods",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 8.4,
+              "size": 19.62
+            },
+            {
+              "price": 8.0,
+              "size": 35.32
+            },
+            {
+              "price": 7.8,
+              "size": 19.63
+            }
+          ]
+        },
+        {
+          "name": "Bajan Bandit",
+          "selectionId": 46064954,
+          "odds": 9.4,
+          "trap": "6",
+          "form": "88122-5",
+          "trainer": "P Morris",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.4,
+              "size": 25.11
+            },
+            {
+              "price": 9.0,
+              "size": 18.47
+            },
+            {
+              "price": 8.8,
+              "size": 33.02
+            }
+          ]
+        },
+        {
+          "name": "Bowood",
+          "selectionId": 58351411,
+          "odds": 9.6,
+          "trap": "1",
+          "form": "634117-",
+          "trainer": "I Furtado",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.6,
+              "size": 12.99
+            },
+            {
+              "price": 9.2,
+              "size": 18.58
+            },
+            {
+              "price": 9.0,
+              "size": 12.26
+            }
+          ]
+        },
+        {
+          "name": "Lessay",
+          "selectionId": 63805217,
+          "odds": 21.0,
+          "trap": "7",
+          "form": "65126-7",
+          "trainer": "P Morris",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 21.0,
+              "size": 15.33
+            },
+            {
+              "price": 20.0,
+              "size": 71.72
+            },
+            {
+              "price": 19.5,
+              "size": 22.39
+            }
+          ]
+        }
+      ],
+      "total_runners": 7,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619867",
+      "market_name": "2m NHF",
+      "venue": "Ayr",
+      "course": "Ayr",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T15:48:00.000Z",
+      "runners": [
+        {
+          "name": "Coconut Man",
+          "selectionId": 7180922,
+          "odds": 2.56,
+          "trap": "1",
+          "form": "2-1",
+          "trainer": "L Russell & M Scudamore",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 2.56,
+              "size": 11.58
+            },
+            {
+              "price": 2.5,
+              "size": 29.09
+            },
+            {
+              "price": 2.48,
+              "size": 14.63
+            }
+          ]
+        },
+        {
+          "name": "Diamant Dore",
+          "selectionId": 93729844,
+          "odds": 4.3,
+          "trap": "2",
+          "form": "F",
+          "trainer": "A Keatley",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.3,
+              "size": 30.41
+            },
+            {
+              "price": 4.2,
+              "size": 29.69
+            },
+            {
+              "price": 4.1,
+              "size": 29.8
+            }
+          ]
+        },
+        {
+          "name": "Kingsman Mail",
+          "selectionId": 91037299,
+          "odds": 4.9,
+          "trap": "4",
+          "form": "2",
+          "trainer": "N W Alexander",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.9,
+              "size": 11.57
+            },
+            {
+              "price": 4.7,
+              "size": 15.23
+            },
+            {
+              "price": 4.6,
+              "size": 30.05
+            }
+          ]
+        },
+        {
+          "name": "Mcelhattan",
+          "selectionId": 93583084,
+          "odds": 11.5,
+          "trap": "5",
+          "form": "21",
+          "trainer": "D McCain Jnr",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 11.5,
+              "size": 18.94
+            },
+            {
+              "price": 10.5,
+              "size": 13.81
+            },
+            {
+              "price": 10.0,
+              "size": 13.7
+            }
+          ]
+        },
+        {
+          "name": "Dublinofficecallin",
+          "selectionId": 92646410,
+          "odds": 14.5,
+          "trap": "3",
+          "form": "56-4",
+          "trainer": "Ewan Whillans",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 14.5,
+              "size": 14.35
+            },
+            {
+              "price": 14.0,
+              "size": 66.6
+            },
+            {
+              "price": 13.5,
+              "size": 11.63
+            }
+          ]
+        },
+        {
+          "name": "Melbourne Ghost",
+          "selectionId": 93729842,
+          "odds": 18.5,
+          "trap": "6",
+          "form": "0",
+          "trainer": "D W Whillans",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 18.5,
+              "size": 16.12
+            },
+            {
+              "price": 18.0,
+              "size": 16.82
+            },
+            {
+              "price": 16.5,
+              "size": 15.19
+            }
+          ]
+        },
+        {
+          "name": "Brewdog",
+          "selectionId": 93729843,
+          "odds": 90.0,
+          "trap": "8",
+          "form": "0",
+          "trainer": "R M Smith",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 90.0,
+              "size": 12.4
+            },
+            {
+              "price": 85.0,
+              "size": 18.24
+            },
+            {
+              "price": 75.0,
+              "size": 13.9
+            }
+          ]
+        },
+        {
+          "name": "Oor Wish",
+          "selectionId": 92881171,
+          "odds": 90.0,
+          "trap": "7",
+          "form": "0",
+          "trainer": "N W Alexander",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 90.0,
+              "size": 14.66
+            },
+            {
+              "price": 70.0,
+              "size": 13.42
+            },
+            {
+              "price": 55.0,
+              "size": 40.19
+            }
+          ]
+        }
+      ],
+      "total_runners": 8,
+      "distance": "WIN",
+      "race_type": "NHF"
+    },
+    {
+      "market_id": "1.252622162",
+      "market_name": "6f Hcap",
+      "venue": "Dundalk",
+      "course": "Dundalk",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T16:00:00.000Z",
+      "runners": [
+        {
+          "name": "Battleforsupremacy",
+          "selectionId": 88088356,
+          "odds": 2.92,
+          "trap": "4",
+          "form": "097016-",
+          "trainer": "Daniel McLoughlin",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 2.92,
+              "size": 26.09
+            },
+            {
+              "price": 2.86,
+              "size": 13.82
+            },
+            {
+              "price": 2.8,
+              "size": 12.46
+            }
+          ]
+        },
+        {
+          "name": "Friendly Invoice",
+          "selectionId": 88124472,
+          "odds": 5.4,
+          "trap": "1",
+          "form": "00901-",
+          "trainer": "Conor David Maxwell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 5.4,
+              "size": 14.12
+            },
+            {
+              "price": 5.1,
+              "size": 13.82
+            },
+            {
+              "price": 5.0,
+              "size": 17.96
+            }
+          ]
+        },
+        {
+          "name": "Dakota Dancer",
+          "selectionId": 41516509,
+          "odds": 7.8,
+          "trap": "8",
+          "form": "076-",
+          "trainer": "Henry de Bromhead",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 7.8,
+              "size": 13.96
+            },
+            {
+              "price": 7.0,
+              "size": 28.61
+            },
+            {
+              "price": 6.8,
+              "size": 12.02
+            }
+          ]
+        },
+        {
+          "name": "Stone Bear",
+          "selectionId": 85557499,
+          "odds": 8.6,
+          "trap": "11",
+          "form": "75075-",
+          "trainer": "Ross O'Sullivan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 8.6,
+              "size": 20.57
+            },
+            {
+              "price": 8.4,
+              "size": 18.4
+            },
+            {
+              "price": 7.8,
+              "size": 15.38
+            }
+          ]
+        },
+        {
+          "name": "Oh Cecelia",
+          "selectionId": 81862485,
+          "odds": 10.5,
+          "trap": "2",
+          "form": "105636-",
+          "trainer": "Jack W. Davison",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 10.5,
+              "size": 12.04
+            },
+            {
+              "price": 10.0,
+              "size": 12.69
+            },
+            {
+              "price": 9.4,
+              "size": 19.98
+            }
+          ]
+        },
+        {
+          "name": "Commander Kabaw",
+          "selectionId": 90543627,
+          "odds": 16.5,
+          "trap": "9",
+          "form": "700-",
+          "trainer": "Daniel James Murphy",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 16.5,
+              "size": 12.89
+            },
+            {
+              "price": 16.0,
+              "size": 17.32
+            },
+            {
+              "price": 15.0,
+              "size": 13.84
+            }
+          ]
+        },
+        {
+          "name": "Cause I Like You",
+          "selectionId": 91125424,
+          "odds": 18.0,
+          "trap": "7",
+          "form": "0944-",
+          "trainer": "Michael Mulvany",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 18.0,
+              "size": 12.71
+            },
+            {
+              "price": 7.2,
+              "size": 22.03
+            },
+            {
+              "price": 6.2,
+              "size": 19.27
+            }
+          ]
+        },
+        {
+          "name": "Mr Kobe",
+          "selectionId": 83284978,
+          "odds": 22.0,
+          "trap": "10",
+          "form": "997040-",
+          "trainer": "Diego Dias",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 22.0,
+              "size": 11.6
+            },
+            {
+              "price": 21.0,
+              "size": 20.05
+            },
+            {
+              "price": 20.0,
+              "size": 11.67
+            }
+          ]
+        },
+        {
+          "name": "The Love Machine",
+          "selectionId": 7371332,
+          "odds": 29.0,
+          "trap": "3",
+          "form": "561456-",
+          "trainer": "Sean Davis",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 29.0,
+              "size": 14.82
+            },
+            {
+              "price": 25.0,
+              "size": 12.28
+            },
+            {
+              "price": 21.0,
+              "size": 17.93
+            }
+          ]
+        },
+        {
+          "name": "Practical Move",
+          "selectionId": 47508131,
+          "odds": 34.0,
+          "trap": "5",
+          "form": "39650-",
+          "trainer": "Michael Butler",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 34.0,
+              "size": 13.01
+            },
+            {
+              "price": 28.0,
+              "size": 14.95
+            },
+            {
+              "price": 26.0,
+              "size": 29.12
+            }
+          ]
+        },
+        {
+          "name": "Plushy",
+          "selectionId": 85483022,
+          "odds": 40.0,
+          "trap": "6",
+          "form": "328060-",
+          "trainer": "Gavin Patrick Cromwell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 40.0,
+              "size": 15.91
+            },
+            {
+              "price": 32.0,
+              "size": 16.78
+            },
+            {
+              "price": 30.0,
+              "size": 28.86
+            }
+          ]
+        },
+        {
+          "name": "Mini Cotai",
+          "selectionId": 83421771,
+          "odds": 42.0,
+          "trap": "12",
+          "form": "707050-",
+          "trainer": "Michael Mulvany",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 42.0,
+              "size": 17.41
+            },
+            {
+              "price": 36.0,
+              "size": 11.66
+            },
+            {
+              "price": 32.0,
+              "size": 45.98
+            }
+          ]
+        }
+      ],
+      "total_runners": 12,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619725",
+      "market_name": "5f Hcap",
+      "venue": "Newcastle",
+      "course": "Newcastle",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T16:15:00.000Z",
+      "runners": [
+        {
+          "name": "Heavenly Heather",
+          "selectionId": 75091796,
+          "odds": 3.2,
+          "trap": "1",
+          "form": "386221-",
+          "trainer": "Miss Tracy Waggott",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.2,
+              "size": 112.86
+            },
+            {
+              "price": 3.15,
+              "size": 16.05
+            },
+            {
+              "price": 3.1,
+              "size": 44.26
+            }
+          ]
+        },
+        {
+          "name": "Lethal Nymph",
+          "selectionId": 43869018,
+          "odds": 3.35,
+          "trap": "2",
+          "form": "721383-",
+          "trainer": "P T Midgley",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.35,
+              "size": 45.9
+            },
+            {
+              "price": 3.3,
+              "size": 30.39
+            },
+            {
+              "price": 3.25,
+              "size": 87.73
+            }
+          ]
+        },
+        {
+          "name": "Monks Dream",
+          "selectionId": 61601121,
+          "odds": 6.6,
+          "trap": "4",
+          "form": "263294-",
+          "trainer": "T D Easterby",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.6,
+              "size": 30.65
+            },
+            {
+              "price": 6.4,
+              "size": 54.07
+            },
+            {
+              "price": 6.2,
+              "size": 15.79
+            }
+          ]
+        },
+        {
+          "name": "Farandaway",
+          "selectionId": 72176817,
+          "odds": 7.6,
+          "trap": "5",
+          "form": "233037-",
+          "trainer": "Grant Tuer",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 7.6,
+              "size": 51.02
+            },
+            {
+              "price": 7.4,
+              "size": 49.37
+            },
+            {
+              "price": 7.2,
+              "size": 38.11
+            }
+          ]
+        },
+        {
+          "name": "Kings Crown",
+          "selectionId": 9191527,
+          "odds": 8.2,
+          "trap": "3",
+          "form": "34612-1",
+          "trainer": "M Dods",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 8.2,
+              "size": 26.45
+            },
+            {
+              "price": 8.0,
+              "size": 31.51
+            },
+            {
+              "price": 7.6,
+              "size": 32.6
+            }
+          ]
+        }
+      ],
+      "total_runners": 5,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619882",
+      "market_name": "5f App Hcap",
+      "venue": "Southwell",
+      "course": "Southwell",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T16:30:00.000Z",
+      "runners": [
+        {
+          "name": "Popular Dream",
+          "selectionId": 50862121,
+          "odds": 3.05,
+          "trap": "4",
+          "form": "13562-1",
+          "trainer": "D Shaw",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.05,
+              "size": 18.29
+            },
+            {
+              "price": 3.0,
+              "size": 18.67
+            },
+            {
+              "price": 2.98,
+              "size": 42.21
+            }
+          ]
+        },
+        {
+          "name": "Emperors Son",
+          "selectionId": 56616124,
+          "odds": 3.35,
+          "trap": "2",
+          "form": "02623-1",
+          "trainer": "R A Fahey",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.35,
+              "size": 43.82
+            },
+            {
+              "price": 3.3,
+              "size": 46.87
+            },
+            {
+              "price": 3.25,
+              "size": 78.61
+            }
+          ]
+        },
+        {
+          "name": "Beaumadier",
+          "selectionId": 51418441,
+          "odds": 6.6,
+          "trap": "3",
+          "form": "21255-3",
+          "trainer": "D M Loughnane",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.6,
+              "size": 20.62
+            },
+            {
+              "price": 6.2,
+              "size": 15.9
+            },
+            {
+              "price": 6.0,
+              "size": 28.94
+            }
+          ]
+        },
+        {
+          "name": "Sams Hope",
+          "selectionId": 50307180,
+          "odds": 9.4,
+          "trap": "8",
+          "form": "141155-",
+          "trainer": "Martin Dunne",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.4,
+              "size": 13.88
+            },
+            {
+              "price": 8.8,
+              "size": 38.55
+            },
+            {
+              "price": 8.6,
+              "size": 14.28
+            }
+          ]
+        },
+        {
+          "name": "Birkenhead",
+          "selectionId": 593000,
+          "odds": 12.0,
+          "trap": "6",
+          "form": "435342-",
+          "trainer": "P T Midgley",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 12.0,
+              "size": 12.99
+            },
+            {
+              "price": 11.0,
+              "size": 20.99
+            },
+            {
+              "price": 10.0,
+              "size": 18.82
+            }
+          ]
+        },
+        {
+          "name": "Hostility",
+          "selectionId": 72454022,
+          "odds": 17.5,
+          "trap": "5",
+          "form": "222444-",
+          "trainer": "D O'Meara",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 17.5,
+              "size": 14.37
+            },
+            {
+              "price": 15.0,
+              "size": 17.46
+            },
+            {
+              "price": 14.0,
+              "size": 14.02
+            }
+          ]
+        },
+        {
+          "name": "Basholo",
+          "selectionId": 40426048,
+          "odds": 29.0,
+          "trap": "7",
+          "form": "04101-5",
+          "trainer": "T & S Barclay",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 29.0,
+              "size": 13.1
+            },
+            {
+              "price": 17.5,
+              "size": 17.11
+            },
+            {
+              "price": 15.5,
+              "size": 18.99
+            }
+          ]
+        }
+      ],
+      "total_runners": 7,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252622167",
+      "market_name": "1m2f Hcap",
+      "venue": "Dundalk",
+      "course": "Dundalk",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T16:35:00.000Z",
+      "runners": [
+        {
+          "name": "Mapa",
+          "selectionId": 59778651,
+          "odds": 4.3,
+          "trap": "4",
+          "form": "700524-",
+          "trainer": "Ms Sheila Lavery",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.3,
+              "size": 18.33
+            },
+            {
+              "price": 4.1,
+              "size": 11.67
+            },
+            {
+              "price": 3.95,
+              "size": 14.44
+            }
+          ]
+        },
+        {
+          "name": "Limestone Red",
+          "selectionId": 58079335,
+          "odds": 4.5,
+          "trap": "1",
+          "form": "050425-",
+          "trainer": "Tracey Collins",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.5,
+              "size": 17.57
+            },
+            {
+              "price": 4.3,
+              "size": 14.34
+            },
+            {
+              "price": 3.8,
+              "size": 33.82
+            }
+          ]
+        },
+        {
+          "name": "Aingeal Dorcha",
+          "selectionId": 35886780,
+          "odds": 4.7,
+          "trap": "7",
+          "form": "000428-",
+          "trainer": "A. Slattery",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.7,
+              "size": 43.63
+            },
+            {
+              "price": 2.88,
+              "size": 12.93
+            },
+            {
+              "price": 2.76,
+              "size": 72.16
+            }
+          ]
+        },
+        {
+          "name": "Master Garvey",
+          "selectionId": 46297852,
+          "odds": 10.0,
+          "trap": "11",
+          "form": "336990-",
+          "trainer": "Joseph Anthony Murray",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 10.0,
+              "size": 21.45
+            },
+            {
+              "price": 3.6,
+              "size": 60.29
+            },
+            {
+              "price": 3.4,
+              "size": 79.37
+            }
+          ]
+        },
+        {
+          "name": "Dont Look Now",
+          "selectionId": 10006733,
+          "odds": 11.5,
+          "trap": "12",
+          "form": "230/R00-",
+          "trainer": "Shane Crawley",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 11.5,
+              "size": 14.42
+            },
+            {
+              "price": 9.8,
+              "size": 13.03
+            },
+            {
+              "price": 8.2,
+              "size": 13.72
+            }
+          ]
+        },
+        {
+          "name": "Timandi",
+          "selectionId": 74127289,
+          "odds": 12.0,
+          "trap": "2",
+          "form": "804505-",
+          "trainer": "James M. Barrett",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 12.0,
+              "size": 12.35
+            },
+            {
+              "price": 10.0,
+              "size": 18.07
+            },
+            {
+              "price": 7.0,
+              "size": 12.31
+            }
+          ]
+        },
+        {
+          "name": "Mythical Rock",
+          "selectionId": 69520085,
+          "odds": 12.5,
+          "trap": "3",
+          "form": "323498-",
+          "trainer": "P. J. F. Murphy",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 12.5,
+              "size": 12.44
+            },
+            {
+              "price": 10.5,
+              "size": 11.8
+            },
+            {
+              "price": 9.8,
+              "size": 12.9
+            }
+          ]
+        },
+        {
+          "name": "Roderick",
+          "selectionId": 19186424,
+          "odds": 18.0,
+          "trap": "6",
+          "form": "150407-",
+          "trainer": "P. Sweeney",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 18.0,
+              "size": 28.9
+            },
+            {
+              "price": 8.6,
+              "size": 13.93
+            },
+            {
+              "price": 6.2,
+              "size": 14.08
+            }
+          ]
+        },
+        {
+          "name": "Chou Chou",
+          "selectionId": 13426760,
+          "odds": 21.0,
+          "trap": "5",
+          "form": "725179-",
+          "trainer": "Eamonn O'Connell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 21.0,
+              "size": 18.1
+            },
+            {
+              "price": 17.5,
+              "size": 21.49
+            },
+            {
+              "price": 8.2,
+              "size": 13.97
+            }
+          ]
+        },
+        {
+          "name": "General Grant",
+          "selectionId": 38449234,
+          "odds": 18.5,
+          "trap": "8",
+          "form": "090-",
+          "trainer": "Noel Meade",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 18.5,
+              "size": 14.15
+            },
+            {
+              "price": 17.5,
+              "size": 19.63
+            },
+            {
+              "price": 9.4,
+              "size": 13.39
+            }
+          ]
+        },
+        {
+          "name": "Surf On Jamie",
+          "selectionId": 85195331,
+          "odds": 17.5,
+          "trap": "10",
+          "form": "6008-",
+          "trainer": "P. Mulligan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 17.5,
+              "size": 12.31
+            },
+            {
+              "price": 15.5,
+              "size": 28.86
+            },
+            {
+              "price": 9.2,
+              "size": 11.75
+            }
+          ]
+        },
+        {
+          "name": "Quick Blessing",
+          "selectionId": 46636604,
+          "odds": 34.0,
+          "trap": "14",
+          "form": "20800/0-",
+          "trainer": "C. Moore",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 34.0,
+              "size": 15.19
+            },
+            {
+              "price": 25.0,
+              "size": 24.8
+            },
+            {
+              "price": 14.0,
+              "size": 16.99
+            }
+          ]
+        },
+        {
+          "name": "Promo Queen",
+          "selectionId": 57348898,
+          "odds": 26.0,
+          "trap": "9",
+          "form": "0098/00-",
+          "trainer": "Christopher David Timmons",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 26.0,
+              "size": 14.72
+            },
+            {
+              "price": 25.0,
+              "size": 12.7
+            },
+            {
+              "price": 20.0,
+              "size": 31.36
+            }
+          ]
+        },
+        {
+          "name": "Vocology",
+          "selectionId": 87347078,
+          "odds": 38.0,
+          "trap": "13",
+          "form": "00800-",
+          "trainer": "Thomas Coyle",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 38.0,
+              "size": 20.96
+            },
+            {
+              "price": 29.0,
+              "size": 43.26
+            },
+            {
+              "price": 14.0,
+              "size": 18.54
+            }
+          ]
+        }
+      ],
+      "total_runners": 14,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619821",
+      "market_name": "7f App Hcap",
+      "venue": "Newcastle",
+      "course": "Newcastle",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T16:45:00.000Z",
+      "runners": [
+        {
+          "name": "Aisling Oscar",
+          "selectionId": 58079300,
+          "odds": 2.92,
+          "trap": "1",
+          "form": "031111-",
+          "trainer": "A Keatley",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 2.92,
+              "size": 25.87
+            },
+            {
+              "price": 2.86,
+              "size": 16.45
+            },
+            {
+              "price": 2.84,
+              "size": 11.84
+            }
+          ]
+        },
+        {
+          "name": "Moyowasi",
+          "selectionId": 82866819,
+          "odds": 3.6,
+          "trap": "6",
+          "form": "77466-1",
+          "trainer": "Ian Williams",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.6,
+              "size": 32.61
+            },
+            {
+              "price": 3.5,
+              "size": 16.88
+            },
+            {
+              "price": 3.45,
+              "size": 12.7
+            }
+          ]
+        },
+        {
+          "name": "Pallas Lord",
+          "selectionId": 39246357,
+          "odds": 7.0,
+          "trap": "5",
+          "form": "80883-2",
+          "trainer": "D W Whillans",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 7.0,
+              "size": 20.83
+            },
+            {
+              "price": 6.8,
+              "size": 19.64
+            },
+            {
+              "price": 6.6,
+              "size": 17.45
+            }
+          ]
+        },
+        {
+          "name": "Wyvern",
+          "selectionId": 924665,
+          "odds": 7.2,
+          "trap": "3",
+          "form": "641451-",
+          "trainer": "P Morris",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 7.2,
+              "size": 17.7
+            },
+            {
+              "price": 6.8,
+              "size": 24.24
+            },
+            {
+              "price": 6.4,
+              "size": 23.66
+            }
+          ]
+        },
+        {
+          "name": "Sovereign Class",
+          "selectionId": 78792421,
+          "odds": 15.0,
+          "trap": "7",
+          "form": "66207-3",
+          "trainer": "Grant Tuer",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 15.0,
+              "size": 53.51
+            },
+            {
+              "price": 14.0,
+              "size": 19.31
+            },
+            {
+              "price": 12.5,
+              "size": 28.79
+            }
+          ]
+        },
+        {
+          "name": "Believe In Lies",
+          "selectionId": 83917114,
+          "odds": 15.5,
+          "trap": "2",
+          "form": "10430-5",
+          "trainer": "T D Barron",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 15.5,
+              "size": 11.77
+            },
+            {
+              "price": 15.0,
+              "size": 30.59
+            },
+            {
+              "price": 14.5,
+              "size": 12.66
+            }
+          ]
+        }
+      ],
+      "total_runners": 6,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619889",
+      "market_name": "7f Class Stks",
+      "venue": "Southwell",
+      "course": "Southwell",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T17:00:00.000Z",
+      "runners": [
+        {
+          "name": "Call Glory",
+          "selectionId": 55504419,
+          "odds": 2.08,
+          "trap": "1",
+          "form": "4027-12",
+          "trainer": "Ian Williams",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 2.08,
+              "size": 35.09
+            },
+            {
+              "price": 2.04,
+              "size": 29.47
+            },
+            {
+              "price": 2.0,
+              "size": 46.39
+            }
+          ]
+        },
+        {
+          "name": "Laurens Dream",
+          "selectionId": 73377916,
+          "odds": 3.65,
+          "trap": "6",
+          "form": "0766-62",
+          "trainer": "M & D Easterby",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.65,
+              "size": 14.63
+            },
+            {
+              "price": 3.6,
+              "size": 14.53
+            },
+            {
+              "price": 3.55,
+              "size": 13.59
+            }
+          ]
+        },
+        {
+          "name": "Headshot",
+          "selectionId": 28712730,
+          "odds": 8.6,
+          "trap": "5",
+          "form": "62372-5",
+          "trainer": "A W Carroll",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 8.6,
+              "size": 14.66
+            },
+            {
+              "price": 8.0,
+              "size": 47.67
+            },
+            {
+              "price": 7.6,
+              "size": 21.32
+            }
+          ]
+        },
+        {
+          "name": "Evoluir",
+          "selectionId": 56330196,
+          "odds": 13.5,
+          "trap": "2",
+          "form": "46584-9",
+          "trainer": "Micky Hammond",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 13.5,
+              "size": 16.61
+            },
+            {
+              "price": 12.5,
+              "size": 13.93
+            },
+            {
+              "price": 11.0,
+              "size": 27.63
+            }
+          ]
+        },
+        {
+          "name": "My Boy Jack",
+          "selectionId": 3324325,
+          "odds": 16.0,
+          "trap": "8",
+          "form": "27585-7",
+          "trainer": "K Frost",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 16.0,
+              "size": 26.84
+            },
+            {
+              "price": 14.5,
+              "size": 16.0
+            },
+            {
+              "price": 13.0,
+              "size": 14.8
+            }
+          ]
+        },
+        {
+          "name": "Purpendicular",
+          "selectionId": 82292376,
+          "odds": 46.0,
+          "trap": "10",
+          "form": "63578-",
+          "trainer": "M Murphy",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 46.0,
+              "size": 16.15
+            },
+            {
+              "price": 40.0,
+              "size": 12.92
+            },
+            {
+              "price": 26.0,
+              "size": 12.86
+            }
+          ]
+        },
+        {
+          "name": "For What Its Worth",
+          "selectionId": 82208916,
+          "odds": 48.0,
+          "trap": "3",
+          "form": "89980-",
+          "trainer": "M Wigham",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 48.0,
+              "size": 12.6
+            },
+            {
+              "price": 42.0,
+              "size": 19.36
+            },
+            {
+              "price": 36.0,
+              "size": 13.05
+            }
+          ]
+        },
+        {
+          "name": "Our Nicola",
+          "selectionId": 83092118,
+          "odds": 50.0,
+          "trap": "9",
+          "form": "05380-0",
+          "trainer": "T D Barron",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 50.0,
+              "size": 12.37
+            },
+            {
+              "price": 26.0,
+              "size": 12.31
+            },
+            {
+              "price": 21.0,
+              "size": 11.66
+            }
+          ]
+        },
+        {
+          "name": "Galette",
+          "selectionId": 69520245,
+          "odds": 70.0,
+          "trap": "4",
+          "form": "574560-",
+          "trainer": "J G Portman",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 70.0,
+              "size": 12.49
+            },
+            {
+              "price": 30.0,
+              "size": 12.6
+            },
+            {
+              "price": 22.0,
+              "size": 14.73
+            }
+          ]
+        },
+        {
+          "name": "Zaramara",
+          "selectionId": 83092122,
+          "odds": 60.0,
+          "trap": "11",
+          "form": "658690-",
+          "trainer": "M Appleby",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 60.0,
+              "size": 12.56
+            },
+            {
+              "price": 36.0,
+              "size": 12.56
+            },
+            {
+              "price": 23.0,
+              "size": 17.54
+            }
+          ]
+        },
+        {
+          "name": "Lilac Wood",
+          "selectionId": 87264492,
+          "odds": 120.0,
+          "trap": "7",
+          "form": "8660-9",
+          "trainer": "D Shaw",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 120.0,
+              "size": 11.63
+            },
+            {
+              "price": 44.0,
+              "size": 13.24
+            },
+            {
+              "price": 27.0,
+              "size": 13.67
+            }
+          ]
+        }
+      ],
+      "total_runners": 11,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252622172",
+      "market_name": "1m2f Hcap",
+      "venue": "Dundalk",
+      "course": "Dundalk",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T17:10:00.000Z",
+      "runners": [
+        {
+          "name": "Thompson Gunner",
+          "selectionId": 70755017,
+          "odds": 4.2,
+          "trap": "3",
+          "form": "000244-",
+          "trainer": "Cian Hughes",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.2,
+              "size": 30.7
+            },
+            {
+              "price": 4.0,
+              "size": 11.98
+            },
+            {
+              "price": 3.8,
+              "size": 14.17
+            }
+          ]
+        },
+        {
+          "name": "Church Mountain",
+          "selectionId": 35551685,
+          "odds": 6.2,
+          "trap": "1",
+          "form": "060083-",
+          "trainer": "Denis Hogan",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.2,
+              "size": 13.58
+            },
+            {
+              "price": 5.9,
+              "size": 16.23
+            },
+            {
+              "price": 5.5,
+              "size": 13.24
+            }
+          ]
+        },
+        {
+          "name": "Storm Eric",
+          "selectionId": 41515656,
+          "odds": 6.0,
+          "trap": "9",
+          "form": "00000-3",
+          "trainer": "Jamie Flynn",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.0,
+              "size": 17.62
+            },
+            {
+              "price": 4.8,
+              "size": 19.05
+            },
+            {
+              "price": 4.3,
+              "size": 11.57
+            }
+          ]
+        },
+        {
+          "name": "Captain Hanley",
+          "selectionId": 76351851,
+          "odds": 7.4,
+          "trap": "5",
+          "form": "533554-",
+          "trainer": "Eamonn O'Connell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 7.4,
+              "size": 17.51
+            },
+            {
+              "price": 6.6,
+              "size": 13.15
+            },
+            {
+              "price": 5.9,
+              "size": 14.53
+            }
+          ]
+        },
+        {
+          "name": "Haeret In Pectore",
+          "selectionId": 83242496,
+          "odds": 9.6,
+          "trap": "13",
+          "form": "14/0005-",
+          "trainer": "A. J. Martin",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.6,
+              "size": 11.98
+            },
+            {
+              "price": 8.4,
+              "size": 12.72
+            },
+            {
+              "price": 4.8,
+              "size": 12.6
+            }
+          ]
+        },
+        {
+          "name": "Waystar",
+          "selectionId": 63867604,
+          "odds": 8.0,
+          "trap": "11",
+          "form": "200702-",
+          "trainer": "John McConnell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 8.0,
+              "size": 13.77
+            },
+            {
+              "price": 5.1,
+              "size": 16.83
+            },
+            {
+              "price": 4.5,
+              "size": 38.84
+            }
+          ]
+        },
+        {
+          "name": "Nibras Rainbow",
+          "selectionId": 45281781,
+          "odds": 8.6,
+          "trap": "6",
+          "form": "222919-",
+          "trainer": "Gavin Patrick Cromwell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 8.6,
+              "size": 11.79
+            },
+            {
+              "price": 7.6,
+              "size": 12.31
+            },
+            {
+              "price": 5.8,
+              "size": 14.08
+            }
+          ]
+        },
+        {
+          "name": "Barretstown",
+          "selectionId": 29970173,
+          "odds": 18.0,
+          "trap": "4",
+          "form": "000715-",
+          "trainer": "Conor O'Dwyer",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 18.0,
+              "size": 14.71
+            },
+            {
+              "price": 9.2,
+              "size": 13.02
+            },
+            {
+              "price": 6.2,
+              "size": 17.03
+            }
+          ]
+        },
+        {
+          "name": "Givehertilxmas",
+          "selectionId": 82799312,
+          "odds": 23.0,
+          "trap": "8",
+          "form": "692606-",
+          "trainer": "Gerard Keane",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 23.0,
+              "size": 11.58
+            },
+            {
+              "price": 10.0,
+              "size": 17.3
+            },
+            {
+              "price": 6.2,
+              "size": 17.03
+            }
+          ]
+        },
+        {
+          "name": "Yquem",
+          "selectionId": 31525,
+          "odds": 26.0,
+          "trap": "14",
+          "form": "97069-",
+          "trainer": "John S. O'Donoghue",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 26.0,
+              "size": 13.14
+            },
+            {
+              "price": 14.0,
+              "size": 15.54
+            },
+            {
+              "price": 11.0,
+              "size": 14.04
+            }
+          ]
+        },
+        {
+          "name": "Harbanaker",
+          "selectionId": 27295142,
+          "odds": 32.0,
+          "trap": "12",
+          "form": "160600-",
+          "trainer": "William Harvey",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 32.0,
+              "size": 11.81
+            },
+            {
+              "price": 15.5,
+              "size": 11.67
+            },
+            {
+              "price": 12.0,
+              "size": 12.09
+            }
+          ]
+        },
+        {
+          "name": "Si Senior",
+          "selectionId": 56330561,
+          "odds": 20.0,
+          "trap": "15",
+          "form": "66000-8",
+          "trainer": "M. K. Flannery",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 20.0,
+              "size": 17.66
+            },
+            {
+              "price": 14.0,
+              "size": 17.33
+            },
+            {
+              "price": 10.5,
+              "size": 17.69
+            }
+          ]
+        },
+        {
+          "name": "Guest Star",
+          "selectionId": 25296060,
+          "odds": 48.0,
+          "trap": "10",
+          "form": "140890-",
+          "trainer": "T. G. McCourt",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 48.0,
+              "size": 16.47
+            },
+            {
+              "price": 30.0,
+              "size": 44.36
+            },
+            {
+              "price": 15.5,
+              "size": 15.93
+            }
+          ]
+        },
+        {
+          "name": "Jazz Forever",
+          "selectionId": 50307050,
+          "odds": 28.0,
+          "trap": "2",
+          "form": "69/8000-",
+          "trainer": "Paul W. Flynn",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 28.0,
+              "size": 12.87
+            },
+            {
+              "price": 27.0,
+              "size": 12.7
+            },
+            {
+              "price": 22.0,
+              "size": 45.24
+            }
+          ]
+        }
+      ],
+      "total_runners": 14,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619895",
+      "market_name": "7f Class Stks",
+      "venue": "Southwell",
+      "course": "Southwell",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T17:30:00.000Z",
+      "runners": [
+        {
+          "name": "Pink Socks",
+          "selectionId": 40511647,
+          "odds": 1.84,
+          "trap": "1",
+          "form": "0053-41",
+          "trainer": "Ian Williams",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.84,
+              "size": 14.39
+            },
+            {
+              "price": 1.83,
+              "size": 19.71
+            },
+            {
+              "price": 1.81,
+              "size": 16.16
+            }
+          ]
+        },
+        {
+          "name": "Aim For The Bull",
+          "selectionId": 72422018,
+          "odds": 6.8,
+          "trap": "2",
+          "form": "227042-",
+          "trainer": "M Murphy",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.8,
+              "size": 14.8
+            },
+            {
+              "price": 6.4,
+              "size": 25.0
+            },
+            {
+              "price": 6.2,
+              "size": 23.22
+            }
+          ]
+        },
+        {
+          "name": "Kodebreaker",
+          "selectionId": 39135794,
+          "odds": 9.2,
+          "trap": "7",
+          "form": "466525-",
+          "trainer": "M Herrington",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.2,
+              "size": 18.11
+            },
+            {
+              "price": 8.8,
+              "size": 16.04
+            },
+            {
+              "price": 8.6,
+              "size": 17.66
+            }
+          ]
+        },
+        {
+          "name": "Embarked",
+          "selectionId": 36062379,
+          "odds": 11.5,
+          "trap": "6",
+          "form": "243658-",
+          "trainer": "S Dixon",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 11.5,
+              "size": 12.38
+            },
+            {
+              "price": 10.0,
+              "size": 23.09
+            },
+            {
+              "price": 9.6,
+              "size": 23.8
+            }
+          ]
+        },
+        {
+          "name": "Captain Pickles",
+          "selectionId": 70679577,
+          "odds": 20.0,
+          "trap": "5",
+          "form": "054065-",
+          "trainer": "T & S Barclay",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 20.0,
+              "size": 12.49
+            },
+            {
+              "price": 18.5,
+              "size": 14.78
+            },
+            {
+              "price": 17.0,
+              "size": 15.54
+            }
+          ]
+        },
+        {
+          "name": "Anificas Beauty",
+          "selectionId": 39682591,
+          "odds": 20.0,
+          "trap": "4",
+          "form": "94088-8",
+          "trainer": "P Winks",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 20.0,
+              "size": 14.5
+            },
+            {
+              "price": 17.5,
+              "size": 13.49
+            },
+            {
+              "price": 11.5,
+              "size": 13.07
+            }
+          ]
+        },
+        {
+          "name": "Wrath Of Hector",
+          "selectionId": 24786738,
+          "odds": 26.0,
+          "trap": "10",
+          "form": "473327-",
+          "trainer": "Jessica Macey",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 26.0,
+              "size": 13.97
+            },
+            {
+              "price": 19.5,
+              "size": 14.33
+            },
+            {
+              "price": 14.0,
+              "size": 17.98
+            }
+          ]
+        },
+        {
+          "name": "American Rose",
+          "selectionId": 41302451,
+          "odds": 34.0,
+          "trap": "3",
+          "form": "805467-",
+          "trainer": "H J Evans",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 34.0,
+              "size": 11.66
+            },
+            {
+              "price": 24.0,
+              "size": 11.74
+            },
+            {
+              "price": 18.0,
+              "size": 16.33
+            }
+          ]
+        },
+        {
+          "name": "Nutcracker",
+          "selectionId": 10495039,
+          "odds": 42.0,
+          "trap": "8",
+          "form": "6/8574-9",
+          "trainer": "A W Carroll",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 42.0,
+              "size": 13.16
+            },
+            {
+              "price": 25.0,
+              "size": 13.46
+            },
+            {
+              "price": 19.5,
+              "size": 13.33
+            }
+          ]
+        },
+        {
+          "name": "Sharp Call",
+          "selectionId": 77978731,
+          "odds": 44.0,
+          "trap": "9",
+          "form": "846608-",
+          "trainer": "M & D Easterby",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 44.0,
+              "size": 14.45
+            },
+            {
+              "price": 27.0,
+              "size": 12.43
+            },
+            {
+              "price": 21.0,
+              "size": 12.65
+            }
+          ]
+        }
+      ],
+      "total_runners": 10,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619901",
+      "market_name": "7f Hcap",
+      "venue": "Southwell",
+      "course": "Southwell",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T18:00:00.000Z",
+      "runners": [
+        {
+          "name": "Shiplake",
+          "selectionId": 38132261,
+          "odds": 2.28,
+          "trap": "4",
+          "form": "274361-",
+          "trainer": "K P De Foy",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 2.28,
+              "size": 80.77
+            },
+            {
+              "price": 2.22,
+              "size": 45.94
+            },
+            {
+              "price": 2.2,
+              "size": 126.37
+            }
+          ]
+        },
+        {
+          "name": "Candonomore",
+          "selectionId": 58644474,
+          "odds": 4.3,
+          "trap": "5",
+          "form": "504125-",
+          "trainer": "S C Williams",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.3,
+              "size": 19.96
+            },
+            {
+              "price": 4.2,
+              "size": 20.42
+            },
+            {
+              "price": 4.1,
+              "size": 14.85
+            }
+          ]
+        },
+        {
+          "name": "Secret Guest",
+          "selectionId": 46065551,
+          "odds": 9.0,
+          "trap": "2",
+          "form": "50838-6",
+          "trainer": "B Smart",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.0,
+              "size": 27.7
+            },
+            {
+              "price": 8.6,
+              "size": 13.05
+            },
+            {
+              "price": 8.0,
+              "size": 12.16
+            }
+          ]
+        },
+        {
+          "name": "The Turpinator",
+          "selectionId": 26400149,
+          "odds": 10.5,
+          "trap": "6",
+          "form": "08980-2",
+          "trainer": "Grant Tuer",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 10.5,
+              "size": 22.22
+            },
+            {
+              "price": 10.0,
+              "size": 35.87
+            },
+            {
+              "price": 9.4,
+              "size": 16.4
+            }
+          ]
+        },
+        {
+          "name": "Good Morning Alex",
+          "selectionId": 57238335,
+          "odds": 11.0,
+          "trap": "3",
+          "form": "64/6162-",
+          "trainer": "T D Barron",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 11.0,
+              "size": 15.67
+            },
+            {
+              "price": 10.5,
+              "size": 26.67
+            },
+            {
+              "price": 9.8,
+              "size": 16.05
+            }
+          ]
+        },
+        {
+          "name": "Invited",
+          "selectionId": 26539884,
+          "odds": 12.5,
+          "trap": "1",
+          "form": "315781-",
+          "trainer": "G Boughey",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 12.5,
+              "size": 17.88
+            },
+            {
+              "price": 11.0,
+              "size": 11.56
+            },
+            {
+              "price": 10.5,
+              "size": 12.81
+            }
+          ]
+        }
+      ],
+      "total_runners": 6,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619908",
+      "market_name": "6f Hcap",
+      "venue": "Southwell",
+      "course": "Southwell",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T18:30:00.000Z",
+      "runners": [
+        {
+          "name": "Cargin Bhui",
+          "selectionId": 60745628,
+          "odds": 3.1,
+          "trap": "3",
+          "form": "33796-2",
+          "trainer": "T D Barron",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.1,
+              "size": 27.84
+            },
+            {
+              "price": 3.05,
+              "size": 38.1
+            },
+            {
+              "price": 3.0,
+              "size": 18.11
+            }
+          ]
+        },
+        {
+          "name": "Showtime Mahomes",
+          "selectionId": 39381940,
+          "odds": 4.7,
+          "trap": "1",
+          "form": "47994-1",
+          "trainer": "Grant Tuer",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.7,
+              "size": 11.8
+            },
+            {
+              "price": 4.6,
+              "size": 66.65
+            },
+            {
+              "price": 4.5,
+              "size": 13.98
+            }
+          ]
+        },
+        {
+          "name": "Clover Time",
+          "selectionId": 71597401,
+          "odds": 5.6,
+          "trap": "12",
+          "form": "982222-",
+          "trainer": "M Appleby",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 5.6,
+              "size": 14.87
+            },
+            {
+              "price": 5.4,
+              "size": 26.35
+            },
+            {
+              "price": 5.3,
+              "size": 26.47
+            }
+          ]
+        },
+        {
+          "name": "Minnesota Lad",
+          "selectionId": 44665607,
+          "odds": 9.6,
+          "trap": "10",
+          "form": "456392-",
+          "trainer": "I Furtado",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.6,
+              "size": 20.26
+            },
+            {
+              "price": 8.8,
+              "size": 17.49
+            },
+            {
+              "price": 8.2,
+              "size": 14.64
+            }
+          ]
+        },
+        {
+          "name": "Ottawa",
+          "selectionId": 4273530,
+          "odds": 13.0,
+          "trap": "2",
+          "form": "923761-",
+          "trainer": "J Parr",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 13.0,
+              "size": 16.6
+            },
+            {
+              "price": 12.0,
+              "size": 14.9
+            },
+            {
+              "price": 11.0,
+              "size": 14.19
+            }
+          ]
+        },
+        {
+          "name": "Pickering Castle",
+          "selectionId": 72520014,
+          "odds": 22.0,
+          "trap": "4",
+          "form": "224388-",
+          "trainer": "D M Simcock",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 22.0,
+              "size": 11.58
+            },
+            {
+              "price": 19.0,
+              "size": 12.88
+            },
+            {
+              "price": 17.0,
+              "size": 12.34
+            }
+          ]
+        },
+        {
+          "name": "Good Earth",
+          "selectionId": 12186699,
+          "odds": 21.0,
+          "trap": "11",
+          "form": "26238-4",
+          "trainer": "M Herrington",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 21.0,
+              "size": 14.48
+            },
+            {
+              "price": 18.5,
+              "size": 11.79
+            },
+            {
+              "price": 13.5,
+              "size": 16.83
+            }
+          ]
+        },
+        {
+          "name": "Sub Thirteen",
+          "selectionId": 59054607,
+          "odds": 23.0,
+          "trap": "6",
+          "form": "461235-",
+          "trainer": "A W Carroll",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 23.0,
+              "size": 13.8
+            },
+            {
+              "price": 19.0,
+              "size": 14.26
+            },
+            {
+              "price": 13.5,
+              "size": 14.42
+            }
+          ]
+        },
+        {
+          "name": "Dapperling",
+          "selectionId": 54534379,
+          "odds": 36.0,
+          "trap": "9",
+          "form": "605747-",
+          "trainer": "S Dixon",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 36.0,
+              "size": 12.19
+            },
+            {
+              "price": 22.0,
+              "size": 11.61
+            },
+            {
+              "price": 18.0,
+              "size": 14.1
+            }
+          ]
+        }
+      ],
+      "total_runners": 9,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619915",
+      "market_name": "6f Nov Stks",
+      "venue": "Southwell",
+      "course": "Southwell",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T19:00:00.000Z",
+      "runners": [
+        {
+          "name": "Autumn Affair",
+          "selectionId": 11792903,
+          "odds": 2.68,
+          "trap": "3",
+          "form": "2-",
+          "trainer": "Harry Eustace",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 2.68,
+              "size": 13.93
+            },
+            {
+              "price": 2.64,
+              "size": 12.63
+            },
+            {
+              "price": 2.62,
+              "size": 20.74
+            }
+          ]
+        },
+        {
+          "name": "Marianne Mozart",
+          "selectionId": 79039852,
+          "odds": 3.8,
+          "trap": "2",
+          "form": "5-",
+          "trainer": "I Mohammed",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 3.8,
+              "size": 31.23
+            },
+            {
+              "price": 3.75,
+              "size": 25.25
+            },
+            {
+              "price": 3.6,
+              "size": 20.49
+            }
+          ]
+        },
+        {
+          "name": "Pantheon Princess",
+          "selectionId": 93729865,
+          "odds": 8.8,
+          "trap": "6",
+          "form": "0",
+          "trainer": "J A Osborne",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 8.8,
+              "size": 14.83
+            },
+            {
+              "price": 8.2,
+              "size": 14.34
+            },
+            {
+              "price": 8.0,
+              "size": 11.58
+            }
+          ]
+        },
+        {
+          "name": "Starfinch",
+          "selectionId": 2464982,
+          "odds": 10.0,
+          "trap": "10",
+          "form": "0-",
+          "trainer": "Harry Eustace",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 10.0,
+              "size": 13.2
+            },
+            {
+              "price": 9.6,
+              "size": 16.58
+            },
+            {
+              "price": 9.2,
+              "size": 19.44
+            }
+          ]
+        },
+        {
+          "name": "Love Alive",
+          "selectionId": 68765414,
+          "odds": 17.0,
+          "trap": "4",
+          "form": "8446-",
+          "trainer": "Martin Dunne",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 17.0,
+              "size": 13.83
+            },
+            {
+              "price": 14.0,
+              "size": 17.24
+            },
+            {
+              "price": 13.5,
+              "size": 16.13
+            }
+          ]
+        },
+        {
+          "name": "Sirhana",
+          "selectionId": 92125598,
+          "odds": 17.0,
+          "trap": "9",
+          "form": "7-",
+          "trainer": "R A Fahey",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 17.0,
+              "size": 12.24
+            },
+            {
+              "price": 16.5,
+              "size": 17.32
+            },
+            {
+              "price": 12.0,
+              "size": 39.46
+            }
+          ]
+        },
+        {
+          "name": "Tabby Kat",
+          "selectionId": 42483947,
+          "odds": 17.0,
+          "trap": "11",
+          "form": "65-",
+          "trainer": "Jane Chapple-Hyam",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 17.0,
+              "size": 13.55
+            },
+            {
+              "price": 13.0,
+              "size": 13.45
+            },
+            {
+              "price": 10.0,
+              "size": 22.61
+            }
+          ]
+        },
+        {
+          "name": "Power Of Chora",
+          "selectionId": 91820405,
+          "odds": 30.0,
+          "trap": "7",
+          "form": "57-",
+          "trainer": "Joey Ramsden",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 30.0,
+              "size": 12.55
+            },
+            {
+              "price": 20.0,
+              "size": 12.68
+            },
+            {
+              "price": 16.0,
+              "size": 13.33
+            }
+          ]
+        },
+        {
+          "name": "Thunder Pants",
+          "selectionId": 92058225,
+          "odds": 40.0,
+          "trap": "12",
+          "form": "0",
+          "trainer": "R A Fahey",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 40.0,
+              "size": 13.61
+            },
+            {
+              "price": 23.0,
+              "size": 13.92
+            },
+            {
+              "price": 16.0,
+              "size": 14.43
+            }
+          ]
+        },
+        {
+          "name": "Sequential",
+          "selectionId": 141003,
+          "odds": 44.0,
+          "trap": "8",
+          "form": "0",
+          "trainer": "Martin Dunne",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 44.0,
+              "size": 11.71
+            },
+            {
+              "price": 24.0,
+              "size": 11.66
+            },
+            {
+              "price": 19.0,
+              "size": 19.23
+            }
+          ]
+        },
+        {
+          "name": "Maybe Soon",
+          "selectionId": 93729864,
+          "odds": 29.0,
+          "trap": "5",
+          "form": "0",
+          "trainer": "T P Tate",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 29.0,
+              "size": 15.97
+            },
+            {
+              "price": 19.5,
+              "size": 18.67
+            },
+            {
+              "price": 16.5,
+              "size": 14.11
+            }
+          ]
+        },
+        {
+          "name": "Avalon Mill Mehmas",
+          "selectionId": 92058227,
+          "odds": 80.0,
+          "trap": "1",
+          "form": "6-",
+          "trainer": "N Kent",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 80.0,
+              "size": 11.72
+            },
+            {
+              "price": 28.0,
+              "size": 16.51
+            },
+            {
+              "price": 21.0,
+              "size": 13.6
+            }
+          ]
+        }
+      ],
+      "total_runners": 12,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619921",
+      "market_name": "5f Hcap",
+      "venue": "Southwell",
+      "course": "Southwell",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T19:30:00.000Z",
+      "runners": [
+        {
+          "name": "Ziggys Triton",
+          "selectionId": 71695198,
+          "odds": 4.6,
+          "trap": "3",
+          "form": "34411-2",
+          "trainer": "D O'Meara",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.6,
+              "size": 40.31
+            },
+            {
+              "price": 4.4,
+              "size": 16.99
+            },
+            {
+              "price": 4.3,
+              "size": 23.94
+            }
+          ]
+        },
+        {
+          "name": "Atomic Force",
+          "selectionId": 5504068,
+          "odds": 4.7,
+          "trap": "4",
+          "form": "541/053-",
+          "trainer": "E Bethell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 4.7,
+              "size": 18.15
+            },
+            {
+              "price": 4.6,
+              "size": 18.0
+            },
+            {
+              "price": 4.5,
+              "size": 11.67
+            }
+          ]
+        },
+        {
+          "name": "Paddys Day",
+          "selectionId": 1260203,
+          "odds": 5.3,
+          "trap": "2",
+          "form": "180561-",
+          "trainer": "N Tinkler",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 5.3,
+              "size": 23.31
+            },
+            {
+              "price": 5.2,
+              "size": 35.91
+            },
+            {
+              "price": 5.1,
+              "size": 36.65
+            }
+          ]
+        },
+        {
+          "name": "Fidelius",
+          "selectionId": 32278,
+          "odds": 6.2,
+          "trap": "6",
+          "form": "649153-",
+          "trainer": "R M H Cowell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.2,
+              "size": 54.83
+            },
+            {
+              "price": 5.9,
+              "size": 37.24
+            },
+            {
+              "price": 5.7,
+              "size": 20.6
+            }
+          ]
+        },
+        {
+          "name": "Juan Les Pins",
+          "selectionId": 216060,
+          "odds": 9.0,
+          "trap": "7",
+          "form": "53589-3",
+          "trainer": "M Appleby",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.0,
+              "size": 24.73
+            },
+            {
+              "price": 8.6,
+              "size": 16.65
+            },
+            {
+              "price": 8.2,
+              "size": 25.23
+            }
+          ]
+        },
+        {
+          "name": "Alligator Alley",
+          "selectionId": 267698,
+          "odds": 9.4,
+          "trap": "1",
+          "form": "721113-",
+          "trainer": "Mrs R Carr",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 9.4,
+              "size": 12.66
+            },
+            {
+              "price": 8.8,
+              "size": 12.91
+            },
+            {
+              "price": 8.2,
+              "size": 15.77
+            }
+          ]
+        },
+        {
+          "name": "Spring Is Sprung",
+          "selectionId": 39113756,
+          "odds": 19.0,
+          "trap": "5",
+          "form": "111008-",
+          "trainer": "P T Midgley",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 19.0,
+              "size": 16.26
+            },
+            {
+              "price": 18.0,
+              "size": 15.18
+            },
+            {
+              "price": 13.0,
+              "size": 28.15
+            }
+          ]
+        }
+      ],
+      "total_runners": 7,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252619928",
+      "market_name": "1m4f Hcap",
+      "venue": "Southwell",
+      "course": "Southwell",
+      "competition": "Unknown",
+      "start_time": "2026-01-13T20:00:00.000Z",
+      "runners": [
+        {
+          "name": "Charlies Choice",
+          "selectionId": 59965,
+          "odds": 2.44,
+          "trap": "5",
+          "form": "2422-13",
+          "trainer": "D M Simcock",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 2.44,
+              "size": 20.81
+            },
+            {
+              "price": 2.4,
+              "size": 33.12
+            },
+            {
+              "price": 2.36,
+              "size": 30.09
+            }
+          ]
+        },
+        {
+          "name": "Machete",
+          "selectionId": 389728,
+          "odds": 5.8,
+          "trap": "1",
+          "form": "5/6321-2",
+          "trainer": "D O'Meara",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 5.8,
+              "size": 16.24
+            },
+            {
+              "price": 5.6,
+              "size": 21.98
+            },
+            {
+              "price": 5.4,
+              "size": 20.09
+            }
+          ]
+        },
+        {
+          "name": "Codiak",
+          "selectionId": 86321368,
+          "odds": 5.9,
+          "trap": "3",
+          "form": "42521-",
+          "trainer": "E Bethell",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 5.9,
+              "size": 13.08
+            },
+            {
+              "price": 5.6,
+              "size": 13.0
+            },
+            {
+              "price": 5.5,
+              "size": 14.38
+            }
+          ]
+        },
+        {
+          "name": "Cannon Rock",
+          "selectionId": 49021604,
+          "odds": 6.6,
+          "trap": "2",
+          "form": "784521-",
+          "trainer": "James Owen",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 6.6,
+              "size": 20.94
+            },
+            {
+              "price": 6.2,
+              "size": 22.81
+            },
+            {
+              "price": 6.0,
+              "size": 23.41
+            }
+          ]
+        },
+        {
+          "name": "Robusto",
+          "selectionId": 12960367,
+          "odds": 12.5,
+          "trap": "4",
+          "form": "52595-2",
+          "trainer": "Eve Johnson Houghton",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 12.5,
+              "size": 17.8
+            },
+            {
+              "price": 11.5,
+              "size": 11.9
+            },
+            {
+              "price": 10.0,
+              "size": 54.76
+            }
+          ]
+        },
+        {
+          "name": "Moon Sniper",
+          "selectionId": 69652907,
+          "odds": 16.0,
+          "trap": "6",
+          "form": "018343-",
+          "trainer": "W Muir & C Grassick",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 16.0,
+              "size": 12.39
+            },
+            {
+              "price": 15.0,
+              "size": 21.32
+            },
+            {
+              "price": 14.0,
+              "size": 31.62
+            }
+          ]
+        }
+      ],
+      "total_runners": 6,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252650293",
+      "market_name": "5f Hcap",
+      "venue": "Lingfield",
+      "course": "Lingfield",
+      "competition": "Unknown",
+      "start_time": "2026-01-14T11:55:00.000Z",
+      "runners": [
+        {
+          "name": "Kuiama",
+          "selectionId": 82292363,
+          "odds": 1.1,
+          "trap": "5",
+          "form": "582133-",
+          "trainer": "Dylan Cunha",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 62.66
+            },
+            {
+              "price": 1.03,
+              "size": 1987.33
+            },
+            {
+              "price": 1.02,
+              "size": 5791.35
+            }
+          ]
+        },
+        {
+          "name": "Rosieisme Darling",
+          "selectionId": 89318980,
+          "odds": 1.1,
+          "trap": "1",
+          "form": "07921-4",
+          "trainer": "Hayley Burton",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 63.77
+            },
+            {
+              "price": 1.03,
+              "size": 2111.33
+            },
+            {
+              "price": 1.02,
+              "size": 5791.35
+            }
+          ]
+        },
+        {
+          "name": "Rogue Rebellion",
+          "selectionId": 86203379,
+          "odds": 1.1,
+          "trap": "6",
+          "form": "859-6",
+          "trainer": "James Owen",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 61.88
+            },
+            {
+              "price": 1.03,
+              "size": 2015.33
+            },
+            {
+              "price": 1.02,
+              "size": 5791.35
+            }
+          ]
+        },
+        {
+          "name": "A Lott Of Kane",
+          "selectionId": 87999515,
+          "odds": 1.1,
+          "trap": "7",
+          "form": "0774-",
+          "trainer": "C Banham",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 61.85
+            },
+            {
+              "price": 1.03,
+              "size": 2140.33
+            },
+            {
+              "price": 1.02,
+              "size": 5791.35
+            }
+          ]
+        },
+        {
+          "name": "Havin A Flyer",
+          "selectionId": 84924882,
+          "odds": 1.1,
+          "trap": "3",
+          "form": "355348-",
+          "trainer": "R Menzies",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 65.22
+            },
+            {
+              "price": 1.03,
+              "size": 1968.33
+            },
+            {
+              "price": 1.02,
+              "size": 5791.35
+            }
+          ]
+        },
+        {
+          "name": "He Bangs The Drums",
+          "selectionId": 84080024,
+          "odds": 1.1,
+          "trap": "4",
+          "form": "68965-",
+          "trainer": "A Watson",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 65.39
+            },
+            {
+              "price": 1.03,
+              "size": 1936.33
+            },
+            {
+              "price": 1.02,
+              "size": 5791.35
+            }
+          ]
+        },
+        {
+          "name": "Grand Echo",
+          "selectionId": 82354599,
+          "odds": 1.1,
+          "trap": "2",
+          "form": "83660-0",
+          "trainer": "M D I Usher",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 63.29
+            },
+            {
+              "price": 1.03,
+              "size": 1808.33
+            },
+            {
+              "price": 1.02,
+              "size": 5791.35
+            }
+          ]
+        },
+        {
+          "name": "Dawn Melody",
+          "selectionId": 83952843,
+          "odds": 1.1,
+          "trap": "8",
+          "form": "995508-",
+          "trainer": "R Cook & J Bridger",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 65.32
+            },
+            {
+              "price": 1.03,
+              "size": 1846.33
+            },
+            {
+              "price": 1.02,
+              "size": 5791.35
+            }
+          ]
+        }
+      ],
+      "total_runners": 8,
+      "distance": "WIN",
+      "race_type": "Flat"
+    },
+    {
+      "market_id": "1.252650299",
+      "market_name": "5f Class Stks",
+      "venue": "Lingfield",
+      "course": "Lingfield",
+      "competition": "Unknown",
+      "start_time": "2026-01-14T12:25:00.000Z",
+      "runners": [
+        {
+          "name": "Colors Of Freedom",
+          "selectionId": 49411491,
+          "odds": 1.1,
+          "trap": "1",
+          "form": "63442-2",
+          "trainer": "Joe Ponting",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 62.45
+            },
+            {
+              "price": 1.03,
+              "size": 2007.33
+            },
+            {
+              "price": 1.02,
+              "size": 5779.81
+            }
+          ]
+        },
+        {
+          "name": "Nad Alshiba Snow",
+          "selectionId": 69296696,
+          "odds": 1.1,
+          "trap": "5",
+          "form": "834445-",
+          "trainer": "M Murphy",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 61.71
+            },
+            {
+              "price": 1.03,
+              "size": 2034.33
+            },
+            {
+              "price": 1.02,
+              "size": 5779.81
+            }
+          ]
+        },
+        {
+          "name": "Forest Gunner",
+          "selectionId": 30180,
+          "odds": 1.1,
+          "trap": "3",
+          "form": "1064-65",
+          "trainer": "P D Evans",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 62.01
+            },
+            {
+              "price": 1.03,
+              "size": 2147.33
+            },
+            {
+              "price": 1.02,
+              "size": 5779.81
+            }
+          ]
+        },
+        {
+          "name": "Commendation",
+          "selectionId": 3358853,
+          "odds": 1.1,
+          "trap": "2",
+          "form": "595909-",
+          "trainer": "Martin Dunne",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 63.28
+            },
+            {
+              "price": 1.03,
+              "size": 2039.33
+            },
+            {
+              "price": 1.02,
+              "size": 5779.81
+            }
+          ]
+        },
+        {
+          "name": "Sultan Of Oj",
+          "selectionId": 70641865,
+          "odds": 1.1,
+          "trap": "7",
+          "form": "56862-6",
+          "trainer": "T Faulkner",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 63.38
+            },
+            {
+              "price": 1.03,
+              "size": 2114.33
+            },
+            {
+              "price": 1.02,
+              "size": 5779.81
+            }
+          ]
+        },
+        {
+          "name": "Global Effort",
+          "selectionId": 43843824,
+          "odds": 1.1,
+          "trap": "4",
+          "form": "76078-7",
+          "trainer": "P S McEntee",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 63.3
+            },
+            {
+              "price": 1.03,
+              "size": 1912.33
+            },
+            {
+              "price": 1.02,
+              "size": 5779.81
+            }
+          ]
+        },
+        {
+          "name": "Rogue Endeavour",
+          "selectionId": 69803907,
+          "odds": 1.1,
+          "trap": "6",
+          "form": "066597-",
+          "trainer": "G Harris",
+          "total_matched": 0.0,
+          "market_depth": [
+            {
+              "price": 1.1,
+              "size": 63.42
+            },
+            {
+              "price": 1.03,
+              "size": 2164.33
+            },
+            {
+              "price": 1.02,
+              "size": 5779.81
+            }
+          ]
+        }
+      ],
+      "total_runners": 7,
+      "distance": "WIN",
+      "race_type": "Flat"
+    }
+  ],
+  "total_races": 32
+}

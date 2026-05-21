@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cheltenham Festival 2026 — Strategy Dashboard</title>
+  <style>
+    :root {
+      --gold:    #c9a84c;
+      --gold-lt: #f0d080;
+      --dark:    #0d1117;
+      --dark2:   #161b22;
+      --dark3:   #21262d;
+      --dark4:   #30363d;
+      --green:   #3fb950;
+      --green-dk:#238636;
+      --blue:    #58a6ff;
+      --red:     #f85149;
+      --orange:  #d29922;
+      --purple:  #bc8cff;
+      --muted:   #8b949e;
+      --text:    #e6edf3;
+      --border:  #30363d;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #0d1117 0%, #1a2035 50%, #0d1117 100%);
+      border-bottom: 2px solid var(--gold);
+      padding: 40px 32px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.12) 0%, transparent 70%);
+    }
+    header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 1px;
+      position: relative;
+    }
+    header .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-top: 6px;
+      position: relative;
+    }
+    .badge-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 18px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .badge {
+      background: var(--dark3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .badge.live { border-color: var(--green); color: var(--green); }
+    .badge.gold { border-color: var(--gold); color: var(--gold); }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    @media (max-width: 900px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .blueprint-grid { grid-template-columns: 1fr 1fr !important; }
+    }
+
+    /* ── SECTION HEADINGS ── */
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--dark2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 22px;
+    }
+    .card.gold-border { border-color: var(--gold); }
+    .card.green-border { border-color: var(--green); }
+    .card.blue-border { border-color: var(--blue); }
+    .card.red-border { border-color: var(--red); }
+
+    .card-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .card-value {
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .card-sub { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── STAT GRID ── */
+    .stat-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+    .stat-box {
+      background: var(--dark3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+    }
+    .stat-box .num { font-size: 1.8rem; font-weight: 700; }
+    .stat-box .lbl { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+    .num.gold  { color: var(--gold); }
+    .num.green { color: var(--green); }
+    .num.blue  { color: var(--blue); }
+    .num.orange{ color: var(--orange); }
+    .num.red   { color: var(--red); }
+    .num.purple{ color: var(--purple); }
+
+    /* ── TIER BADGES ── */
+    .tier {
+      display: inline-block;
+      border-radius: 5px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 9px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .tier-betting { background: rgba(63,185,80,0.18); color: var(--green); border: 1px solid var(--green-dk); }
+    .tier-watch   { background: rgba(210,153,34,0.18); color: var(--orange); border: 1px solid var(--orange); }
+    .tier-opinion { background: rgba(88,166,255,0.12); color: var(--blue); border: 1px solid #1f6feb; }
+    .tier-skip    { background: rgba(248,81,73,0.12);  color: var(--red);  border: 1px solid #6e2020; }
+    .tier-aplus   { background: rgba(201,168,76,0.2);  color: var(--gold); border: 1px solid #7d5d1e; }
+
+    /* ── TABLE ── */
+    .picks-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    .picks-table th {
+      background: var(--dark3);
+      color: var(--muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 2px solid var(--border);
+    }
+    .picks-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .picks-table tr:hover td { background: var(--dark3); }
+    .picks-table .day-row td {
+      background: var(--dark3);
+      color: var(--gold);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+    }
+    .horse-name { font-weight: 600; color: var(--text); }
+    .odds { color: var(--orange); font-weight: 600; font-size: 0.8rem; }
+    .score-pill {
+      display: inline-block;
+      min-width: 38px;
+      text-align: center;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .score-aplus  { background: rgba(201,168,76,0.25); color: var(--gold); }
+    .score-a      { background: rgba(201,168,76,0.15); color: var(--gold-lt); }
+    .score-b      { background: rgba(63,185,80,0.15);  color: var(--green); }
+    .score-c      { background: rgba(88,166,255,0.15); color: var(--blue); }
+    .score-d      { background: rgba(139,148,158,0.15);color: var(--muted); }
+
+    /* ── SCORE LEGEND ── */
+    .score-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .legend-item {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 0.78rem; color: var(--muted);
+    }
+    .legend-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── BONUS TABLE ── */
+    .bonus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .bonus-row {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--dark3);
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 0.83rem;
+    }
+    .bonus-pts {
+      font-weight: 700;
+      color: var(--green);
+      font-size: 0.85rem;
+    }
+
+    /* ── WORKFLOW ── */
+    .workflow-step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .workflow-step:last-child { border-bottom: none; }
+    .step-num {
+      width: 28px; height: 28px;
+      background: var(--dark4);
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+    .step-body { flex: 1; }
+    .step-title { font-weight: 600; font-size: 0.9rem; }
+    .step-desc { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    .step-code {
+      display: inline-block;
+      background: var(--dark4);
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--purple);
+      margin-top: 3px;
+    }
+
+    /* ── TIMELINE ── */
+    .timeline { display: flex; gap: 0; margin: 16px 0; }
+    .tl-day {
+      flex: 1;
+      text-align: center;
+      padding: 10px 6px;
+      border-right: 1px solid var(--border);
+      font-size: 0.78rem;
+    }
+    .tl-day:last-child { border-right: none; }
+    .tl-day.active { background: rgba(201,168,76,0.1); border-radius: 8px; }
+    .tl-day .date { color: var(--gold); font-weight: 700; font-size: 0.85rem; }
+    .tl-day .name { color: var(--muted); font-size: 0.7rem; text-transform: uppercase; }
+    .tl-day .races { color: var(--text); font-size: 0.75rem; margin-top: 5px; }
+
+    /* ── ROI TABLE ── */
+    .roi-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    .roi-table th {
+      background: var(--dark3); color: var(--muted);
+      font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 8px 12px; text-align: right; border-bottom: 2px solid var(--border);
+    }
+    .roi-table th:first-child { text-align: left; }
+    .roi-table td {
+      padding: 9px 12px; border-bottom: 1px solid var(--border);
+      text-align: right;
+    }
+    .roi-table td:first-child { text-align: left; font-weight: 600; }
+    .roi-table .total td { color: var(--green); font-weight: 700; background: rgba(63,185,80,0.07); }
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap { background: var(--dark4); border-radius: 20px; height: 8px; margin-top: 8px; overflow: hidden; }
+    .progress-bar  { height: 100%; border-radius: 20px; }
+    .pb-gold   { background: var(--gold); }
+    .pb-green  { background: var(--green); }
+    .pb-blue   { background: var(--blue); }
+    .pb-orange { background: var(--orange); }
+    .pb-red    { background: var(--red); }
+
+    /* ── SKIP LIST ── */
+    .skip-list { display: flex; flex-wrap: wrap; gap: 7px; }
+    .skip-chip {
+      background: rgba(248,81,73,0.1);
+      border: 1px solid rgba(248,81,73,0.3);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 0.74rem;
+      color: var(--red);
+    }
+
+    /* ── NOTES ── */
+    .note {
+      background: rgba(88,166,255,0.08);
+      border-left: 3px solid var(--blue);
+      border-radius: 0 8px 8px 0;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 12px 0;
+    }
+
+    h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 16px; }
+    h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 10px; }
+
+    .spacer { height: 28px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-20 { margin-top: 20px; }
+
+    .runner-count { font-size: 0.73rem; color: var(--muted); }
+    .trainer-name { font-size: 0.78rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <h1>🏆 Cheltenham Festival 2026</h1>
+  <div class="subtitle">Strategy Dashboard · Full System Overview · 10–13 March 2026</div>
+  <div class="badge-row">
+    <span class="badge gold">228 Horses Scored</span>
+    <span class="badge gold">28 Races Analysed</span>
+    <span class="badge live">Daily Automation Active</span>
+    <span class="badge gold">DynamoDB Live · CheltenhamPicks</span>
+    <span class="badge">Updated: 13 March 2026 — Master Combined</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ── HEADLINE STATS ── -->
+  <div class="stat-row">
+    <div class="stat-box"><div class="num green">228</div><div class="lbl">Horses Scored</div></div>
+    <div class="stat-box"><div class="num gold">28</div><div class="lbl">Races Covered</div></div>
+    <div class="stat-box"><div class="num green">16</div><div class="lbl">BETTING_PICK</div></div>
+    <div class="stat-box"><div class="num orange">0</div><div class="lbl">WATCH_LIST</div></div>
+    <div class="stat-box"><div class="num blue">12</div><div class="lbl">OPINION_ONLY</div></div>
+    <div class="stat-box"><div class="num red">21</div><div class="lbl">Races Skipped (No Bet)</div></div>
+  </div>
+
+  <!-- ── FESTIVAL NAPs — TOP 3 PICKS OF THE WEEK ── -->
+  <div style="background:linear-gradient(135deg,#0d1520 0%,#1a0d00 60%,#0d1117 100%);border:2px solid var(--gold);border-radius:12px;padding:28px 32px;margin-bottom:28px;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,0.12) 0%,transparent 65%);pointer-events:none;"></div>
+    <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;position:relative;">⭐ Festival NAPs — Our Highest-Conviction Bets</div>
+    <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:6px;position:relative;">⭐ Festival NAPs — Top 3 Picks of the Week</div>
+    <div style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;position:relative;">Best value bets for personal stakes · Updated 8 March 2026 · Jockey declarations 9 March</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px;position:relative;">
+
+      <!-- #1 Fact To File — NAP #1 BANKER -->
+      <div style="background:linear-gradient(135deg,rgba(201,168,76,0.15) 0%,rgba(63,185,80,0.05) 100%);border:2px solid var(--gold);border-radius:10px;padding:18px 20px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="background:var(--gold);color:#0d1117;font-size:1.1rem;font-weight:900;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+          <div>
+            <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);">Ryanair Chase · Day 3 · Thu 12 Mar</div>
+            <div style="font-size:1.1rem;font-weight:800;color:var(--text);">Fact To File</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <span style="background:rgba(63,185,80,0.15);border:1px solid rgba(63,185,80,0.4);border-radius:6px;padding:2px 8px;font-size:0.75rem;color:var(--green);font-weight:700;">Score: 185</span>
+          <span style="background:rgba(63,185,80,0.15);border:1px solid rgba(63,185,80,0.4);border-radius:6px;padding:2px 8px;font-size:0.75rem;color:var(--green);font-weight:700;">Grade A+ ELITE</span>
+          <span style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);border-radius:6px;padding:2px 8px;font-size:0.75rem;color:var(--gold);font-weight:700;">4/5</span>
+        </div>
+        <div style="font-size:0.8rem;color:var(--muted);line-height:1.5;">
+          <span style="color:var(--green);font-weight:700;">🏆 HIGHEST SCORE IN FESTIVAL</span> — Defending Ryanair champion confirmed staying in the Ryanair (not Gold Cup). Willie Mullins · Paul Townend. Score 185 = top-rated horse across all 28 races. Grade 1 2m5f specialist at Cheltenham.
+        </div>
+        <div style="margin-top:10px;padding:8px 10px;background:rgba(63,185,80,0.1);border-radius:6px;border-left:3px solid var(--green);">
+          <div style="font-size:0.72rem;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">Why He Wins</div>
+          <div style="font-size:0.77rem;color:var(--muted);margin-top:2px;">Defending champion back in same race. Confirmed Mullins/Townend. Score 185 = A+ ELITE — the festival's highest-rated horse. Short price but the system's top conviction bet.</div>
+        </div>
+      </div>
+
+      <!-- #2 Jango Baie — NAP #2 KEY BET -->
+      <div style="background:linear-gradient(135deg,rgba(210,153,34,0.12) 0%,rgba(63,185,80,0.05) 100%);border:2px solid var(--orange);border-radius:10px;padding:18px 20px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="background:var(--orange);color:#0d1117;font-size:1.1rem;font-weight:900;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+          <div>
+            <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);">Cheltenham Gold Cup · Day 4 · Fri 13 Mar</div>
+            <div style="font-size:1.1rem;font-weight:800;color:var(--text);">Jango Baie ★ KEY BET</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <span style="background:rgba(63,185,80,0.15);border:1px solid rgba(63,185,80,0.4);border-radius:6px;padding:2px 8px;font-size:0.75rem;color:var(--green);font-weight:700;">Score: 129</span>
+          <span style="background:rgba(210,153,34,0.2);border:1px solid rgba(210,153,34,0.5);border-radius:6px;padding:2px 8px;font-size:0.75rem;color:var(--orange);font-weight:700;">Narrow Gap: +2</span>
+          <span style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);border-radius:6px;padding:2px 8px;font-size:0.75rem;color:var(--gold);font-weight:700;">—</span>
+        </div>
+        <div style="font-size:0.8rem;color:var(--muted);line-height:1.5;">
+          <span style="color:var(--orange);font-weight:700;">🔵 SYSTEM TOP PICK</span> — Nicky Henderson-trained stayer. Score 129 edges Haiti Couleurs (127) by just 2 pts after trainer rebalance. <strong style="color:var(--green);">Henderson boosted to +18 — best UK trainer on historical data (15% festival WR)</strong>. Narrow margin — treat as watch rather than banker.
+        </div>
+        <div style="margin-top:10px;padding:8px 10px;background:rgba(210,153,34,0.1);border-radius:6px;border-left:3px solid var(--orange);">
+          <div style="font-size:0.72rem;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">Why He Scores</div>
+          <div style="font-size:0.77rem;color:var(--muted);margin-top:2px;">Henderson (15% festival WR, 2× avg) boosted to +18 in rebalance. Gap to Haiti Couleurs is only 2 pts — this is a close-call race. Consider each-way or saver.</div>
+        </div>
+      </div>
+
+      <!-- #3 Lossiemouth — NAP #3 RACE SWITCH -->
+      <div style="background:linear-gradient(135deg,rgba(188,140,255,0.1) 0%,rgba(63,185,80,0.05) 100%);border:2px solid var(--purple);border-radius:10px;padding:18px 20px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="background:var(--purple);color:#0d1117;font-size:1.1rem;font-weight:900;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+          <div>
+            <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--purple);">Unibet Champion Hurdle · Day 1 · Tue 10 Mar</div>
+            <div style="font-size:1.1rem;font-weight:800;color:var(--text);">Lossiemouth ⚡ RACE SWITCH</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <span style="background:rgba(63,185,80,0.15);border:1px solid rgba(63,185,80,0.4);border-radius:6px;padding:2px 8px;font-size:0.75rem;color:var(--green);font-weight:700;">Score: 153</span>
+          <span style="background:rgba(188,140,255,0.2);border:1px solid rgba(188,140,255,0.4);border-radius:6px;padding:2px 8px;font-size:0.75rem;color:var(--purple);font-weight:700;">9/4 Favourite</span>
+          <span style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);border-radius:6px;padding:2px 8px;font-size:0.75rem;color:var(--gold);font-weight:700;">9/4</span>
+        </div>
+        <div style="font-size:0.8rem;color:var(--muted);line-height:1.5;">
+          <span style="color:var(--purple);font-weight:700;">⚡ CONFIRMED SWITCH 08/03</span> — Mullins confirmed move from Mares Hurdle to Champion Hurdle. Wears <strong style="color:var(--text);">cheekpieces for first time</strong>. 2× Mares Hurdle winner stepping up to take on the championship at 9/4 favourite. <strong style="color:var(--green);">Paul Townend confirmed rider.</strong>
+        </div>
+        <div style="margin-top:10px;padding:8px 10px;background:rgba(188,140,255,0.1);border-radius:6px;border-left:3px solid var(--purple);">
+          <div style="font-size:0.72rem;color:var(--purple);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">Why She Wins</div>
+          <div style="font-size:0.77rem;color:var(--muted);margin-top:2px;">Dominant mare taking on the boys. Mullins/Townend confirmed. Market prices her 9/4 — the system agrees she belongs at the top (score 153). Cheekpieces signal Mullins extracting maximum performance.</div>
+        </div>
+      </div>
+
+    </div>
+    <!-- Combined stake note -->
+    <div style="margin-top:16px;padding:12px 16px;background:rgba(201,168,76,0.08);border-radius:8px;border:1px solid rgba(201,168,76,0.25);font-size:0.82rem;display:flex;align-items:center;gap:8px;">
+      <span style="color:var(--gold);font-size:1rem;">💡</span>
+      <span style="color:var(--muted);"><strong style="color:var(--text);">Festival NAPs Staking (Updated 09/03/2026):</strong> NAP #1 Fact To File 2U win @ 4/5 (banker — score 185). NAP #2 Jango Baie 1U e/w (Gold Cup — 2pt gap over Haiti Couleurs, narrow call — Henderson +18 historical). NAP #3 Lossiemouth 1U win @ 9/4 (race switch to Champion Hurdle — Paul Townend confirmed). Run <code style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px;font-size:0.78rem;">python save_cheltenham_picks.py</code> after declarations (9 Mar) to refresh.</span>
+    </div>
+  </div>
+
+  <!-- ── DAY 1 RESULTS — COMPLETE ── -->
+  <div style="background:linear-gradient(135deg,#0d1a0d 0%,#0d1117 100%);border:2px solid var(--green);border-radius:12px;padding:20px 24px;margin-bottom:28px;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(63,185,80,0.06) 0%,transparent 70%);pointer-events:none;"></div>
+    <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:8px;">✅ DAY 1 COMPLETE — Champion Day · Tue 10 Mar 2026</div>
+    <div style="font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:14px;">7 Races Completed · Results Locked in Database</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
+      <div style="background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.35);border-radius:8px;padding:12px 20px;text-align:center;">
+        <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">SureBet</div>
+        <div style="font-size:1.8rem;font-weight:800;color:var(--gold);">40 pts</div>
+      </div>
+      <div style="background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.3);border-radius:8px;padding:12px 20px;text-align:center;">
+        <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">MacFitz</div>
+        <div style="font-size:1.8rem;font-weight:800;color:var(--blue);">28 pts</div>
+      </div>
+      <div style="background:rgba(63,185,80,0.08);border:1px solid rgba(63,185,80,0.25);border-radius:8px;padding:12px 20px;flex:1;min-width:200px;">
+        <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Winners (3/7)</div>
+        <div style="font-size:0.85rem;color:var(--green);font-weight:700;">Old Park Star ✅ · Lossiemouth ✅ · Madara ✅</div>
+      </div>
+    </div>
+    <div style="font-size:0.78rem;color:var(--muted);padding:8px 12px;background:rgba(139,148,158,0.07);border-radius:6px;">📦 Full race data, picks, scores and results retained in DynamoDB for 2027 model training</div>
+  </div>
+
+    <!-- ── PERFECT STORM BANNER ── -->
+  <div style="background:linear-gradient(135deg,#1a2035 0%,#0d1520 60%,#1a1a0d 100%);border:2px solid var(--gold);border-radius:12px;padding:28px 32px;margin-bottom:28px;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(201,168,76,0.07) 0%,transparent 70%);pointer-events:none;"></div>
+    <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">🏆 The Perfect Storm for Our System</div>
+    <div style="font-size:1.35rem;font-weight:700;color:var(--text);margin-bottom:14px;line-height:1.3;">
+      How to Dominate Cheltenham Festival
+    </div>
+    <div style="font-size:0.85rem;color:var(--muted);margin-bottom:18px;">
+      Your validated scoring logic is <em style="color:var(--text);">built</em> for Cheltenham. Every factor we weight heavily is exactly what wins here.
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+      <div style="background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.3);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--green);margin-bottom:4px;">✅ Elite Trainers Dominate</div>
+        <div style="font-size:0.78rem;color:var(--muted);">Mullins/Elliott/Henderson = our <strong style="color:var(--text);">+25 trainer bonus</strong> fires in every Grade 1. They win 60%+ of championship races.</div>
+      </div>
+      <div style="background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.3);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--green);margin-bottom:4px;">✅ Grade 1 Championships</div>
+        <div style="font-size:0.78rem;color:var(--muted);">No novice penalties. Pure quality racing. Our <strong style="color:var(--text);">+10 Grade 1 bonus</strong> + <strong style="color:var(--text);">+25 Festival history</strong> are the top two predictors.</div>
+      </div>
+      <div style="background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.3);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--green);margin-bottom:4px;">✅ Recent Grade 1 Form</div>
+        <div style="font-size:0.78rem;color:var(--muted);">Recent Grade 1 winners get <strong style="color:var(--text);">+12 graded winner</strong> + <strong style="color:var(--text);">+15 form bonus</strong>. Festival form compounds on itself.</div>
+      </div>
+      <div style="background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.3);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--green);margin-bottom:4px;">✅ Heavy March Ground</div>
+        <div style="font-size:0.78rem;color:var(--muted);">March in UK = Soft/Heavy. Irish horses on similar home ground. Our weather and going analysis applies perfectly.</div>
+      </div>
+    </div>
+    <div style="margin-top:18px;padding:12px 16px;background:rgba(201,168,76,0.1);border-radius:8px;border-left:3px solid var(--gold);font-size:0.88rem;">
+      <strong style="color:var(--gold);">"Opinion on ALL — Bet on BEST"</strong>
+      <span style="color:var(--muted);"> · Every race analysed · Only Grade 1 non-handicap races with score ≥ 75 get real money</span>
+    </div>
+  </div>
+
+  <!-- ── HISTORICAL LEARNING — WHY WINNERS WIN ── -->
+  <div style="background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:24px;">
+    <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue);margin-bottom:6px;">📊 Historical Intelligence — 2021–2023 (42 Races Analysed)</div>
+    <div style="font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:14px;">Why Cheltenham Winners Win — Lessons From The Data</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">
+      <div style="background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:14px;">
+        <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);margin-bottom:6px;font-weight:700;">🏆 Trainer Dominance</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--text);">8</div>
+        <div style="font-size:0.75rem;color:var(--muted);">Willie Mullins wins (2021–23)<br><span style="color:var(--gold);">+6 De Bromhead</span> · Irish yards win <strong style="color:var(--text);">~50%</strong></div>
+      </div>
+      <div style="background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:14px;">
+        <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--green);margin-bottom:6px;font-weight:700;">💰 SP Sweet Spot</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--text);">11</div>
+        <div style="font-size:0.75rem;color:var(--muted);">Winners at 2/1–4/1<br><span style="color:var(--green);">Most profitable SP range</span> · 6 winners at 12/1+</div>
+      </div>
+      <div style="background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:14px;">
+        <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);margin-bottom:6px;font-weight:700;">🌧️ Going Preference</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--text);">19</div>
+        <div style="font-size:0.75rem;color:var(--muted);">Winners on Good to Soft<br>+8 on Soft · Cheltenham = <strong style="color:var(--text);">March ground</strong></div>
+      </div>
+      <div style="background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:14px;">
+        <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--orange);margin-bottom:6px;font-weight:700;">⚡ Jockey Stars</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--text);">3+</div>
+        <div style="font-size:0.75rem;color:var(--muted);">Townend · Kennedy · Blackmore · de Boinville<br><span style="color:var(--orange);">3 wins each 2021–23</span></div>
+      </div>
+    </div>
+    <!-- Key lessons -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="padding:10px 14px;background:rgba(63,185,80,0.06);border:1px solid rgba(63,185,80,0.2);border-radius:8px;">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--green);margin-bottom:4px;">✅ LESSON: Back defending champions</div>
+        <div style="font-size:0.77rem;color:var(--muted);">Honeysuckle (Champion Hurdle), Fact To File (Ryanair ×2), Tiger Roll (Cross Country) — <strong style="color:var(--text);">course winners dominate at Cheltenham more than anywhere</strong>. If they won it before, back them again.</div>
+      </div>
+      <div style="padding:10px 14px;background:rgba(63,185,80,0.06);border:1px solid rgba(63,185,80,0.2);border-radius:8px;">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--green);margin-bottom:4px;">✅ LESSON: Short-priced Irish Grade 1 horses</div>
+        <div style="font-size:0.77rem;color:var(--muted);">Appreciate It (8/11), Monkfish (1/4), El Fabiolo (11/10), Constitution Hill (4/11) — <strong style="color:var(--text);">short-priced Irish raiders in Grade 1 races almost always justify favouritism</strong> here.</div>
+      </div>
+      <div style="padding:10px 14px;background:rgba(210,153,34,0.06);border:1px solid rgba(210,153,34,0.2);border-radius:8px;">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--orange);margin-bottom:4px;">⚠️ LESSON: Handicaps produce shock results</div>
+        <div style="font-size:0.77rem;color:var(--muted);">Jeff Kidder 80/1, Heaven Help Us 33/1, Vintage Clouds 28/1 all won handicaps. Our scoring system is <strong style="color:var(--text);">not calibrated for handicaps</strong> — treat handicap selections as OPINION_ONLY regardless of score.</div>
+      </div>
+      <div style="padding:10px 14px;background:rgba(63,185,80,0.06);border:1px solid rgba(63,185,80,0.2);border-radius:8px;">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--green);margin-bottom:4px;">✅ LESSON: Mullins wins with his main jockey</div>
+        <div style="font-size:0.77rem;color:var(--muted);">Every Mullins Grade 1 win came with Townend or Blackmore (retained riders). <strong style="color:var(--text);">When Townend switches off a Mullins horse, that horse's chances drop sharply</strong>. Always verify confirmed ride.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── JOCKEY ANALYSIS — CONFLICTS & REALITY ── -->
+  <div style="background:var(--dark2);border:1px solid rgba(248,81,73,0.35);border-radius:12px;padding:24px 28px;margin-bottom:24px;">
+    <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);margin-bottom:6px;">🏇 Jockey Intelligence — Critical Warning</div>
+    <div style="font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:10px;">Paul Townend Cannot Ride Every Mullins Horse</div>
+    <div style="font-size:0.83rem;color:var(--muted);margin-bottom:16px;">Our scoring system assigns <strong style="color:var(--text);">+20pts for Paul Townend</strong> as a top jockey. Willie Mullins runs 10–15 horses per festival. Townend can only ride ONE per race. Below shows the scoring reality versus confirmed-ride reality.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:14px;">
+      <div style="background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:14px;">
+        <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--gold);margin-bottom:8px;font-weight:700;">Day 1 — Tuesday 10 March</div>
+        <div style="font-size:0.78rem;color:var(--muted);line-height:1.8;">
+          <div><span style="color:var(--green);font-weight:700;">▶ Kopek Des Bordes</span> — Arkle (14:00) <span style="color:var(--gold);">→ Townend likely</span></div>
+          <div><span style="color:var(--green);font-weight:700;">▶ Lossiemouth</span> — Champion Hurdle (16:00) <span style="color:var(--gold);">→ Paul Townend ✔ confirmed</span></div>
+          <div><span style="color:var(--muted);font-size:0.73rem;">↳ Jade De Grugy — Mares Hurdle (Day 4) → Walsh / P.Mullins</span></div>
+        </div>
+      </div>
+      <div style="background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:14px;">
+        <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--gold);margin-bottom:8px;font-weight:700;">Day 2 — Wednesday 11 March</div>
+        <div style="font-size:0.78rem;color:var(--muted);line-height:1.8;">
+          <div><span style="color:var(--green);font-weight:700;">▶ Majborough</span> — QMCC (15:20) <span style="color:var(--gold);">→ Townend likely</span></div>
+          <div><span style="color:var(--muted);">▷ Bambino Fever</span> — Dawn Run (14:40) <span style="color:var(--text);">→ Walsh / P.Mullins</span></div>
+          <div><span style="color:var(--muted);">▷ King Rasko Grey</span> — Ballymore (13:20) <span style="color:var(--text);">→ Walsh / D.Mullins</span></div>
+          <div><span style="color:var(--muted);">▷ Kaid D'Authie</span> — Brown Advisory (14:00) <span style="color:var(--text);">→ Walsh / Mullins</span></div>
+        </div>
+      </div>
+      <div style="background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:14px;">
+        <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--gold);margin-bottom:8px;font-weight:700;">Day 3 — Thursday 12 March</div>
+        <div style="font-size:0.78rem;color:var(--muted);line-height:1.8;">
+          <div><span style="color:var(--green);font-weight:700;">▶ Fact To File</span> — Ryanair (14:40) <span style="color:var(--gold);">→ Townend confirmed</span></div>
+          <div><span style="color:var(--muted);">▷ Teahupoo</span> — Stayers (15:20) <span style="color:var(--text);">→ Jack Kennedy (Elliott)</span></div>
+          <div><span style="color:var(--muted);">▷ Gold Dancer</span> — Jack Richards (16:15) <span style="color:var(--text);">→ Walsh / Mullins</span></div>
+        </div>
+      </div>
+      <div style="background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:14px;">
+        <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--gold);margin-bottom:8px;font-weight:700;">Day 4 — Friday 13 March</div>
+        <div style="font-size:0.78rem;color:var(--muted);line-height:1.8;">
+          <div><span style="color:var(--green);font-weight:700;">▶ Jango Baie</span> — Gold Cup (15:20) <span style="color:var(--gold);">→ Nicky Henderson</span></div>
+          <div><span style="color:var(--muted);">▷ Doctor Steinberg</span> — Albert Bartlett (14:00) <span style="color:var(--text);">→ Walsh / D.Mullins</span></div>
+          <div><span style="color:var(--muted);">▷ Dinoblue</span> — Mares Chase (16:00) <span style="color:var(--text);">→ Walsh / P.Mullins</span></div>
+          <div><span style="color:var(--muted);">▷ Proactif</span> — Triumph (13:20) <span style="color:var(--text);">→ Walsh / D.Mullins</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:10px 14px;background:rgba(248,81,73,0.08);border-radius:8px;border-left:3px solid var(--red);font-size:0.8rem;">
+      <strong style="color:var(--red);">⚠️ Score Inflation Warning:</strong><span style="color:var(--muted);"> Horses not getting Townend will effectively score <strong style="color:var(--text);">~12 points lower</strong> when the confirmed jockey is Mark Walsh (+8) vs Paul Townend (+20). This won't change our race-winner picks, but be aware that the supporting Mullins horses are slightly over-scored in our table. <strong style="color:var(--text);">Always check Racing Post for confirmed jockey bookings before race day.</strong></span>
+    </div>
+  </div>
+
+  <!-- ── STRATEGY OVERVIEW ── -->
+  <div class="section-title">Strategy Overview — 3-Tier System</div>
+
+  <!-- KEY DIFFERENCE BANNER -->
+  <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin-bottom:20px;">
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;">Regular Racing</div>
+      <div style="font-size:1rem;font-weight:600;color:var(--text);">Bet anything <span style="color:var(--orange);">60+</span></div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:4px;">Cast a wider net, more volume</div>
+    </div>
+    <div style="text-align:center;font-size:1.4rem;color:var(--gold);">⚡</div>
+    <div style="background:rgba(201,168,76,0.08);border:2px solid var(--gold);border-radius:10px;padding:16px 20px;">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);margin-bottom:6px;">Cheltenham Festival</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--gold);">ONLY bet Grade 1 at <span style="color:var(--green);">75+</span></div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:4px;">Ultra-selective — quality over quantity</div>
+    </div>
+  </div>
+
+  <!-- 3 TIERS -->
+  <div class="grid-3" style="margin-bottom:20px;">
+
+    <div style="background:rgba(63,185,80,0.06);border:2px solid var(--green-dk);border-radius:10px;padding:20px 22px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="font-size:1.3rem;">🎯</span>
+        <div>
+          <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--green);font-weight:700;">Tier 1</div>
+          <div style="font-size:1rem;font-weight:700;color:var(--text);">BETTING PICKS</div>
+        </div>
+        <span class="tier tier-betting" style="margin-left:auto;">75+ pts</span>
+      </div>
+      <div style="font-size:0.82rem;color:var(--muted);line-height:1.6;">
+        <div style="margin-bottom:6px;"><strong style="color:var(--text);">10–15 total</strong> across 4 days (2–4 per day)</div>
+        <div style="margin-bottom:6px;">Elite connections + Festival history + recent Grade 1 form</div>
+        <div style="margin-bottom:6px;"><strong style="color:var(--text);">Priority races:</strong> Champion Hurdle, Gold Cup, Queen Mother Chase</div>
+        <div style="color:var(--green);font-weight:600;margin-top:10px;">Stakes: £5–£10 per bet</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(210,153,34,0.06);border:2px solid rgba(210,153,34,0.5);border-radius:10px;padding:20px 22px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="font-size:1.3rem;">👀</span>
+        <div>
+          <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--orange);font-weight:700;">Tier 2</div>
+          <div style="font-size:1rem;font-weight:700;color:var(--text);">WATCH LIST</div>
+        </div>
+        <span class="tier tier-watch" style="margin-left:auto;">60–74 pts</span>
+      </div>
+      <div style="font-size:0.82rem;color:var(--muted);line-height:1.6;">
+        <div style="margin-bottom:6px;"><strong style="color:var(--text);">15–20 picks</strong> total across the festival</div>
+        <div style="margin-bottom:6px;">Solid but not elite — worth tracking closely</div>
+        <div style="margin-bottom:6px;">Potential value if odds are big enough</div>
+        <div style="color:var(--orange);font-weight:600;margin-top:10px;">Stakes: £2–£3 if you want action</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(88,166,255,0.06);border:2px solid rgba(88,166,255,0.25);border-radius:10px;padding:20px 22px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="font-size:1.3rem;">📊</span>
+        <div>
+          <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);font-weight:700;">Tier 3</div>
+          <div style="font-size:1rem;font-weight:700;color:var(--text);">OPINION / LEARNING</div>
+        </div>
+        <span class="tier tier-opinion" style="margin-left:auto;">&lt; 60 pts</span>
+      </div>
+      <div style="font-size:0.82rem;color:var(--muted);line-height:1.6;">
+        <div style="margin-bottom:6px;"><strong style="color:var(--text);">60+ horses</strong> — full analysis on all remaining runners</div>
+        <div style="margin-bottom:6px;">Track predictions vs actual outcomes</div>
+        <div style="margin-bottom:6px;">Build Cheltenham-specific patterns for future years</div>
+        <div style="color:var(--blue);font-weight:600;margin-top:10px;">NO BETS — learning only</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 4-DAY BLUEPRINT -->
+  <div class="section-title">4-Day Blueprint</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;">
+
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:16px;border-top:3px solid var(--gold);">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);font-weight:700;margin-bottom:6px;">Day 1 · Tuesday 10 Mar</div>
+      <div style="font-size:0.88rem;font-weight:600;margin-bottom:8px;">Champion Day</div>
+      <div style="font-size:0.78rem;color:var(--muted);line-height:1.7;">
+        🏆 Champion Hurdle<br>
+        ⚔️ Arkle Chase<br>
+        🌸 Mares Hurdle<br>
+        <span style="color:var(--green);font-size:0.73rem;">Focus: Supreme + Arkle novices</span>
+      </div>
+    </div>
+
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:16px;border-top:3px solid var(--gold);">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);font-weight:700;margin-bottom:6px;">Day 2 · Wednesday 11 Mar</div>
+      <div style="font-size:0.88rem;font-weight:600;margin-bottom:8px;">Ladies Day</div>
+      <div style="font-size:0.78rem;color:var(--muted);line-height:1.7;">
+        👑 Queen Mother Champion Chase<br>
+        🥅 Ballymore Novices<br>
+        🏇 Brown Advisory<br>
+        <span style="color:var(--green);font-size:0.73rem;">Focus: QMCC — headline race</span>
+      </div>
+    </div>
+
+    <div style="background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:16px;border-top:3px solid var(--orange);">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--orange);font-weight:700;margin-bottom:6px;">Day 3 · Thursday 12 Mar</div>
+      <div style="font-size:0.88rem;font-weight:600;margin-bottom:8px;">St Patrick's Eve</div>
+      <div style="font-size:0.78rem;color:var(--muted);line-height:1.7;">
+        🦅 Ryanair Chase<br>
+        🔱 Stayers' Hurdle<br>
+        🌺 Dawn Run Mares Novices<br>
+        <span style="color:var(--orange);font-size:0.73rem;">Focus: Fact To File — highest score</span>
+      </div>
+    </div>
+
+    <div style="background:rgba(201,168,76,0.06);border:2px solid var(--gold);border-radius:10px;padding:16px;border-top:3px solid var(--gold);">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);font-weight:700;margin-bottom:6px;">Day 4 · Friday 13 Mar</div>
+      <div style="font-size:0.88rem;font-weight:700;color:var(--gold);margin-bottom:8px;">GOLD CUP DAY 🏆</div>
+      <div style="font-size:0.78rem;color:var(--muted);line-height:1.7;">
+        🥇 Cheltenham Gold Cup<br>
+        🎠 Triumph Hurdle<br>
+        📚 Albert Bartlett<br>
+        <span style="color:var(--gold);font-size:0.73rem;font-weight:600;">Mandatory: bet if score ≥ 75</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- WHAT TO SKIP + BET TIER RULES 2-col -->
+  <div class="grid-2" style="margin-bottom:28px;">
+
+    <div style="background:rgba(248,81,73,0.05);border:1px solid rgba(248,81,73,0.3);border-radius:10px;padding:20px 22px;">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--red);font-weight:700;margin-bottom:12px;">❌ What to SKIP (even with high score)</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:0.84rem;">
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:rgba(248,81,73,0.08);border-radius:6px;">
+          <span style="color:var(--red);">✗</span><span>Handicap Hurdles <span style="color:var(--muted);font-size:0.76rem;">— too unpredictable, big fields</span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:rgba(248,81,73,0.08);border-radius:6px;">
+          <span style="color:var(--red);">✗</span><span>Handicap Chases <span style="color:var(--muted);font-size:0.76rem;">— weights level the field</span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:rgba(248,81,73,0.08);border-radius:6px;">
+          <span style="color:var(--red);">✗</span><span>Amateur / Foxhunter Races <span style="color:var(--muted);font-size:0.76rem;">— rider quality unreliable</span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:rgba(248,81,73,0.08);border-radius:6px;">
+          <span style="color:var(--red);">✗</span><span>Cross Country Chase <span style="color:var(--muted);font-size:0.76rem;">— specialist format only</span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:rgba(248,81,73,0.08);border-radius:6px;">
+          <span style="color:var(--red);">✗</span><span>Conditional Jockeys Races <span style="color:var(--muted);font-size:0.76rem;">— jockey factor unreliable</span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:rgba(248,81,73,0.12);border-radius:6px;border:1px solid rgba(248,81,73,0.3);">
+          <span style="color:var(--red);">✗</span><span><strong>Anything scoring &lt; 75</strong> <span style="color:var(--muted);font-size:0.76rem;">— discipline is the edge!</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Cheltenham Scoring Bonuses Applied</div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px;">These bonuses are <em>on top of</em> the baseline scoring engine, specifically calibrated for Festival conditions:</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--dark3);border-radius:6px;font-size:0.83rem;">
+          <span>Previous Festival winner</span><span style="font-weight:700;color:var(--gold);">+25 pts</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--dark3);border-radius:6px;font-size:0.83rem;">
+          <span>Elite trainer (Mullins/Elliott/Henderson)</span><span style="font-weight:700;color:var(--green);">+25 pts</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--dark3);border-radius:6px;font-size:0.83rem;">
+          <span>Grade 1 winner this season</span><span style="font-weight:700;color:var(--green);">+12 pts</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--dark3);border-radius:6px;font-size:0.83rem;">
+          <span>Grade 1 Championship race context</span><span style="font-weight:700;color:var(--blue);">+10 pts</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--dark3);border-radius:6px;font-size:0.83rem;">
+          <span>Elite Irish raider (top stable)</span><span style="font-weight:700;color:var(--blue);">+8 pts</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--dark3);border-radius:6px;font-size:0.83rem;">
+          <span>Champion jockey</span><span style="font-weight:700;color:var(--muted);">+5 pts</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--dark3);border-radius:6px;font-size:0.83rem;">
+          <span>Trainer + Jockey elite combo</span><span style="font-weight:700;color:var(--green);">+15 pts</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- ── SCORE TIERS ── -->
+  <div class="section-title">Score Tiers &amp; What They Mean</div>
+  <div class="grid-3">
+
+    <div class="card">
+      <div class="card-title">Score Bands</div>
+      <table style="width:100%;font-size:0.83rem;border-collapse:collapse;">
+        <tr>
+          <td style="padding:5px 0;"><span class="score-pill score-aplus">155+</span></td>
+          <td style="padding:5px 8px;font-weight:600;color:var(--gold);">A+ ELITE</td>
+          <td style="padding:5px 0;color:var(--muted);font-size:0.78rem;">Premier favourite, clear pick</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;"><span class="score-pill score-a">140–154</span></td>
+          <td style="padding:5px 8px;font-weight:600;color:var(--gold-lt);">A ELITE</td>
+          <td style="padding:5px 0;color:var(--muted);font-size:0.78rem;">Strong favourite, key chance</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;"><span class="score-pill score-b">120–139</span></td>
+          <td style="padding:5px 8px;font-weight:600;color:var(--green);">B EXCELLENT</td>
+          <td style="padding:5px 0;color:var(--muted);font-size:0.78rem;">Strong chance, good value</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;"><span class="score-pill score-c">100–119</span></td>
+          <td style="padding:5px 8px;font-weight:600;color:var(--blue);">C STRONG</td>
+          <td style="padding:5px 0;color:var(--muted);font-size:0.78rem;">Solid contender</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;"><span class="score-pill score-d">80–99</span></td>
+          <td style="padding:5px 8px;font-weight:600;color:var(--muted);">D FAIR</td>
+          <td style="padding:5px 0;color:var(--muted);font-size:0.78rem;">Outsider, weak case</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;"><span class="score-pill score-d">0–79</span></td>
+          <td style="padding:5px 8px;font-weight:600;color:var(--red);">E WEAK</td>
+          <td style="padding:5px 0;color:var(--muted);font-size:0.78rem;">No realistic case</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Scoring Logic — Base + Bonuses</div>
+      <div style="font-size:0.82rem;margin-bottom:8px;color:var(--muted);">Starting score: <strong style="color:var(--text);">40 pts</strong></div>
+      <div class="bonus-grid">
+        <div class="bonus-row"><span>Mullins / Elliott trainer</span><span class="bonus-pts">+25</span></div>
+        <div class="bonus-row"><span>Elite jockey (Walsh etc)</span><span class="bonus-pts">+20</span></div>
+        <div class="bonus-row"><span>Trainer + Jockey combo</span><span class="bonus-pts">+15</span></div>
+        <div class="bonus-row"><span>Previous Festival win</span><span class="bonus-pts">+25</span></div>
+        <div class="bonus-row"><span>Grade 1 win this season</span><span class="bonus-pts">+12</span></div>
+        <div class="bonus-row"><span>Grade 1 championship race</span><span class="bonus-pts">+10</span></div>
+        <div class="bonus-row"><span>Recent form (1st/2nd)</span><span class="bonus-pts">+15</span></div>
+        <div class="bonus-row"><span>High official rating</span><span class="bonus-pts">+10</span></div>
+        <div class="bonus-row"><span>Irish raider (top stable)</span><span class="bonus-pts">+8</span></div>
+        <div class="bonus-row"><span>Champion jockey</span><span class="bonus-pts">+5</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Why This Scoring Works at Cheltenham</div>
+      <div style="font-size:0.83rem;">
+        <div style="margin-bottom:10px;">
+          <strong style="color:var(--gold);">Elite trainer dominance</strong><br>
+          <span style="color:var(--muted);">Mullins/Elliott/Henderson win 60%+ of championship races. Our +25 trainer bonus reflects 10 years of data.</span>
+        </div>
+        <div style="margin-bottom:10px;">
+          <strong style="color:var(--gold);">Festival form is king</strong><br>
+          <span style="color:var(--muted);">Previous Festival winners have 4× the win rate of debutants. The +25 Festival history bonus is the single biggest predictor.</span>
+        </div>
+        <div style="margin-bottom:10px;">
+          <strong style="color:var(--gold);">Grade 1 only context</strong><br>
+          <span style="color:var(--muted);">No novice penalties. Pure championship racing rewards quality metrics over conditions racing form.</span>
+        </div>
+        <div>
+          <strong style="color:var(--gold);">Heavy March ground</strong><br>
+          <span style="color:var(--muted);">March Cheltenham = Soft/Heavy. Irish horses (trained on similar ground) get the form bonus applied correctly.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+
+  <!-- ── HISTORICAL PATTERNS — WHY WINNERS WIN ── -->
+  <div class="section-title">📊 Why Previous Cheltenham Winners Won — Patterns to 2026</div>
+  <div style="background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:22px 26px;margin-bottom:20px;">
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <div style="border-left:3px solid var(--gold);padding-left:14px;">
+        <div style="font-size:0.86rem;font-weight:700;color:var(--gold);margin-bottom:5px;">Lossiemouth — Champion Hurdle Switch (Score 153) ⚡ Paul Townend confirmed</div>
+        <div style="font-size:0.81rem;color:var(--muted);line-height:1.65;">
+          Won Mares Hurdle 2023, 2024 (8/13f) AND 2025 (4/6f) for Willie Mullins / Paul Townend.
+          <strong style="color:var(--text)">Confirmed declared for Champion Hurdle 2026</strong> — stepping out of the Mares Hurdle for the biggest race on the card.
+          System top pick = Champion Hurdle at 9/4 (score 153, updated 09/03 with Option B reweighting). Paul Townend confirmed rider. Wodhooh takes the Mares Hurdle pick (score 91).
+          Defending 3× Mares Hurdle champion taking on the open Champion Hurdle — fascinating angle.
+          Score: <strong style="color:var(--text)">153</strong> (Champion Hurdle) · clearly top-ranked in that field.
+        </div>
+      </div>
+
+      <div style="border-left:3px solid var(--green);padding-left:14px;">
+        <div style="font-size:0.86rem;font-weight:700;color:var(--green);margin-bottom:5px;">Fact To File — Ryanair Defender (4/5 favourite)</div>
+        <div style="font-size:0.81rem;color:var(--muted);line-height:1.65;">
+          Won 2025 Ryanair Chase at 6/4f for Mullins / Mark Walsh. Defending Grade 1 champions at
+          Cheltenham win ~40% of the time. Highest overall score in the entire Festival at <strong style="color:var(--text)">185 pts</strong>.
+          Gap of +22 pts. No logical reason to oppose at near-odds-on.
+        </div>
+      </div>
+
+      <div style="border-left:3px solid var(--blue);padding-left:14px;">
+        <div style="font-size:0.86rem;font-weight:700;color:var(--blue);margin-bottom:5px;">Kopek Des Bordes — Supreme → Arkle Pattern</div>
+        <div style="font-size:0.81rem;color:var(--muted);line-height:1.65;">
+          Won 2025 Supreme Novices Hurdle (4/6f, Mullins/Townend) and schooled over fences.
+          Classic novice hurdle champion steppping up to novice chase blueprint:
+          Altior (Supreme 2016 → Arkle 2017), Douvan (Supreme 2015 → Arkle 2016), Shishkin (Supreme 2020 → Arkle 2021).
+          Mullins/Townend at 7/4. Score 171, gap +83 pts.
+        </div>
+      </div>
+
+      <div style="border-left:3px solid var(--gold);padding-left:14px;">
+        <div style="font-size:0.86rem;font-weight:700;color:var(--gold);margin-bottom:5px;">Willie Mullins — Festival Domination in Soft Ground</div>
+        <div style="font-size:0.81rem;color:var(--muted);line-height:1.65;">
+          14 winners combined in 2024 + 2025 from Irish yards. 2026 ground confirmed Good to Soft / Soft
+          throughout (locked 6 March 2026). Irish horses trained through soft winter conditions have a massive
+          edge at March Cheltenham. Expect Mullins 7–10 winners again. Any Mullins horse in a Grade 1
+          should receive top priority weighting in your selections.
+        </div>
+      </div>
+
+      <div style="border-left:3px solid var(--green);padding-left:14px;">
+        <div style="font-size:0.86rem;font-weight:700;color:var(--green);margin-bottom:5px;">Inothewayurthinkin — Defending Gold Cup Champion</div>
+        <div style="font-size:0.81rem;color:var(--muted);line-height:1.65;">
+          Won 2024 Kim Muir (13/8f, Gavin Cromwell) then stepped up to win 2025 Gold Cup at 15/2
+          with Mark Walsh. Defending Gold Cup champions have a solid 30%+ return rate.
+          At 8/1 for 2026 — each-way value with top connections. Score 152.
+        </div>
+      </div>
+
+      <div style="border-left:3px solid var(--orange);padding-left:14px;">
+        <div style="font-size:0.86rem;font-weight:700;color:var(--orange);margin-bottom:5px;">2025 Shock Results — Value Always Exists in Cheltenham</div>
+        <div style="font-size:0.81rem;color:var(--muted);line-height:1.65;">
+          2025 produced multiple big-priced winners: <strong style="color:var(--text)">Poniros 100/1</strong> (Triumph, Willie Mullins),
+          <strong style="color:var(--text)">Golden Ace 25/1</strong> (Champion Hurdle, Jeremy Scott),
+          <strong style="color:var(--text)">Wonderwall 28/1</strong> (Hunters Chase),
+          <strong style="color:var(--text)">Doddiethegreat 25/1</strong> (Pertemps Final).
+          In handicaps especially, course specialists at double-figure prices consistently fire.
+          Don't be afraid of runners with Cheltenham form at any price.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- ── GRADE 1 PICKS — DynamoDB SCORED ── -->
+  <div class="section-title">🎯 Grade 1 Best Bets — DynamoDB Scored (2024/2025 History Weighted)</div>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px;">
+
+    <div style="background:rgba(30,30,30,.85);border:1.5px solid var(--green);border-radius:8px;padding:14px 16px;flex:1 1 175px;min-width:160px;max-width:215px;">
+      <div style="color:var(--muted);font-size:.68rem;text-transform:uppercase;margin-bottom:4px">Supreme Novices Hurdle</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text)">Old Park Star</div>
+      <div style="color:var(--green);font-weight:700;font-size:.9rem">—</div>
+      <div style="color:var(--muted);font-size:.75rem">Willie Mullins</div>
+      <div style="color:var(--muted);font-size:.7rem;margin-top:4px">Score: 131 · Gap: +35</div>
+      <div style="color:#666;font-size:.68rem;margin-top:4px">✓ 2025: Kopek Des Bordes (4/6f) — now in Arkle</div>
+    </div>
+
+    <div style="background:rgba(30,30,30,.85);border:1.5px solid var(--green);border-radius:8px;padding:14px 16px;flex:1 1 175px;min-width:160px;max-width:215px;">
+      <div style="color:var(--muted);font-size:.68rem;text-transform:uppercase;margin-bottom:4px">Arkle Challenge Trophy</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text)">Kopek Des Bordes</div>
+      <div style="color:var(--green);font-weight:700;font-size:.9rem">7/4</div>
+      <div style="color:var(--muted);font-size:.75rem">Willie Mullins</div>
+      <div style="color:var(--muted);font-size:.7rem;margin-top:4px">Score: 179 · Gap: +58</div>
+      <div style="color:#666;font-size:.68rem;margin-top:4px">✓ 2025: Jango Baie (5/1)</div>
+    </div>
+
+    <div style="background:rgba(30,30,30,.85);border:1.5px solid var(--green);border-radius:8px;padding:14px 16px;flex:1 1 175px;min-width:160px;max-width:215px;">
+      <div style="color:var(--muted);font-size:.68rem;text-transform:uppercase;margin-bottom:4px">Unibet Champion Hurdle</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text)">Lossiemouth</div>
+      <div style="color:var(--green);font-weight:700;font-size:.9rem">9/4</div>
+      <div style="color:var(--muted);font-size:.75rem">Willie Mullins · Paul Townend</div>
+      <div style="color:var(--muted);font-size:.7rem;margin-top:4px">Score: 184 · Gap: +30</div>
+      <div style="color:#666;font-size:.68rem;margin-top:4px">✓ 3× Mares Hurdle champion — confirmed Champ Hrd · P.Townend</div>
+    </div>
+
+    <div style="background:rgba(30,30,30,.85);border:1.5px solid var(--green);border-radius:8px;padding:14px 16px;flex:1 1 175px;min-width:160px;max-width:215px;">
+      <div style="color:var(--muted);font-size:.68rem;text-transform:uppercase;margin-bottom:4px">Close Brothers Mares Hurdle</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text)">Wodhooh</div>
+      <div style="color:var(--green);font-weight:700;font-size:.9rem">—</div>
+      <div style="color:var(--muted);font-size:.75rem">Willie Mullins</div>
+      <div style="color:var(--muted);font-size:.7rem;margin-top:4px">Score: 105 · Gap: +36</div>
+      <div style="color:#666;font-size:.68rem;margin-top:4px">Lossiemouth confirmed in Champion Hurdle</div>
+    </div>
+
+    <div style="background:rgba(30,30,30,.85);border:1.5px solid var(--green);border-radius:8px;padding:14px 16px;flex:1 1 175px;min-width:160px;max-width:215px;">
+      <div style="color:var(--muted);font-size:.68rem;text-transform:uppercase;margin-bottom:4px">Queen Mother Champion Chase</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text)">Majborough</div>
+      <div style="color:var(--green);font-weight:700;font-size:.9rem">6/4</div>
+      <div style="color:var(--muted);font-size:.75rem">Willie Mullins</div>
+      <div style="color:var(--muted);font-size:.7rem;margin-top:4px">Score: 193 · Gap: +36</div>
+      <div style="color:#666;font-size:.68rem;margin-top:4px">✓ 2024 Triumph winner stepping up</div>
+    </div>
+
+    <div style="background:rgba(30,30,30,.85);border:1.5px solid var(--green);border-radius:8px;padding:14px 16px;flex:1 1 175px;min-width:160px;max-width:215px;">
+      <div style="color:var(--muted);font-size:.68rem;text-transform:uppercase;margin-bottom:4px">Ryanair Chase</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text)">Fact To File</div>
+      <div style="color:var(--green);font-weight:700;font-size:.9rem">4/5</div>
+      <div style="color:var(--muted);font-size:.75rem">Willie Mullins</div>
+      <div style="color:var(--muted);font-size:.7rem;margin-top:4px">Score: 211 · Gap: +29</div>
+      <div style="color:#666;font-size:.68rem;margin-top:4px">✓ 2025: Fact To File (6/4f defender)</div>
+    </div>
+
+    <div style="background:rgba(30,30,30,.85);border:1.5px solid var(--green);border-radius:8px;padding:14px 16px;flex:1 1 175px;min-width:160px;max-width:215px;">
+      <div style="color:var(--muted);font-size:.68rem;text-transform:uppercase;margin-bottom:4px">Turners Novices Chase</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text)">Gold Dancer</div>
+      <div style="color:var(--green);font-weight:700;font-size:.9rem">9/2</div>
+      <div style="color:var(--muted);font-size:.75rem">Willie Mullins</div>
+      <div style="color:var(--muted);font-size:.7rem;margin-top:4px">Score: 125 · Gap: +30</div>
+      <div style="color:#666;font-size:.68rem;margin-top:4px">✓ 2025: Caldwell Potter (7/1)</div>
+    </div>
+
+    <div style="background:rgba(88,166,255,0.08);border:1.5px solid var(--blue);border-radius:8px;padding:14px 16px;flex:1 1 175px;min-width:160px;max-width:215px;">
+      <div style="color:var(--muted);font-size:.68rem;text-transform:uppercase;margin-bottom:4px">Champion Bumper</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text)">Love Sign d'Aunou</div>
+      <div style="color:var(--blue);font-weight:700;font-size:.9rem">9/2</div>
+      <div style="color:var(--muted);font-size:.75rem">Willie Mullins</div>
+      <div style="color:var(--muted);font-size:.7rem;margin-top:4px">Score: 82 · Gap: +13</div>
+      <div style="color:#666;font-size:.68rem;margin-top:4px">MED confidence — watch odds</div>
+    </div>
+
+    <div style="background:rgba(30,30,30,.85);border:1.5px solid var(--green);border-radius:8px;padding:14px 16px;flex:1 1 175px;min-width:160px;max-width:215px;">
+      <div style="color:var(--muted);font-size:.68rem;text-transform:uppercase;margin-bottom:4px">Albert Bartlett Novices Hurdle</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text)">Panda Boy</div>
+      <div style="color:var(--green);font-weight:700;font-size:.9rem">3/1</div>
+      <div style="color:var(--muted);font-size:.75rem">Willie Mullins</div>
+      <div style="color:var(--muted);font-size:.7rem;margin-top:4px">Score: 105 · Gap: +36</div>
+      <div style="color:#666;font-size:.68rem;margin-top:4px">✓ 2025: Jasmin De Vaux (6/1)</div>
+    </div>
+
+    <div style="background:rgba(88,166,255,0.08);border:1.5px solid var(--blue);border-radius:8px;padding:14px 16px;flex:1 1 175px;min-width:160px;max-width:215px;">
+      <div style="color:var(--muted);font-size:.68rem;text-transform:uppercase;margin-bottom:4px">JCB Triumph Hurdle</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text)">Selma De Vary</div>
+      <div style="color:var(--blue);font-weight:700;font-size:.9rem">9/2</div>
+      <div style="color:var(--muted);font-size:.75rem">Willie Mullins</div>
+      <div style="color:var(--muted);font-size:.7rem;margin-top:4px">Score: 102 · Gap: +13</div>
+      <div style="color:#666;font-size:.68rem;margin-top:4px">✓ 2025: Poniros (100/1 shock)</div>
+    </div>
+
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- ── 2024/2025 RESULTS + 2026 PREDICTIONS TABLE ── -->
+  <div class="section-title">📋 All Races — 2024/2025 Actual Results &amp; 2026 Predictions</div>
+  <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px;font-size:.78rem;color:var(--muted);">
+    <span style="display:inline-flex;align-items:center;gap:5px;">
+      <span style="width:9px;height:9px;border-radius:50%;background:var(--green);display:inline-block;"></span> Favourite/short-priced winner
+    </span>
+    <span style="display:inline-flex;align-items:center;gap:5px;">
+      <span style="width:9px;height:9px;border-radius:50%;background:var(--blue);display:inline-block;"></span> Well-backed winner
+    </span>
+    <span style="display:inline-flex;align-items:center;gap:5px;">
+      <span style="width:9px;height:9px;border-radius:50%;background:var(--gold);display:inline-block;"></span> Big-priced upset
+    </span>
+    <span style="display:inline-flex;align-items:center;gap:5px;">
+      <span style="width:9px;height:9px;border-radius:50%;background:var(--green);opacity:.4;display:inline-block;"></span> 2026 Result — TBD (festival 10–13 Mar)
+    </span>
+  </div>
+  <div style="overflow-x:auto;">
+  <table class="picks-table mt-16" style="font-size:0.79rem;">
+    <thead>
+      <tr>
+        <th rowspan="2" style="min-width:180px;">Race</th>
+        <th colspan="2" style="text-align:center;background:#0d2b0d;color:#3fb950;border-left:2px solid #2d5a2d;border-bottom:2px solid #2d5a2d;">✅ Actual Results</th>
+        <th colspan="6" style="text-align:center;background:#0a1929;color:#58a6ff;border-left:2px solid #1a3a5c;border-bottom:2px solid #1a3a5c;">🔮 2026 Predictions</th>
+        <th style="background:#0d2b0d;color:#3fb950;border-left:2px solid #2d5a2d;border-bottom:2px solid #2d5a2d;">2026 Result</th>
+      </tr>
+      <tr>
+        <th style="background:#0d2b0d;color:#3fb950;border-left:2px solid #2d5a2d;">2024 Winner</th>
+        <th style="background:#0d2b0d;color:#3fb950;">2025 Winner</th>
+        <th style="background:#0a1929;color:#58a6ff;border-left:2px solid #1a3a5c;">2026 Pick</th>
+        <th style="background:#0a1929;color:#58a6ff;">Odds</th>
+        <th style="background:#0a1929;color:#58a6ff;">Score</th>
+        <th style="background:#0a1929;color:#58a6ff;">Conf</th>
+        <th style="background:#0a1929;color:#58a6ff;">Trainer</th>
+        <th style="background:#0a1929;color:#58a6ff;">Jockey</th>
+        <th style="background:#0d2b0d;color:#3fb950;border-left:2px solid #2d5a2d;">Actual</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="day-row"><td colspan="10">⚡ DAY 1 — Tue 10 Mar · Champion Day · Going: Good to Soft</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Supreme Novices Hurdle</td><td style="font-size:.78rem"><span style="color:var(--blue);font-weight:600">Slade Steel</span><br><span style="color:#666;font-size:.7rem">7/2 · Henry</span></td><td style="font-size:.78rem"><span style="color:var(--green);font-weight:600">Kopek Des Bordes</span><br><span style="color:#666;font-size:.7rem">4/6f · Willie</span></td><td style="color:var(--green);font-weight:700">Old Park Star</td><td style="color:var(--gold);font-weight:700">—</td><td style="color:var(--green);font-weight:600">131</td><td style="color:var(--green);font-size:.78rem">HIGH (+35)</td><td>Willie Mullins</td><td style="color:var(--muted)">TBC</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Arkle Challenge Trophy</td><td style="font-size:.78rem"><span style="color:var(--blue);font-weight:600">Jango Baie</span><br><span style="color:#666;font-size:.7rem">2/1f · Willie</span></td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Jango Baie</span><br><span style="color:#666;font-size:.7rem">5/1 · Nicky</span></td><td style="color:var(--green);font-weight:700">Kopek Des Bordes</td><td style="color:var(--gold);font-weight:700">7/4</td><td style="color:var(--green);font-weight:600">179</td><td style="color:var(--green);font-size:.78rem">HIGH (+58)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--muted);font-size:.72rem">[G3]</span> Ultima Handicap Chase <span style="color:#666;font-size:.7rem">[skip]</span></td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Chianti Classico</span><br><span style="color:#666;font-size:.7rem">6/1 · Kim</span></td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Myretown</span><br><span style="color:#666;font-size:.7rem">13/2f · Lucinda</span></td><td style="color:var(--green);font-weight:700">Mister Coffey</td><td style="color:var(--gold);font-weight:700">12/1</td><td style="color:var(--gold);font-weight:600">72</td><td style="color:var(--gold);font-size:.78rem">LOW (+6)</td><td>N Henderson</td><td style="color:var(--muted)">James Bowen</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Unibet Champion Hurdle</td><td style="font-size:.78rem"><span style="color:var(--green);font-weight:600">State Man</span><br><span style="color:#666;font-size:.7rem">2/5f · Willie</span></td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Golden Ace</span><br><span style="color:#666;font-size:.7rem">25/1 · Jeremy</span></td><td style="color:var(--green);font-weight:700">Lossiemouth</td><td style="color:var(--gold);font-weight:700">9/4</td><td style="color:var(--green);font-weight:600">184</td><td style="color:var(--green);font-size:.78rem">HIGH (+30)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Close Brothers Mares Hurdle</td><td style="font-size:.78rem"><span style="color:var(--green);font-weight:600">Lossiemouth</span><br><span style="color:#666;font-size:.7rem">8/13f · Willie</span></td><td style="font-size:.78rem"><span style="color:var(--green);font-weight:600">Lossiemouth</span><br><span style="color:#666;font-size:.7rem">4/6f · Willie</span></td><td style="color:var(--green);font-weight:700">Wodhooh</td><td style="color:var(--gold);font-weight:700">—</td><td style="color:var(--green);font-weight:600">86</td><td style="color:var(--green);font-size:.78rem">SOLID (+11)</td><td>Gordon Elliott</td><td style="color:var(--muted)">TBC</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--muted);font-size:.72rem">[G2]</span> National Hunt Chase <span style="color:#666;font-size:.7rem">[skip]</span></td><td style="color:#555;font-size:.75rem">—</td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Haiti Couleurs</span><br><span style="color:#666;font-size:.7rem">7/2jf · Rebecca</span></td><td style="color:var(--green);font-weight:700">Backmersackme</td><td style="color:var(--gold);font-weight:700">9/2</td><td style="color:var(--gold);font-weight:600">47</td><td style="color:var(--gold);font-size:.78rem">LOW (+0)</td><td>H de Bromhead</td><td style="color:var(--muted)">D O'Regan</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+
+      <tr class="day-row"><td colspan="10">⚡ DAY 2 — Wed 11 Mar · Ladies Day · Going: Good to Soft</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Ballymore Novices Hurdle</td><td style="color:#555;font-size:.75rem">—</td><td style="color:#555;font-size:.75rem">—</td><td style="color:var(--green);font-weight:700">Doctor Steinberg</td><td style="color:var(--gold);font-weight:700">3/1</td><td style="color:var(--gold);font-weight:600">93</td><td style="color:var(--gold);font-size:.78rem">LOW (+5)</td><td>Gordon Elliott</td><td style="color:var(--muted)">Jack Kennedy</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Brown Advisory Novices Chase</td><td style="color:#555;font-size:.75rem">—</td><td style="color:#555;font-size:.75rem">—</td><td style="color:var(--green);font-weight:700">Jango Baie</td><td style="color:var(--gold);font-weight:700">5/1</td><td style="color:var(--green);font-weight:600">119</td><td style="color:var(--green);font-size:.78rem">HIGH (+42)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Queen Mother Champion Chase</td><td style="color:#555;font-size:.75rem">—</td><td style="color:#555;font-size:.75rem">—</td><td style="color:var(--green);font-weight:700">Majborough</td><td style="color:var(--gold);font-weight:700">6/4</td><td style="color:var(--green);font-weight:600">138</td><td style="color:var(--green);font-size:.78rem">HIGH (+36)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--muted);font-size:.72rem">[G3]</span> Pertemps Network Final <span style="color:#666;font-size:.7rem">[skip]</span></td><td style="color:#555;font-size:.75rem">—</td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Doddiethegreat</span><br><span style="color:#666;font-size:.7rem">25/1 · Nicky</span></td><td style="color:var(--green);font-weight:700">Minella Crooner</td><td style="color:var(--gold);font-weight:700">10/1</td><td style="color:var(--gold);font-weight:600">39</td><td style="color:var(--gold);font-size:.78rem">LOW (+4)</td><td>J O'Brien</td><td style="color:var(--muted)">Mark Walsh</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--blue);font-size:.72rem">[G2]</span> Dawn Run Mares Novices Hurdle</td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Golden Ace</span><br><span style="color:#666;font-size:.7rem">10/1 · Jeremy</span></td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Air Of Entitlement</span><br><span style="color:#666;font-size:.7rem">16/1 · Henry</span></td><td style="color:var(--green);font-weight:700">Bambino Fever</td><td style="color:var(--gold);font-weight:700">4/5</td><td style="color:var(--green);font-weight:600">110</td><td style="color:var(--green);font-size:.78rem">HIGH (+26)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Champion Bumper</td><td style="color:#555;font-size:.75rem">—</td><td style="color:#555;font-size:.75rem">—</td><td style="color:var(--green);font-weight:700">Love Sign d'Aunou</td><td style="color:var(--gold);font-weight:700">9/2</td><td style="color:var(--blue);font-weight:600">82</td><td style="color:var(--blue);font-size:.78rem">MED (+13)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+
+      <tr class="day-row"><td colspan="10">⚡ DAY 3 — Thu 12 Mar · St Patrick's Day · Going: Good to Soft / Soft</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Turners Novices Chase</td><td style="color:#555;font-size:.75rem">—</td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Caldwell Potter</span><br><span style="color:#666;font-size:.7rem">7/1 · Paul</span></td><td style="color:var(--green);font-weight:700">King Rasko Grey</td><td style="color:var(--gold);font-weight:700">—</td><td style="color:var(--green);font-weight:600">102</td><td style="color:var(--green);font-size:.78rem">SOLID (+7)</td><td>Willie Mullins</td><td style="color:var(--muted)">TBC</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Ryanair Chase</td><td style="color:#555;font-size:.75rem">—</td><td style="font-size:.78rem"><span style="color:var(--green);font-weight:600">Fact To File</span><br><span style="color:#666;font-size:.7rem">6/4f · Willie</span></td><td style="color:var(--green);font-weight:700">Fact To File</td><td style="color:var(--gold);font-weight:700">4/5</td><td style="color:var(--green);font-weight:600">172</td><td style="color:var(--green);font-size:.78rem">HIGH (+29)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Stayers Hurdle</td><td style="color:#555;font-size:.75rem">—</td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Bob Olinger</span><br><span style="color:#666;font-size:.7rem">8/1 · Henry</span></td><td style="color:var(--green);font-weight:700">Ballyburn</td><td style="color:var(--gold);font-weight:700">12/1</td><td style="color:var(--gold);font-weight:600">113</td><td style="color:var(--gold);font-size:.78rem">LOW (+6)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--muted);font-size:.72rem">[G3]</span> Festival Plate Chase <span style="color:#666;font-size:.7rem">[skip]</span></td><td style="color:#555;font-size:.75rem">—</td><td style="font-size:.78rem"><span style="color:var(--blue);font-weight:600">Jagwar</span><br><span style="color:#666;font-size:.7rem">3/1f · Oliver</span></td><td style="color:var(--green);font-weight:700">Jagwar</td><td style="color:var(--gold);font-weight:700">10/1</td><td style="color:var(--gold);font-weight:600">68</td><td style="color:var(--gold);font-size:.78rem">LOW (+0)</td><td>O Greenall</td><td style="color:var(--muted)">Jonjo Jr</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--muted);font-size:.72rem">[G3]</span> Kim Muir Challenge Cup <span style="color:#666;font-size:.7rem">[skip]</span></td><td style="font-size:.78rem"><span style="color:var(--green);font-weight:600">Inothewayurthinkin</span><br><span style="color:#666;font-size:.7rem">13/8f · Gavin</span></td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Daily Present</span><br><span style="color:#666;font-size:.7rem">12/1 · Paul</span></td><td style="color:var(--green);font-weight:700">Inothewayurthinkin</td><td style="color:var(--gold);font-weight:700">3/1</td><td style="color:var(--green);font-weight:600">116</td><td style="color:var(--green);font-size:.78rem">HIGH (+60)</td><td>G Cromwell</td><td style="color:var(--muted)">Derek O'Connor</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--blue);font-size:.72rem">[G2]</span> Mares Chase</td><td style="color:#555;font-size:.75rem">—</td><td style="font-size:.78rem"><span style="color:var(--green);font-weight:600">Dinoblue</span><br><span style="color:#666;font-size:.7rem">6/4 · Willie</span></td><td style="color:var(--green);font-weight:700">Dinoblue</td><td style="color:var(--gold);font-weight:700">4/5</td><td style="color:var(--green);font-weight:600">137</td><td style="color:var(--green);font-size:.78rem">HIGH (+48)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+
+      <tr class="day-row"><td colspan="10">⚡ DAY 4 — Fri 13 Mar · Gold Cup Day · Going: Soft</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> JCB Triumph Hurdle</td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Majborough</span><br><span style="color:#666;font-size:.7rem">6/1 · Willie</span></td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Poniros</span><br><span style="color:#666;font-size:.7rem">100/1 · Willie</span></td><td style="color:var(--green);font-weight:700">Selma De Vary</td><td style="color:var(--gold);font-weight:700">9/2</td><td style="color:var(--blue);font-weight:600">102</td><td style="color:var(--blue);font-size:.78rem">MED (+13)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Albert Bartlett Novices Hurdle</td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Stellar Story</span><br><span style="color:#666;font-size:.7rem">33/1 · Gordon</span></td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Jasmin De Vaux</span><br><span style="color:#666;font-size:.7rem">6/1 · Willie</span></td><td style="color:var(--green);font-weight:700">Panda Boy</td><td style="color:var(--gold);font-weight:700">3/1</td><td style="color:var(--green);font-weight:600">105</td><td style="color:var(--green);font-size:.78rem">HIGH (+36)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Cheltenham Gold Cup</td><td style="font-size:.78rem"><span style="color:var(--green);font-weight:600">Galopin Des Champs</span><br><span style="color:#666;font-size:.7rem">10/11f · Willie</span></td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Inothewayurthinkin</span><br><span style="color:#666;font-size:.7rem">15/2 · Gavin</span></td><td style="color:var(--green);font-weight:700">Inothewayurthinkin</td><td style="color:var(--gold);font-weight:700">8/1</td><td style="color:var(--gold);font-weight:600">152</td><td style="color:var(--gold);font-size:.78rem">LOW (+7)</td><td>G Cromwell</td><td style="color:var(--muted)">Mark Walsh</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--muted);font-size:.72rem">[G3]</span> County Handicap Hurdle <span style="color:#666;font-size:.7rem">[skip]</span></td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Absurde</span><br><span style="color:#666;font-size:.7rem">12/1 · Willie</span></td><td style="font-size:.78rem"><span style="color:var(--blue);font-weight:600">Kargese</span><br><span style="color:#666;font-size:.7rem">3/1 · Willie</span></td><td style="color:var(--green);font-weight:700">Kargese</td><td style="color:var(--gold);font-weight:700">4/1</td><td style="color:var(--green);font-weight:600">127</td><td style="color:var(--green);font-size:.78rem">HIGH (+34)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--muted);font-size:.72rem">[G3]</span> Martin Pipe Conditional Jockeys Hurdle <span style="color:#666;font-size:.7rem">[skip]</span></td><td style="color:#555;font-size:.75rem">—</td><td style="font-size:.78rem"><span style="color:var(--blue);font-weight:600">Wodhooh</span><br><span style="color:#666;font-size:.7rem">9/2 · Gordon</span></td><td style="color:var(--green);font-weight:700">Wodhooh</td><td style="color:var(--gold);font-weight:700">5/1</td><td style="color:var(--gold);font-weight:600">74</td><td style="color:var(--gold);font-size:.78rem">LOW (+0)</td><td>Gordon Elliott</td><td style="color:var(--muted)">Danny Gilligan</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--muted);font-size:.72rem">[G3]</span> Festival Hunters Chase <span style="color:#666;font-size:.7rem">[skip]</span></td><td style="color:#555;font-size:.75rem">—</td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Wonderwall</span><br><span style="color:#666;font-size:.7rem">28/1 · Sam</span></td><td style="color:var(--green);font-weight:700">Wonderwall</td><td style="color:var(--gold);font-weight:700">12/1</td><td style="color:var(--gold);font-weight:600">50</td><td style="color:var(--gold);font-size:.78rem">LOW (+0)</td><td>Sam Curling</td><td style="color:var(--muted)">Rob James</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--muted);font-size:.72rem">[G3]</span> Grand Annual Chase <span style="color:#666;font-size:.7rem">[skip]</span></td><td style="color:#555;font-size:.75rem">—</td><td style="color:#555;font-size:.75rem">—</td><td style="color:var(--green);font-weight:700">Blue Lord</td><td style="color:var(--gold);font-weight:700">7/1</td><td style="color:var(--gold);font-weight:600">88</td><td style="color:var(--gold);font-size:.78rem">LOW (+0)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--muted);font-size:.72rem">[G3]</span> Juvenile Handicap Hurdle <span style="color:#666;font-size:.7rem">[skip]</span></td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Lark In The Mornin</span><br><span style="color:#666;font-size:.7rem">9/1 · Joseph</span></td><td style="font-size:.78rem"><span style="color:var(--gold);font-weight:600">Puturhandstogether</span><br><span style="color:#666;font-size:.7rem">17/2 · Joseph</span></td><td style="color:var(--green);font-weight:700">Proactif</td><td style="color:var(--gold);font-weight:700">6/1</td><td style="color:var(--gold);font-weight:600">40</td><td style="color:var(--gold);font-size:.78rem">LOW (+0)</td><td>F Nicolle</td><td style="color:var(--muted)">Felix De Giles</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 10px"><span style="color:var(--green);font-size:.72rem">[G1]</span> Champion Bumper (NH Flat)</td><td style="color:#555;font-size:.75rem">—</td><td style="color:#555;font-size:.75rem">—</td><td style="color:var(--green);font-weight:700">Love Sign d'Aunou</td><td style="color:var(--gold);font-weight:700">9/2</td><td style="color:var(--blue);font-weight:600">82</td><td style="color:var(--blue);font-size:.78rem">MED (+13)</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td style="color:#555;font-style:italic;font-size:.75rem">TBD</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- ── CURRENT PICKS - TODAY'S DATA ── -->
+  <div class="section-title">Today’s Ranked Picks — Day 2 (Wed 11 March 2026 · Ladies Day)</div>
+  <div class="note">
+    Day 1 (Tue 10 Mar) complete — 7/7 races locked. Below shows Day 2–4 picks (21 races).
+    Live Betfair odds refresh each morning before re-scoring on race days.
+  </div>
+
+  <table class="picks-table mt-16">
+    <thead>
+      <tr>
+        <th>Race</th>
+        <th>Top Pick</th>
+        <th>Score</th>
+        <th>Tier</th>
+        <th>Odds</th>
+        <th>Runners</th>
+        <th>Bet Status</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr style="background:rgba(63,185,80,0.05);">
+        <td colspan="7" style="padding:10px 16px;text-align:center;">
+          <span style="color:var(--green);font-weight:700;">✅ DAY 1 COMPLETE — 7/7 Races Locked</span>
+          &nbsp;·&nbsp; SureBet <strong style="color:var(--gold);">40 pts</strong> · MacFitz <strong style="color:var(--blue);">28 pts</strong>
+          &nbsp;·&nbsp; Winners: <span style="color:var(--green);">Old Park Star · Lossiemouth · Madara</span>
+          &nbsp;·&nbsp; <span style="font-size:0.75rem;color:var(--muted);">Full data in DynamoDB</span>
+        </td>
+      </tr>
+
+      <tr class="day-row"><td colspan="7">⚡ DAY 2 — WEDNESDAY 11 MARCH (Ladies Day)</td></tr>
+      <tr>
+        <td>Coral Cup Handicap Hurdle</td>
+        <td><span class="horse-name">Storm Heart</span><br><span class="trainer-name">Willie Mullins</span></td>
+        <td><span class="score-pill score-c">95</span></td>
+        <td><span class="tier tier-aplus">B EXCELLENT</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">6 runners</td>
+        <td><span class="tier tier-opinion">OPINION_ONLY</span></td>
+      </tr>
+      <tr>
+        <td>Ballymore Novices Hurdle</td>
+        <td><span class="horse-name">King Rasko Grey</span><br><span class="trainer-name">Willie Mullins</span></td>
+        <td><span class="score-pill score-c">102</span></td>
+        <td><span class="tier tier-aplus">A ELITE</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">5 runners</td>
+        <td><span class="tier tier-betting">BETTING_PICK</span></td>
+      </tr>
+      <tr>
+        <td>Brown Advisory Novices Chase</td>
+        <td><span class="horse-name">Kaid D'Authie</span><br><span class="trainer-name">Willie Mullins</span></td>
+        <td><span class="score-pill score-c">110</span></td>
+        <td><span class="tier tier-aplus">C STRONG</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">9 runners</td>
+        <td><span class="tier tier-betting">BETTING_PICK</span></td>
+      </tr>
+      <tr>
+        <td>Queen Mother Champion Chase</td>
+        <td><span class="horse-name">Majborough</span><br><span class="trainer-name">Willie Mullins</span></td>
+        <td><span class="score-pill score-aplus">170</span></td>
+        <td><span class="tier tier-aplus">A+ ELITE</span></td>
+        <td class="odds">6/4</td>
+        <td class="runner-count">8 runners</td>
+        <td><span class="tier tier-betting">BETTING_PICK</span></td>
+      </tr>
+      <tr>
+        <td>Boodles Juvenile Handicap</td>
+        <td><span class="horse-name">Manlaga</span><br><span class="trainer-name">Nicky Henderson</span></td>
+        <td><span class="score-pill score-c">91</span></td>
+        <td><span class="tier tier-aplus">C STRONG</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">5 runners</td>
+        <td><span class="tier tier-opinion">OPINION_ONLY</span></td>
+      </tr>
+      <tr>
+        <td>Turners Novices Chase</td>
+        <td><span class="horse-name">Gold Dancer</span><br><span class="trainer-name">Willie Mullins</span></td>
+        <td><span class="score-pill score-c">97</span></td>
+        <td><span class="tier tier-aplus">C STRONG</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">5 runners</td>
+        <td><span class="tier tier-betting">BETTING_PICK</span></td>
+      </tr>
+      <tr>
+        <td>Glenfarclas Cross Country Chase</td>
+        <td><span class="horse-name">Stumptown</span><br><span class="trainer-name">Gavin Cromwell</span></td>
+        <td><span class="score-pill score-b">133</span></td>
+        <td><span class="tier tier-aplus">B EXCELLENT</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">5 runners</td>
+        <td><span class="tier tier-opinion">OPINION_ONLY</span></td>
+      </tr>
+
+      <tr class="day-row"><td colspan="7">⚡ DAY 3 — THURSDAY 12 MARCH (St Patrick's Day Eve)</td></tr>
+      <tr>
+        <td>Pertemps Final Handicap Hurdle</td>
+        <td><span class="horse-name">Impose Toi</span><br><span class="trainer-name">Nicky Henderson</span></td>
+        <td><span class="score-pill score-c">117</span></td>
+        <td><span class="tier tier-aplus">C STRONG</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">6 runners</td>
+        <td><span class="tier tier-opinion">OPINION_ONLY</span></td>
+      </tr>
+      <tr>
+        <td>Ryanair Chase</td>
+        <td><span class="horse-name">Fact To File</span><br><span class="trainer-name">Willie Mullins</span></td>
+        <td><span class="score-pill score-aplus">185</span></td>
+        <td><span class="tier tier-aplus">A+ ELITE</span></td>
+        <td class="odds">4/5</td>
+        <td class="runner-count">9 runners</td>
+        <td><span class="tier tier-betting">BETTING_PICK</span></td>
+      </tr>
+      <tr>
+        <td>Paddy Power Stayers Hurdle</td>
+        <td><span class="horse-name">Teahupoo</span><br><span class="trainer-name">Gordon Elliott</span></td>
+        <td><span class="score-pill score-aplus">155</span></td>
+        <td><span class="tier tier-aplus">A+ ELITE</span></td>
+        <td class="odds">9/4</td>
+        <td class="runner-count">16 runners</td>
+        <td><span class="tier tier-betting">BETTING_PICK</span></td>
+      </tr>
+      <tr>
+        <td>Dawn Run Mares Novices Hurdle</td>
+        <td><span class="horse-name">Bambino Fever</span><br><span class="trainer-name">Willie Mullins</span></td>
+        <td><span class="score-pill score-aplus">126</span></td>
+        <td><span class="tier tier-aplus">B EXCELLENT</span></td>
+        <td class="odds">4/5</td>
+        <td class="runner-count">4 runners</td>
+        <td><span class="tier tier-betting">BETTING_PICK</span></td>
+      </tr>
+      <tr>
+        <td>Plate Handicap Chase</td>
+        <td><span class="horse-name">Madara</span><br><span class="trainer-name">Dan Skelton</span></td>
+        <td><span class="score-pill score-c">103</span></td>
+        <td><span class="tier tier-aplus">C STRONG</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">5 runners</td>
+        <td><span class="tier tier-opinion">OPINION_ONLY</span></td>
+      </tr>
+      <tr>
+        <td>Martin Pipe Conditional Jockeys</td>
+        <td><span class="horse-name">Nurse Susan</span><br><span class="trainer-name">Dan Skelton</span></td>
+        <td><span class="score-pill score-d">74</span></td>
+        <td><span class="tier tier-aplus" style="background:rgba(139,148,158,0.1);color:var(--muted);border-color:var(--border);">D FAIR</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">6 runners</td>
+        <td><span class="tier tier-opinion">OPINION_ONLY</span></td>
+      </tr>
+
+      <tr class="day-row"><td colspan="7">⚡ DAY 4 — FRIDAY 13 MARCH (Gold Cup Day)</td></tr>
+      <tr>
+        <td>Cheltenham Gold Cup</td>
+        <td><span class="horse-name">Jango Baie</span><br><span class="trainer-name">Nicky Henderson</span></td>
+        <td><span class="score-pill score-c">129</span></td>
+        <td><span class="tier tier-aplus">C STRONG</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">27 runners</td>
+        <td><span class="tier tier-betting">BETTING_PICK</span></td>
+      </tr>
+      <tr>
+        <td>JCB Triumph Hurdle</td>
+        <td><span class="horse-name">Proactif</span><br><span class="trainer-name">Willie Mullins</span></td>
+        <td><span class="score-pill score-c">108</span></td>
+        <td><span class="tier tier-aplus">B EXCELLENT</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">6 runners</td>
+        <td><span class="tier tier-betting">BETTING_PICK</span></td>
+      </tr>
+      <tr>
+        <td>Albert Bartlett Novices Hurdle</td>
+        <td><span class="horse-name">Doctor Steinberg</span><br><span class="trainer-name">Willie Mullins</span></td>
+        <td><span class="score-pill score-aplus">118</span></td>
+        <td><span class="tier tier-aplus">C STRONG</span></td>
+        <td class="odds">3/1</td>
+        <td class="runner-count">6 runners</td>
+        <td><span class="tier tier-betting">BETTING_PICK</span></td>
+      </tr>
+      <tr>
+        <td>County Handicap Hurdle</td>
+        <td><span class="horse-name">Absurde</span><br><span class="trainer-name">Willie Mullins</span></td>
+        <td><span class="score-pill score-d">68</span></td>
+        <td><span class="tier tier-aplus" style="background:rgba(139,148,158,0.1);color:var(--muted);border-color:var(--border);">D FAIR</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">7 runners</td>
+        <td><span class="tier tier-opinion">OPINION_ONLY</span></td>
+      </tr>
+      <tr>
+        <td>Grand Annual Handicap Chase</td>
+        <td><span class="horse-name">Coeur De Lion</span><br><span class="trainer-name">Nicky Henderson</span></td>
+        <td><span class="score-pill score-c">85</span></td>
+        <td><span class="tier tier-aplus">C STRONG</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">6 runners</td>
+        <td><span class="tier tier-opinion">OPINION_ONLY</span></td>
+      </tr>
+      <tr>
+        <td>St James Place Foxhunter Chase</td>
+        <td><span class="horse-name">Chemical Energy</span></td>
+        <td><span class="score-pill score-c">106</span></td>
+        <td><span class="tier tier-aplus">C STRONG</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">6 runners</td>
+        <td><span class="tier tier-opinion">OPINION_ONLY</span></td>
+      </tr>
+      <tr>
+        <td>FBD NH Flat Race</td>
+        <td><span class="horse-name">Keep Him Company</span><br><span class="trainer-name">Gordon Elliott</span></td>
+        <td><span class="score-pill score-c">93</span></td>
+        <td><span class="tier tier-aplus">C STRONG</span></td>
+        <td class="odds">—</td>
+        <td class="runner-count">5 runners</td>
+        <td><span class="tier tier-betting">BETTING_PICK</span></td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <div class="spacer"></div>
+
+
+  <div class="spacer"></div>
+
+  <!-- ── DETAILED FORM ANALYSIS ── -->
+  <div class="section-title">🔬 Detailed Form Analysis — All Races (Score / Form / Gap / Confidence)</div>
+  <div class="note">Scores combine: trainer bonus + jockey bonus + form + rating + going + historical pattern + market confidence.
+  Form column = recent finishes, right = most recent (1=win). Gap = score lead over 2nd-ranked horse in same race.
+  <strong style="color:var(--gold)">ELITE CONFIDENCE = 200+</strong> pts with positive gap — strongest possible signal.</div>
+
+  <table class="picks-table mt-16" style="font-size:0.79rem;">
+    <thead>
+      <tr>
+        <th>Race</th>
+        <th>Top Pick</th>
+        <th>Score</th>
+        <th>Odds</th>
+        <th>Trainer</th>
+        <th>Jockey</th>
+        <th>Form</th>
+        <th>Gap</th>
+        <th>Confidence</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="day-row"><td colspan="9">⚡ DAY 1 — CHAMPION DAY · Tue 10 Mar · Going: Good to Soft</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Supreme Novices Hurdle</td><td style="color:var(--green);font-weight:700">Old Park Star</td><td style="color:var(--green);font-weight:700">139</td><td style="color:var(--gold)">13/2</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td>1</td><td style="color:var(--muted);font-size:0.78rem">+13pts</td><td style="color:var(--blue);font-size:0.75rem">STRONG</td></tr>
+      <tr style="border-bottom:1px solid var(--border);background:rgba(201,168,76,0.04)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Arkle Challenge Trophy</td><td style="color:var(--gold);font-weight:700">Kopek Des Bordes</td><td style="color:var(--gold);font-weight:700">171</td><td style="color:var(--gold)">7/4</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td>1-4-1-11</td><td style="color:var(--muted);font-size:0.78rem">+29pts</td><td style="color:var(--gold);font-size:0.75rem;font-weight:700">ELITE CONFIDENCE</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[H]</span> Ultima Handicap Chase <span style="color:var(--muted);font-size:0.75rem">[skip]</span></td><td style="color:var(--green);font-weight:700">Jagwar</td><td style="color:var(--green);font-weight:700">117</td><td style="color:var(--gold)">40/1</td><td>Gordon Elliott</td><td style="color:var(--muted)">Jack Kennedy</td><td>1-P-1-21</td><td style="color:var(--muted);font-size:0.78rem">(0pts)</td><td style="color:var(--blue);font-size:0.75rem">MODERATE</td></tr>
+      <tr style="border-bottom:1px solid var(--border);background:rgba(201,168,76,0.04)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Champion Hurdle</td><td style="color:var(--gold);font-weight:700">Lossiemouth</td><td style="color:var(--gold);font-weight:700">153</td><td style="color:var(--gold)">9/4</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td>1-1-1-11</td><td style="color:var(--muted);font-size:0.78rem">+30pts</td><td style="color:var(--gold);font-size:0.75rem;font-weight:700">ELITE CONFIDENCE</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Close Brothers Mares Hurdle</td><td style="color:var(--green);font-weight:700">Wodhooh</td><td style="color:var(--green);font-weight:700">86</td><td style="color:var(--gold)">—</td><td>Willie Mullins</td><td style="color:var(--muted)">TBC</td><td>1-1-1</td><td style="color:var(--muted);font-size:0.78rem">+36pts</td><td style="color:var(--green);font-size:0.75rem;font-weight:700">HIGH CONFIDENCE</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G4]</span> National Hunt Chase <span style="color:var(--muted);font-size:0.75rem">[skip]</span></td><td style="color:var(--green);font-weight:700">Backmersackme</td><td style="color:var(--green);font-weight:700">72</td><td style="color:var(--gold)">9/2</td><td>Henry de Bromhead</td><td style="color:var(--muted)">Jack Kennedy</td><td>1-1-1</td><td style="color:var(--muted);font-size:0.78rem">(0pts)</td><td style="color:var(--blue);font-size:0.75rem">LOW</td></tr>
+
+      <tr class="day-row"><td colspan="9">⚡ DAY 2 — LADIES DAY · Wed 11 Mar · Going: Good to Soft / Soft</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Ballymore Novices Hurdle</td><td style="color:var(--green);font-weight:700">King Rasko Grey</td><td style="color:var(--green);font-weight:700">102</td><td style="color:var(--gold)">6/1</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td>1-1-1</td><td style="color:var(--muted);font-size:0.78rem">+14pts</td><td style="color:var(--green);font-size:0.75rem">HIGH CONFIDENCE</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Brown Advisory Novices Chase</td><td style="color:var(--green);font-weight:700">Kaid D'Authie</td><td style="color:var(--green);font-weight:700">110</td><td style="color:var(--gold)">8/1</td><td>Gordon Elliott</td><td style="color:var(--muted)">Jack Kennedy</td><td>2-1-1-31</td><td style="color:var(--muted);font-size:0.78rem">(3pts)</td><td style="color:var(--blue);font-size:0.75rem">SOLID</td></tr>
+      <tr style="border-bottom:1px solid var(--border);background:rgba(201,168,76,0.04)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Queen Mother Champion Chase</td><td style="color:var(--gold);font-weight:700">Majborough</td><td style="color:var(--gold);font-weight:700">170</td><td style="color:var(--gold)">6/4</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td>1-2-3-1</td><td style="color:var(--muted);font-size:0.78rem">+18pts</td><td style="color:var(--gold);font-size:0.75rem;font-weight:700">ELITE CONFIDENCE</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G2]</span> Dawn Run Mares Novices Hurdle</td><td style="color:var(--green);font-weight:700">Bambino Fever</td><td style="color:var(--green);font-weight:700">126</td><td style="color:var(--gold)">4/5</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td>1-1-1</td><td style="color:var(--muted);font-size:0.78rem">+35pts</td><td style="color:var(--green);font-size:0.75rem">HIGH CONFIDENCE</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Champion Bumper</td><td style="color:var(--green);font-weight:700">Keep Him Company</td><td style="color:var(--green);font-weight:700">93</td><td style="color:var(--gold)">9/2</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td>1</td><td style="color:var(--muted);font-size:0.78rem">+22pts</td><td style="color:var(--blue);font-size:0.75rem">STRONG</td></tr>
+
+      <tr class="day-row"><td colspan="9">⚡ DAY 3 — ST PATRICK'S EVE · Thu 12 Mar · Going: Soft</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Turners Novices Chase</td><td style="color:var(--green);font-weight:700">Gold Dancer</td><td style="color:var(--green);font-weight:700">97</td><td style="color:var(--gold)">9/2</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td>1-1-1-22</td><td style="color:var(--muted);font-size:0.78rem">+13pts</td><td style="color:var(--green);font-size:0.75rem">HIGH CONFIDENCE</td></tr>
+      <tr style="border-bottom:1px solid var(--border);background:rgba(201,168,76,0.06)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Ryanair Chase</td><td style="color:var(--gold);font-weight:700;font-size:1rem">Fact To File</td><td style="color:var(--gold);font-weight:700;font-size:1rem">185</td><td style="color:var(--gold)">4/5</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td>1-1-1-11</td><td style="color:var(--muted);font-size:0.78rem">+47pts</td><td style="color:var(--gold);font-size:0.75rem;font-weight:700">ELITE CONFIDENCE ★</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Stayers Hurdle</td><td style="color:var(--green);font-weight:700">Teahupoo</td><td style="color:var(--green);font-weight:700">155</td><td style="color:var(--gold)">12/1</td><td>Willie Mullins</td><td style="color:var(--muted)">Patrick Mullins</td><td>2-1-1-12</td><td style="color:var(--muted);font-size:0.78rem">(3pts)</td><td style="color:var(--green);font-size:0.75rem">HIGH CONFIDENCE</td></tr>
+
+      <tr class="day-row"><td colspan="9">⚡ DAY 4 — GOLD CUP DAY · Fri 13 Mar · Going: Soft / Soft-Heavy (patches)</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> JCB Triumph Hurdle</td><td style="color:var(--green);font-weight:700">Proactif</td><td style="color:var(--green);font-weight:700">108</td><td style="color:var(--gold)">9/2</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td>1-1-1</td><td style="color:var(--muted);font-size:0.78rem">+19pts</td><td style="color:var(--green);font-size:0.75rem">HIGH CONFIDENCE</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Albert Bartlett Novices Hurdle</td><td style="color:var(--green);font-weight:700">Doctor Steinberg</td><td style="color:var(--green);font-weight:700">118</td><td style="color:var(--gold)">3/1</td><td>Willie Mullins</td><td style="color:var(--muted)">Paul Townend</td><td>1-1-1</td><td style="color:var(--muted);font-size:0.78rem">+26pts</td><td style="color:var(--green);font-size:0.75rem">HIGH CONFIDENCE</td></tr>
+      <tr style="border-bottom:1px solid var(--border);background:rgba(201,168,76,0.04)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Cheltenham Gold Cup</td><td style="color:var(--green);font-weight:700">Jango Baie</td><td style="color:var(--green);font-weight:700">129</td><td style="color:var(--gold)">—</td><td>Nicky Henderson</td><td style="color:var(--muted)">TBC</td><td>—</td><td style="color:var(--muted);font-size:0.78rem">+2pts</td><td style="color:var(--blue);font-size:0.75rem">NARROW</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[Hunt]</span> Foxhunter Chase <span style="color:var(--muted);font-size:0.75rem">[skip]</span></td><td style="color:var(--green);font-weight:700">Chemical Energy</td><td style="color:var(--green);font-weight:700">77</td><td style="color:var(--gold)">100/1</td><td>Stephanie Sykes</td><td style="color:var(--muted)">Derek O'Connor</td><td>1-1-2-1</td><td style="color:var(--muted);font-size:0.78rem">(0pts)</td><td style="color:var(--blue);font-size:0.75rem">LOW</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><span style="color:var(--blue);font-size:0.75rem">[G1]</span> Champion Bumper (NH Flat)</td><td style="color:var(--green);font-weight:700">Keep Him Company</td><td style="color:var(--green);font-weight:700">93</td><td style="color:var(--gold)">—</td><td>Gordon Elliott</td><td style="color:var(--muted)">Paul Townend</td><td>1</td><td style="color:var(--muted);font-size:0.78rem">+22pts</td><td style="color:var(--blue);font-size:0.75rem">STRONG</td></tr>
+    </tbody>
+  </table>
+
+
+  <!-- ── GROUND / WEATHER ── -->
+  <div class="section-title">🌧 Going &amp; Weather Forecast — 5–13 March 2026</div>
+
+  <div style="background:rgba(88,166,255,0.06);border:2px solid #1f6feb;border-radius:10px;padding:18px 22px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <span style="font-size:1.1rem;">📡</span>
+      <div style="font-size:0.88rem;font-weight:700;color:var(--blue);">Met Office Live Forecast — Updated 14:28 Thu 5 March 2026</div>
+    </div>
+    <div style="font-size:0.82rem;color:var(--muted);">Source: Met Office UK regional forecast (London &amp; SE England / Gloucestershire). Rain on Fri 6 Mar 60–70% probability begins softening the ground. Festival week (10–13 Mar) = persistent light rain all four days.</div>
+  </div>
+
+  <!-- DAY-BY-DAY FORECAST TABLE -->
+  <div style="overflow-x:auto;margin-bottom:20px;">
+  <table style="width:100%;border-collapse:collapse;font-size:0.82rem;min-width:700px;">
+    <thead>
+      <tr style="background:var(--dark3);">
+        <th style="padding:9px 12px;text-align:left;border-bottom:2px solid var(--border);color:var(--muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;">Date</th>
+        <th style="padding:9px 12px;text-align:left;border-bottom:2px solid var(--border);color:var(--muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;">Conditions</th>
+        <th style="padding:9px 12px;text-align:center;border-bottom:2px solid var(--border);color:var(--muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;">Max °C</th>
+        <th style="padding:9px 12px;text-align:center;border-bottom:2px solid var(--border);color:var(--muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;">Rain %</th>
+        <th style="padding:9px 12px;text-align:left;border-bottom:2px solid var(--border);color:var(--muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;">Ground Impact</th>
+        <th style="padding:9px 12px;text-align:left;border-bottom:2px solid var(--border);color:var(--muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;">Festival</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);font-weight:600;">Thu 5 Mar</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);">☀️ Sunny, mild</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--orange);">18°</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--green);">&lt;5%</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);">Dry — ground currently firm</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.75rem;">Today</td>
+      </tr>
+      <tr style="background:rgba(248,81,73,0.04);">
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);font-weight:600;">Fri 6 Mar</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);">🌧 Light rain (persistent)</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--blue);">13°</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--red);font-weight:700;">60–70%</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--orange);">⚠️ Significant softening begins</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.75rem;">—</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);font-weight:600;">Sat 7 Mar</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);">☁️ Overcast, cloud</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--blue);">13°</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--orange);">30%</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);">Further softening, slow drainage</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.75rem;">—</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);font-weight:600;">Sun 8 Mar</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);">☀️ Sunny day</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--orange);">15°</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--green);">&lt;5%</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);">Brief dry window — some firming</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.75rem;">—</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);font-weight:600;">Mon 9 Mar</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);">🌫 Mist / drizzle</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--blue);">15°</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--orange);">10–15%</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);">Soft patches, going easing</td>
+        <td style="padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.75rem;">Eve of Festival</td>
+      </tr>
+      <tr style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);">
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--gold);">Tue 10 Mar 🏇</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);">🌧 Cloudy, light rain</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--blue);">14°</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--orange);">10–20%</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);">
+          <span style="background:rgba(63,185,80,0.15);color:var(--green);font-weight:700;border-radius:4px;padding:2px 8px;font-size:0.78rem;">Good to Soft</span>
+        </td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--gold);font-weight:600;font-size:0.8rem;">Day 1 · Champion Day</td>
+      </tr>
+      <tr style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);">
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--gold);">Wed 11 Mar 🏇</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);">🌧 Cloudy, light rain</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--blue);">14°</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--orange);">10–30%</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);">
+          <span style="background:rgba(88,166,255,0.15);color:var(--blue);font-weight:700;border-radius:4px;padding:2px 8px;font-size:0.78rem;">Good to Soft / Soft</span>
+        </td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--gold);font-weight:600;font-size:0.8rem;">Day 2 · Ladies Day</td>
+      </tr>
+      <tr style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);">
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--gold);">Thu 12 Mar 🏇</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);">🌧 Light rain</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--blue);">12°</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--red);font-weight:700;">20–40%</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);">
+          <span style="background:rgba(88,166,255,0.2);color:var(--blue);font-weight:700;border-radius:4px;padding:2px 8px;font-size:0.78rem;">Soft</span>
+        </td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--gold);font-weight:600;font-size:0.8rem;">Day 3 · St Patrick's Eve</td>
+      </tr>
+      <tr style="background:rgba(201,168,76,0.08);border-left:3px solid var(--gold);">
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-weight:700;color:var(--gold);">Fri 13 Mar 🏆</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);">🌧 Light rain continuing</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--blue);">11°</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);text-align:center;color:var(--red);font-weight:700;">20–40%</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);">
+          <span style="background:rgba(248,81,73,0.15);color:#f09050;font-weight:700;border-radius:4px;padding:2px 8px;font-size:0.78rem;">Soft / Soft-Heavy (patches)</span>
+        </td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--gold);font-weight:700;font-size:0.8rem;">Day 4 · GOLD CUP DAY</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- GOING IMPACT + SCORE ADJUSTMENTS -->
+  <div class="grid-2" style="margin-bottom:20px;">
+
+    <div style="background:rgba(63,185,80,0.06);border:1px solid rgba(63,185,80,0.3);border-radius:10px;padding:20px 22px;">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--green);font-weight:700;margin-bottom:12px;">✅ Going = BOOSTS Our System</div>
+      <div style="font-size:0.83rem;line-height:1.7;margin-bottom:12px;">
+        Soft/Good-to-Soft ground at Cheltenham is <strong>exactly what our Irish raider bonus is calibrated for.</strong>
+        Mullins and Elliott horses train year-round on similar Tipperary/Meath ground — this is their optimal surface.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;font-size:0.81rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(63,185,80,0.1);border-radius:6px;">
+          <span>Mullins/Elliott Irish horses</span><span style="color:var(--green);font-weight:700;">Confirmed advantage ✓</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(63,185,80,0.1);border-radius:6px;">
+          <span>Previous Festival winners (10yr avg = Soft)</span><span style="color:var(--green);font-weight:700;">Form repeats ✓</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(63,185,80,0.1);border-radius:6px;">
+          <span>Jango Baie — Henderson stable, soft ground handler</span><span style="color:var(--green);font-weight:700;">Gold Cup ✓</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(63,185,80,0.1);border-radius:6px;">
+          <span>Fact To File — soft ground record</span><span style="color:var(--green);font-weight:700;">Ryanair ✓</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(63,185,80,0.1);border-radius:6px;">
+          <span>Lossiemouth — Irish mare, heavy-ground wins</span><span style="color:var(--green);font-weight:700;">Champ Hrd ✓</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(63,185,80,0.1);border-radius:6px;">
+          <span>Teahupoo — Elliott staying hurdler</span><span style="color:var(--green);font-weight:700;">Stayers ✓</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:rgba(248,81,73,0.05);border:1px solid rgba(248,81,73,0.25);border-radius:10px;padding:20px 22px;">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--red);font-weight:700;margin-bottom:12px;">⚠️ Going = WATCH CAREFULLY</div>
+      <div style="font-size:0.83rem;line-height:1.7;margin-bottom:12px;">
+        Some horses in the field historically prefer <strong>Good or better</strong>. On Soft/Heavy they underperform vs our score projection. Flag before betting.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;font-size:0.81rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(248,81,73,0.08);border-radius:6px;">
+          <span>French-trained horses (Proactif — Triumph)</span><span style="color:var(--orange);font-weight:700;">Check form ⚠</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(248,81,73,0.08);border-radius:6px;">
+          <span>Galopin Des Champs — Gold Cup</span><span style="color:var(--orange);font-weight:700;">Prefers Good ⚠</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(248,81,73,0.08);border-radius:6px;">
+          <span>Grey Dawning — Dan Skelton UK-trained</span><span style="color:var(--orange);font-weight:700;">Ground query ⚠</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(248,81,73,0.08);border-radius:6px;">
+          <span>Any fast-ground specialist at 10/1+</span><span style="color:var(--red);font-weight:700;">Swerve ✗</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(248,81,73,0.08);border-radius:6px;">
+          <span>Bumper/NH Flat debutants on heavy</span><span style="color:var(--red);font-weight:700;">Unpredictable ✗</span>
+        </div>
+        <div style="padding:8px 10px;background:rgba(201,168,76,0.1);border-radius:6px;border-left:2px solid var(--gold);">
+          <span style="color:var(--gold);font-weight:600;font-size:0.8rem;">💡 Check racingpost.com going updates morning-of race — ground can change overnight</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- GOING VERDICT BANNER -->
+  <div style="background:linear-gradient(135deg,#0d1520,#1a1a0d);border:2px solid var(--gold);border-radius:10px;padding:18px 24px;margin-bottom:20px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+    <div style="font-size:2rem;">🌧</div>
+    <div style="flex:1;min-width:250px;">
+      <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);font-weight:700;margin-bottom:4px;">Going Verdict — Festival Week</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text);">
+        Day 1: <span style="color:var(--green);">Good to Soft</span> &nbsp;·&nbsp;
+        Day 2: <span style="color:var(--blue);">Good to Soft / Soft</span> &nbsp;·&nbsp;
+        Day 3: <span style="color:var(--blue);">Soft</span> &nbsp;·&nbsp;
+        Day 4 (Gold Cup): <span style="color:#f09050;">Soft / Soft-Heavy</span>
+      </div>
+    </div>
+    <div style="background:rgba(63,185,80,0.12);border:1px solid rgba(63,185,80,0.4);border-radius:8px;padding:10px 16px;text-align:center;">
+      <div style="font-size:0.72rem;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">System Impact</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--green);">POSITIVE</div>
+      <div style="font-size:0.75rem;color:var(--muted);">Irish raiders boosted<br>Our scoring favours soft</div>
+    </div>
+    <div style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.4);border-radius:8px;padding:10px 16px;text-align:center;">
+      <div style="font-size:0.72rem;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">10-yr Cheltenham avg</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--gold);">Soft / G-S</div>
+      <div style="font-size:0.75rem;color:var(--muted);">This year = typical<br>No surprise</div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- ── RACES TO SKIP ── -->
+  <div class="section-title">Races Excluded from Betting (OPINION_ONLY regardless of score)</div>
+  <div class="card">
+    <div style="margin-bottom:10px;font-size:0.82rem;color:var(--muted);">These race types are tracked and ranked but never bet — too unpredictable, specialist format, or amateur rider quality:</div>
+    <div class="skip-list">
+      <span class="skip-chip">Handicap Hurdles</span>
+      <span class="skip-chip">Handicap Chases</span>
+      <span class="skip-chip">Cross Country Chase</span>
+      <span class="skip-chip">Foxhunter Chase</span>
+      <span class="skip-chip">Conditional Jockeys Races</span>
+      <span class="skip-chip">National Hunt Chase</span>
+      <span class="skip-chip">Martin Pipe Hurdle</span>
+      <span class="skip-chip">County Handicap</span>
+      <span class="skip-chip">Grand Annual</span>
+      <span class="skip-chip">Pertemps Final</span>
+      <span class="skip-chip">Coral Cup</span>
+      <span class="skip-chip">Plate Handicap</span>
+      <span class="skip-chip">Boodles Juvenile Handicap</span>
+      <span class="skip-chip">Fred Winter Juvenile Hdcp</span>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- ── AUTOMATION ── -->
+  <div class="section-title">Automation — When It Runs</div>
+
+  <div class="timeline" style="background:var(--dark2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;">
+    <div class="tl-day">
+      <div class="date">5–9 Mar</div>
+      <div class="name">Pre-Festival</div>
+      <div class="races" style="margin-top:6px;">Once/day<br>Score + save<br>all 28 races</div>
+    </div>
+    <div class="tl-day active">
+      <div class="date">10 Mar</div>
+      <div class="name">Day 1 · Tue</div>
+      <div class="races">Morning odds refresh<br>Re-rank all horses<br>7 races</div>
+    </div>
+    <div class="tl-day active">
+      <div class="date">11 Mar</div>
+      <div class="name">Day 2 · Wed</div>
+      <div class="races">Morning odds refresh<br>Re-rank all horses<br>7 races</div>
+    </div>
+    <div class="tl-day active">
+      <div class="date">12 Mar</div>
+      <div class="name">Day 3 · Thu</div>
+      <div class="races">Morning odds refresh<br>Re-rank all horses<br>7 races</div>
+    </div>
+    <div class="tl-day active">
+      <div class="date">13 Mar</div>
+      <div class="name">Day 4 · Fri</div>
+      <div class="races">Gold Cup Day<br>Morning odds refresh<br>7 races</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Daily Workflow Chain</div>
+      <div class="workflow-step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Windows Scheduled Task fires</div>
+          <div class="step-desc">BettingDailyWorkflow / BettingWorkflow_AutoLearning — runs every morning</div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">daily_automated_workflow.py</div>
+          <div class="step-desc">Runs standard picks + learning cycle. Detects Cheltenham window (5–13 Mar)</div>
+          <div class="step-code">python daily_automated_workflow.py</div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">save_cheltenham_picks.py</div>
+          <div class="step-desc">Scores all 228 horses across 28 races. Saves to DynamoDB with full ranked field</div>
+          <div class="step-code">python save_cheltenham_picks.py</div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Live festival days only: Betfair odds refresh</div>
+          <div class="step-desc">Fetches live exchange prices, updates RP_LIVE_ODDS, then re-saves picks with current odds</div>
+          <div class="step-code">python cheltenham_2026_intelligence.py --update-picks</div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">API reads from DynamoDB</div>
+          <div class="step-desc">All ranked data available immediately at /api/cheltenham/picks</div>
+          <div class="step-code">GET /api/cheltenham/picks</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Scoring Engine Stack</div>
+      <table style="width:100%;font-size:0.8rem;border-collapse:collapse;">
+        <tr>
+          <td style="padding:7px 0;border-bottom:1px solid var(--border);font-weight:600;">cheltenham_deep_analysis_2026.py</td>
+          <td style="padding:7px 0;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.75rem;">10-yr data · <code style="color:var(--purple)">score_horse_2026()</code></td>
+        </tr>
+        <tr>
+          <td style="padding:7px 0;border-bottom:1px solid var(--border);font-weight:600;">cheltenham_full_fields_2026.py</td>
+          <td style="padding:7px 0;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.75rem;">228-runner database · <code style="color:var(--purple)">extend_race_entries()</code></td>
+        </tr>
+        <tr>
+          <td style="padding:7px 0;border-bottom:1px solid var(--border);font-weight:600;">barrys/surebet_intel.py</td>
+          <td style="padding:7px 0;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.75rem;">Race builder · <code style="color:var(--purple)">build_all_picks()</code></td>
+        </tr>
+        <tr>
+          <td style="padding:7px 0;border-bottom:1px solid var(--border);font-weight:600;">save_cheltenham_picks.py</td>
+          <td style="padding:7px 0;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.75rem;">Workflow · tiering · DynamoDB save</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 0;border-bottom:1px solid var(--border);font-weight:600;">cheltenham_2026_intelligence.py</td>
+          <td style="padding:7px 0;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.75rem;">Betfair odds · weather · 10yr stats</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 0;font-weight:600;">cheltenham_analyzer.py</td>
+          <td style="padding:7px 0;color:var(--muted);font-size:0.75rem;">TRAINER_STATS / JOCKEY_STATS used by comprehensive_pick_logic</td>
+        </tr>
+      </table>
+      <div class="note mt-16">DynamoDB table: <strong>CheltenhamPicks</strong><br>PK: race_name · SK: pick_date · all_horses field = full ranked list</div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- ── ROI PROJECTIONS ── -->
+  <div class="section-title">Expected Coverage &amp; Target ROI</div>
+
+  <div class="grid-2">
+    <div class="card green-border">
+      <div class="card-title">Conservative Scenario — 40% Strike Rate</div>
+      <table class="roi-table">
+        <thead>
+          <tr><th>Race Type</th><th>Bets</th><th>Winners</th><th>Avg SP</th><th>Stake</th><th>P/L</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>A+/A ELITE picks</td>
+            <td>8</td><td>3</td><td>2.5/1</td><td>£10</td><td style="color:var(--green);">+£50</td>
+          </tr>
+          <tr>
+            <td>B EXCELLENT picks</td>
+            <td>5</td><td>2</td><td>4/1</td><td>£7</td><td style="color:var(--green);">+£49</td>
+          </tr>
+          <tr>
+            <td>C STRONG picks</td>
+            <td>3</td><td>0</td><td>3/1</td><td>£5</td><td style="color:var(--red);">-£15</td>
+          </tr>
+          <tr class="total">
+            <td>TOTAL</td>
+            <td>16</td><td>5</td><td>—</td><td>£126</td><td>+£84</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;">
+        <div style="font-size:0.78rem;color:var(--muted);margin-bottom:4px;">Target ROI</div>
+        <div style="font-size:1.5rem;font-weight:700;color:var(--green);">+67%</div>
+        <div class="progress-wrap"><div class="progress-bar pb-green" style="width:67%"></div></div>
+      </div>
+    </div>
+
+    <div class="card gold-border">
+      <div class="card-title">Optimistic Scenario — 50% Strike Rate</div>
+      <table class="roi-table">
+        <thead>
+          <tr><th>Race Type</th><th>Bets</th><th>Winners</th><th>Avg SP</th><th>Stake</th><th>P/L</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>A+/A ELITE picks</td>
+            <td>8</td><td>4</td><td>2.5/1</td><td>£10</td><td style="color:var(--green);">+£80</td>
+          </tr>
+          <tr>
+            <td>B EXCELLENT picks</td>
+            <td>5</td><td>3</td><td>4/1</td><td>£7</td><td style="color:var(--green);">+£91</td>
+          </tr>
+          <tr>
+            <td>C STRONG picks</td>
+            <td>3</td><td>1</td><td>3/1</td><td>£5</td><td style="color:var(--green);">+£10</td>
+          </tr>
+          <tr class="total">
+            <td>TOTAL</td>
+            <td>16</td><td>8</td><td>—</td><td>£126</td><td>+£181</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;">
+        <div style="font-size:0.78rem;color:var(--muted);margin-bottom:4px;">Target ROI</div>
+        <div style="font-size:1.5rem;font-weight:700;color:var(--gold);">+144%</div>
+        <div class="progress-wrap"><div class="progress-bar pb-gold" style="width:100%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-20">
+    <div class="card">
+      <div class="card-title">Coverage by Bet Tier — Current Picks</div>
+      <div class="grid-4 mt-16">
+        <div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px;">BETTING_PICK races</div>
+          <div style="font-size:1.6rem;font-weight:700;color:var(--green);">16 / 28</div>
+          <div class="progress-wrap"><div class="progress-bar pb-green" style="width:57%"></div></div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">57% race coverage</div>
+        </div>
+        <div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px;">OPINION_ONLY races</div>
+          <div style="font-size:1.6rem;font-weight:700;color:var(--blue);">12 / 28</div>
+          <div class="progress-wrap"><div class="progress-bar pb-blue" style="width:43%"></div></div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">tracked but not bet</div>
+        </div>
+        <div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px;">Horses fully ranked</div>
+          <div style="font-size:1.6rem;font-weight:700;color:var(--gold);">228</div>
+          <div class="progress-wrap"><div class="progress-bar pb-gold" style="width:100%"></div></div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">100% field coverage</div>
+        </div>
+        <div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px;">A+/A ELITE top picks</div>
+          <div style="font-size:1.6rem;font-weight:700;color:var(--purple);">11</div>
+          <div class="progress-wrap"><div class="progress-bar" style="width:70%;background:var(--purple);"></div></div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">score ≥ 140</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- ── KEY A+ PICKS ── -->
+  <div class="section-title">Top Conviction Plays — A+ ELITE (Score 155+)</div>
+  <div class="grid-3">
+
+    <div class="card gold-border">
+      <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px;">Ryanair Chase — Day 3</div>
+      <div style="font-size:1.2rem;font-weight:700;color:var(--gold);">Fact To File</div>
+      <div style="font-size:0.8rem;color:var(--muted);">Willie Mullins</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+        <span class="score-pill score-aplus" style="font-size:1rem;padding:4px 12px;">211</span>
+        <span class="odds" style="font-size:1rem;">4/5</span>
+        <span class="tier tier-betting">BETTING_PICK</span>
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:8px;">Highest score in the entire Festival. Dominant Mullins/jockey combo. Clear field best.</div>
+    </div>
+
+    <div class="card gold-border">
+      <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px;">Queen Mother Champion Chase — Day 2</div>
+      <div style="font-size:1.2rem;font-weight:700;color:var(--gold);">Majborough</div>
+      <div style="font-size:0.8rem;color:var(--muted);">Willie Mullins</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+        <span class="score-pill score-aplus" style="font-size:1rem;padding:4px 12px;">193</span>
+        <span class="odds" style="font-size:1rem;">6/4</span>
+        <span class="tier tier-betting">BETTING_PICK</span>
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:8px;">Joint highest alongside Grand Annual. Two-mile champion chase territory. Elite connections.</div>
+    </div>
+
+    <div class="card gold-border">
+      <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px;">Cheltenham Gold Cup — Day 4</div>
+      <div style="font-size:1.2rem;font-weight:700;color:var(--gold);">Jango Baie</div>
+      <div style="font-size:0.8rem;color:var(--muted);">Willie Mullins</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+        <span class="score-pill score-aplus" style="font-size:1rem;padding:4px 12px;">185</span>
+        <span class="odds" style="font-size:1rem;">6/1</span>
+        <span class="tier tier-betting">BETTING_PICK</span>
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:8px;">Best of 27 declared runners. Mullins Gold Cup machine. Top of the entire Gold Cup field.</div>
+    </div>
+
+    <div class="card gold-border">
+      <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px;">Champion Hurdle — Day 1</div>
+      <div style="font-size:1.2rem;font-weight:700;color:var(--gold);">Lossiemouth</div>
+      <div style="font-size:0.8rem;color:var(--muted);">Willie Mullins</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+        <span class="score-pill score-aplus" style="font-size:1rem;padding:4px 12px;">172</span>
+        <span class="odds" style="font-size:1rem;">2/1</span>
+        <span class="tier tier-betting">BETTING_PICK</span>
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:8px;">Confirmed declared Champion Hurdle 2026. 3× Mares Hurdle champion taking the big step up. Festival history unmatched.</div>
+    </div>
+
+    <div class="card gold-border">
+      <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px;">Stayers Hurdle — Day 3</div>
+      <div style="font-size:1.2rem;font-weight:700;color:var(--gold);">Teahupoo</div>
+      <div style="font-size:0.8rem;color:var(--muted);">Gordon Elliott</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+        <span class="score-pill score-aplus" style="font-size:1rem;padding:4px 12px;">174</span>
+        <span class="odds" style="font-size:1rem;">9/4</span>
+        <span class="tier tier-betting">BETTING_PICK</span>
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:8px;">Elite staying hurdle form. Elliott + top jockey combo. Ranked top of 16 scored runners.</div>
+    </div>
+
+    <div class="card gold-border">
+      <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px;">Arkle Chase — Day 1</div>
+      <div style="font-size:1.2rem;font-weight:700;color:var(--gold);">Kopek Des Bordes</div>
+      <div style="font-size:0.8rem;color:var(--muted);">Willie Mullins</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+        <span class="score-pill score-aplus" style="font-size:1rem;padding:4px 12px;">179</span>
+        <span class="odds" style="font-size:1rem;">7/4</span>
+        <span class="tier tier-betting">BETTING_PICK</span>
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:8px;">Ranked top of 14 Arkle runners. Strong Mullins novice chase profile. Short-enough price.</div>
+    </div>
+
+  </div>
+
+  <div class="spacer"></div>
+
+  <!-- ── FOOTNOTES ── -->
+  <div class="note">
+    <strong>Picks update daily</strong> — odds and runner lists are refreshed each morning from Betfair Exchange and Racing Post data.
+    On race days (10–13 March) the system refetches live exchange prices before re-scoring, so rankings reflect morning-of odds.
+    All data is stored in <strong>DynamoDB / CheltenhamPicks</strong> and served via <strong>/api/cheltenham/picks</strong>.
+  </div>
+  <div class="note" style="margin-top:10px;border-left-color:var(--orange);">
+    <strong>ROI targets are projections only.</strong> Based on 10-year Cheltenham historical win rates for horses matching our elite criteria
+    (Mullins/Elliott/Henderson + Grade 1 form + Festival history). Actual results will vary. Stake responsibly.
+    Recommended max exposure: £80–£120 total across the 4-day festival (£5–£10 per BETTING_PICK).
+  </div>
+
+  <div style="height:40px;"></div>
+  <div style="text-align:center;color:var(--muted);font-size:0.75rem;padding-bottom:32px;">
+    Generated: 8 March 2026 · Cheltenham Festival Master Dashboard · FuturegenAI Betting System · Combined: Strategy + Historical Results + Form Analysis
+  </div>
+
+</div>
+</body>
+</html>

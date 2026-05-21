@@ -1,0 +1,151 @@
+{
+    "apps": [
+        {
+            "appId": "d23o07yt59ollu",
+            "appArn": "arn:aws:amplify:us-east-1:813281204422:apps/d23o07yt59ollu",
+            "name": "Lyvia's MovieMateAI",
+            "tags": {},
+            "platform": "WEB",
+            "createTime": "2025-12-16T19:14:50.409000+00:00",
+            "updateTime": "2025-12-16T19:14:50.409000+00:00",
+            "defaultDomain": "d23o07yt59ollu.amplifyapp.com",
+            "enableBranchAutoBuild": false,
+            "enableBranchAutoDeletion": false,
+            "enableBasicAuth": false,
+            "customRules": [
+                {
+                    "source": "/<*>",
+                    "target": "/index.html",
+                    "status": "404-200"
+                }
+            ],
+            "productionBranch": {
+                "lastDeployTime": "2025-12-16T19:14:56.026000+00:00",
+                "status": "SUCCEED",
+                "branchName": "staging"
+            },
+            "customHeaders": "",
+            "enableAutoBranchCreation": false,
+            "cacheConfig": {
+                "type": "AMPLIFY_MANAGED_NO_COOKIES"
+            },
+            "jobConfig": {
+                "buildComputeType": "STANDARD_8GB"
+            }
+        },
+        {
+            "appId": "d2cp2pfnzl7t60",
+            "appArn": "arn:aws:amplify:us-east-1:813281204422:apps/d2cp2pfnzl7t60",
+            "name": "frontend",
+            "tags": {},
+            "platform": "WEB",
+            "createTime": "2026-05-10T13:47:29.677000+01:00",
+            "updateTime": "2026-05-10T13:47:29.677000+01:00",
+            "environmentVariables": {
+                "_LIVE_PACKAGE_UPDATES": "[{\"pkg\":\"@aws-amplify/cli\",\"type\":\"npm\",\"version\":\"latest\"}]"
+            },
+            "defaultDomain": "d2cp2pfnzl7t60.amplifyapp.com",
+            "enableBranchAutoBuild": false,
+            "enableBranchAutoDeletion": false,
+            "enableBasicAuth": false,
+            "customRules": [],
+            "customHeaders": "",
+            "enableAutoBranchCreation": false,
+            "cacheConfig": {
+                "type": "AMPLIFY_MANAGED_NO_COOKIES"
+            },
+            "jobConfig": {
+                "buildComputeType": "STANDARD_8GB"
+            }
+        },
+        {
+            "appId": "d2r4d9ini3engr",
+            "appArn": "arn:aws:amplify:us-east-1:813281204422:apps/d2r4d9ini3engr",
+            "name": "MovieMateAI",
+            "tags": {},
+            "platform": "WEB",
+            "createTime": "2025-12-17T09:44:14.553000+00:00",
+            "updateTime": "2025-12-17T09:44:14.553000+00:00",
+            "environmentVariables": {
+                "_LIVE_PACKAGE_UPDATES": "[{\"pkg\":\"@aws-amplify/cli\",\"type\":\"npm\",\"version\":\"latest\"}]"
+            },
+            "defaultDomain": "d2r4d9ini3engr.amplifyapp.com",
+            "enableBranchAutoBuild": false,
+            "enableBranchAutoDeletion": false,
+            "enableBasicAuth": false,
+            "customRules": [],
+            "customHeaders": "",
+            "enableAutoBranchCreation": false,
+            "cacheConfig": {
+                "type": "AMPLIFY_MANAGED_NO_COOKIES"
+            },
+            "jobConfig": {
+                "buildComputeType": "STANDARD_8GB"
+            }
+        },
+        {
+            "appId": "d2u43pjwtpmlz9",
+            "appArn": "arn:aws:amplify:us-east-1:813281204422:apps/d2u43pjwtpmlz9",
+            "name": "HealthAI",
+            "tags": {},
+            "repository": "https://github.com/cmccar09/HealthAI",
+            "platform": "WEB",
+            "createTime": "2025-12-15T19:24:29.727000+00:00",
+            "updateTime": "2025-12-15T19:35:51.391000+00:00",
+            "environmentVariables": {
+                "REACT_APP_AWS_ACCESS_KEY_ID": "AKIA32W2WLDDNR2ZHUM6",
+                "REACT_APP_AWS_REGION": "us-east-1",
+                "REACT_APP_AWS_SECRET_ACCESS_KEY": "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"
+            },
+            "defaultDomain": "d2u43pjwtpmlz9.amplifyapp.com",
+            "enableBranchAutoBuild": false,
+            "enableBranchAutoDeletion": false,
+            "enableBasicAuth": false,
+            "customRules": [
+                {
+                    "source": "/<*>",
+                    "target": "/index.html",
+                    "status": "404-200"
+                }
+            ],
+            "productionBranch": {
+                "lastDeployTime": "2026-01-22T11:21:42.697000+00:00",
+                "status": "SUCCEED",
+                "branchName": "master"
+            },
+            "buildSpec": "version: 1\nfrontend:\n  phases:\n    preBuild:\n      commands:\n        - cd frontend\n        - npm install\n    build:\n      commands:\n        - npm run build\n  artifacts:\n    baseDirectory: frontend/build\n    files:\n      - '**/*'\n  cache:\n    paths:\n      - frontend/node_modules/**/*",
+            "customHeaders": "",
+            "enableAutoBranchCreation": false,
+            "repositoryCloneMethod": "TOKEN",
+            "cacheConfig": {
+                "type": "AMPLIFY_MANAGED_NO_COOKIES"
+            },
+            "webhookCreateTime": "2025-12-15T19:24:29.461000+00:00",
+            "jobConfig": {
+                "buildComputeType": "STANDARD_8GB"
+            }
+        },
+        {
+            "appId": "dq1bl6tcd76mm",
+            "appArn": "arn:aws:amplify:us-east-1:813281204422:apps/dq1bl6tcd76mm",
+            "name": "Charlie-Health-AI-Demo",
+            "tags": {},
+            "platform": "WEB",
+            "createTime": "2026-02-12T13:25:29.036000+00:00",
+            "updateTime": "2026-02-12T13:25:29.036000+00:00",
+            "defaultDomain": "dq1bl6tcd76mm.amplifyapp.com",
+            "enableBranchAutoBuild": false,
+            "enableBranchAutoDeletion": false,
+            "enableBasicAuth": false,
+            "customRules": [],
+            "customHeaders": "",
+            "enableAutoBranchCreation": false,
+            "cacheConfig": {
+                "type": "AMPLIFY_MANAGED_NO_COOKIES"
+            },
+            "jobConfig": {
+                "buildComputeType": "STANDARD_8GB"
+            }
+        }
+    ]
+}

@@ -1,0 +1,452 @@
+
+====================================================================================================
+DAILY 3-PICK SELECTION ENGINE
+====================================================================================================
+  Races    : 23
+  Strategy : Best horse per race -> top 3 cross-race bests (min score 85)
+====================================================================================================
+
+Loading horse history from DynamoDB...
+  Horse history loaded: 33 horses tracked in DB
+[Lingfield  2026-03-25T13:52]  9 runners
+
+================================================================================
+WEATHER-BASED GOING INFERENCE (3-Day Rainfall + Seasonal Factor)
+Current Month: March (Seasonal Bias: -3)
+Using weather API inference
+================================================================================
+
+Checking Carlisle (turf) - Weather API...
+  [RAIN] Rainfall: 26.6mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Taunton (turf) - Weather API...
+  [CLOUD] Rainfall: 2.1mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Fairyhouse (turf) - Weather API...
+  [RAIN] Rainfall: 16.4mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Wolverhampton (all-weather) - Weather API...
+  [CLOUD] Rainfall: 4.6mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Kempton (all-weather) - Weather API...
+  [CLOUD] Rainfall: 4.7mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Punchestown (turf) - Weather API...
+  [RAIN] Rainfall: 21.4mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Ludlow (turf) - Weather API...
+  [CLOUD] Rainfall: 3.7mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Newcastle (all-weather) - Weather API...
+  [RAIN] Rainfall: 19.7mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Sedgefield (turf) - Weather API...
+  [RAIN] Rainfall: 14.8mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Ffos Las (turf) - Weather API...
+  [RAIN] Rainfall: 11.2mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Exeter (turf) - Weather API...
+  [CLOUD] Rainfall: 2.9mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Warwick (turf) - Weather API...
+  [CLOUD] Rainfall: 2.5mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Southwell (all-weather) - Weather API...
+  [CLOUD] Rainfall: 4.2mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Dundalk (all-weather) - Weather API...
+  [RAIN] Rainfall: 21.8mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Doncaster (turf) - Weather API...
+  [CLOUD] Rainfall: 8.7mm -> Going: Soft (Score: -4)
+     March typical: softer (-3)
+
+Checking Kelso (turf) - Weather API...
+  [CLOUD] Rainfall: 8.5mm -> Going: Soft (Score: -4)
+     March typical: softer (-3)
+
+Checking Navan (turf) - Weather API...
+  [RAIN] Rainfall: 23.6mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Newbury (turf) - Weather API...
+  [CLOUD] Rainfall: 3.2mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Lingfield (all-weather) - Weather API...
+  [CLOUD] Rainfall: 3.0mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Cheltenham (turf) - Weather API...
+  [CLOUD] Rainfall: 4.1mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Ascot (turf) - Weather API...
+  [CLOUD] Rainfall: 4.8mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Sandown (turf) - Weather API...
+  [CLOUD] Rainfall: 3.1mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Haydock (turf) - Weather API...
+  [RAIN] Rainfall: 25.8mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Leicester (turf) - Weather API...
+  [CLOUD] Rainfall: 4.2mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Leopardstown (turf) - Weather API...
+  [CLOUD] Rainfall: 9.4mm -> Going: Soft (Score: -4)
+     March typical: softer (-3)
+
+Checking Naas (turf) - Weather API...
+  [RAIN] Rainfall: 15.6mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Gowran Park (turf) - Weather API...
+  [CLOUD] Rainfall: 7.2mm -> Going: Soft (Score: -4)
+     March typical: softer (-3)
+
+Checking Thurles (turf) - Weather API...
+  [RAIN] Rainfall: 11.0mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Clonmel (turf) - Weather API...
+  [CLOUD] Rainfall: 8.3mm -> Going: Soft (Score: -4)
+     March typical: softer (-3)
+
+Checking Limerick (turf) - Weather API...
+  [RAIN] Rainfall: 22.6mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Cork (turf) - Weather API...
+  [CLOUD] Rainfall: 4.8mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Galway (turf) - Weather API...
+  [RAIN] Rainfall: 28.9mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Ayr (turf) - Weather API...
+  [RAIN] Rainfall: 16.0mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Musselburgh (turf) - Weather API...
+  [CLOUD] Rainfall: 4.7mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Perth (turf) - Weather API...
+  [CLOUD] Rainfall: 3.2mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Huntingdon (turf) - Weather API...
+  [SUN] Rainfall: 1.8mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Market Rasen (turf) - Weather API...
+  [CLOUD] Rainfall: 6.8mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Wincanton (turf) - Weather API...
+  [CLOUD] Rainfall: 5.2mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Plumpton (turf) - Weather API...
+  [SUN] Rainfall: 1.8mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Fontwell (turf) - Weather API...
+  [CLOUD] Rainfall: 2.1mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Wetherby (turf) - Weather API...
+  [RAIN] Rainfall: 12.4mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Bangor-on-Dee (turf) - Weather API...
+  [CLOUD] Rainfall: 8.5mm -> Going: Soft (Score: -4)
+     March typical: softer (-3)
+
+Checking Stratford (turf) - Weather API...
+  [CLOUD] Rainfall: 3.2mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Worcester (turf) - Weather API...
+  [CLOUD] Rainfall: 2.3mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Hereford (turf) - Weather API...
+  [CLOUD] Rainfall: 2.3mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Chepstow (turf) - Weather API...
+  [CLOUD] Rainfall: 3.9mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+================================================================================
+
+[Lingfield  2026-03-25T14:22]  9 runners
+[Hereford  2026-03-25T14:30]  9 runners
+[Lingfield  2026-03-25T14:52]  8 runners
+[Hereford  2026-03-25T15:00]  6 runners
+[Lingfield  2026-03-25T15:22]  8 runners
+[Hereford  2026-03-25T15:30]  10 runners
+[Lingfield  2026-03-25T15:52]  12 runners
+[Hereford  2026-03-25T16:00]  7 runners
+[Lingfield  2026-03-25T16:22]  12 runners
+[Hereford  2026-03-25T16:30]  8 runners
+[Lingfield  2026-03-25T16:52]  12 runners
+[Kempton  2026-03-25T17:00]  11 runners
+[Hereford  2026-03-25T17:05]  9 runners
+[Lingfield  2026-03-25T17:22]  9 runners
+[Kempton  2026-03-25T17:30]  9 runners
+[Lingfield  2026-03-25T17:52]  12 runners
+[Kempton  2026-03-25T18:00]  9 runners
+[Kempton  2026-03-25T18:30]  11 runners
+[Kempton  2026-03-25T19:00]  9 runners
+[Kempton  2026-03-25T19:30]  8 runners
+[Kempton  2026-03-25T20:00]  5 runners
+[Kempton  2026-03-25T20:30]  6 runners
+
+====================================================================================================
+TOP 1 PICKS SELECTED
+====================================================================================================
+  #1  L'aventara                    @ 3.00  Score:  90  [Hereford  2026-03-25T15:30]
+====================================================================================================
+
+  -  Learning: Kondratiev Wave              @ 2.50  Score:  9
+  -  Learning: Global Warning               @ 3.50  Score:-19
+  -  Learning: Fort Augustus                @ 8.50  Score:-24
+  -  Learning: Alashos                      @15.00  Score:-22
+  -  Learning: Semser                       @19.00  Score:-41
+  -  Learning: Blue Collar Lad              @41.00  Score:-62
+  -  Learning: Raqraaq                      @ 8.00  Score:-39
+  -  Learning: Twitch                       @ 9.50  Score:-41
+  -  Learning: Tilsworth Silver             @151.00  Score:-62
+  -  Learning: Gundogan                     @ 2.62  Score: -7
+  -  Learning: King of The Dance            @ 9.00  Score:-30
+  -  Learning: Havana Club                  @23.00  Score:-52
+  -  Learning: So Chic                      @15.00  Score:-21
+  -  Learning: Manton Road                  @13.00  Score:-34
+  -  Learning: Taskheer                     @ 5.50  Score:-13
+  -  Learning: Tilsworth Max                @ 7.50  Score: -3
+  -  Learning: Miss Moonshine               @11.00  Score:-21
+  -  Learning: Maury                        @ 9.50  Score:-17
+  -  Learning: Fat Sam                      @15.00  Score:-33
+  -  Learning: Chief Black Robe             @ 8.50  Score:-25
+  -  Learning: Line Of Descent              @ 5.50  Score:  9
+  -  Learning: Lelant                       @ 2.25  Score: 25
+  -  Learning: Warner's Cross               @21.00  Score:-24
+  -  Learning: Black Occ                    @10.00  Score:-23
+  -  Learning: Boys Of Wexford              @21.00  Score:-56
+  -  Learning: Ultra Viers                  @15.00  Score:-28
+  -  Learning: Jack Doyen                   @10.00  Score: -5
+  -  Learning: Robbo                        @ 4.50  Score: -3
+  -  Learning: Yaa Min                      @10.00  Score: -3
+  -  Learning: Analogical                   @ 6.50  Score:  7
+  -  Learning: I'd Go Maniac                @10.00  Score:-16
+  -  Learning: Naval Tribute                @ 4.50  Score:  1
+  -  Learning: Tortured Soul                @ 3.75  Score:  2
+  -  Learning: Provision                    @13.00  Score:-26
+  -  Learning: Upepo                        @26.00  Score:-33
+  -  Learning: Chestnut Pete                @ 6.00  Score:-14
+  -  Learning: Blackijo Dagrostis           @ 5.00  Score: -7
+  -  Learning: Ballywood                    @ 3.50  Score: -6
+  -  Learning: McGrath From Clune           @ 8.50  Score: 21
+  -  Learning: Quinta Brigada               @51.00  Score:-47
+  -  Learning: The Brickey Ranger           @ 3.00  Score: 26
+  -  Learning: Thecoffeepoddotco            @ 5.00  Score: 21
+  -  Learning: Calling A Star               @ 5.00  Score: 29
+  -  Learning: Welcome Retreat              @ 6.00  Score: -7
+  -  Learning: Miss Lady Grace              @ 4.00  Score: 14
+  -  Learning: Filly Foden                  @11.00  Score:  9
+  -  Learning: Whiskey Kisses               @ 8.00  Score:  4
+  -  Learning: Autumn Affair                @11.00  Score:-26
+  -  Learning: Space Bear                   @ 4.50  Score:  7
+  -  Learning: Crystal Box                  @26.00  Score:-22
+  -  Learning: Davita Blaze                 @15.00  Score:  8
+  -  Learning: Johnny's Belle               @ 7.50  Score: 42
+  -  Learning: Kernie D'airy                @ 5.00  Score: 50
+  >> PICK #1: L'aventara                   @ 3.00  Score: 90  [Hereford]
+  -  Learning: Svelte Silhouette            @21.00  Score:  5
+  -  Learning: Tierbay                      @21.00  Score:-32
+  -  Learning: Tipperary Star               @11.00  Score: 17
+  -  Learning: Isabella Islay               @ 6.50  Score: 45
+  -  Learning: Millady                      @11.00  Score: 10
+  -  Learning: Arenas Del Tiempo            @11.00  Score:-37
+  -  Learning: Belle Of Kt                  @ 5.00  Score: 14
+  -  Learning: Everest                      @ 8.00  Score:-34
+  -  Learning: Keeper Of Secrets            @17.00  Score:-26
+  -  Learning: Pablo Prince                 @ 5.50  Score:-22
+  -  Learning: Sky Dancer                   @34.00  Score:-74
+  -  Learning: Tara Iti                     @15.00  Score:-45
+  -  Learning: Zooks                        @11.00  Score:-20
+  -  Learning: Beaune                       @ 6.00  Score: 19
+  -  Learning: My O My                      @34.00  Score:-64
+  -  Learning: Nymphaea                     @ 9.00  Score:-20
+  -  Learning: Spaceage Love Song           @11.00  Score:-22
+  -  Learning: Arnie Moon                   @ 7.00  Score:-27
+  -  Learning: Best Night                   @ 1.67  Score: 29
+  -  Learning: Madame De Labrunie           @ 8.00  Score: 17
+  -  Learning: Directly                     @26.00  Score:-57
+  -  Learning: Kotgar                       @15.00  Score:-15
+  -  Learning: Inca                         @15.00  Score:-25
+  -  Learning: Ramaah                       @ 9.00  Score: -8
+  -  Learning: Alex The Great               @17.00  Score:-36
+  -  Learning: Change Of Fortune            @13.00  Score:-36
+  -  Learning: Dotties Star                 @ 6.50  Score:-29
+  -  Learning: Foinix                       @13.00  Score:-18
+  -  Learning: Gearing's Point              @ 7.00  Score:-39
+  -  Learning: Onlyriversrunfree            @11.00  Score:-34
+  -  Learning: Paps Of Jura                 @17.00  Score:-26
+  -  Learning: Saachi                       @ 4.00  Score: 12
+  -  Learning: Tatmeen                      @ 9.00  Score:-28
+  -  Learning: Warrior Lion                 @11.00  Score:-36
+  -  Learning: Ignition                     @11.00  Score:-30
+  -  Learning: Pure Theory                  @21.00  Score:-64
+  -  Learning: Land Girl's Luck             @ 3.75  Score:  3
+  -  Learning: Midnight Ginger              @ 8.00  Score:-30
+  -  Learning: Broadway Honey               @26.00  Score:-46
+  -  Learning: Border Gem                   @ 4.50  Score: -4
+  -  Learning: Hey Flint                    @17.00  Score:-22
+  -  Learning: Reel Orange                  @ 3.25  Score: 10
+  -  Learning: Miss Carbo                   @11.00  Score: -5
+  -  Learning: Miss Fedora                  @17.00  Score:-29
+  -  Learning: Sandscreendeliverd           @21.00  Score:-37
+  -  Learning: Northcliff                   @34.00  Score:-70
+  -  Learning: Lequinto                     @15.00  Score:-33
+  -  Learning: Way To Dubai                 @ 7.00  Score: -7
+  -  Learning: Profit Street                @ 3.25  Score: 30
+  -  Learning: Beaming Light                @ 8.00  Score:-34
+  -  Learning: Mart                         @15.00  Score:-30
+  -  Learning: Desdemona                    @ 5.50  Score: 21
+  -  Learning: Style King                   @13.00  Score: -7
+  -  Learning: Due Date                     @34.00  Score:-38
+  -  Learning: Phoenix Moon                 @13.00  Score: -3
+  -  Learning: Fai Fai                      @11.00  Score:-24
+  -  Learning: Rory Rocket                  @13.00  Score:-26
+  -  Learning: Sub Thirteen                 @ 9.00  Score: -6
+  -  Learning: Rye                          @ 6.00  Score:  7
+  -  Learning: Just Jump                    @ 8.00  Score: -8
+  -  Learning: Valsharah                    @ 9.00  Score:-24
+  -  Learning: He's An Angel                @ 7.00  Score:-23
+  -  Learning: Mighty Ruler                 @11.00  Score:-26
+  -  Learning: Haziym                       @15.00  Score:-28
+  -  Learning: Vitalline                    @ 8.00  Score:-10
+  -  Learning: Horus                        @ 8.00  Score:-28
+  -  Learning: Battle Point                 @11.00  Score:-38
+  -  Learning: One Knight                   @ 2.38  Score: -1
+  -  Learning: Legend D'airy                @ 5.00  Score: -1
+  -  Learning: Mac J                        @ 8.50  Score:-11
+  -  Learning: Thunderous Sea               @17.00  Score:-21
+  -  Learning: Britway Belle                @17.00  Score:  3
+  -  Learning: Great Oak Lad                @13.00  Score:-15
+  -  Learning: Mac Gayveur                  @ 9.00  Score: -9
+  -  Learning: Strong Man Tom               @13.00  Score:-15
+  -  Learning: Gentora                      @17.00  Score:-19
+  -  Learning: Shavkat                      @ 5.50  Score: 54
+  -  Learning: Tainted Love                 @67.00  Score:-14
+  -  Learning: Rainbow Sorbet               @21.00  Score:-10
+  -  Learning: Caviar Cowboy                @13.00  Score: 32
+  -  Learning: Comprador                    @ 3.00  Score: 38
+  -  Learning: Jellystone Park              @13.00  Score: 16
+  -  Learning: Saddle Up                    @101.00  Score:-14
+  -  Learning: Westport                     @ 2.75  Score: 28
+  -  Learning: Magic Lady Mae               @13.00  Score: 22
+  -  Learning: Daddy Chill                  @21.00  Score:-60
+  -  Learning: Homme De Fer                 @ 3.25  Score: 29
+  -  Learning: Whiskey Sunrise              @ 3.75  Score:-11
+  -  Learning: Timely Affair                @ 4.00  Score: -3
+  -  Learning: Harry Don't Bite             @21.00  Score:-64
+  -  Learning: Aim For The Bull             @13.00  Score:-22
+  -  Learning: Unknown Journey              @11.00  Score:-14
+  -  Learning: Resilient Lady               @17.00  Score:-38
+  -  Learning: Petra Grey                   @21.00  Score:-64
+  -  Learning: Desiderata                   @ 5.50  Score:  8
+  -  Learning: Celebrating Ethel            @ 6.00  Score:-10
+  -  Learning: Al Shabab                    @ 9.00  Score:-16
+  -  Learning: Angel's Call                 @26.00  Score:-60
+  -  Learning: Celtic John                  @ 9.00  Score:  3
+  -  Learning: Haveagobeau                  @ 7.00  Score: -7
+  -  Learning: Hijo De La Luna              @ 7.00  Score:-16
+  -  Learning: Iftikhaar                    @21.00  Score:-70
+  -  Learning: Kaaress                      @15.00  Score:-11
+  -  Learning: Monks Mead                   @ 8.00  Score:  3
+  -  Learning: Myna                         @13.00  Score:  9
+  -  Learning: Spirit Charmer               @26.00  Score:-60
+  -  Learning: Purple Sky                   @26.00  Score:-64
+  -  Learning: Volendam                     @ 3.50  Score:  7
+  -  Learning: Grand Citadel                @11.00  Score:-20
+  -  Learning: Whiteley Way                 @ 7.00  Score:-20
+  -  Learning: Port Noir                    @ 8.00  Score:-12
+  -  Learning: Scenario                     @ 8.00  Score: -8
+  -  Learning: Dubai Harbour                @ 4.00  Score:-13
+  -  Learning: Boujee Gold                  @ 9.00  Score:-22
+  -  Learning: Senseofentitlement           @51.00  Score:-74
+  -  Learning: Pureis King                  @34.00  Score:-18
+  -  Learning: Receipt                      @ 4.50  Score: 48
+  -  Learning: Freda                        @ 3.75  Score: 46
+  -  Learning: Eagle Thunder                @13.00  Score: 16
+  -  Learning: Enemy Agent                  @ 9.00  Score: 22
+  -  Learning: Franschhoek                  @17.00  Score: 12
+  -  Learning: Generic                      @ 8.50  Score: 22
+  -  Learning: Pace Attack                  @11.00  Score: 16
+  -  Learning: Miss Guinevere               @ 9.00  Score: 30
+  -  Learning: Midnight Media               @67.00  Score:-11
+  -  Learning: The Bureau Club              @ 7.50  Score: 25
+  -  Learning: Blues And Royals             @ 9.00  Score: -4
+  -  Learning: Just A Gambler               @ 7.00  Score: 14
+  -  Learning: Thestral                     @ 4.50  Score:  4
+  -  Learning: Heart Sign                   @ 8.00  Score:-12
+  -  Learning: Ebn Sabt                     @11.00  Score:-12
+  -  Learning: Hamaleel                     @ 7.00  Score: 13
+  -  Learning: Armstrong                    @ 5.00  Score:  5
+  -  Learning: Gnocchi                      @34.00  Score:-64
+  -  Learning: Station Bar                  @ 8.00  Score: -4
+  -  Learning: Constitution Hill            @ 1.18  Score: 11
+  -  Learning: Classical Allusion           @ 6.50  Score: 35
+  -  Learning: Edward Sexton                @67.00  Score:-24
+  -  Learning: Roadlesstravelled            @13.00  Score: 10
+  -  Learning: Star Artist                  @101.00  Score:-18
+  -  Learning: Victors Spirit               @101.00  Score:-14
+  -  Learning: Serviceman                   @21.00  Score:-14
+  -  Learning: Keep It Cool                 @101.00  Score:-18
+  -  Learning: High Point                   @ 6.00  Score: 39
+  -  Learning: Knight Templar               @ 2.75  Score: 75
+  -  Learning: Naasma                       @ 5.00  Score: 42
+  -  Learning: Sword Of Wessex              @ 3.75  Score: 36
+  -  Learning: Fleurman                     @ 9.00  Score: 13
+  -  Learning: Mr Ubiquitous                @ 9.00  Score: -8
+  -  Learning: Mr Cool                      @ 8.00  Score:-28
+  -  Learning: Safari Dream                 @ 6.00  Score:-29
+  -  Learning: Cypriot Diaspora             @ 7.00  Score:-12
+  -  Learning: Mumayaz                      @ 2.62  Score:-17
+  -  Learning: Terries Royale               @ 5.00  Score:-12
+
+Saved 208 horses | 1 UI picks | 207 learning records
+
+Traceback (most recent call last):
+  File "C:\Users\charl\OneDrive\futuregenAI\Betting\complete_daily_analysis.py", line 359, in <module>
+    print(f"\u2713 {stats['ui_picks']} picks ready ù run 'python show_todays_ui_picks.py' to review")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\charl\AppData\Local\Programs\Python\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2713' in position 0: character maps to <undefined>

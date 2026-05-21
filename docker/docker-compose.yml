@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    ports:
+      - "5000:5000"
+    environment:
+      - ENV=development
+      - AWS_REGION=eu-west-1
+      - FLASK_ENV=development
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ../backend:/app/backend
+    command: python backend/api/app.py
+    networks:
+      - betbudai
+
+  # LocalStack for local AWS service testing (optional)
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=dynamodb,lambda,s3
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - ./tmp/localstack:/tmp/localstack
+    networks:
+      - betbudai
+
+networks:
+  betbudai:
+    driver: bridge

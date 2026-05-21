@@ -1,0 +1,198 @@
+
+================================================================================
+WEATHER-BASED GOING INFERENCE (3-Day Rainfall + Seasonal Factor)
+Current Month: March (Seasonal Bias: -3)
+Using weather API inference
+================================================================================
+
+Checking Carlisle (turf) - Weather API...
+  [CLOUD] Rainfall: 7.1mm -> Going: Soft (Score: -4)
+     March typical: softer (-3)
+
+Checking Taunton (turf) - Weather API...
+  [SUN] Rainfall: 1.4mm -> Going: Good to Firm (Score: +6)
+     March typical: softer (-3)
+
+Checking Fairyhouse (turf) - Weather API...
+  [CLOUD] Rainfall: 7.3mm -> Going: Soft (Score: -4)
+     March typical: softer (-3)
+
+Checking Wolverhampton (all-weather) - Weather API...
+  [CLOUD] Rainfall: 5.2mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Kempton (all-weather) - Weather API...
+  [CLOUD] Rainfall: 2.5mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Punchestown (turf) - Weather API...
+  [CLOUD] Rainfall: 8.8mm -> Going: Soft (Score: -4)
+     March typical: softer (-3)
+
+Checking Ludlow (turf) - Weather API...
+  [CLOUD] Rainfall: 2.8mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Newcastle (all-weather) - Weather API...
+  [CLOUD] Rainfall: 2.6mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Sedgefield (turf) - Weather API...
+  [CLOUD] Rainfall: 2.7mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Ffos Las (turf) - Weather API...
+  [RAIN] Rainfall: 11.8mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Exeter (turf) - Weather API...
+  [CLOUD] Rainfall: 4.7mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Warwick (turf) - Weather API...
+  [CLOUD] Rainfall: 6.3mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Southwell (all-weather) - Weather API...
+  [CLOUD] Rainfall: 5.0mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Dundalk (all-weather) - Weather API...
+  [RAIN] Rainfall: 10.8mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Doncaster (turf) - Weather API...
+  [CLOUD] Rainfall: 5.3mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Kelso (turf) - Weather API...
+  [CLOUD] Rainfall: 4.3mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Navan (turf) - Weather API...
+  [CLOUD] Rainfall: 8.2mm -> Going: Soft (Score: -4)
+     March typical: softer (-3)
+
+Checking Newbury (turf) - Weather API...
+  [CLOUD] Rainfall: 6.9mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Lingfield (all-weather) - Weather API...
+  [CLOUD] Rainfall: 2.5mm -> Going: Standard (All-Weather) (Score: 0)
+     All-weather surface
+
+Checking Cheltenham (turf) - Weather API...
+  [CLOUD] Rainfall: 3.1mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Ascot (turf) - Weather API...
+  [CLOUD] Rainfall: 2.8mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Sandown (turf) - Weather API...
+  [SUN] Rainfall: 2.0mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Haydock (turf) - Weather API...
+  [RAIN] Rainfall: 17.4mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Leicester (turf) - Weather API...
+  [CLOUD] Rainfall: 7.4mm -> Going: Soft (Score: -4)
+     March typical: softer (-3)
+
+Checking Leopardstown (turf) - Weather API...
+  [CLOUD] Rainfall: 4.8mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Naas (turf) - Weather API...
+  [CLOUD] Rainfall: 5.9mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Gowran Park (turf) - Weather API...
+  [CLOUD] Rainfall: 2.7mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Thurles (turf) - Weather API...
+  [CLOUD] Rainfall: 5.1mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Clonmel (turf) - Weather API...
+  [CLOUD] Rainfall: 4.1mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Limerick (turf) - Weather API...
+  [RAIN] Rainfall: 14.2mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Cork (turf) - Weather API...
+  [CLOUD] Rainfall: 5.1mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Galway (turf) - Weather API...
+  [RAIN] Rainfall: 14.9mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Ayr (turf) - Weather API...
+  [RAIN] Rainfall: 25.8mm -> Going: Soft (Score: -7)
+     March typical: softer (-3)
+
+Checking Musselburgh (turf) - Weather API...
+  [CLOUD] Rainfall: 3.8mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Perth (turf) - Weather API...
+  [CLOUD] Rainfall: 5.6mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Huntingdon (turf) - Weather API...
+  [CLOUD] Rainfall: 6.3mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Market Rasen (turf) - Weather API...
+  [CLOUD] Rainfall: 4.4mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Wincanton (turf) - Weather API...
+  [CLOUD] Rainfall: 2.4mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Plumpton (turf) - Weather API...
+  [CLOUD] Rainfall: 2.8mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Fontwell (turf) - Weather API...
+  [CLOUD] Rainfall: 3.2mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Wetherby (turf) - Weather API...
+  [CLOUD] Rainfall: 5.1mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Bangor-on-Dee (turf) - Weather API...
+  [CLOUD] Rainfall: 3.8mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Stratford (turf) - Weather API...
+  [CLOUD] Rainfall: 6.5mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Worcester (turf) - Weather API...
+  [CLOUD] Rainfall: 2.9mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+Checking Hereford (turf) - Weather API...
+  [CLOUD] Rainfall: 4.8mm -> Going: Good to Soft (Score: -2)
+     March typical: softer (-3)
+
+Checking Chepstow (turf) - Weather API...
+  [CLOUD] Rainfall: 2.4mm -> Going: Good (Score: +2)
+     March typical: softer (-3)
+
+================================================================================
+
+Final score: 78
+class5_cap applied: 0
+aw_low_class_penalty: -35
+  AW Class 5/6 (unpredictable handicap): -35pts
+PASS: score capped at <= 80

@@ -1,0 +1,280 @@
+{
+  "Comment": "SureBet Refresh Pipeline — runs at 12:00, 14:00, 16:00, 18:00 UTC. Re-fetches odds, re-scores, validates, sends updated picks, then settles finished races via SL + Betfair.",
+  "StartAt": "InjectDate",
+  "States": {
+
+    "InjectDate": {
+      "Type": "Pass",
+      "Parameters": {
+        "date.$": "States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'), 0)"
+      },
+      "Next": "FetchBetfairOdds"
+    },
+
+    "FetchBetfairOdds": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-betfair-fetch",
+        "Payload": {
+          "date.$": "$.date",
+          "run_type": "refresh"
+        }
+      },
+      "ResultSelector": {
+        "date.$":       "$.Payload.date",
+        "race_count.$": "$.Payload.race_count",
+        "s3_key.$":     "$.Payload.s3_key",
+        "success.$":    "$.Payload.success"
+      },
+      "ResultPath": "$.fetchResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "RefreshFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "RunAnalysis"
+    },
+
+    "RunAnalysis": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-analysis",
+        "Payload": {
+          "date.$":   "$.date",
+          "s3_key.$": "$.fetchResult.s3_key"
+        }
+      },
+      "ResultSelector": {
+        "date.$":        "$.Payload.date",
+        "picks_count.$": "$.Payload.picks_count",
+        "success.$":     "$.Payload.success"
+      },
+      "ResultPath": "$.analysisResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 60,
+          "MaxAttempts": 1,
+          "BackoffRate": 1.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "RefreshFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "ValidatePicks"
+    },
+
+    "ValidatePicks": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-validate",
+        "Payload": {
+          "date.$":        "$.date",
+          "picks_count.$": "$.analysisResult.picks_count"
+        }
+      },
+      "ResultSelector": {
+        "valid_picks.$": "$.Payload.valid_picks",
+        "errors.$":      "$.Payload.errors"
+      },
+      "ResultPath": "$.validateResult",
+      "Retry": [],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "RefreshFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "SendNotifications"
+    },
+
+    "SendNotifications": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-notify",
+        "Payload": {
+          "date.$":        "$.date",
+          "valid_picks.$": "$.validateResult.valid_picks"
+        }
+      },
+      "ResultSelector": {
+        "notifications_sent.$": "$.Payload.notifications_sent",
+        "skipped.$":            "$.Payload.skipped"
+      },
+      "ResultPath": "$.notifyResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "RefreshFavResults",
+          "ResultPath": "$.notifyError"
+        }
+      ],
+      "Next": "RefreshSLResults"
+    },
+
+    "RefreshSLResults": {
+      "Comment": "Settle finished races via Sporting Life fast-results — fires 10-30 min before Betfair settles.",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-sl-results",
+        "Payload.$": "$"
+      },
+      "ResultSelector": {
+        "date.$":             "$.Payload.date",
+        "results_recorded.$": "$.Payload.results_recorded",
+        "winners.$":          "$.Payload.winners",
+        "success.$":          "$.Payload.success"
+      },
+      "ResultPath": "$.slResultsResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "RefreshFavResults",
+          "ResultPath": "$.slResultsError",
+          "Comment": "Non-fatal — continue to fav results even if SL scrape fails"
+        }
+      ],
+      "Next": "RefreshFavResults"
+    },
+
+    "RefreshFavResults": {
+      "Comment": "Write fav_outcome to favourites throughout the day so Results page shows win/loss for each lay candidate.",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-fav-results",
+        "Payload.$": "$"
+      },
+      "ResultSelector": {
+        "races_processed.$": "$.Payload.races_processed",
+        "favs_updated.$":    "$.Payload.favs_updated",
+        "success.$":         "$.Payload.success"
+      },
+      "ResultPath": "$.favResultsResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 15,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "RefreshBetfairResults",
+          "ResultPath": "$.favResultsError",
+          "Comment": "Non-fatal — continue to Betfair results even if fav results write fails"
+        }
+      ],
+      "Next": "RefreshBetfairResults"
+    },
+
+    "RefreshBetfairResults": {
+      "Comment": "Settle any remaining races via Betfair market status — catches anything SL missed.",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "PLACEHOLDER_surebet-results-fetch",
+        "Payload.$": "$"
+      },
+      "ResultSelector": {
+        "date.$":             "$.Payload.date",
+        "results_recorded.$": "$.Payload.results_recorded",
+        "winners.$":          "$.Payload.winners",
+        "success.$":          "$.Payload.success"
+      },
+      "ResultPath": "$.betfairResultsResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "RefreshComplete",
+          "ResultPath": "$.betfairResultsError",
+          "Comment": "Non-fatal — refresh still succeeds even if Betfair results fetch fails"
+        }
+      ],
+      "Next": "RefreshComplete"
+    },
+
+    "RefreshComplete": {
+      "Type": "Succeed"
+    },
+
+    "RefreshFailed": {
+      "Type": "Fail",
+      "Error": "RefreshPipelineFailed",
+      "Cause": "A critical step in the refresh pipeline failed — check CloudWatch Logs"
+    }
+  }
+}

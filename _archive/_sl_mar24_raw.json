@@ -1,0 +1,4963 @@
+{
+  "meetings": [
+    {
+      "meeting_summary": {
+        "meeting_reference": {
+          "id": 117845,
+          "external_reference": []
+        },
+        "date": "2026-03-24",
+        "status": "DORMANT",
+        "course": {
+          "course_reference": {
+            "id": 284,
+            "external_reference": []
+          },
+          "name": "Taunton",
+          "short_name": "TAU",
+          "country": {
+            "country_reference": {
+              "id": 34,
+              "external_reference": []
+            },
+            "long_name": "England"
+          },
+          "feed_source": "RUK"
+        },
+        "going": "Good",
+        "surface_summary": "Turf",
+        "visible": true,
+        "weather": "Overcast",
+        "abandoned": null
+      },
+      "races": [
+        {
+          "meeting_summary_reference": {
+            "id": 117845,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908674,
+            "external_reference": []
+          },
+          "name": "Join The Johnson White Racing Syndicate Novices' Hurdle (GBB Race)",
+          "race_slug": null,
+          "course_name": "Taunton",
+          "course_shortcode": "TAU",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "4",
+          "distance": "2m 104y",
+          "date": "2026-03-24",
+          "time": "14:15",
+          "off_time": "14:16:22",
+          "winning_time": "4m 9.08s",
+          "ride_count": 7,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": false,
+          "verdict": "<p><b>FALLS OF ACHARN</b> has been highly tried since making a winning hurdles bow at Musselburgh earlier this year and will find this company more to his liking. He can get back on the scoreboard. <b>Sinchi Roca</b> looks the obvious danger on form, whilst <b>Ettore</b> should know more about this discipline after his Newbury debut and is also of interest.</p><ol><li><b>FALLS OF ACHARN</b></li><li><b>SINCHI ROCA (IRE)</b></li><li><b>ETTORE (IRE)</b></li></ol>",
+          "verdict_text": "FALLS OF ACHARN has been highly tried since making a winning hurdles bow at Musselburgh earlier this year and will find this company more to his liking. He can get back on the scoreboard. Sinchi Roca looks the obvious danger on form, whilst Ettore should know more about this discipline after his Newbury debut and is also of interest.",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Falls Of Acharn",
+              "position": 1,
+              "odds": "5/6",
+              "favourite": true
+            },
+            {
+              "name": "Sinchi Roca",
+              "position": 2,
+              "odds": "11/8",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": true,
+            "horse_name": "Falls Of Acharn",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1184024",
+              "external_reference": []
+            },
+            "odds": "5/6",
+            "saddlecloth_number": "4",
+            "silk_filename": "20260324tau141504.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117845,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908675,
+            "external_reference": []
+          },
+          "name": "Experience The Thrill With HotToTrot Racing Mares' Handicap Hurdle",
+          "race_slug": null,
+          "course_name": "Taunton",
+          "course_shortcode": "TAU",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "5",
+          "distance": "2m 7f 198y",
+          "date": "2026-03-24",
+          "time": "14:45",
+          "off_time": "14:45:37",
+          "winning_time": "6m 2.98s",
+          "ride_count": 10,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": true,
+          "verdict": "<p>This can go to <b>LADY CARO</b>, who ran a cracker here earlier this month and remains fairly treated. <b>Newmill Getaway</b> and <b>Kantagua Du Large</b> rate the principal dangers. </p><ol><li><b>LADY CARO (IRE)</b></li><li><b>NEWMILL GETAWAY (IRE)</b></li><li><b>KANTAGUA DU LARGE (FR)</b></li></ol>",
+          "verdict_text": "This can go to LADY CARO, who ran a cracker here earlier this month and remains fairly treated. Newmill Getaway and Kantagua Du Large rate the principal dangers. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Lady Caro",
+              "position": 1,
+              "odds": "4/1",
+              "favourite": false
+            },
+            {
+              "name": "Newmill Getaway",
+              "position": 2,
+              "odds": "11/4",
+              "favourite": true
+            },
+            {
+              "name": "Miss Tiara",
+              "position": 3,
+              "odds": "18/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": false,
+            "horse_name": "Lady Caro",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1081539",
+              "external_reference": []
+            },
+            "odds": "4/1",
+            "saddlecloth_number": "3",
+            "silk_filename": "20260324tau144503.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117845,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908676,
+            "external_reference": []
+          },
+          "name": "4Racing Owners Club Charitable Syndicates Handicap Hurdle",
+          "race_slug": null,
+          "course_name": "Taunton",
+          "course_shortcode": "TAU",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "5",
+          "distance": "2m 104y",
+          "date": "2026-03-24",
+          "time": "15:15",
+          "off_time": "15:15:13",
+          "winning_time": "4m 3.82s",
+          "ride_count": 13,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": true,
+          "verdict": "<p><b>ST LUKES CHELSEA</b> went close when third over C&D 15 days ago and he can build on that effort to gain a breakthrough success. He gets the vote ahead of <b>Thistle Be The One</b>, who was runner-up twice here last season, while <b>Raging Al</b> could still have more to offer in this sphere.</p><ol><li><b>ST LUKES CHELSEA</b></li><li><b>THISTLE BE THE ONE (IRE)</b></li><li><b>RAGING AL (IRE)</b></li></ol>",
+          "verdict_text": "ST LUKES CHELSEA went close when third over C&D 15 days ago and he can build on that effort to gain a breakthrough success. He gets the vote ahead of Thistle Be The One, who was runner-up twice here last season, while Raging Al could still have more to offer in this sphere.",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Victory Shout",
+              "position": 1,
+              "odds": "13/2",
+              "favourite": false
+            },
+            {
+              "name": "Walk In The West",
+              "position": 2,
+              "odds": "25/1",
+              "favourite": false
+            },
+            {
+              "name": "Dance Havana",
+              "position": 3,
+              "odds": "66/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": true,
+            "horse_name": "St Lukes Chelsea",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1111606",
+              "external_reference": []
+            },
+            "odds": "15/8",
+            "saddlecloth_number": "3",
+            "silk_filename": "20260324tau151503.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117845,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908677,
+            "external_reference": []
+          },
+          "name": "Kayley Woollacott Syndicates & Blackmore Racing Club Handicap Chase (GBB Race)",
+          "race_slug": null,
+          "course_name": "Taunton",
+          "course_shortcode": "TAU",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "5YO plus",
+          "race_class": "4",
+          "distance": "2m 7f 3y",
+          "date": "2026-03-24",
+          "time": "15:45",
+          "off_time": "15:45:13",
+          "winning_time": "5m 50.02s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": true,
+          "verdict": "<p><b>WICKED THOUGHTS</b> looked a natural when making a winning debut in this sphere over C&D under similar conditions on his return in November so is well worth another chance having disappointed on testing ground subsequently. <b>Ede'iffs Rock</b> arrives on the back of a career-best win over C&D so looks the obvious threat. </p><ol><li><b>WICKED THOUGHTS (IRE)</b></li><li><b>EDE'IFFS ROCK</b></li><li><b>GOOD FRIDAY FAIRY (IRE)</b></li></ol>",
+          "verdict_text": "WICKED THOUGHTS looked a natural when making a winning debut in this sphere over C&D under similar conditions on his return in November so is well worth another chance having disappointed on testing ground subsequently. Ede'iffs Rock arrives on the back of a career-best win over C&D so looks the obvious threat. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Ede'iffs Rock",
+              "position": 1,
+              "odds": "11/4",
+              "favourite": true
+            },
+            {
+              "name": "Gyenyame",
+              "position": 2,
+              "odds": "10/3",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": false,
+            "horse_name": "Wicked Thoughts",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1122106",
+              "external_reference": []
+            },
+            "odds": "3/1",
+            "saddlecloth_number": "2",
+            "silk_filename": "20260324tau154502.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117845,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908678,
+            "external_reference": []
+          },
+          "name": "Racehorse Ownership From 25 At racingclub.com Handicap Hurdle",
+          "race_slug": null,
+          "course_name": "Taunton",
+          "course_shortcode": "TAU",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "4",
+          "distance": "2m 3f 1y",
+          "date": "2026-03-24",
+          "time": "16:15",
+          "off_time": "16:15:12",
+          "winning_time": "4m 43.12s",
+          "ride_count": 7,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": true,
+          "verdict": "<p>The progressive <b>KHAFRE</b> can make a winning start in handicaps off what looks a fair opening mark. <b>Knock Off Soxs</b> and <b>Treasure Planet</b> are also going the right way so are feared most. </p><ol><li><b>KHAFRE (FR)</b></li><li><b>KNOCK OFF SOXS (IRE)</b></li><li><b>TREASURE PLANET (IRE)</b></li></ol>",
+          "verdict_text": "The progressive KHAFRE can make a winning start in handicaps off what looks a fair opening mark. Knock Off Soxs and Treasure Planet are also going the right way so are feared most. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Khafre",
+              "position": 1,
+              "odds": "7/4",
+              "favourite": true
+            },
+            {
+              "name": "Siam Park",
+              "position": 2,
+              "odds": "17/2",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": true,
+            "horse_name": "Khafre",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1204747",
+              "external_reference": []
+            },
+            "odds": "7/4",
+            "saddlecloth_number": "1",
+            "silk_filename": "20260324tau161501.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117845,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908679,
+            "external_reference": []
+          },
+          "name": "Crest Racing Mares' Handicap Chase",
+          "race_slug": null,
+          "course_name": "Taunton",
+          "course_shortcode": "TAU",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "5YO plus",
+          "race_class": "5",
+          "distance": "2m 2f 40y",
+          "date": "2026-03-24",
+          "time": "16:45",
+          "off_time": "16:45:33",
+          "winning_time": "4m 38.95s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": true,
+          "verdict": "<p>A chance is taken on chase debutante <b>PRAIRIE QUEEN</b>, who was spring heeled when a good third over hurdles off this mark at Hereford and hopes can be high that she will take to fences at the first attempt. <b>Bobbi's Beauty</b> has winning form round here and is feared most ahead of <b>Ryder's Rock</b>.</p><ol><li><b>PRAIRIE QUEEN</b></li><li><b>BOBBI'S BEAUTY (IRE)</b></li><li><b>RYDER'S ROCK</b></li></ol>",
+          "verdict_text": "A chance is taken on chase debutante PRAIRIE QUEEN, who was spring heeled when a good third over hurdles off this mark at Hereford and hopes can be high that she will take to fences at the first attempt. Bobbi's Beauty has winning form round here and is feared most ahead of Ryder's Rock.",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Bobbi's Beauty",
+              "position": 1,
+              "odds": "5/2",
+              "favourite": true
+            },
+            {
+              "name": "Prairie Queen",
+              "position": 2,
+              "odds": "11/2",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": false,
+            "horse_name": "Prairie Queen",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1123234",
+              "external_reference": []
+            },
+            "odds": "11/2",
+            "saddlecloth_number": "6",
+            "silk_filename": "20260324tau164506.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117845,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908680,
+            "external_reference": []
+          },
+          "name": "South West Rail Solutions Open NH Flat Race (GBB Race)",
+          "race_slug": null,
+          "course_name": "Taunton",
+          "course_shortcode": "TAU",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO to 6YO",
+          "race_class": "5",
+          "distance": "2m 104y",
+          "date": "2026-03-24",
+          "time": "17:15",
+          "off_time": "17:15:40",
+          "winning_time": "3m 55.02s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": false,
+          "verdict": "<p><b>CREST OF ARMS</b> shaped notably well in a listed event at Cheltenham on New Year's Day and has to be considered the one to beat back down in grade. However, strong market support for newcomer <b>Artaban</b> would need taking seriously. </p><ol><li><b>CREST OF ARMS</b></li><li><b>ARTABAN (FR)</b></li><li><b>ARMS PARK</b></li></ol>",
+          "verdict_text": "CREST OF ARMS shaped notably well in a listed event at Cheltenham on New Year's Day and has to be considered the one to beat back down in grade. However, strong market support for newcomer Artaban would need taking seriously. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Arms Park",
+              "position": 1,
+              "odds": "4/1",
+              "favourite": false
+            },
+            {
+              "name": "Barachiel",
+              "position": 2,
+              "odds": "11/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": true,
+            "horse_name": "Crest of Arms",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1206782",
+              "external_reference": []
+            },
+            "odds": "11/8",
+            "saddlecloth_number": "6",
+            "silk_filename": "20260324tau171506.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        }
+      ]
+    },
+    {
+      "meeting_summary": {
+        "meeting_reference": {
+          "id": 117847,
+          "external_reference": []
+        },
+        "date": "2026-03-24",
+        "status": "DORMANT",
+        "course": {
+          "course_reference": {
+            "id": 296,
+            "external_reference": []
+          },
+          "name": "Southwell",
+          "short_name": "STH",
+          "country": {
+            "country_reference": {
+              "id": 34,
+              "external_reference": []
+            },
+            "long_name": "England"
+          },
+          "feed_source": "ATR"
+        },
+        "going": "Good",
+        "surface_summary": "Turf",
+        "visible": true,
+        "weather": "Overcast & Showers",
+        "abandoned": null
+      },
+      "races": [
+        {
+          "meeting_summary_reference": {
+            "id": 117847,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908688,
+            "external_reference": []
+          },
+          "name": "Ladies Day Sunday 16th August Handicap Chase (GBB Race)",
+          "race_slug": null,
+          "course_name": "Southwell",
+          "course_shortcode": "STH",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "5YO plus",
+          "race_class": "4",
+          "distance": "3m 1f 185y",
+          "date": "2026-03-24",
+          "time": "14:00",
+          "off_time": "14:00:19",
+          "winning_time": "7m 13.96s",
+          "ride_count": 5,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": true,
+          "verdict": "<p><b>SMURFETTE</b> showed a good attitude when resuming winning ways over 3m here 3 weeks ago and a 3-lb rise on the back of that shouldn't prevent her going well again. <b>Copshill Lad</b> and <b>Icaque de L'isle</b> will each find this less demanding than their most recent assignment and can provide chief resistance.</p><ol><li><b>SMURFETTE</b></li><li><b>COPSHILL LAD (IRE)</b></li><li><b>ICAQUE DE L'ISLE (FR)</b></li></ol>",
+          "verdict_text": "SMURFETTE showed a good attitude when resuming winning ways over 3m here 3 weeks ago and a 3-lb rise on the back of that shouldn't prevent her going well again. Copshill Lad and Icaque de L'isle will each find this less demanding than their most recent assignment and can provide chief resistance.",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Copshill Lad",
+              "position": 1,
+              "odds": "15/8",
+              "favourite": false
+            },
+            {
+              "name": "Smurfette",
+              "position": 2,
+              "odds": "7/4",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": true,
+            "horse_name": "Smurfette",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1083017",
+              "external_reference": []
+            },
+            "odds": "7/4",
+            "saddlecloth_number": "4",
+            "silk_filename": "20260324sth140004.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117847,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908689,
+            "external_reference": []
+          },
+          "name": "Book Your Party At Southwell Racecourse Novices' Handicap Chase",
+          "race_slug": null,
+          "course_name": "Southwell",
+          "course_shortcode": "STH",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "5YO plus",
+          "race_class": "5",
+          "distance": "1m 7f 182y",
+          "date": "2026-03-24",
+          "time": "14:30",
+          "off_time": "14:31:01",
+          "winning_time": "4m 12.67s",
+          "ride_count": 5,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": true,
+          "verdict": "<p><b>SHADOWFAX OF ROHAN</b> found only one who continues to progress too strong on his most recent start at Catterick 3 weeks ago and, still very much unexposed as a chaser, he makes plenty of appeal from the same mark. <b>Classical Sting</b> can emerge as the lead danger, ahead of <b>Catchim</b>, who has been given a break ahead of this.</p><ol><li><b>SHADOWFAX OF ROHAN (IRE)</b></li><li><b>CLASSICAL STING</b></li><li><b>CATCHIM (IRE)</b></li></ol>",
+          "verdict_text": "SHADOWFAX OF ROHAN found only one who continues to progress too strong on his most recent start at Catterick 3 weeks ago and, still very much unexposed as a chaser, he makes plenty of appeal from the same mark. Classical Sting can emerge as the lead danger, ahead of Catchim, who has been given a break ahead of this.",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Shadowfax Of Rohan",
+              "position": 1,
+              "odds": "1/1",
+              "favourite": true
+            },
+            {
+              "name": "Known Warrior",
+              "position": 2,
+              "odds": "5/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": true,
+            "horse_name": "Shadowfax Of Rohan",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1146790",
+              "external_reference": []
+            },
+            "odds": "1/1",
+            "saddlecloth_number": "4",
+            "silk_filename": "20260324sth143004.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117847,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908690,
+            "external_reference": []
+          },
+          "name": "Southwell Open Maiden NH Flat Race (GBB Race)",
+          "race_slug": null,
+          "course_name": "Southwell",
+          "course_shortcode": "STH",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO to 6YO",
+          "race_class": "5",
+          "distance": "1m 7f 182y",
+          "date": "2026-03-24",
+          "time": "15:00",
+          "off_time": "15:00:13",
+          "winning_time": "4m 1.7s",
+          "ride_count": 7,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": false,
+          "verdict": "<p><b>TANDY'S BRIDGE</b> proved a major let-down on first outing for Tom Ellis at Warwick in December but is well worth another chance based on the strength of his debut form. <b>Indulto Rouge</b> will find this more suitable back down in grade, while <b>L'amalric</b> is an interesting Rules newcomer on pedigree, for all that he's not exactly pulled up any trees in points. </p><ol><li><b>TANDY'S BRIDGE (IRE)</b></li><li><b>INDULTO ROUGE (FR)</b></li><li><b>L'AMALRIC (FR)</b></li></ol>",
+          "verdict_text": "TANDY'S BRIDGE proved a major let-down on first outing for Tom Ellis at Warwick in December but is well worth another chance based on the strength of his debut form. Indulto Rouge will find this more suitable back down in grade, while L'amalric is an interesting Rules newcomer on pedigree, for all that he's not exactly pulled up any trees in points. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Scott's Legacy",
+              "position": 1,
+              "odds": "11/2",
+              "favourite": false
+            },
+            {
+              "name": "Music Song",
+              "position": 2,
+              "odds": "6/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": false,
+            "horse_name": "Tandy's Bridge",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1192264",
+              "external_reference": []
+            },
+            "odds": "7/2",
+            "saddlecloth_number": "3",
+            "silk_filename": "20260324sth150003.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117847,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908691,
+            "external_reference": []
+          },
+          "name": "Free Bets On attheraces.com Conditional Jockeys' Handicap Hurdle",
+          "race_slug": null,
+          "course_name": "Southwell",
+          "course_shortcode": "STH",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "5",
+          "distance": "3m 60y",
+          "date": "2026-03-24",
+          "time": "15:30",
+          "off_time": "15:30:37",
+          "winning_time": "6m 37.21s",
+          "ride_count": 7,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": true,
+          "verdict": "<p><b>PECKFORTON HILLS</b> has improved since switching to handicap company and his bumper form provides hope for better still now stepping up to 3m for the first time, so he appeals as the most persuasive option. <b>Jack The Savage</b> remains well treated on old form after ending a long losing spell at Hereford recently, while <b>Broderick</b> shouldn't be written off completely for all that he disappointed on most recent outing. </p><ol><li><b>PECKFORTON HILLS (IRE)</b></li><li><b>JACK THE SAVAGE</b></li><li><b>BRODERICK (IRE)</b></li></ol>",
+          "verdict_text": "PECKFORTON HILLS has improved since switching to handicap company and his bumper form provides hope for better still now stepping up to 3m for the first time, so he appeals as the most persuasive option. Jack The Savage remains well treated on old form after ending a long losing spell at Hereford recently, while Broderick shouldn't be written off completely for all that he disappointed on most recent outing. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Raby Mere",
+              "position": 1,
+              "odds": "28/1",
+              "favourite": false
+            },
+            {
+              "name": "Peckforton Hills",
+              "position": 2,
+              "odds": "5/4",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": true,
+            "horse_name": "Peckforton Hills",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1165935",
+              "external_reference": []
+            },
+            "odds": "5/4",
+            "saddlecloth_number": "6",
+            "silk_filename": "20260324sth153006.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117847,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908692,
+            "external_reference": []
+          },
+          "name": "Easter Sunday Family Fun Day Novices' Hurdle (GBB Race)",
+          "race_slug": null,
+          "course_name": "Southwell",
+          "course_shortcode": "STH",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "4",
+          "distance": "2m 4f 88y",
+          "date": "2026-03-24",
+          "time": "16:00",
+          "off_time": "16:00:24",
+          "winning_time": "5m 35.5s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": false,
+          "verdict": "<p>It's hard to look beyond <b>HILLBERRY HILL</b>, who was successful in the second of his 2 starts for Margaret Mullins in Ireland and looks sure to progress for his new yard. <b>The Flier Begley</b> isn't getting any younger but he's the conceivable danger to the selection, for all that <b>Tombereau</b> showed some promise over C&D last time.</p><ol><li><b>HILLBERRY HILL (IRE)</b></li><li><b>THE FLIER BEGLEY (IRE)</b></li><li><b>TOMBEREAU (IRE)</b></li></ol>",
+          "verdict_text": "It's hard to look beyond HILLBERRY HILL, who was successful in the second of his 2 starts for Margaret Mullins in Ireland and looks sure to progress for his new yard. The Flier Begley isn't getting any younger but he's the conceivable danger to the selection, for all that Tombereau showed some promise over C&D last time.",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Hillberry Hill",
+              "position": 1,
+              "odds": "4/6",
+              "favourite": true
+            },
+            {
+              "name": "The Flier Begley",
+              "position": 2,
+              "odds": "5/2",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": true,
+            "horse_name": "Hillberry Hill",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1202517",
+              "external_reference": []
+            },
+            "odds": "4/6",
+            "saddlecloth_number": "1",
+            "silk_filename": "20260324sth160001.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117847,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908693,
+            "external_reference": []
+          },
+          "name": "Join Southwell Golf Club Handicap Hurdle",
+          "race_slug": null,
+          "course_name": "Southwell",
+          "course_shortcode": "STH",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "4",
+          "distance": "2m 4f 88y",
+          "date": "2026-03-24",
+          "time": "16:30",
+          "off_time": "16:30:06",
+          "winning_time": "5m 21.55s",
+          "ride_count": 10,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": true,
+          "verdict": "<p><b>MOAB</b> performed with credit, despite the drop back to around 17f counting against him, at Exeter recently and he is taken to deservedly open his hurdles account. Next on the list is <b>Karton Plein</b>, who arguably produced his best effort yet when third at Lingfield and he's lurking on a fairly appealing mark. <b>Codetalker</b>, <b>Fine Casting</b> and <b>Sutherland</b> all have claims, too.</p><ol><li><b>MOAB (IRE)</b></li><li><b>KARTON PLEIN (FR)</b></li><li><b>CODETALKER</b></li></ol>",
+          "verdict_text": "MOAB performed with credit, despite the drop back to around 17f counting against him, at Exeter recently and he is taken to deservedly open his hurdles account. Next on the list is Karton Plein, who arguably produced his best effort yet when third at Lingfield and he's lurking on a fairly appealing mark. Codetalker, Fine Casting and Sutherland all have claims, too.",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Codetalker",
+              "position": 1,
+              "odds": "6/1",
+              "favourite": false
+            },
+            {
+              "name": "Heard That",
+              "position": 2,
+              "odds": "40/1",
+              "favourite": false
+            },
+            {
+              "name": "Fine Casting",
+              "position": 3,
+              "odds": "11/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": true,
+            "horse_name": "Moab",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1095952",
+              "external_reference": []
+            },
+            "odds": "7/2",
+            "saddlecloth_number": "9",
+            "silk_filename": "20260324sth163009.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117847,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908694,
+            "external_reference": []
+          },
+          "name": "Visit The Bistro In Seasons Restaurant Novices' Limited Handicap Hurdle",
+          "race_slug": null,
+          "course_name": "Southwell",
+          "course_shortcode": "STH",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "5",
+          "distance": "2m 4f 88y",
+          "date": "2026-03-24",
+          "time": "17:00",
+          "off_time": "17:00:14",
+          "winning_time": "5m 26.34s",
+          "ride_count": 12,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": true,
+          "verdict": "<p><b>PARISH STAR</b> disappointed on her hat-trick attempt at Carlisle but was a stylish winner over C&D the time before so is worth another chance back from a short break. <b>Ever Ready</b> and <b>Feet On The Ground</b> head the dangers. </p><ol><li><b>PARISH STAR (IRE)</b></li><li><b>EVER READY</b></li><li><b>FEET ON THE GROUND (IRE)</b></li></ol>",
+          "verdict_text": "PARISH STAR disappointed on her hat-trick attempt at Carlisle but was a stylish winner over C&D the time before so is worth another chance back from a short break. Ever Ready and Feet On The Ground head the dangers. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Dartmouth Rose",
+              "position": 1,
+              "odds": "17/2",
+              "favourite": false
+            },
+            {
+              "name": "Cher Monsieur",
+              "position": 2,
+              "odds": "11/4",
+              "favourite": true
+            },
+            {
+              "name": "Fine As Wine",
+              "position": 3,
+              "odds": "12/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": null,
+            "favourite": false,
+            "horse_name": "Parish Star",
+            "horse_status": "NONRUNNER",
+            "horse_reference": {
+              "id": "1095676",
+              "external_reference": []
+            },
+            "odds": "5/1",
+            "saddlecloth_number": "13",
+            "silk_filename": "20260324sth170013.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        }
+      ]
+    },
+    {
+      "meeting_summary": {
+        "meeting_reference": {
+          "id": 117846,
+          "external_reference": []
+        },
+        "date": "2026-03-24",
+        "status": "DORMANT",
+        "course": {
+          "course_reference": {
+            "id": 292,
+            "external_reference": []
+          },
+          "name": "Wolverhampton",
+          "short_name": "WOL",
+          "country": {
+            "country_reference": {
+              "id": 34,
+              "external_reference": []
+            },
+            "long_name": "England"
+          },
+          "feed_source": "ATR"
+        },
+        "going": "Standard",
+        "surface_summary": "Allweather",
+        "visible": true,
+        "weather": "Cloudy & Windy",
+        "abandoned": null
+      },
+      "races": [
+        {
+          "meeting_summary_reference": {
+            "id": 117846,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909408,
+            "external_reference": []
+          },
+          "name": "Daily Profit Boosts At betmgm.co.uk Handicap (Div 1)",
+          "race_slug": null,
+          "course_name": "Wolverhampton",
+          "course_shortcode": "WOL",
+          "course_surface": {
+            "surface": "ALLWEATHER"
+          },
+          "country_short_name": "ENG",
+          "age": "3YO only",
+          "race_class": "6",
+          "distance": "1m 142y",
+          "date": "2026-03-24",
+          "time": "16:23",
+          "off_time": "16:23:42",
+          "winning_time": "1m 51.32s",
+          "ride_count": 9,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": true,
+          "verdict": "<p><b>WORLINGTON</b> was well held in a trio of quick-fire runs in maiden/novice company last year but this well-bred sort firmly appeals as the type to do better now handicapping following a break (also gelded) so he gets the nod, with confidence behind him in the betting bolstering the view. <b>Quick Turn</b> and <b>Lapidarist</b> are others expected to be in the mix.</p><ol><li><b>WORLINGTON</b></li><li><b>QUICK TURN (FR)</b></li><li><b>LAPIDARIST</b></li></ol>",
+          "verdict_text": "WORLINGTON was well held in a trio of quick-fire runs in maiden/novice company last year but this well-bred sort firmly appeals as the type to do better now handicapping following a break (also gelded) so he gets the nod, with confidence behind him in the betting bolstering the view. Quick Turn and Lapidarist are others expected to be in the mix.",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Quick Turn",
+              "position": 1,
+              "odds": "9/4",
+              "favourite": true
+            },
+            {
+              "name": "Worlington",
+              "position": 2,
+              "odds": "7/2",
+              "favourite": false
+            },
+            {
+              "name": "Lady Of Clover",
+              "position": 3,
+              "odds": "12/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": 9,
+            "favourite": false,
+            "horse_name": "Worlington",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1203021",
+              "external_reference": []
+            },
+            "odds": "7/2",
+            "saddlecloth_number": "4",
+            "silk_filename": "20260324wol162304.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117846,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909409,
+            "external_reference": []
+          },
+          "name": "Daily Profit Boosts At betmgm.co.uk Handicap (Div 2)",
+          "race_slug": null,
+          "course_name": "Wolverhampton",
+          "course_shortcode": "WOL",
+          "course_surface": {
+            "surface": "ALLWEATHER"
+          },
+          "country_short_name": "ENG",
+          "age": "3YO only",
+          "race_class": "6",
+          "distance": "1m 142y",
+          "date": "2026-03-24",
+          "time": "16:55",
+          "off_time": "16:56:07",
+          "winning_time": "1m 50.33s",
+          "ride_count": 8,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": true,
+          "verdict": "<p><b>SORTED</b> has improved switched to handicaps in recent weeks, just failing having been forced wider than the winner when runner-up over C&D 8 days ago. He can confirm recent promise and open his account. <b>Angry Ant</b> fared better than previously here last time and along with <b>Lexington Express</b>, heads the dangers. </p><ol><li><b>SORTED (IRE)</b></li><li><b>ANGRY ANT (USA)</b></li><li><b>LEXINGTON EXPRESS (IRE)</b></li></ol>",
+          "verdict_text": "SORTED has improved switched to handicaps in recent weeks, just failing having been forced wider than the winner when runner-up over C&D 8 days ago. He can confirm recent promise and open his account. Angry Ant fared better than previously here last time and along with Lexington Express, heads the dangers. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Lexington Express",
+              "position": 1,
+              "odds": "85/40",
+              "favourite": false
+            },
+            {
+              "name": "Nautical Sky",
+              "position": 2,
+              "odds": "12/1",
+              "favourite": false
+            },
+            {
+              "name": "Sorted",
+              "position": 3,
+              "odds": "5/4",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": 4,
+            "favourite": true,
+            "horse_name": "Sorted",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1184550",
+              "external_reference": []
+            },
+            "odds": "5/4",
+            "saddlecloth_number": "6",
+            "silk_filename": "20260324wol165506.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117846,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908681,
+            "external_reference": []
+          },
+          "name": "Join The Midnite Movement Handicap",
+          "race_slug": null,
+          "course_name": "Wolverhampton",
+          "course_shortcode": "WOL",
+          "course_surface": {
+            "surface": "ALLWEATHER"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "6",
+          "distance": "5f 21y",
+          "date": "2026-03-24",
+          "time": "17:30",
+          "off_time": "17:30:08",
+          "winning_time": "1m 1.07s",
+          "ride_count": 9,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": true,
+          "verdict": "<p><b>HENERY HAWK</b> wasn't able to reel in <b>Kento</b> in a C&D handicap earlier this month but he enjoys a 3 lb pull at the weights with Tony Carrol's charge and is taken to emerge on top this time. <b>Kento</b> should again be in the mix but if <b>My Genghis</b> gets away on terms he may prove to be the main danger. </p><ol><li><b>HENERY HAWK</b></li><li><b>MY GENGHIS</b></li><li><b>KENTO</b></li></ol>",
+          "verdict_text": "HENERY HAWK wasn't able to reel in Kento in a C&D handicap earlier this month but he enjoys a 3 lb pull at the weights with Tony Carrol's charge and is taken to emerge on top this time. Kento should again be in the mix but if My Genghis gets away on terms he may prove to be the main danger. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Kento",
+              "position": 1,
+              "odds": "11/4",
+              "favourite": true
+            },
+            {
+              "name": "Isla Bella",
+              "position": 2,
+              "odds": "28/1",
+              "favourite": false
+            },
+            {
+              "name": "Henery Hawk",
+              "position": 3,
+              "odds": "15/2",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": 1,
+            "favourite": false,
+            "horse_name": "Henery Hawk",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1031849",
+              "external_reference": []
+            },
+            "odds": "15/2",
+            "saddlecloth_number": "3",
+            "silk_filename": "20260324wol173003.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117846,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908682,
+            "external_reference": []
+          },
+          "name": "Create Your Bet Builders At Midnite Maiden Stakes (GBB Race)",
+          "race_slug": null,
+          "course_name": "Wolverhampton",
+          "course_shortcode": "WOL",
+          "course_surface": {
+            "surface": "ALLWEATHER"
+          },
+          "country_short_name": "ENG",
+          "age": "3YO plus",
+          "race_class": "4",
+          "distance": "1m 1f 104y",
+          "date": "2026-03-24",
+          "time": "18:00",
+          "off_time": "18:00:27",
+          "winning_time": "2m 0.46s",
+          "ride_count": 4,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": "<p><b>ROYAL STANDARD</b> ought to have more to offer yet and hails from a yard in fine form. He can get off the mark. Chelmsford runner-up <b>Montevetro</b> looks the obvious danger. </p><ol><li><b>ROYAL STANDARD (IRE)</b></li><li><b>MONTEVETRO (IRE)</b></li><li><b>STEPANOV (IRE)</b></li></ol>",
+          "verdict_text": "ROYAL STANDARD ought to have more to offer yet and hails from a yard in fine form. He can get off the mark. Chelmsford runner-up Montevetro looks the obvious danger. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Royal Standard",
+              "position": 1,
+              "odds": "4/6",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": 1,
+            "favourite": true,
+            "horse_name": "Royal Standard",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1193855",
+              "external_reference": []
+            },
+            "odds": "4/6",
+            "saddlecloth_number": "3",
+            "silk_filename": "20260324wol180003.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117846,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908683,
+            "external_reference": []
+          },
+          "name": "Midnite, Building The Future Of Betting Classified Stakes (Div 1)",
+          "race_slug": null,
+          "course_name": "Wolverhampton",
+          "course_shortcode": "WOL",
+          "course_surface": {
+            "surface": "ALLWEATHER"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "6",
+          "distance": "6f 20y",
+          "date": "2026-03-24",
+          "time": "18:30",
+          "off_time": "18:30:53",
+          "winning_time": "1m 14.57s",
+          "ride_count": 11,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": "<p><b>OPTIMISTIC</b> has taken his form up a notch this year and, with the potential of more still to offer after only 5 starts, he could be ready to open his account this time around. <b>Flicka's Girl</b> arrives in good heart and is feared most, ahead of <b>Autumn Angel</b>.</p><ol><li><b>OPTIMISTIC</b></li><li><b>FLICKA'S GIRL</b></li><li><b>AUTUMN ANGEL (IRE)</b></li></ol>",
+          "verdict_text": "OPTIMISTIC has taken his form up a notch this year and, with the potential of more still to offer after only 5 starts, he could be ready to open his account this time around. Flicka's Girl arrives in good heart and is feared most, ahead of Autumn Angel.",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Flicka's Girl",
+              "position": 1,
+              "odds": "13/2",
+              "favourite": false
+            },
+            {
+              "name": "Top Star",
+              "position": 2,
+              "odds": "14/1",
+              "favourite": false
+            },
+            {
+              "name": "Autumn Angel",
+              "position": 3,
+              "odds": "4/1",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": 5,
+            "favourite": false,
+            "horse_name": "Optimistic",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1157256",
+              "external_reference": []
+            },
+            "odds": "11/2",
+            "saddlecloth_number": "8",
+            "silk_filename": "20260324wol183008.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117846,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908684,
+            "external_reference": []
+          },
+          "name": "Midnite, Building The Future Of Betting Classified Stakes (Div 2)",
+          "race_slug": null,
+          "course_name": "Wolverhampton",
+          "course_shortcode": "WOL",
+          "course_surface": {
+            "surface": "ALLWEATHER"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "6",
+          "distance": "6f 20y",
+          "date": "2026-03-24",
+          "time": "19:00",
+          "off_time": "19:00:15",
+          "winning_time": "1m 13.7s",
+          "ride_count": 11,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": "<p><b>DR ALI</b> wasted no time getting back to form and went down fighting when runner up over C&D 2 weeks ago. Well drawn, he can make another bold bid in this groove. <b>Port Hedland</b>, <b>Tommytwohoots</b> and <b>Black Cab</b> are a trio of others to consider.</p><ol><li><b>DR ALI (IRE)</b></li><li><b>PORT HEDLAND</b></li><li><b>TOMMYTWOHOOTS</b></li></ol>",
+          "verdict_text": "DR ALI wasted no time getting back to form and went down fighting when runner up over C&D 2 weeks ago. Well drawn, he can make another bold bid in this groove. Port Hedland, Tommytwohoots and Black Cab are a trio of others to consider.",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Dr Ali",
+              "position": 1,
+              "odds": "9/4",
+              "favourite": false
+            },
+            {
+              "name": "Tommytwohoots",
+              "position": 2,
+              "odds": "7/1",
+              "favourite": false
+            },
+            {
+              "name": "Black Cab",
+              "position": 3,
+              "odds": "5/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": 3,
+            "favourite": false,
+            "horse_name": "Dr Ali",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1142175",
+              "external_reference": []
+            },
+            "odds": "9/4",
+            "saddlecloth_number": "5",
+            "silk_filename": "20260324wol190005.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117846,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908685,
+            "external_reference": []
+          },
+          "name": "Midnite: Built For 2026 Not 2006 Handicap",
+          "race_slug": null,
+          "course_name": "Wolverhampton",
+          "course_shortcode": "WOL",
+          "course_surface": {
+            "surface": "ALLWEATHER"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "4",
+          "distance": "5f 21y",
+          "date": "2026-03-24",
+          "time": "19:30",
+          "off_time": "19:30:34",
+          "winning_time": "1m 0.22s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": true,
+          "verdict": "<p><b>AMERICAN BAY</b> made a pleasing return to action over C&D recently and is the percentage call to come out on top from the same mark. <b>Smooth Silesie</b> and <b>Mr Lightside</b> head the opposition. </p><ol><li><b>AMERICAN BAY</b></li><li><b>SMOOTH SILESIE (IRE)</b></li><li><b>MR LIGHTSIDE (IRE)</b></li></ol>",
+          "verdict_text": "AMERICAN BAY made a pleasing return to action over C&D recently and is the percentage call to come out on top from the same mark. Smooth Silesie and Mr Lightside head the opposition. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Counsel",
+              "position": 1,
+              "odds": "6/1",
+              "favourite": false
+            },
+            {
+              "name": "American Bay",
+              "position": 2,
+              "odds": "2/1",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": 6,
+            "favourite": true,
+            "horse_name": "American Bay",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1111184",
+              "external_reference": []
+            },
+            "odds": "2/1",
+            "saddlecloth_number": "3",
+            "silk_filename": "20260324wol193003.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117846,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908686,
+            "external_reference": []
+          },
+          "name": "Midnite Aint Your Grandads Bookie Novice Stakes (GBB Race)",
+          "race_slug": null,
+          "course_name": "Wolverhampton",
+          "course_shortcode": "WOL",
+          "course_surface": {
+            "surface": "ALLWEATHER"
+          },
+          "country_short_name": "ENG",
+          "age": "3YO plus",
+          "race_class": "4",
+          "distance": "5f 21y",
+          "date": "2026-03-24",
+          "time": "20:00",
+          "off_time": "20:00:18",
+          "winning_time": "1m 0.58s",
+          "ride_count": 3,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": "<p><b>TIME TO TAKE OFF</b> left the impression she will go on to better things when making a winning debut at Nottingham in October and looks the one to beat. Newcastle scorer <b>Merlier</b> is feared most. </p><ol><li><b>TIME TO TAKE OFF (IRE)</b></li><li><b>MERLIER (IRE)</b></li><li><b>BURDETT ESTATE (IRE)</b></li></ol>",
+          "verdict_text": "TIME TO TAKE OFF left the impression she will go on to better things when making a winning debut at Nottingham in October and looks the one to beat. Newcastle scorer Merlier is feared most. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Merlier",
+              "position": 1,
+              "odds": "7/4",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": 1,
+            "favourite": true,
+            "horse_name": "Time To Take Off",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1201448",
+              "external_reference": []
+            },
+            "odds": "8/13",
+            "saddlecloth_number": "3",
+            "silk_filename": "20260324wol200003.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117846,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 908687,
+            "external_reference": []
+          },
+          "name": "Win 250,000 With BetMGM's Golden Goals Handicap",
+          "race_slug": null,
+          "course_name": "Wolverhampton",
+          "course_shortcode": "WOL",
+          "course_surface": {
+            "surface": "ALLWEATHER"
+          },
+          "country_short_name": "ENG",
+          "age": "4YO plus",
+          "race_class": "4",
+          "distance": "1m 142y",
+          "date": "2026-03-24",
+          "time": "20:30",
+          "off_time": "20:30:45",
+          "winning_time": "1m 47.52s",
+          "ride_count": 7,
+          "race_stage": "WEIGHEDIN",
+          "has_video": true,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": true,
+          "verdict": "<p><b>PANAMA BLACK</b>'s latest third at Southwell was arguably a career-best effort so he could be ready to strike. <b>Helm Rock</b> should strip fitter for his comeback run, while <b>Farasi Lane</b> can be expected to bounce back. </p><ol><li><b>PANAMA BLACK (IRE)</b></li><li><b>HELM ROCK</b></li><li><b>FARASI LANE (IRE)</b></li></ol>",
+          "verdict_text": "PANAMA BLACK's latest third at Southwell was arguably a career-best effort so he could be ready to strike. Helm Rock should strip fitter for his comeback run, while Farasi Lane can be expected to bounce back. ",
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Farasi Lane",
+              "position": 1,
+              "odds": "11/10",
+              "favourite": true
+            },
+            {
+              "name": "Helm Rock",
+              "position": 2,
+              "odds": "4/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {
+            "draw_number": 3,
+            "favourite": false,
+            "horse_name": "Panama Black",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1160073",
+              "external_reference": []
+            },
+            "odds": "11/2",
+            "saddlecloth_number": "5",
+            "silk_filename": "20260324wol203005.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "DORMANT"
+        }
+      ]
+    },
+    {
+      "meeting_summary": {
+        "meeting_reference": {
+          "id": 117929,
+          "external_reference": []
+        },
+        "date": "2026-03-24",
+        "status": "DORMANT",
+        "course": {
+          "course_reference": {
+            "id": 102,
+            "external_reference": []
+          },
+          "name": "Enghien",
+          "short_name": null,
+          "country": {
+            "country_reference": {
+              "id": 2,
+              "external_reference": []
+            },
+            "long_name": "France"
+          },
+          "feed_source": null
+        },
+        "going": "Standard",
+        "surface_summary": "Turf",
+        "visible": true,
+        "weather": "Cloudy",
+        "abandoned": null
+      },
+      "races": [
+        {
+          "meeting_summary_reference": {
+            "id": 117929,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909420,
+            "external_reference": []
+          },
+          "name": "Prix Du Pont Alexandre III - Attele",
+          "race_slug": null,
+          "course_name": "Enghien",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "5YO only",
+          "race_class": "",
+          "distance": "1m 6f 64y",
+          "date": "2026-03-24",
+          "time": "15:32",
+          "off_time": "15:37:28",
+          "winning_time": "3m 33.05s",
+          "ride_count": 15,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Lelizia",
+              "position": 1,
+              "odds": "11/4",
+              "favourite": false
+            },
+            {
+              "name": "Lolly Star",
+              "position": 2,
+              "odds": "9/4",
+              "favourite": true
+            },
+            {
+              "name": "Lili Des Ormes",
+              "position": 3,
+              "odds": "6/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117929,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909422,
+            "external_reference": []
+          },
+          "name": "Prix Du Pont Du Carrousel - Monte",
+          "race_slug": null,
+          "course_name": "Enghien",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m 6f 64y",
+          "date": "2026-03-24",
+          "time": "16:07",
+          "off_time": "16:15:26",
+          "winning_time": "3m 31.99s",
+          "ride_count": 11,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Kalico Jack",
+              "position": 1,
+              "odds": "5/1",
+              "favourite": false
+            },
+            {
+              "name": "Leonce Du Clos",
+              "position": 2,
+              "odds": "5/2",
+              "favourite": true
+            },
+            {
+              "name": "Ka Factor",
+              "position": 3,
+              "odds": "4/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117929,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909424,
+            "external_reference": []
+          },
+          "name": "Prix Du Pont D'iena - Attele",
+          "race_slug": null,
+          "course_name": "Enghien",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "5YO only",
+          "race_class": "",
+          "distance": "1m 6f 64y",
+          "date": "2026-03-24",
+          "time": "16:42",
+          "off_time": "16:45:22",
+          "winning_time": "3m 37.2s",
+          "ride_count": 11,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Lutin Des Arris",
+              "position": 1,
+              "odds": "12/1",
+              "favourite": false
+            },
+            {
+              "name": "Live Your Dreams",
+              "position": 2,
+              "odds": "6/4",
+              "favourite": true
+            },
+            {
+              "name": "Larabien",
+              "position": 3,
+              "odds": "11/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117929,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909426,
+            "external_reference": []
+          },
+          "name": "Prix Du Pont De Grenelle - Monte",
+          "race_slug": null,
+          "course_name": "Enghien",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m 3f 40y",
+          "date": "2026-03-24",
+          "time": "17:15",
+          "off_time": "17:18:20",
+          "winning_time": "2m 41s",
+          "ride_count": 15,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Gard",
+              "position": 1,
+              "odds": "6/4",
+              "favourite": true
+            },
+            {
+              "name": "Hanielle Crepin",
+              "position": 2,
+              "odds": "50/1",
+              "favourite": false
+            },
+            {
+              "name": "Joie De La Cote",
+              "position": 3,
+              "odds": "11/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117929,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909428,
+            "external_reference": []
+          },
+          "name": "Prix De L'isere - Attele",
+          "race_slug": null,
+          "course_name": "Enghien",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "4YO only",
+          "race_class": "",
+          "distance": "1m 6f 64y",
+          "date": "2026-03-24",
+          "time": "18:02",
+          "off_time": "18:05:23",
+          "winning_time": "3m 35.57s",
+          "ride_count": 16,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Majorelle",
+              "position": 1,
+              "odds": "5/1",
+              "favourite": false
+            },
+            {
+              "name": "Macumba Du Vivier",
+              "position": 2,
+              "odds": "6/5",
+              "favourite": true
+            },
+            {
+              "name": "Metallica Smart",
+              "position": 3,
+              "odds": "5/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117929,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909430,
+            "external_reference": []
+          },
+          "name": "Prix Du Pont Saint-louis - Monte",
+          "race_slug": null,
+          "course_name": "Enghien",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "4YO only",
+          "race_class": "",
+          "distance": "1m 6f 64y",
+          "date": "2026-03-24",
+          "time": "18:34",
+          "off_time": "18:34:19",
+          "winning_time": "3m 35.35s",
+          "ride_count": 10,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "My Love D'ar",
+              "position": 1,
+              "odds": "2/1",
+              "favourite": true
+            },
+            {
+              "name": "Marvelous",
+              "position": 2,
+              "odds": "17/2",
+              "favourite": false
+            },
+            {
+              "name": "Mojito Des Ecus",
+              "position": 3,
+              "odds": "7/2",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117929,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909433,
+            "external_reference": []
+          },
+          "name": "Prix De Chennevieres - Attele",
+          "race_slug": null,
+          "course_name": "Enghien",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "4YO plus",
+          "race_class": "",
+          "distance": "1m 2f 151y",
+          "date": "2026-03-24",
+          "time": "19:06",
+          "off_time": "19:09:04",
+          "winning_time": "2m 40.3s",
+          "ride_count": 15,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Lannister D'avril",
+              "position": 1,
+              "odds": "5/1",
+              "favourite": false
+            },
+            {
+              "name": "Kheops Saint Clair",
+              "position": 2,
+              "odds": "6/1",
+              "favourite": false
+            },
+            {
+              "name": "L'arc",
+              "position": 3,
+              "odds": "20/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117929,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909434,
+            "external_reference": []
+          },
+          "name": "Prix De Saint-clement - Attele",
+          "race_slug": null,
+          "course_name": "Enghien",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "4YO plus",
+          "race_class": "",
+          "distance": "1m 6f 64y",
+          "date": "2026-03-24",
+          "time": "19:38",
+          "off_time": "19:43:29",
+          "winning_time": "3m 36.77s",
+          "ride_count": 9,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Jardin Du Roi",
+              "position": 1,
+              "odds": "6/4",
+              "favourite": true
+            },
+            {
+              "name": "Kyrielle Jomuna",
+              "position": 2,
+              "odds": "20/1",
+              "favourite": false
+            },
+            {
+              "name": "Jullian Daddy",
+              "position": 3,
+              "odds": "8/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        }
+      ]
+    },
+    {
+      "meeting_summary": {
+        "meeting_reference": {
+          "id": 117928,
+          "external_reference": []
+        },
+        "date": "2026-03-24",
+        "status": "DORMANT",
+        "course": {
+          "course_reference": {
+            "id": 965,
+            "external_reference": []
+          },
+          "name": "Maure De Bretagne",
+          "short_name": null,
+          "country": {
+            "country_reference": {
+              "id": 2,
+              "external_reference": []
+            },
+            "long_name": "France"
+          },
+          "feed_source": null
+        },
+        "going": "Standard",
+        "surface_summary": "Turf",
+        "visible": true,
+        "weather": "Fine but Cloudy",
+        "abandoned": null
+      },
+      "races": [
+        {
+          "meeting_summary_reference": {
+            "id": 117928,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909419,
+            "external_reference": []
+          },
+          "name": "Prix Vallons En Bretagne - Attele",
+          "race_slug": null,
+          "course_name": "Maure De Bretagne",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "3YO only",
+          "race_class": "",
+          "distance": "1m 6f 36y",
+          "date": "2026-03-24",
+          "time": "10:51",
+          "off_time": "10:52:22",
+          "winning_time": "3m 40.74s",
+          "ride_count": 8,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Nouquileo",
+              "position": 1,
+              "odds": "10/3",
+              "favourite": false
+            },
+            {
+              "name": "Naimar",
+              "position": 2,
+              "odds": "4/7",
+              "favourite": true
+            },
+            {
+              "name": "Nectar Du Bocage",
+              "position": 3,
+              "odds": "16/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117928,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909421,
+            "external_reference": []
+          },
+          "name": "Prix 36 Heures Immo - Monte",
+          "race_slug": null,
+          "course_name": "Maure De Bretagne",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m 6f 36y",
+          "date": "2026-03-24",
+          "time": "11:23",
+          "off_time": "11:25:00",
+          "winning_time": "3m 36.26s",
+          "ride_count": 14,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "L'as De Smarves",
+              "position": 1,
+              "odds": "4/5",
+              "favourite": true
+            },
+            {
+              "name": "Lizon Des Bordes",
+              "position": 2,
+              "odds": "20/1",
+              "favourite": false
+            },
+            {
+              "name": "La Mome",
+              "position": 3,
+              "odds": "20/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117928,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909423,
+            "external_reference": []
+          },
+          "name": "Prix Jean Sevestre - Attele",
+          "race_slug": null,
+          "course_name": "Maure De Bretagne",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "4YO only",
+          "race_class": "",
+          "distance": "1m 6f 36y",
+          "date": "2026-03-24",
+          "time": "11:55",
+          "off_time": "11:56:14",
+          "winning_time": "3m 42.63s",
+          "ride_count": 12,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Mon Prestige Nemo",
+              "position": 1,
+              "odds": "11/8",
+              "favourite": true
+            },
+            {
+              "name": "Menelas De Corbery",
+              "position": 2,
+              "odds": "25/1",
+              "favourite": false
+            },
+            {
+              "name": "Mesange De Val",
+              "position": 3,
+              "odds": "8/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117928,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909425,
+            "external_reference": []
+          },
+          "name": "Prix Jean Raffegeau - Attele",
+          "race_slug": null,
+          "course_name": "Maure De Bretagne",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "5YO only",
+          "race_class": "",
+          "distance": "1m 6f 36y",
+          "date": "2026-03-24",
+          "time": "12:27",
+          "off_time": "12:30:36",
+          "winning_time": "3m 35.98s",
+          "ride_count": 13,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Lynx Du Ruisseau",
+              "position": 1,
+              "odds": "9/4",
+              "favourite": true
+            },
+            {
+              "name": "L'as Des Isles",
+              "position": 2,
+              "odds": "16/1",
+              "favourite": false
+            },
+            {
+              "name": "Loki Factier",
+              "position": 3,
+              "odds": "13/2",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117928,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909427,
+            "external_reference": []
+          },
+          "name": "Prix Alexis De La Bouere - Attele",
+          "race_slug": null,
+          "course_name": "Maure De Bretagne",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "4YO plus",
+          "race_class": "",
+          "distance": "1m 6f 36y",
+          "date": "2026-03-24",
+          "time": "13:12",
+          "off_time": "13:15:06",
+          "winning_time": "3m 34.29s",
+          "ride_count": 18,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Kingston De Blary",
+              "position": 1,
+              "odds": "4/1",
+              "favourite": false
+            },
+            {
+              "name": "Juliano Stile",
+              "position": 2,
+              "odds": "15/2",
+              "favourite": false
+            },
+            {
+              "name": "Jasmine De Grez",
+              "position": 3,
+              "odds": "25/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117928,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909429,
+            "external_reference": []
+          },
+          "name": "Prix Agrial Yearly - Attele",
+          "race_slug": null,
+          "course_name": "Maure De Bretagne",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "5YO only",
+          "race_class": "",
+          "distance": "1m 6f 36y",
+          "date": "2026-03-24",
+          "time": "13:47",
+          "off_time": "13:48:48",
+          "winning_time": "3m 34.31s",
+          "ride_count": 14,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Louviers",
+              "position": 1,
+              "odds": "6/4",
+              "favourite": true
+            },
+            {
+              "name": "Leo Des Malberaux",
+              "position": 2,
+              "odds": "12/1",
+              "favourite": false
+            },
+            {
+              "name": "Leader Carisaie",
+              "position": 3,
+              "odds": "10/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117928,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909431,
+            "external_reference": []
+          },
+          "name": "Prix Immonot - Monte",
+          "race_slug": null,
+          "course_name": "Maure De Bretagne",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m 6f 36y",
+          "date": "2026-03-24",
+          "time": "14:22",
+          "off_time": "14:25:20",
+          "winning_time": "3m 31.84s",
+          "ride_count": 11,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Jaeger Man",
+              "position": 1,
+              "odds": "8/13",
+              "favourite": true
+            },
+            {
+              "name": "Just Me Nesle",
+              "position": 2,
+              "odds": "40/1",
+              "favourite": false
+            },
+            {
+              "name": "Koala Des Arcs",
+              "position": 3,
+              "odds": "9/2",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117928,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909432,
+            "external_reference": []
+          },
+          "name": "Prix De Paris-vincennes - Attele",
+          "race_slug": null,
+          "course_name": "Maure De Bretagne",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "4YO plus",
+          "race_class": "",
+          "distance": "1m 6f 36y",
+          "date": "2026-03-24",
+          "time": "14:57",
+          "off_time": "15:06:09",
+          "winning_time": "3m 33.96s",
+          "ride_count": 17,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Standard",
+          "going_shortcode": "ST",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Ilaria Kily",
+              "position": 1,
+              "odds": "50/1",
+              "favourite": false
+            },
+            {
+              "name": "Jackson D'ecajeul",
+              "position": 2,
+              "odds": "22/1",
+              "favourite": false
+            },
+            {
+              "name": "Joia Du Citrus",
+              "position": 3,
+              "odds": "8/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        }
+      ]
+    },
+    {
+      "meeting_summary": {
+        "meeting_reference": {
+          "id": 117927,
+          "external_reference": []
+        },
+        "date": "2026-03-24",
+        "status": "DORMANT",
+        "course": {
+          "course_reference": {
+            "id": 80,
+            "external_reference": []
+          },
+          "name": "Saint-Cloud",
+          "short_name": "SAI",
+          "country": {
+            "country_reference": {
+              "id": 2,
+              "external_reference": []
+            },
+            "long_name": "France"
+          },
+          "feed_source": null
+        },
+        "going": "Heavy",
+        "surface_summary": "Turf",
+        "visible": true,
+        "weather": "Fine but Cloudy",
+        "abandoned": null
+      },
+      "races": [
+        {
+          "meeting_summary_reference": {
+            "id": 117927,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909410,
+            "external_reference": []
+          },
+          "name": "Maison Jardies Handicap",
+          "race_slug": null,
+          "course_name": "Saint-Cloud",
+          "course_shortcode": "SAI",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "4YO plus",
+          "race_class": "2",
+          "distance": "7f 209y",
+          "date": "2026-03-24",
+          "time": "12:55",
+          "off_time": "12:58:54",
+          "winning_time": "1m 39.75s",
+          "ride_count": 16,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Heavy",
+          "going_shortcode": "HVY",
+          "has_handicap": true,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Clavus",
+              "position": 1,
+              "odds": "5/2",
+              "favourite": true
+            },
+            {
+              "name": "Felix Aux Ormes",
+              "position": 2,
+              "odds": "7/1",
+              "favourite": false
+            },
+            {
+              "name": "Olympic Message",
+              "position": 3,
+              "odds": "15/2",
+              "favourite": false
+            },
+            {
+              "name": "Bellano",
+              "position": 4,
+              "odds": "14/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117927,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909411,
+            "external_reference": []
+          },
+          "name": "Du Debut Stakes",
+          "race_slug": null,
+          "course_name": "Saint-Cloud",
+          "course_shortcode": "SAI",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "2YO only",
+          "race_class": "",
+          "distance": "4f 104y",
+          "date": "2026-03-24",
+          "time": "13:30",
+          "off_time": "13:31:49",
+          "winning_time": "51.8s",
+          "ride_count": 8,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Heavy",
+          "going_shortcode": "HVY",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Say Squirrel",
+              "position": 1,
+              "odds": "7/4",
+              "favourite": true
+            },
+            {
+              "name": "Tokaido",
+              "position": 2,
+              "odds": "3/1",
+              "favourite": false
+            },
+            {
+              "name": "Incredible",
+              "position": 3,
+              "odds": "28/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117927,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909412,
+            "external_reference": []
+          },
+          "name": "Mirska Maiden Stakes",
+          "race_slug": null,
+          "course_name": "Saint-Cloud",
+          "course_shortcode": "SAI",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "3YO only",
+          "race_class": "",
+          "distance": "1m 3f 204y",
+          "date": "2026-03-24",
+          "time": "14:05",
+          "off_time": "14:06:07",
+          "winning_time": "2m 35.86s",
+          "ride_count": 12,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Heavy",
+          "going_shortcode": "HVY",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Calasita",
+              "position": 1,
+              "odds": "2/1",
+              "favourite": false
+            },
+            {
+              "name": "Spirit Of Zarak",
+              "position": 2,
+              "odds": "9/1",
+              "favourite": false
+            },
+            {
+              "name": "Tickea",
+              "position": 3,
+              "odds": "12/1",
+              "favourite": false
+            },
+            {
+              "name": "Jannet",
+              "position": 3,
+              "odds": "5/4",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117927,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909413,
+            "external_reference": []
+          },
+          "name": "Goodly Maiden Stakes",
+          "race_slug": null,
+          "course_name": "Saint-Cloud",
+          "course_shortcode": "SAI",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "3YO only",
+          "race_class": "",
+          "distance": "1m 3f 204y",
+          "date": "2026-03-24",
+          "time": "14:40",
+          "off_time": "14:44:25",
+          "winning_time": "2m 35.71s",
+          "ride_count": 14,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Heavy",
+          "going_shortcode": "HVY",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Aeronef",
+              "position": 1,
+              "odds": "5/1",
+              "favourite": false
+            },
+            {
+              "name": "Kinasani",
+              "position": 2,
+              "odds": "17/2",
+              "favourite": false
+            },
+            {
+              "name": "Sorano",
+              "position": 3,
+              "odds": "12/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117927,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909414,
+            "external_reference": []
+          },
+          "name": "Rose De Mai Listed Stakes",
+          "race_slug": null,
+          "course_name": "Saint-Cloud",
+          "course_shortcode": "SAI",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "3YO only",
+          "race_class": "",
+          "distance": "1m 1f 207y",
+          "date": "2026-03-24",
+          "time": "15:15",
+          "off_time": "15:22:04",
+          "winning_time": "2m 8.84s",
+          "ride_count": 12,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Heavy",
+          "going_shortcode": "HVY",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Arkansas",
+              "position": 1,
+              "odds": "13/2",
+              "favourite": false
+            },
+            {
+              "name": "Habibi",
+              "position": 2,
+              "odds": "9/2",
+              "favourite": false
+            },
+            {
+              "name": "Warriors Whisper",
+              "position": 3,
+              "odds": "11/4",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117927,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909415,
+            "external_reference": []
+          },
+          "name": "D'estimauville Handicap",
+          "race_slug": null,
+          "course_name": "Saint-Cloud",
+          "course_shortcode": "SAI",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "3YO only",
+          "race_class": "",
+          "distance": "7f 209y",
+          "date": "2026-03-24",
+          "time": "15:50",
+          "off_time": "15:56:18",
+          "winning_time": "1m 42.78s",
+          "ride_count": 14,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Heavy",
+          "going_shortcode": "HVY",
+          "has_handicap": true,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Howitzer",
+              "position": 1,
+              "odds": "16/1",
+              "favourite": false
+            },
+            {
+              "name": "Ingeborg",
+              "position": 2,
+              "odds": "8/1",
+              "favourite": false
+            },
+            {
+              "name": "Delire D'amour",
+              "position": 3,
+              "odds": "28/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117927,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909416,
+            "external_reference": []
+          },
+          "name": "Bango Stakes (Arab Group 3)",
+          "race_slug": null,
+          "course_name": "Saint-Cloud",
+          "course_shortcode": "SAI",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "4YO to 5YO",
+          "race_class": "",
+          "distance": "1m 4f 94y",
+          "date": "2026-03-24",
+          "time": "16:25",
+          "off_time": "16:29:59",
+          "winning_time": "2m 50.88s",
+          "ride_count": 11,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Heavy",
+          "going_shortcode": "HVY",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Louisa Banbou",
+              "position": 1,
+              "odds": "1/2",
+              "favourite": true
+            },
+            {
+              "name": "Madrinha Rosa",
+              "position": 2,
+              "odds": "20/1",
+              "favourite": false
+            },
+            {
+              "name": "Mission Smart",
+              "position": 3,
+              "odds": "13/2",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117927,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909417,
+            "external_reference": []
+          },
+          "name": "Villa Brillants Handicap",
+          "race_slug": null,
+          "course_name": "Saint-Cloud",
+          "course_shortcode": "SAI",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "4YO plus",
+          "race_class": "3",
+          "distance": "7f 209y",
+          "date": "2026-03-24",
+          "time": "17:00",
+          "off_time": "17:03:53",
+          "winning_time": "1m 41.67s",
+          "ride_count": 11,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Heavy",
+          "going_shortcode": "HVY",
+          "has_handicap": true,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Trophane",
+              "position": 1,
+              "odds": "6/1",
+              "favourite": false
+            },
+            {
+              "name": "Lisippo",
+              "position": 2,
+              "odds": "6/1",
+              "favourite": false
+            },
+            {
+              "name": "Montgaudry",
+              "position": 3,
+              "odds": "7/2",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117927,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909418,
+            "external_reference": []
+          },
+          "name": "Du Musee Handicap",
+          "race_slug": null,
+          "course_name": "Saint-Cloud",
+          "course_shortcode": "SAI",
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "FR",
+          "age": "3YO only",
+          "race_class": "",
+          "distance": "7f 209y",
+          "date": "2026-03-24",
+          "time": "17:30",
+          "off_time": "17:34:39",
+          "winning_time": "1m 42.72s",
+          "ride_count": 12,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Heavy",
+          "going_shortcode": "HVY",
+          "has_handicap": true,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Faolio",
+              "position": 1,
+              "odds": "7/1",
+              "favourite": false
+            },
+            {
+              "name": "Parvage",
+              "position": 2,
+              "odds": "9/4",
+              "favourite": true
+            },
+            {
+              "name": "Bavarois",
+              "position": 3,
+              "odds": "16/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        }
+      ]
+    },
+    {
+      "meeting_summary": {
+        "meeting_reference": {
+          "id": 117920,
+          "external_reference": []
+        },
+        "date": "2026-03-24",
+        "status": "ABANDONED",
+        "course": {
+          "course_reference": {
+            "id": 161,
+            "external_reference": []
+          },
+          "name": "Vaal",
+          "short_name": null,
+          "country": {
+            "country_reference": {
+              "id": 12,
+              "external_reference": []
+            },
+            "long_name": "South Africa"
+          },
+          "feed_source": null
+        },
+        "going": "Good",
+        "surface_summary": "Turf",
+        "visible": true,
+        "weather": null,
+        "abandoned": "Waterlogged Track"
+      },
+      "races": [
+        {
+          "meeting_summary_reference": {
+            "id": 117920,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909338,
+            "external_reference": []
+          },
+          "name": "4Racing Welcomes You Work Riders Maiden Plate (F & M)",
+          "race_slug": null,
+          "course_name": "Vaal",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "SAF",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "4f 214y",
+          "date": "2026-03-24",
+          "time": "10:00",
+          "off_time": null,
+          "winning_time": null,
+          "ride_count": 6,
+          "race_stage": "ABANDONED",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": "<ol><li><b>DUCHESS DI (SAF)</b></li><li><b>EMPRESS WU (SAF)</b></li><li><b>HURRICANE POWER (SAF)</b></li></ol>",
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [],
+          "top_rated_horse": {
+            "draw_number": 5,
+            "favourite": false,
+            "horse_name": "Duchess Di",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1202428",
+              "external_reference": []
+            },
+            "odds": "8/11",
+            "saddlecloth_number": "1",
+            "silk_filename": "20260324vaa100001.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "ABANDONED"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117920,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909339,
+            "external_reference": []
+          },
+          "name": "youcanbetonus! Maiden Plate",
+          "race_slug": null,
+          "course_name": "Vaal",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "SAF",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m 3f 205y",
+          "date": "2026-03-24",
+          "time": "10:35",
+          "off_time": null,
+          "winning_time": null,
+          "ride_count": 5,
+          "race_stage": "ABANDONED",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": "<ol><li><b>COMIC ARTIST (SAF)</b></li><li><b>THOONSIL (SAF)</b></li><li><b>SAMUEL SHARPE (SAF)</b></li></ol>",
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [],
+          "top_rated_horse": {
+            "draw_number": 3,
+            "favourite": false,
+            "horse_name": "Comic Artist",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1192143",
+              "external_reference": []
+            },
+            "odds": "2/1",
+            "saddlecloth_number": "5",
+            "silk_filename": "20260324vaa103505.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "ABANDONED"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117920,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909340,
+            "external_reference": []
+          },
+          "name": "SA Derby 4 April Maiden Plate",
+          "race_slug": null,
+          "course_name": "Vaal",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "SAF",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "4f 214y",
+          "date": "2026-03-24",
+          "time": "11:10",
+          "off_time": null,
+          "winning_time": null,
+          "ride_count": 10,
+          "race_stage": "ABANDONED",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": "<ol><li><b>SOSORU (SAF)</b></li><li><b>HAMMER BLOW (SAF)</b></li><li><b>ELEGANT EDGE (SAF)</b></li></ol>",
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [],
+          "top_rated_horse": {
+            "draw_number": 3,
+            "favourite": false,
+            "horse_name": "Sosoru",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1212623",
+              "external_reference": []
+            },
+            "odds": "8/11",
+            "saddlecloth_number": "7",
+            "silk_filename": "20260324vaa111007.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "ABANDONED"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117920,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909341,
+            "external_reference": []
+          },
+          "name": "For Hospitality Bookings Call 011 681 1796 Middle Stakes",
+          "race_slug": null,
+          "course_name": "Vaal",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "SAF",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m 209y",
+          "date": "2026-03-24",
+          "time": "11:45",
+          "off_time": null,
+          "winning_time": null,
+          "ride_count": 13,
+          "race_stage": "ABANDONED",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": "<ol><li><b>THE PLAYBOY BOMBER (SAF)</b></li><li><b>FULLY LOADED (SAF)</b></li><li><b>ROBERT BROWNING (SAF)</b></li></ol>",
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [],
+          "top_rated_horse": {
+            "draw_number": 7,
+            "favourite": false,
+            "horse_name": "The Playboy Bomber",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1135825",
+              "external_reference": []
+            },
+            "odds": "11/2",
+            "saddlecloth_number": "12",
+            "silk_filename": "20260324vaa114512.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "ABANDONED"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117920,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909342,
+            "external_reference": []
+          },
+          "name": "Play Soccer 6, 10 And 13 Mr 66 Handicap",
+          "race_slug": null,
+          "course_name": "Vaal",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "SAF",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "7f 210y",
+          "date": "2026-03-24",
+          "time": "12:20",
+          "off_time": null,
+          "winning_time": null,
+          "ride_count": 14,
+          "race_stage": "ABANDONED",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": true,
+          "verdict": "<ol><li><b>PRETTY ANALIA (SAF)</b></li><li><b>BOLD ACTION (SAF)</b></li><li><b>LAST GINGER (SAF)</b></li></ol>",
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [],
+          "top_rated_horse": {
+            "draw_number": 14,
+            "favourite": false,
+            "horse_name": "Pretty Analia",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1071252",
+              "external_reference": []
+            },
+            "odds": "12/1",
+            "saddlecloth_number": "6",
+            "silk_filename": "20260324vaa122006.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "ABANDONED"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117920,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909343,
+            "external_reference": []
+          },
+          "name": "Racing240 Mr 85 Handicap",
+          "race_slug": null,
+          "course_name": "Vaal",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "SAF",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "7f 101y",
+          "date": "2026-03-24",
+          "time": "12:55",
+          "off_time": null,
+          "winning_time": null,
+          "ride_count": 11,
+          "race_stage": "ABANDONED",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": true,
+          "verdict": "<ol><li><b>GLAMOROUS LADY (SAF)</b></li><li><b>ORANGE COUNTY (SAF)</b></li><li><b>GOT THE FEELING (SAF)</b></li></ol>",
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [],
+          "top_rated_horse": {
+            "draw_number": 10,
+            "favourite": false,
+            "horse_name": "Glamorous Lady",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1147696",
+              "external_reference": []
+            },
+            "odds": "10/1",
+            "saddlecloth_number": "10",
+            "silk_filename": "20260324vaa125510.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "ABANDONED"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117920,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909344,
+            "external_reference": []
+          },
+          "name": "Racing Today Fm 78 Handicap (F & M)",
+          "race_slug": null,
+          "course_name": "Vaal",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "SAF",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "7f 210y",
+          "date": "2026-03-24",
+          "time": "13:30",
+          "off_time": null,
+          "winning_time": null,
+          "ride_count": 11,
+          "race_stage": "ABANDONED",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": true,
+          "verdict": "<ol><li><b>PRINCESS ILARIA (SAF)</b></li><li><b>FRANGIPANI (SAF)</b></li><li><b>THE MIGHTIEST (SAF)</b></li></ol>",
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [],
+          "top_rated_horse": {
+            "draw_number": 6,
+            "favourite": false,
+            "horse_name": "Princess Ilaria",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1075242",
+              "external_reference": []
+            },
+            "odds": "11/2",
+            "saddlecloth_number": "4",
+            "silk_filename": "20260324vaa133004.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "ABANDONED"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117920,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909345,
+            "external_reference": []
+          },
+          "name": "Tab Telebet 0861 000 822 Mr 82 Handicap",
+          "race_slug": null,
+          "course_name": "Vaal",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "SAF",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "5f 212y",
+          "date": "2026-03-24",
+          "time": "14:05",
+          "off_time": null,
+          "winning_time": null,
+          "ride_count": 18,
+          "race_stage": "ABANDONED",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": true,
+          "verdict": "<ol><li><b>DANTE'S BOND (SAF)</b></li><li><b>ONE TIGER (SAF)</b></li><li><b>SALUTE THE FLAG (SAF)</b></li></ol>",
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [],
+          "top_rated_horse": {
+            "draw_number": 1,
+            "favourite": false,
+            "horse_name": "Dante's Bond",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1193889",
+              "external_reference": []
+            },
+            "odds": "4/1",
+            "saddlecloth_number": "9",
+            "silk_filename": "20260324vaa140509.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "ABANDONED"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117920,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909346,
+            "external_reference": []
+          },
+          "name": "Next Vaal Racemeeting Tuesday 31 March Mr 66 Handicap",
+          "race_slug": null,
+          "course_name": "Vaal",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "SAF",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "5f 212y",
+          "date": "2026-03-24",
+          "time": "14:40",
+          "off_time": null,
+          "winning_time": null,
+          "ride_count": 16,
+          "race_stage": "ABANDONED",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": true,
+          "verdict": "<ol><li><b>TAKING A RISK (SAF)</b></li><li><b>KOTINOS (SAF)</b></li><li><b>PALACE REVOLT (SAF)</b></li></ol>",
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [],
+          "top_rated_horse": {
+            "draw_number": 2,
+            "favourite": false,
+            "horse_name": "Taking A Risk",
+            "horse_status": "RUNNER",
+            "horse_reference": {
+              "id": "1186924",
+              "external_reference": []
+            },
+            "odds": "9/2",
+            "saddlecloth_number": "6",
+            "silk_filename": "20260324vaa144006.png",
+            "timeform_stars": 5
+          },
+          "meeting_status": "ABANDONED"
+        }
+      ]
+    },
+    {
+      "meeting_summary": {
+        "meeting_reference": {
+          "id": 117933,
+          "external_reference": []
+        },
+        "date": "2026-03-24",
+        "status": "DORMANT",
+        "course": {
+          "course_reference": {
+            "id": 196,
+            "external_reference": []
+          },
+          "name": "Mahoning Valley",
+          "short_name": null,
+          "country": {
+            "country_reference": {
+              "id": 1,
+              "external_reference": []
+            },
+            "long_name": "United States"
+          },
+          "feed_source": null
+        },
+        "going": "Good",
+        "surface_summary": "Dirt",
+        "visible": true,
+        "weather": "Overcast",
+        "abandoned": null
+      },
+      "races": [
+        {
+          "meeting_summary_reference": {
+            "id": 117933,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909460,
+            "external_reference": []
+          },
+          "name": "Race 1 - Claiming",
+          "race_slug": null,
+          "course_name": "Mahoning Valley",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "6f",
+          "date": "2026-03-24",
+          "time": "16:15",
+          "off_time": "16:17:30",
+          "winning_time": "1m 12.74s",
+          "ride_count": 5,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Sloppy",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Ultima Grace",
+              "position": 1,
+              "odds": "15/8",
+              "favourite": false
+            },
+            {
+              "name": "Starcourt",
+              "position": 2,
+              "odds": "5/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117933,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909461,
+            "external_reference": []
+          },
+          "name": "Race 2 - Claiming",
+          "race_slug": null,
+          "course_name": "Mahoning Valley",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m",
+          "date": "2026-03-24",
+          "time": "16:43",
+          "off_time": "16:49:44",
+          "winning_time": "1m 40.16s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Sloppy",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Kykeon",
+              "position": 1,
+              "odds": "11/2",
+              "favourite": false
+            },
+            {
+              "name": "Sobieski",
+              "position": 2,
+              "odds": "11/4",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117933,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909462,
+            "external_reference": []
+          },
+          "name": "Race 3 - Claiming",
+          "race_slug": null,
+          "course_name": "Mahoning Valley",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m",
+          "date": "2026-03-24",
+          "time": "17:11",
+          "off_time": "17:17:42",
+          "winning_time": "1m 41.73s",
+          "ride_count": 7,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Beautiful Mandate",
+              "position": 1,
+              "odds": "9/4",
+              "favourite": true
+            },
+            {
+              "name": "Vodkatini",
+              "position": 2,
+              "odds": "9/4",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117933,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909463,
+            "external_reference": []
+          },
+          "name": "Race 4 - Claiming",
+          "race_slug": null,
+          "course_name": "Mahoning Valley",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m",
+          "date": "2026-03-24",
+          "time": "17:39",
+          "off_time": "17:46:38",
+          "winning_time": "1m 42.52s",
+          "ride_count": 7,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Lucky Penny Rose",
+              "position": 1,
+              "odds": "9/1",
+              "favourite": false
+            },
+            {
+              "name": "Feeling Easy",
+              "position": 2,
+              "odds": "7/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117933,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909464,
+            "external_reference": []
+          },
+          "name": "Race 5 - Claiming",
+          "race_slug": null,
+          "course_name": "Mahoning Valley",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "5f 110y",
+          "date": "2026-03-24",
+          "time": "18:07",
+          "off_time": "18:14:53",
+          "winning_time": "1m 6.22s",
+          "ride_count": 9,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Fast Talkin Man",
+              "position": 1,
+              "odds": "7/2",
+              "favourite": false
+            },
+            {
+              "name": "Willie Wando",
+              "position": 2,
+              "odds": "10/1",
+              "favourite": false
+            },
+            {
+              "name": "Bitofjustice",
+              "position": 3,
+              "odds": "14/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117933,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909465,
+            "external_reference": []
+          },
+          "name": "Race 6 - Claiming",
+          "race_slug": null,
+          "course_name": "Mahoning Valley",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "6f",
+          "date": "2026-03-24",
+          "time": "18:35",
+          "off_time": "18:43:56",
+          "winning_time": "1m 14.29s",
+          "ride_count": 7,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Here Comes Dolly",
+              "position": 1,
+              "odds": "9/1",
+              "favourite": false
+            },
+            {
+              "name": "Stick Around",
+              "position": 2,
+              "odds": "4/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117933,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909466,
+            "external_reference": []
+          },
+          "name": "Race 7 - Allowance Optional Claiming",
+          "race_slug": null,
+          "course_name": "Mahoning Valley",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "6f",
+          "date": "2026-03-24",
+          "time": "19:03",
+          "off_time": "19:11:52",
+          "winning_time": "1m 11.99s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Getaway Bay",
+              "position": 1,
+              "odds": "7/1",
+              "favourite": false
+            },
+            {
+              "name": "Lucky Cougar",
+              "position": 2,
+              "odds": "7/2",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117933,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909467,
+            "external_reference": []
+          },
+          "name": "Race 8 - Allowance",
+          "race_slug": null,
+          "course_name": "Mahoning Valley",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m",
+          "date": "2026-03-24",
+          "time": "19:31",
+          "off_time": "19:36:27",
+          "winning_time": "1m 39.47s",
+          "ride_count": 4,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Good",
+          "going_shortcode": "GD",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Handsome Pants",
+              "position": 1,
+              "odds": "6/5",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        }
+      ]
+    },
+    {
+      "meeting_summary": {
+        "meeting_reference": {
+          "id": 117931,
+          "external_reference": []
+        },
+        "date": "2026-03-24",
+        "status": "DORMANT",
+        "course": {
+          "course_reference": {
+            "id": 59,
+            "external_reference": []
+          },
+          "name": "Turf Paradise",
+          "short_name": null,
+          "country": {
+            "country_reference": {
+              "id": 1,
+              "external_reference": []
+            },
+            "long_name": "United States"
+          },
+          "feed_source": null
+        },
+        "going": "Firm",
+        "surface_summary": "Dirt, Turf",
+        "visible": true,
+        "weather": "Fine",
+        "abandoned": null
+      },
+      "races": [
+        {
+          "meeting_summary_reference": {
+            "id": 117931,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909443,
+            "external_reference": []
+          },
+          "name": "Race 1 - Optional Claiming",
+          "race_slug": null,
+          "course_name": "Turf Paradise",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1f 80y",
+          "date": "2026-03-24",
+          "time": "20:15",
+          "off_time": "20:16:03",
+          "winning_time": "15.46s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Tell America",
+              "position": 1,
+              "odds": "10/11",
+              "favourite": true
+            },
+            {
+              "name": "Higher Heat",
+              "position": 2,
+              "odds": "3/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117931,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909444,
+            "external_reference": []
+          },
+          "name": "Race 2 - Optional Claiming",
+          "race_slug": null,
+          "course_name": "Turf Paradise",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1f 110y",
+          "date": "2026-03-24",
+          "time": "20:42",
+          "off_time": "20:45:23",
+          "winning_time": "16.7s",
+          "ride_count": 4,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Four Sweet Kid",
+              "position": 1,
+              "odds": "8/13",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117931,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909445,
+            "external_reference": []
+          },
+          "name": "Race 3 - Allowance",
+          "race_slug": null,
+          "course_name": "Turf Paradise",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "USA",
+          "age": "4YO plus",
+          "race_class": "",
+          "distance": "1m",
+          "date": "2026-03-24",
+          "time": "21:12",
+          "off_time": "21:12:57",
+          "winning_time": "1m 36.69s",
+          "ride_count": 5,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Firm",
+          "going_shortcode": "FM",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Vekoma Kid",
+              "position": 1,
+              "odds": "9/4",
+              "favourite": false
+            },
+            {
+              "name": "Fireman Dan",
+              "position": 2,
+              "odds": "7/2",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117931,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909446,
+            "external_reference": []
+          },
+          "name": "Race 4 - Claiming",
+          "race_slug": null,
+          "course_name": "Turf Paradise",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "4YO plus",
+          "race_class": "",
+          "distance": "6f",
+          "date": "2026-03-24",
+          "time": "21:42",
+          "off_time": "21:43:04",
+          "winning_time": "1m 9.23s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Sharp Attitude",
+              "position": 1,
+              "odds": "7/4",
+              "favourite": true
+            },
+            {
+              "name": "Miracle Ball",
+              "position": 2,
+              "odds": "9/4",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117931,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909447,
+            "external_reference": []
+          },
+          "name": "Race 5 - Claiming",
+          "race_slug": null,
+          "course_name": "Turf Paradise",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "4YO plus",
+          "race_class": "",
+          "distance": "6f 110y",
+          "date": "2026-03-24",
+          "time": "22:12",
+          "off_time": "22:12:52",
+          "winning_time": "1m 15.36s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Cousin Richie",
+              "position": 1,
+              "odds": "7/2",
+              "favourite": false
+            },
+            {
+              "name": "John Dunbar",
+              "position": 2,
+              "odds": "5/6",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117931,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909448,
+            "external_reference": []
+          },
+          "name": "Race 6 - Claiming",
+          "race_slug": null,
+          "course_name": "Turf Paradise",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m",
+          "date": "2026-03-24",
+          "time": "22:41",
+          "off_time": "22:41:48",
+          "winning_time": "1m 37.47s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Riding By",
+              "position": 1,
+              "odds": "5/6",
+              "favourite": true
+            },
+            {
+              "name": "Regarding Harry",
+              "position": 2,
+              "odds": "3/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117931,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909449,
+            "external_reference": []
+          },
+          "name": "Race 7 - Claiming",
+          "race_slug": null,
+          "course_name": "Turf Paradise",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "TURF"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m",
+          "date": "2026-03-24",
+          "time": "23:10",
+          "off_time": "23:11:02",
+          "winning_time": "1m 38.1s",
+          "ride_count": 8,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "Firm",
+          "going_shortcode": "FM",
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Chances Taken",
+              "position": 1,
+              "odds": "6/1",
+              "favourite": false
+            },
+            {
+              "name": "Pure Cane Sugar",
+              "position": 2,
+              "odds": "20/1",
+              "favourite": false
+            },
+            {
+              "name": "Prince Of Memphis",
+              "position": 3,
+              "odds": "5/2",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117931,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909450,
+            "external_reference": []
+          },
+          "name": "Race 8 - Maiden Claiming",
+          "race_slug": null,
+          "course_name": "Turf Paradise",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "5f 110y",
+          "date": "2026-03-24",
+          "time": "23:44",
+          "off_time": "23:45:28",
+          "winning_time": "1m 4.53s",
+          "ride_count": 9,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Hazael",
+              "position": 1,
+              "odds": "2/1",
+              "favourite": true
+            },
+            {
+              "name": "Circle Of Fire",
+              "position": 2,
+              "odds": "3/1",
+              "favourite": false
+            },
+            {
+              "name": "Denada",
+              "position": 3,
+              "odds": "5/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        }
+      ]
+    },
+    {
+      "meeting_summary": {
+        "meeting_reference": {
+          "id": 117932,
+          "external_reference": []
+        },
+        "date": "2026-03-24",
+        "status": "DORMANT",
+        "course": {
+          "course_reference": {
+            "id": 136,
+            "external_reference": []
+          },
+          "name": "Will Rogers Downs",
+          "short_name": null,
+          "country": {
+            "country_reference": {
+              "id": 1,
+              "external_reference": []
+            },
+            "long_name": "United States"
+          },
+          "feed_source": null
+        },
+        "going": null,
+        "surface_summary": "Dirt",
+        "visible": true,
+        "weather": "Fine",
+        "abandoned": null
+      },
+      "races": [
+        {
+          "meeting_summary_reference": {
+            "id": 117932,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909451,
+            "external_reference": []
+          },
+          "name": "Race 1 - Claiming",
+          "race_slug": null,
+          "course_name": "Will Rogers Downs",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "4YO plus",
+          "race_class": "",
+          "distance": "5f 110y",
+          "date": "2026-03-24",
+          "time": "18:15",
+          "off_time": "18:17:28",
+          "winning_time": "1m 5.3s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Favorite Outlaw",
+              "position": 1,
+              "odds": "11/4",
+              "favourite": false
+            },
+            {
+              "name": "Sharp Lorenzo",
+              "position": 2,
+              "odds": "6/4",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117932,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909452,
+            "external_reference": []
+          },
+          "name": "Race 2 - Maiden Claiming",
+          "race_slug": null,
+          "course_name": "Will Rogers Downs",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m",
+          "date": "2026-03-24",
+          "time": "18:42",
+          "off_time": "18:47:02",
+          "winning_time": "1m 43.21s",
+          "ride_count": 7,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Mystic Grace",
+              "position": 1,
+              "odds": "5/6",
+              "favourite": true
+            },
+            {
+              "name": "Osage Express",
+              "position": 2,
+              "odds": "9/4",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117932,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909453,
+            "external_reference": []
+          },
+          "name": "Race 3 - Allowance",
+          "race_slug": null,
+          "course_name": "Will Rogers Downs",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m",
+          "date": "2026-03-24",
+          "time": "19:09",
+          "off_time": "19:16:01",
+          "winning_time": "1m 40.06s",
+          "ride_count": 5,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Sabres",
+              "position": 1,
+              "odds": "10/1",
+              "favourite": false
+            },
+            {
+              "name": "So Jordan",
+              "position": 2,
+              "odds": "2/9",
+              "favourite": true
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117932,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909454,
+            "external_reference": []
+          },
+          "name": "Race 4 - Claiming",
+          "race_slug": null,
+          "course_name": "Will Rogers Downs",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m",
+          "date": "2026-03-24",
+          "time": "19:36",
+          "off_time": "19:41:49",
+          "winning_time": "1m 41.04s",
+          "ride_count": 5,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Out To Party",
+              "position": 1,
+              "odds": "6/5",
+              "favourite": true
+            },
+            {
+              "name": "Mash On The Gas",
+              "position": 2,
+              "odds": "9/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117932,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909455,
+            "external_reference": []
+          },
+          "name": "Race 5 - Maiden Special Weight",
+          "race_slug": null,
+          "course_name": "Will Rogers Downs",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "1m",
+          "date": "2026-03-24",
+          "time": "20:03",
+          "off_time": "20:08:34",
+          "winning_time": "1m 43.08s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Six Gun Sally",
+              "position": 1,
+              "odds": "1/1",
+              "favourite": true
+            },
+            {
+              "name": "Brielle",
+              "position": 2,
+              "odds": "4/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117932,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909456,
+            "external_reference": []
+          },
+          "name": "Race 6 - Claiming",
+          "race_slug": null,
+          "course_name": "Will Rogers Downs",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "4YO plus",
+          "race_class": "",
+          "distance": "5f 110y",
+          "date": "2026-03-24",
+          "time": "20:30",
+          "off_time": "20:33:06",
+          "winning_time": "1m 5.56s",
+          "ride_count": 7,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Shawk's Lil Mia",
+              "position": 1,
+              "odds": "5/1",
+              "favourite": false
+            },
+            {
+              "name": "Strikethreeyourout",
+              "position": 2,
+              "odds": "9/4",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117932,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909457,
+            "external_reference": []
+          },
+          "name": "Race 7 - Maiden Special Weight",
+          "race_slug": null,
+          "course_name": "Will Rogers Downs",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "6f",
+          "date": "2026-03-24",
+          "time": "21:02",
+          "off_time": "21:06:06",
+          "winning_time": "1m 13.27s",
+          "ride_count": 10,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Gwen To Win",
+              "position": 1,
+              "odds": "11/8",
+              "favourite": true
+            },
+            {
+              "name": "Myrna",
+              "position": 2,
+              "odds": "20/1",
+              "favourite": false
+            },
+            {
+              "name": "Devilish Springs",
+              "position": 3,
+              "odds": "16/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117932,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909458,
+            "external_reference": []
+          },
+          "name": "Race 8 - Starter Allowance",
+          "race_slug": null,
+          "course_name": "Will Rogers Downs",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "4YO plus",
+          "race_class": "",
+          "distance": "5f 110y",
+          "date": "2026-03-24",
+          "time": "21:29",
+          "off_time": "21:30:04",
+          "winning_time": "1m 5.33s",
+          "ride_count": 6,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Smooth Pebble",
+              "position": 1,
+              "odds": "5/2",
+              "favourite": false
+            },
+            {
+              "name": "Pop Chart",
+              "position": 2,
+              "odds": "14/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        },
+        {
+          "meeting_summary_reference": {
+            "id": 117932,
+            "external_reference": []
+          },
+          "race_summary_reference": {
+            "id": 909459,
+            "external_reference": []
+          },
+          "name": "Race 9 - Maiden Claiming",
+          "race_slug": null,
+          "course_name": "Will Rogers Downs",
+          "course_shortcode": null,
+          "course_surface": {
+            "surface": "DIRT"
+          },
+          "country_short_name": "USA",
+          "age": "3YO plus",
+          "race_class": "",
+          "distance": "6f",
+          "date": "2026-03-24",
+          "time": "22:01",
+          "off_time": "22:02:58",
+          "winning_time": "1m 13.54s",
+          "ride_count": 9,
+          "race_stage": "WEIGHEDIN",
+          "has_video": false,
+          "going": "",
+          "going_shortcode": null,
+          "has_handicap": false,
+          "verdict": null,
+          "verdict_text": null,
+          "hidden": false,
+          "top_horses": [
+            {
+              "name": "Leavenodoubt",
+              "position": 1,
+              "odds": "12/1",
+              "favourite": false
+            },
+            {
+              "name": "Five Wide",
+              "position": 2,
+              "odds": "9/2",
+              "favourite": false
+            },
+            {
+              "name": "Smiling Time",
+              "position": 3,
+              "odds": "16/1",
+              "favourite": false
+            }
+          ],
+          "top_rated_horse": {},
+          "meeting_status": "DORMANT"
+        }
+      ]
+    }
+  ],
+  "premierRaces": {
+    "date": "2026-03-24",
+    "premier_meeting_ids": [],
+    "premier_race_ids": []
+  },
+  "hasError": false,
+  "_sentryTraceData": "dd0703c8aabf407b99493a7a353d34e2-a4576734974b987a-0",
+  "_sentryBaggage": "sentry-environment=production,sentry-release=JlgtZ3vrXG1rPOYBj3nPd,sentry-public_key=f4c295df0d7341fce08b62704bfe7744,sentry-trace_id=dd0703c8aabf407b99493a7a353d34e2,sentry-sample_rate=0.01,sentry-transaction=%2Fracing%2Fresults%2F%5Bdate%5D,sentry-sampled=false"
+}

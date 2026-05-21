@@ -1,0 +1,273 @@
+{
+  "Comment": "Master Orchestration: Deploy all three recommendation pipelines sequentially",
+  "Description": "Runs all three step functions in sequence: nonrunner tracking → improver boost → model miss analysis. Includes fail-safe and rollback logic.",
+  "StartAt": "ValidateConfiguration",
+  "States": {
+    "ValidateConfiguration": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:validate-deployment-config",
+      "Parameters": {
+        "required_lambdas": [
+          "check-race-timing",
+          "betfair-fetch-current-field",
+          "compare-race-fields",
+          "load-race-scoring-data",
+          "identify-improver-candidates",
+          "calculate-improver-boost-scores",
+          "load-model-miss-races",
+          "analyze-single-model-miss"
+        ],
+        "required_dynamo_tables": [
+          "RaceNonrunnerTracking",
+          "ImproverBoostMetrics",
+          "ModelMissAnalysis"
+        ]
+      },
+      "Next": "CheckDeploymentWindow",
+      "Catch": [
+        {
+          "ErrorEquals": ["ValidationFailed"],
+          "Next": "FailValidation"
+        }
+      ]
+    },
+    "CheckDeploymentWindow": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:check-deployment-window",
+      "Parameters": {
+        "preferred_window_start": "23:00",
+        "preferred_window_end": "07:00",
+        "allow_during_racing": false
+      },
+      "Next": "WindowDecision"
+    },
+    "WindowDecision": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.can_deploy_now",
+          "BooleanEquals": true,
+          "Next": "DeployStep1NonrunnerTracking"
+        }
+      ],
+      "Default": "WaitForDeploymentWindow"
+    },
+    "WaitForDeploymentWindow": {
+      "Type": "Wait",
+      "Seconds": 3600,
+      "Next": "CheckDeploymentWindow"
+    },
+    "DeployStep1NonrunnerTracking": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:stepfunctions:startExecution",
+      "Parameters": {
+        "stateMachineArn": "arn:aws:states:eu-west-1:ACCOUNT_ID:stateMachine:nonrunner-tracking-verification",
+        "name": "deployment-1-nonrunner-tracking-20260514"
+      },
+      "Next": "MonitorStep1",
+      "ResultPath": "$.step1_execution"
+    },
+    "MonitorStep1": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:stepfunctions:describeExecution",
+      "Parameters": {
+        "executionArn.$": "$.step1_execution.executionArn"
+      },
+      "Next": "Step1Complete?",
+      "ResultPath": "$.step1_status"
+    },
+    "Step1Complete?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.step1_status.status",
+          "StringEquals": "SUCCEEDED",
+          "Next": "DeployStep2ImproverBoost"
+        },
+        {
+          "Variable": "$.step1_status.status",
+          "StringEquals": "FAILED",
+          "Next": "Step1Failed"
+        },
+        {
+          "Variable": "$.step1_status.status",
+          "StringEquals": "RUNNING",
+          "Next": "WaitForStep1"
+        }
+      ],
+      "Default": "WaitForStep1"
+    },
+    "WaitForStep1": {
+      "Type": "Wait",
+      "Seconds": 30,
+      "Next": "MonitorStep1"
+    },
+    "DeployStep2ImproverBoost": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:stepfunctions:startExecution",
+      "Parameters": {
+        "stateMachineArn": "arn:aws:states:eu-west-1:ACCOUNT_ID:stateMachine:improver-scoring-boost",
+        "name": "deployment-2-improver-boost-20260514"
+      },
+      "Next": "MonitorStep2",
+      "ResultPath": "$.step2_execution"
+    },
+    "MonitorStep2": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:stepfunctions:describeExecution",
+      "Parameters": {
+        "executionArn.$": "$.step2_execution.executionArn"
+      },
+      "Next": "Step2Complete?",
+      "ResultPath": "$.step2_status"
+    },
+    "Step2Complete?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.step2_status.status",
+          "StringEquals": "SUCCEEDED",
+          "Next": "DeployStep3ModelAnalysis"
+        },
+        {
+          "Variable": "$.step2_status.status",
+          "StringEquals": "FAILED",
+          "Next": "Step2Failed"
+        },
+        {
+          "Variable": "$.step2_status.status",
+          "StringEquals": "RUNNING",
+          "Next": "WaitForStep2"
+        }
+      ],
+      "Default": "WaitForStep2"
+    },
+    "WaitForStep2": {
+      "Type": "Wait",
+      "Seconds": 30,
+      "Next": "MonitorStep2"
+    },
+    "DeployStep3ModelAnalysis": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:stepfunctions:startExecution",
+      "Parameters": {
+        "stateMachineArn": "arn:aws:states:eu-west-1:ACCOUNT_ID:stateMachine:model-miss-deep-analysis",
+        "name": "deployment-3-model-analysis-20260514"
+      },
+      "Next": "MonitorStep3",
+      "ResultPath": "$.step3_execution"
+    },
+    "MonitorStep3": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:stepfunctions:describeExecution",
+      "Parameters": {
+        "executionArn.$": "$.step3_execution.executionArn"
+      },
+      "Next": "Step3Complete?",
+      "ResultPath": "$.step3_status"
+    },
+    "Step3Complete?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.step3_status.status",
+          "StringEquals": "SUCCEEDED",
+          "Next": "AllStepsComplete"
+        },
+        {
+          "Variable": "$.step3_status.status",
+          "StringEquals": "FAILED",
+          "Next": "Step3Failed"
+        },
+        {
+          "Variable": "$.step3_status.status",
+          "StringEquals": "RUNNING",
+          "Next": "WaitForStep3"
+        }
+      ],
+      "Default": "WaitForStep3"
+    },
+    "WaitForStep3": {
+      "Type": "Wait",
+      "Seconds": 30,
+      "Next": "MonitorStep3"
+    },
+    "AllStepsComplete": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:finalize-deployment",
+      "Parameters": {
+        "step1_result.$": "$.step1_status.output",
+        "step2_result.$": "$.step2_status.output",
+        "step3_result.$": "$.step3_status.output",
+        "deployment_date": "2026-05-14"
+      },
+      "Next": "SuccessfulDeployment"
+    },
+    "SuccessfulDeployment": {
+      "Type": "Pass",
+      "Result": {
+        "status": "deployment_successful",
+        "message": "All three recommendation pipelines deployed successfully",
+        "timestamp.$": "$$.State.EnteredTime",
+        "next_action": "Monitor performance metrics for 7 days, then evaluate accuracy improvement"
+      },
+      "End": true
+    },
+    "Step1Failed": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:handle-deployment-failure",
+      "Parameters": {
+        "failed_step": 1,
+        "error_details.$": "$.step1_status.cause",
+        "rollback_enabled": true
+      },
+      "Next": "FailDeployment"
+    },
+    "Step2Failed": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:handle-deployment-failure",
+      "Parameters": {
+        "failed_step": 2,
+        "error_details.$": "$.step2_status.cause",
+        "rollback_enabled": true
+      },
+      "Next": "RollbackStep1"
+    },
+    "Step3Failed": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:handle-deployment-failure",
+      "Parameters": {
+        "failed_step": 3,
+        "error_details.$": "$.step3_status.cause",
+        "rollback_enabled": true
+      },
+      "Next": "RollbackStep2"
+    },
+    "RollbackStep1": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:rollback-nonrunner-tracking",
+      "Parameters": {
+        "execution_id.$": "$.step1_execution.executionArn"
+      },
+      "Next": "FailDeployment"
+    },
+    "RollbackStep2": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-west-1:ACCOUNT_ID:function:rollback-improver-boost",
+      "Parameters": {
+        "execution_id.$": "$.step2_execution.executionArn"
+      },
+      "Next": "RollbackStep1"
+    },
+    "FailValidation": {
+      "Type": "Fail",
+      "Error": "ValidationFailed",
+      "Cause": "Deployment prerequisites not met. Check Lambda functions and DynamoDB tables."
+    },
+    "FailDeployment": {
+      "Type": "Fail",
+      "Error": "DeploymentFailed",
+      "Cause": "One or more pipeline steps failed. Check CloudWatch logs for details."
+    }
+  }
+}

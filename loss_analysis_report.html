@@ -1,0 +1,2482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Loss Analysis Report — 2026-03-30</title>
+<style>
+  :root{
+    --bg:#0f172a; --surface:#1e293b; --surface2:#273347; --border:#334155;
+    --text:#e2e8f0; --muted:#94a3b8; --accent:#6366f1;
+    --green:#22c55e; --red:#ef4444; --orange:#f97316; --yellow:#eab308;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5}
+  h1{font-size:1.6rem;font-weight:700;color:#fff}
+  h2{font-size:1.1rem;font-weight:600;color:var(--accent);margin:2rem 0 .75rem;text-transform:uppercase;letter-spacing:.05em}
+  .page{max-width:1100px;margin:0 auto;padding:1.5rem}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.5rem;background:var(--surface);border-bottom:1px solid var(--border);margin-bottom:1.5rem}
+  .topbar small{color:var(--muted);font-size:.8rem}
+
+  /* KPI tiles */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:1.25rem 1rem;text-align:center}
+  .kpi .kval{font-size:2rem;font-weight:700}
+  .kpi .klabel{color:var(--muted);font-size:.75rem;margin-top:.25rem;text-transform:uppercase;letter-spacing:.04em}
+  .kpi.k-red .kval{color:var(--red)}
+  .kpi.k-orange .kval{color:var(--orange)}
+  .kpi.k-yellow .kval{color:var(--yellow)}
+  .kpi.k-green .kval{color:var(--green)}
+
+  /* Aggregate table */
+  .agg-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:.75rem;overflow:hidden}
+  .agg-table th{background:var(--surface2);color:var(--muted);text-transform:uppercase;font-size:.7rem;letter-spacing:.06em;padding:.6rem .75rem;text-align:left}
+  .agg-table td{padding:.55rem .75rem;border-top:1px solid var(--border)}
+  .agg-table tr:hover td{background:var(--surface2)}
+  .fname{font-weight:600;color:var(--text)}
+  .pct-cell{display:flex;align-items:center;gap:.5rem;min-width:140px}
+  .bar-bg{flex:1;background:var(--border);border-radius:4px;height:6px;overflow:hidden}
+  .bar-fill{height:100%;background:var(--red);border-radius:4px}
+  .pos{color:var(--red)} .neg{color:var(--green)}
+
+  /* Detail cards */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:.75rem;margin-bottom:1rem;overflow:hidden}
+  .card-nodata{border-left:3px solid var(--border)}
+  .gap-card.gap-neg{border-left:3px solid var(--red)}
+  .gap-card.gap-pos{border-left:3px solid var(--green)}
+  .card-header{display:flex;align-items:flex-start;justify-content:space-between;padding:.9rem 1rem .6rem;background:var(--surface2)}
+  .card-title{display:flex;flex-direction:column;gap:.25rem}
+  .horse-name{font-size:1.05rem;font-weight:700;color:#fff}
+  .race-meta{color:var(--muted);font-size:.78rem}
+  .card-scores{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:flex-end}
+  .score-pill{background:#312e81;color:#a5b4fc;padding:.2rem .5rem;border-radius:.4rem;font-size:.75rem;font-weight:600}
+  .odds-pill{background:#1c3a2e;color:#86efac;padding:.2rem .5rem;border-radius:.4rem;font-size:.75rem}
+  .pos-pill{background:var(--border);color:var(--muted);padding:.2rem .5rem;border-radius:.4rem;font-size:.75rem}
+  .card-body{padding:.75rem 1rem}
+  .winner-row{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.65rem}
+  .winner-badge{font-size:.8rem;font-weight:600;background:#1e3a5f;color:#93c5fd;padding:.2rem .6rem;border-radius:.4rem}
+  .winner-badge.nomatch{background:#2d1b1b;color:#fca5a5}
+  .gap-label{font-size:.78rem;padding:.2rem .5rem;border-radius:.4rem;font-weight:600}
+  .gap-label.gap-neg{background:#2d1b1b;color:var(--red)}
+  .gap-label.gap-pos{background:#14291f;color:var(--green)}
+  .zero-flag{background:#7c2d12;color:#fdba74;font-size:.7rem;padding:.1rem .35rem;border-radius:.3rem;margin-left:.3rem}
+
+  /* Factor diff table */
+  .fd-table{width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:.6rem}
+  .fd-table th{color:var(--muted);text-transform:uppercase;font-size:.68rem;padding:.3rem .4rem;text-align:left;border-bottom:1px solid var(--border)}
+  .fd-table td{padding:.28rem .4rem;border-bottom:1px solid #1e2d3f;vertical-align:middle}
+  .fd-pos td{color:#fca5a5} .fd-neg td{color:#86efac}
+  .fd-bar{display:inline-block;height:4px;border-radius:2px;margin-left:4px;vertical-align:middle}
+
+  /* Reasons */
+  .reasons{list-style:none;font-size:.78rem;color:var(--muted);margin-top:.4rem}
+  .reasons li::before{content:"• ";color:var(--accent)}
+  .reasons li{margin:.15rem 0}
+
+  /* Suggestions */
+  .sugg-grid{display:flex;flex-direction:column;gap:.75rem}
+  .sugg{display:flex;align-items:flex-start;gap:1rem;background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:.9rem 1rem}
+  .sugg-rank{background:var(--accent);color:#fff;width:2rem;height:2rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+  .sugg-tip{color:var(--muted);font-size:.8rem;margin-top:.2rem}
+
+  @media(max-width:700px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <strong>FuturegenAI Betting &mdash; Loss Analysis</strong>
+  <small>Generated 30 Mar 2026 09:52 &bull; 46 UI losses analysed</small>
+</div>
+<div class="page">
+
+  <h1>Loss Analysis Report</h1>
+  <p style="color:var(--muted);margin:.4rem 0 1.5rem">Detailed breakdown of every losing pick, comparing our model score against the actual winner&rsquo;s stored record to identify systematic blind spots.</p>
+
+  <div class="kpi-grid">
+    <div class="kpi k-red"><div class="kval">46</div><div class="klabel">Total UI Losses</div></div>
+    <div class="kpi k-orange"><div class="kval">31</div><div class="klabel">With winner data</div></div>
+    <div class="kpi k-yellow"><div class="kval">-48.0</div><div class="klabel">Avg score gap (winner vs us)</div></div>
+    <div class="kpi k-green"><div class="kval">0%</div><div class="klabel">Losses where winner scored higher</div></div>
+  </div>
+
+  <h2>Factor Blind Spots — Aggregate</h2>
+  <p style="color:var(--muted);font-size:.8rem;margin-bottom:.75rem">Factors where the actual winner most frequently outscored our pick. Higher % = a systematic gap in the model.</p>
+  <table class="agg-table">
+    <thead><tr>
+      <th>Factor</th><th>Winner beat us</th><th>Frequency</th><th>Avg winner advantage</th><th>Times we scored 0</th>
+    </tr></thead>
+    <tbody>
+    <tr>
+      <td class="fname">Market Leader</td>
+      <td>11/31</td>
+      <td class="pct-cell">
+        <div class="bar-bg"><div class="bar-fill" style="width:35%"></div></div>
+        <span>35%</span>
+      </td>
+      <td class="pos">+10.3 pts</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td class="fname">Optimal Odds</td>
+      <td>10/31</td>
+      <td class="pct-cell">
+        <div class="bar-bg"><div class="bar-fill" style="width:32%"></div></div>
+        <span>32%</span>
+      </td>
+      <td class="pos">+6.8 pts</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td class="fname">Consistency</td>
+      <td>10/31</td>
+      <td class="pct-cell">
+        <div class="bar-bg"><div class="bar-fill" style="width:32%"></div></div>
+        <span>32%</span>
+      </td>
+      <td class="pos">+6.4 pts</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td class="fname">Sweet Spot</td>
+      <td>5/31</td>
+      <td class="pct-cell">
+        <div class="bar-bg"><div class="bar-fill" style="width:16%"></div></div>
+        <span>16%</span>
+      </td>
+      <td class="pos">+5.6 pts</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td class="fname">Weight Penalty</td>
+      <td>5/31</td>
+      <td class="pct-cell">
+        <div class="bar-bg"><div class="bar-fill" style="width:16%"></div></div>
+        <span>16%</span>
+      </td>
+      <td class="pos">+3.0 pts</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td class="fname">Trainer Reputation</td>
+      <td>4/31</td>
+      <td class="pct-cell">
+        <div class="bar-bg"><div class="bar-fill" style="width:12%"></div></div>
+        <span>12%</span>
+      </td>
+      <td class="pos">+7.0 pts</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td class="fname">Cd Bonus</td>
+      <td>4/31</td>
+      <td class="pct-cell">
+        <div class="bar-bg"><div class="bar-fill" style="width:12%"></div></div>
+        <span>12%</span>
+      </td>
+      <td class="pos">+9.0 pts</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td class="fname">Age Bonus</td>
+      <td>2/31</td>
+      <td class="pct-cell">
+        <div class="bar-bg"><div class="bar-fill" style="width:6%"></div></div>
+        <span>6%</span>
+      </td>
+      <td class="pos">+10.0 pts</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td class="fname">Total Wins</td>
+      <td>1/31</td>
+      <td class="pct-cell">
+        <div class="bar-bg"><div class="bar-fill" style="width:3%"></div></div>
+        <span>3%</span>
+      </td>
+      <td class="pos">+8.0 pts</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td class="fname">Jockey Quality</td>
+      <td>1/31</td>
+      <td class="pct-cell">
+        <div class="bar-bg"><div class="bar-fill" style="width:3%"></div></div>
+        <span>3%</span>
+      </td>
+      <td class="pos">+6.0 pts</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td class="fname">Short Form Improvement</td>
+      <td>1/31</td>
+      <td class="pct-cell">
+        <div class="bar-bg"><div class="bar-fill" style="width:3%"></div></div>
+        <span>3%</span>
+      </td>
+      <td class="pos">+8.0 pts</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td class="fname">Unexposed Bonus</td>
+      <td>1/31</td>
+      <td class="pct-cell">
+        <div class="bar-bg"><div class="bar-fill" style="width:3%"></div></div>
+        <span>3%</span>
+      </td>
+      <td class="pos">+12.0 pts</td>
+      <td>1</td>
+    </tr></tbody>
+  </table>
+
+  <h2>Model Improvement Candidates</h2>
+  <div class="sugg-grid">
+  <div class="sugg">
+    <div class="sugg-rank">1</div>
+    <div>
+      <strong>Market Leader</strong>
+      <div class="sugg-tip">Appears in 35% of losses with avg +10pt winner advantage — we scored 0 in 10 of those races</div>
+    </div>
+  </div>
+  <div class="sugg">
+    <div class="sugg-rank">2</div>
+    <div>
+      <strong>Optimal Odds</strong>
+      <div class="sugg-tip">Appears in 32% of losses with avg +7pt winner advantage — we scored 0 in 6 of those races</div>
+    </div>
+  </div>
+  <div class="sugg">
+    <div class="sugg-rank">3</div>
+    <div>
+      <strong>Consistency</strong>
+      <div class="sugg-tip">Appears in 32% of losses with avg +6pt winner advantage</div>
+    </div>
+  </div>
+  <div class="sugg">
+    <div class="sugg-rank">4</div>
+    <div>
+      <strong>Sweet Spot</strong>
+      <div class="sugg-tip">Appears in 16% of losses with avg +6pt winner advantage</div>
+    </div>
+  </div>
+  <div class="sugg">
+    <div class="sugg-rank">5</div>
+    <div>
+      <strong>Weight Penalty</strong>
+      <div class="sugg-tip">Appears in 16% of losses with avg +3pt winner advantage — we scored 0 in 3 of those races</div>
+    </div>
+  </div></div>
+
+  <h2>&#9881;&#65039; Daily Pipeline — How Picks Are Made Each Day</h2>
+  <p style="color:var(--muted);font-size:.8rem;margin-bottom:1rem">
+    <code>complete_daily_analysis.py</code> runs once per day (triggered at 12:00, 14:00, 16:00, 18:00 by a Lambda cron).
+    Below is every stage it executes in order before a pick is published to the UI.
+    The <strong style="color:#f87171">red stage</strong> was missing during all 61 losses in this report.
+  </p>
+  <table class="agg-table">
+    <thead><tr>
+      <th>#</th><th>Stage</th><th>What it does</th><th>Failure mode</th><th>Status during losses</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>0</strong></td>
+        <td>Betfair odds fetch<br/><code style="font-size:.7rem">betfair_odds_fetcher.py</code></td>
+        <td>Calls Betfair API for every UK/IRE race today. Writes <code>response_horses.json</code> with runners, SP odds, draw, weight, going, trainer, jockey. Also stores Betfair market IDs for settlement matching later.</td>
+        <td>If Betfair token is stale the file will be empty — nothing is scored and no picks are generated.</td>
+        <td style="color:#34d399">&#10003; Running (runs before <code>complete_daily_analysis.py</code>)</td>
+      </tr>
+      <tr style="background:rgba(239,68,68,0.06)">
+        <td><strong>1</strong></td>
+        <td><strong style="color:#f87171">Deep form enrichment</strong><br/><code style="font-size:.7rem">form_enricher.enrich_runners()</code></td>
+        <td>Scrapes Racing Post / Sporting Life for each runner's last-6-race history. Injects <code>form_runs</code> onto every runner dict. The scoring engine then fires: <code>exact_course_win (+20)</code>, <code>exact_distance_win (+20)</code>, <code>going_win_match (+32)</code>, <code>close_2nd_last_time (+14)</code>, <code>fresh_days_optimal (+10)</code>, <code>or_trajectory (+10)</code>, <code>big_field_win (+8)</code>. Combined ceiling: <strong>+114 pts</strong>.</td>
+        <td>Without this step, <em>all seven signals score 0 for every horse</em>. The model still runs but is blind to recent form quality.</td>
+        <td style="color:#f87171"><strong>&#10007; NOT CALLED during all 61 losses</strong><br/>
+          <span style="font-size:.75rem">module existed but was never imported or invoked.<br/>
+          Fixed 2026-03-30 — now wired as Stage 1/5.</span>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td>Horse history load<br/><code style="font-size:.7rem">DynamoDB SureBetBets scan</code></td>
+        <td>Scans DynamoDB for all settled bets (result_won set) to build a win-rate map per horse. Applies a DB history bonus: &gt;40% win rate → +15 pts, &gt;25% → +8 pts, &gt;10% → +4 pts. Only meaningful once 100+ horses have results recorded.</td>
+        <td>Cold start: first few weeks there is no history, bonus is always 0. Not a bug — degrades gracefully.</td>
+        <td style="color:#34d399">&#10003; Running (no data in early period, but correctly handled)</td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td>Comprehensive scoring<br/><code style="font-size:.7rem">comprehensive_pick_logic.analyze_horse_comprehensive()</code></td>
+        <td>7-factor model: <code>jockey_quality</code>, <code>trainer_reputation</code>, <code>going_suitability</code> (capped 10 pts), <code>consistency</code> (6 pts weight), <code>optimal_odds</code>, <code>distance_suitability</code>, <code>cd_bonus</code>, plus <code>market_leader</code> overlay (fav +16, co-fav +10, 2nd choice +5) and <code>deep_form</code> (from Stage 1).</td>
+        <td>Going suitability was previously uncapped (up to 30+ pts) which bloated scores for unsuited horses. Capped at 10 from 2026-03-30.</td>
+        <td style="color:#34d399">&#10003; Running</td>
+      </tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td>Quality gates (S1–S6)<br/><code style="font-size:.7rem">_passes_quality_gates()</code></td>
+        <td>Six filters applied before a race-best can become a UI pick:
+          S1 non-market picks need ≥85 pts;
+          S2 requires at least one anchor signal (market_leader / trainer / cd_bonus / unexposed);
+          S3 age-padded picks without market backing need ≥92;
+          S4 score gap vs 2nd-best must be ≥8 pts;
+          S5 Saturday tightening (gap ≥15, large-field needs market);
+          S6 16+ runner fields without market agreement need gap ≥12.
+        </td>
+        <td>Over-tightening gates (raised threshold to 85 + halved market_leader bonus in Mar 2026) produced 0 picks for 2 straight days. Restored market_leader bonus and set threshold to 78 on 2026-03-27.</td>
+        <td style="color:#34d399">&#10003; Running (6 gates active)</td>
+      </tr>
+      <tr>
+        <td><strong>5</strong></td>
+        <td>Pick selection &amp; save<br/><code style="font-size:.7rem">DynamoDB put_item + manifest</code></td>
+        <td>Best-per-race sorted by score, top 3 with <code>show_in_ui=True</code> saved to DynamoDB. All other horses saved as learning records. Analysis manifest (pipeline status + signal coverage %) written to <code>SYSTEM_ANALYSIS_MANIFEST / STATUS</code> record — the UI reads this to show the pipeline checklist banner.</td>
+        <td>If fewer than 3 races pass gates, fewer than 3 picks are shown. No picks is a valid outcome (model is uncertain — do not force a bet).</td>
+        <td style="color:#34d399">&#10003; Running</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>&#128202; Signal Coverage Gap — Deep Form Was Dormant</h2>
+  <p style="color:var(--muted);font-size:.8rem;margin-bottom:.75rem">
+    The <code>form_enricher</code> module (Racing Post / Sporting Life last-6-race scraper) was
+    <strong>never called</strong> during the period covering these 61 losses.
+    Every row below shows <strong>0 pts</strong> for the deep form signals — they simply could not fire.
+    This is now fixed: <code>enrich_runners()</code> is wired in as <em>Stage 1 / 5</em> of
+    <code>complete_daily_analysis.py</code> and active from the next run.
+  </p>
+  <table class="agg-table">
+    <thead><tr>
+      <th>Signal</th><th>Source</th><th>Max pts</th><th>Status during losses</th><th>Impact if active</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>exact_course_win</td><td>Racing Post CD record</td><td>+20</td><td style="color:#f87171">&#10007; Dormant (0 pts every race)</td><td>+20 for any horse with a course win</td></tr>
+      <tr><td>exact_distance_win</td><td>Racing Post distance record</td><td>+20</td><td style="color:#f87171">&#10007; Dormant (0 pts every race)</td><td>+20 for proven distance winners</td></tr>
+      <tr><td>going_win_match</td><td>Last 6 runs going codes</td><td>+32</td><td style="color:#f87171">&#10007; Dormant (0 pts every race)</td><td>+32 when going exactly matches past wins</td></tr>
+      <tr><td>close_2nd_last_time</td><td>Most recent race result</td><td>+14</td><td style="color:#f87171">&#10007; Dormant (0 pts every race)</td><td>+14 for horse that finished 2nd last time</td></tr>
+      <tr><td>fresh_days_optimal</td><td>Days since last run</td><td>+10</td><td style="color:#f87171">&#10007; Dormant (0 pts every race)</td><td>+10 when rest period optimal (14‑35 days)</td></tr>
+      <tr><td>or_trajectory</td><td>OR rating trend</td><td>+10</td><td style="color:#f87171">&#10007; Dormant (0 pts every race)</td><td>+10 for horses on rising handicap mark</td></tr>
+      <tr><td>big_field_win</td><td>Field size history</td><td>+8</td><td style="color:#f87171">&#10007; Dormant (0 pts every race)</td><td>+8 for proven big-field performers</td></tr>
+    </tbody>
+  </table>
+  <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">
+    Combined ceiling <strong>+114 pts</strong> was unavailable to any pick in this sample.
+    The actual winner may have held several of these traits — explaining why they outscored our pick
+    on &quot;blind spot&quot; factors.  Now wired, these signals will correct that systematic gap.
+  </p>
+
+  <h2>Individual Loss Detail</h2>
+  
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Market House</span>
+        <span class="race-meta">02-02 &bull; Wolverhampton 19:30 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 93</span>
+        <span class="odds-pill">@ 49/10</span>
+        <span class="pos-pill">Finished: 5</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: ? — no stored record</span></div>
+      
+      
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Medieval Gold</span>
+        <span class="race-meta">02-03 &bull; Carlisle 15:35 &bull; 10-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 70</span>
+        <span class="odds-pill">@ 47/10</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: ? — no stored record</span></div>
+      
+      
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">No Return</span>
+        <span class="race-meta">02-03 &bull; Wolverhampton 18:00 &bull; 7-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 55</span>
+        <span class="odds-pill">@ 27/2</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: ? — no stored record</span></div>
+      
+      
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Kadastral</span>
+        <span class="race-meta">02-07 &bull; Newbury 13:00 &bull; 8-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 94</span>
+        <span class="odds-pill">@ 4/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: ? — no stored record</span></div>
+      
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 20pts</li><li>Near optimal odds (4.65): 15pts</li><li>2 total wins: 10pts</li><li>2 places (2nd/3rd): 4pts</li><li>Elite trainer (D Skelton): +25pts</li><li>Elite trainer bonus: +20pts</li></ul>
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Flying Fortune</span>
+        <span class="race-meta">02-07 &bull; Warwick 13:15 &bull; 4-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 50</span>
+        <span class="odds-pill">@ 6/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: ? — no stored record</span></div>
+      
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 20pts</li><li>4 total wins: 20pts</li><li>2 places (2nd/3rd): 4pts</li><li>Versatile performer: +6pts</li></ul>
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Dunleer Crystal</span>
+        <span class="race-meta">02-07 &bull; Naas 13:40 &bull; 5-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 57</span>
+        <span class="odds-pill">@ 6/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: ? — no stored record</span></div>
+      
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 20pts</li><li>1 places (2nd/3rd): 2pts</li><li>Elite trainer (Gordon Elliott): +25pts</li><li>Elite trainer (underdog): +10pts</li></ul>
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Francesi</span>
+        <span class="race-meta">02-07 &bull; Lingfield 13:45 &bull; 7-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 82</span>
+        <span class="odds-pill">@ 5/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: ? — no stored record</span></div>
+      
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 20pts</li><li>3 total wins: 15pts</li><li>3 places (2nd/3rd): 6pts</li><li>Elite trainer (A W Carroll): +25pts</li><li>Elite trainer (underdog): +10pts</li><li>Versatile performer: +6pts</li></ul>
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Mirabad</span>
+        <span class="race-meta">02-07 &bull; Warwick 13:50 &bull; 3-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 67</span>
+        <span class="odds-pill">@ 6/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: ? — no stored record</span></div>
+      
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 20pts</li><li>2 total wins: 10pts</li><li>1 places (2nd/3rd): 2pts</li><li>Elite trainer (D Skelton): +25pts</li><li>Elite trainer (underdog): +10pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Three On Thursday</span>
+        <span class="race-meta">02-10 &bull; Lingfield 16:18 &bull; 11-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 93</span>
+        <span class="odds-pill">@ evs</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: ? — 22pts @ evs</span> <span class="gap-label gap-pos">We outscore winner by 71pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>5</td>
+              <td>0</td>
+              <td>-5
+                <span class="fd-bar" style="width:15.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Consistency </td>
+              <td>8</td>
+              <td>2</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>15</td>
+              <td>0</td>
+              <td>-15
+                <span class="fd-bar" style="width:45.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Favorite Correction </td>
+              <td>20</td>
+              <td>0</td>
+              <td>-20
+                <span class="fd-bar" style="width:60.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Trainer Reputation </td>
+              <td>25</td>
+              <td>0</td>
+              <td>-25
+                <span class="fd-bar" style="width:75.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 20pts</li><li>Near optimal odds (4.65): 15pts</li><li>1 total wins: 5pts</li><li>4 places (2nd/3rd): 8pts</li><li>Elite trainer (A W Carroll): +25pts</li><li>Elite trainer bonus: +20pts</li></ul>
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Kefir Doudairies</span>
+        <span class="race-meta">02-28 &bull; Doncaster 15:05 &bull; 8-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 101</span>
+        <span class="odds-pill">@ 2/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: ? — no stored record</span></div>
+      
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 20pts</li><li>Good odds position: 7pts</li><li>1 total wins: 5pts</li><li>2 places (2nd/3rd): 4pts</li><li>Proven/suited to Soft (Good to Soft in places): +28pts</li><li>Elite trainer (Olly Murphy): +25pts</li></ul>
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Royal Jet</span>
+        <span class="race-meta">02-28 &bull; Lingfield 15:52 &bull; 7-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 105</span>
+        <span class="odds-pill">@ 3/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: ? — no stored record</span></div>
+      
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 20pts</li><li>Near optimal odds (4.65): 15pts</li><li>4 total wins: 20pts</li><li>3 places (2nd/3rd): 6pts</li><li>All-weather (going neutral): +7pts</li><li>Elite trainer (Tony Carroll): +25pts</li></ul>
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Malina Road</span>
+        <span class="race-meta">02-28 &bull; Newbury 16:58 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 88</span>
+        <span class="odds-pill">@ 41/20</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: ? — no stored record</span></div>
+      
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Queen Of Steel</span>
+        <span class="race-meta">03-16 &bull; Ffos Las 14:30 &bull; 6-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 99</span>
+        <span class="odds-pill">@ 13/5</span>
+        <span class="pos-pill">Finished: 3</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Hellfire Princess — 67pts @ 49/10</span> <span class="gap-label gap-pos">We outscore winner by 32pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-neg">
+              <td>Consistency </td>
+              <td>4</td>
+              <td>2</td>
+              <td>-2
+                <span class="fd-bar" style="width:6.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Favorite Correction </td>
+              <td>4</td>
+              <td>0</td>
+              <td>-4
+                <span class="fd-bar" style="width:12.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>15</td>
+              <td>10</td>
+              <td>-5
+                <span class="fd-bar" style="width:15.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Market Leader </td>
+              <td>5</td>
+              <td>0</td>
+              <td>-5
+                <span class="fd-bar" style="width:15.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>8</td>
+              <td>0</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Trainer Reputation </td>
+              <td>8</td>
+              <td>0</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 20pts</li><li>Good odds position: 7pts</li><li>3 total wins: 15pts</li><li>2 places (2nd/3rd): 4pts</li><li>Proven/suited to Soft: +28pts</li><li>Good trainer (Fergal O'Brien): +8pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">El Rojo Grande</span>
+        <span class="race-meta">03-16 &bull; Ffos Las 15:00 &bull; 6-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 98</span>
+        <span class="odds-pill">@ 47/20</span>
+        <span class="pos-pill">Finished: 2</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Boston Joe — 29pts @ 7/2</span> <span class="gap-label gap-pos">We outscore winner by 69pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Optimal Odds </td>
+              <td>7</td>
+              <td>15</td>
+              <td>+8
+                <span class="fd-bar" style="width:24.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>8</td>
+              <td>0</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Market Leader </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>15</td>
+              <td>0</td>
+              <td>-15
+                <span class="fd-bar" style="width:45.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>28</td>
+              <td>-14</td>
+              <td>-42
+                <span class="fd-bar" style="width:100px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 20pts</li><li>Good odds position: 7pts</li><li>3 total wins: 15pts</li><li>4 places (2nd/3rd): 8pts</li><li>Proven/suited to Soft: +28pts</li><li>Versatile/proven performer (3 form wins): +8pts</li></ul>
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">El Gavilan</span>
+        <span class="race-meta">03-16 &bull; Ffos Las 16:30 &bull; 8-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 100</span>
+        <span class="odds-pill">@ 16/5</span>
+        <span class="pos-pill">Finished: 5</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: Jack's Jury — no stored record</span></div>
+      
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 20pts</li><li>Near optimal odds (4.65): 15pts</li><li>3 total wins: 15pts</li><li>1 places (2nd/3rd): 2pts</li><li>Proven/suited to Soft: +28pts</li><li>Versatile/proven performer (3 form wins): +8pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Beauzon</span>
+        <span class="race-meta">03-16 &bull; Wolverhampton 19:30 &bull; 7-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 91</span>
+        <span class="odds-pill">@ 29/10</span>
+        <span class="pos-pill">Finished: 6</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Water Of Leith — 41pts @ 25/16</span> <span class="gap-label gap-pos">We outscore winner by 50pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Market Leader <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>12</td>
+              <td>+12
+                <span class="fd-bar" style="width:36.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Consistency </td>
+              <td>2</td>
+              <td>10</td>
+              <td>+8
+                <span class="fd-bar" style="width:24.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Trainer Reputation </td>
+              <td>4</td>
+              <td>0</td>
+              <td>-4
+                <span class="fd-bar" style="width:12.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>8</td>
+              <td>0</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Sweet Spot </td>
+              <td>20</td>
+              <td>12</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>15</td>
+              <td>0</td>
+              <td>-15
+                <span class="fd-bar" style="width:45.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>35</td>
+              <td>0</td>
+              <td>-35
+                <span class="fd-bar" style="width:100px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 20pts</li><li>Near optimal odds (4.65): 15pts</li><li>7 total wins: 35pts</li><li>1 places (2nd/3rd): 2pts</li><li>All-weather (going neutral): +7pts</li><li>Decent trainer (Ian Williams): +4pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Ballynaheer</span>
+        <span class="race-meta">03-18 &bull; Huntingdon 14:45 &bull; 4-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 85</span>
+        <span class="odds-pill">@ 24/5</span>
+        <span class="pos-pill">Finished: 4</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Mahler Moon — 76pts @ 23/5</span> <span class="gap-label gap-pos">We outscore winner by 9pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Trainer Reputation <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>8</td>
+              <td>+8
+                <span class="fd-bar" style="width:24.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Optimal Odds </td>
+              <td>5</td>
+              <td>10</td>
+              <td>+5
+                <span class="fd-bar" style="width:15.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>6</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>8</td>
+              <td>-16
+                <span class="fd-bar" style="width:48.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Good odds position: 5pts</li><li>3 total wins: 24pts</li><li>4 places (2nd/3rd): 16pts</li><li>Proven/suited to Good to Soft: +16pts</li><li>Versatile/proven performer (3 form wins): +12pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Just Aidan</span>
+        <span class="race-meta">03-18 &bull; Hereford 16:00 &bull; 8-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 101</span>
+        <span class="odds-pill">@ 13/5</span>
+        <span class="pos-pill">Finished: 5</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: The Brickey Ranger — -10pts @ 23/1</span> <span class="gap-label gap-pos">We outscore winner by 111pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>5</td>
+              <td>0</td>
+              <td>-5
+                <span class="fd-bar" style="width:15.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Sweet Spot </td>
+              <td>12</td>
+              <td>2</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Market Leader </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>0</td>
+              <td>-24
+                <span class="fd-bar" style="width:72.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>32</td>
+              <td>-16</td>
+              <td>-48
+                <span class="fd-bar" style="width:100px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Good odds position: 5pts</li><li>3 total wins: 24pts</li><li>1 places (2nd/3rd): 4pts</li><li>Proven/suited to Good to Firm: +32pts</li><li>Versatile/proven performer (3 form wins): +12pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Kalista Love</span>
+        <span class="race-meta">03-20 &bull; Newbury 16:07 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 92</span>
+        <span class="odds-pill">@ 42/5</span>
+        <span class="pos-pill">Finished: 6</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: King Califet — 34pts @ 4/1</span> <span class="gap-label gap-pos">We outscore winner by 58pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Optimal Odds <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>10</td>
+              <td>+10
+                <span class="fd-bar" style="width:30.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Trainer Reputation <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>8</td>
+              <td>+8
+                <span class="fd-bar" style="width:24.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Sweet Spot </td>
+              <td>6</td>
+              <td>12</td>
+              <td>+6
+                <span class="fd-bar" style="width:18.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Consistency </td>
+              <td>8</td>
+              <td>4</td>
+              <td>-4
+                <span class="fd-bar" style="width:12.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>8</td>
+              <td>-16
+                <span class="fd-bar" style="width:48.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>32</td>
+              <td>-8</td>
+              <td>-40
+                <span class="fd-bar" style="width:100px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Spit Spot</span>
+        <span class="race-meta">03-20 &bull; Musselburgh 16:30 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 92</span>
+        <span class="odds-pill">@ 59/1</span>
+        <span class="pos-pill">Finished: 7</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Bollin Matilda — 24pts @ 13/1</span> <span class="gap-label gap-pos">We outscore winner by 68pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Sweet Spot </td>
+              <td>2</td>
+              <td>6</td>
+              <td>+4
+                <span class="fd-bar" style="width:12.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>6</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>8</td>
+              <td>-16
+                <span class="fd-bar" style="width:48.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>32</td>
+              <td>-8</td>
+              <td>-40
+                <span class="fd-bar" style="width:100px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Khrisma</span>
+        <span class="race-meta">03-21 &bull; Kelso 14:10 &bull; 15-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 117</span>
+        <span class="odds-pill">@ 1.3/1</span>
+        <span class="pos-pill">Finished: 10</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Queenie St Clair — -4pts @ 39/1</span> <span class="gap-label gap-pos">We outscore winner by 121pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-neg">
+              <td>Favorite Correction </td>
+              <td>3</td>
+              <td>0</td>
+              <td>-3
+                <span class="fd-bar" style="width:9.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Consistency </td>
+              <td>16</td>
+              <td>4</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Market Leader </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Trainer Reputation </td>
+              <td>15</td>
+              <td>0</td>
+              <td>-15
+                <span class="fd-bar" style="width:45.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>32</td>
+              <td>16</td>
+              <td>-16
+                <span class="fd-bar" style="width:48.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>20</td>
+              <td>0</td>
+              <td>-20
+                <span class="fd-bar" style="width:60.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Sweet Spot </td>
+              <td>7</td>
+              <td>-24</td>
+              <td>-31
+                <span class="fd-bar" style="width:93.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Short odds (2-3): 7pts</li><li>4 total wins: 32pts</li><li>4 places (2nd/3rd): 16pts</li><li>Proven/suited to Good to Firm: +20pts</li><li>Elite trainer (Nicky Henderson): +15pts</li><li>Short odds + elite trainer: +3pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Fifty Sent</span>
+        <span class="race-meta">03-21 &bull; Southwell 14:20 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 80</span>
+        <span class="odds-pill">@ 23/5</span>
+        <span class="pos-pill">Finished: 9</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Mr Fustic — 28pts @ 7/1</span> <span class="gap-label gap-pos">We outscore winner by 52pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Consistency </td>
+              <td>4</td>
+              <td>8</td>
+              <td>+4
+                <span class="fd-bar" style="width:12.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>0</td>
+              <td>-24
+                <span class="fd-bar" style="width:72.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Glen Road</span>
+        <span class="race-meta">03-21 &bull; Kelso 14:40 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 81</span>
+        <span class="odds-pill">@ 24/5</span>
+        <span class="pos-pill">Finished: 9</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Diamond Dealer — 72pts @ 43/10</span> <span class="gap-label gap-pos">We outscore winner by 9pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Market Leader <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>12</td>
+              <td>+12
+                <span class="fd-bar" style="width:36.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Trainer Reputation <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>8</td>
+              <td>+8
+                <span class="fd-bar" style="width:24.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Optimal Odds </td>
+              <td>5</td>
+              <td>10</td>
+              <td>+5
+                <span class="fd-bar" style="width:15.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>6</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>16</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>20</td>
+              <td>0</td>
+              <td>-20
+                <span class="fd-bar" style="width:60.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Kalypsochance</span>
+        <span class="race-meta">03-21 &bull; Navan 15:07 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 105</span>
+        <span class="odds-pill">@ 12/5</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Shabby Hill — 17pts @ 27/5</span> <span class="gap-label gap-pos">We outscore winner by 88pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-neg">
+              <td>Favorite Correction </td>
+              <td>3</td>
+              <td>0</td>
+              <td>-3
+                <span class="fd-bar" style="width:9.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Consistency </td>
+              <td>4</td>
+              <td>0</td>
+              <td>-4
+                <span class="fd-bar" style="width:12.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Trainer Reputation </td>
+              <td>15</td>
+              <td>0</td>
+              <td>-15
+                <span class="fd-bar" style="width:45.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>8</td>
+              <td>-16
+                <span class="fd-bar" style="width:48.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>20</td>
+              <td>-8</td>
+              <td>-28
+                <span class="fd-bar" style="width:84.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">The Four Sixes</span>
+        <span class="race-meta">03-21 &bull; Bangor-on-Dee 15:20 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 88</span>
+        <span class="odds-pill">@ 42/5</span>
+        <span class="pos-pill">Finished: 7</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Static — 49pts @ 37/10</span> <span class="gap-label gap-pos">We outscore winner by 39pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Optimal Odds <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>10</td>
+              <td>+10
+                <span class="fd-bar" style="width:30.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Consistency <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>8</td>
+              <td>+8
+                <span class="fd-bar" style="width:24.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Sweet Spot </td>
+              <td>6</td>
+              <td>12</td>
+              <td>+6
+                <span class="fd-bar" style="width:18.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Market Leader <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>5</td>
+              <td>+5
+                <span class="fd-bar" style="width:15.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>6</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>32</td>
+              <td>8</td>
+              <td>-24
+                <span class="fd-bar" style="width:72.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>20</td>
+              <td>-8</td>
+              <td>-28
+                <span class="fd-bar" style="width:84.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Koukeo</span>
+        <span class="race-meta">03-21 &bull; Newbury 16:10 &bull; 5-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 104</span>
+        <span class="odds-pill">@ 57/20</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Palacio — 39pts @ 27/5</span> <span class="gap-label gap-pos">We outscore winner by 65pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Consistency </td>
+              <td>4</td>
+              <td>12</td>
+              <td>+8
+                <span class="fd-bar" style="width:24.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Favorite Correction </td>
+              <td>2</td>
+              <td>0</td>
+              <td>-2
+                <span class="fd-bar" style="width:6.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Trainer Reputation </td>
+              <td>8</td>
+              <td>4</td>
+              <td>-4
+                <span class="fd-bar" style="width:12.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>10</td>
+              <td>5</td>
+              <td>-5
+                <span class="fd-bar" style="width:15.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>6</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Market Leader </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>8</td>
+              <td>-16
+                <span class="fd-bar" style="width:48.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>20</td>
+              <td>-8</td>
+              <td>-28
+                <span class="fd-bar" style="width:84.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Near optimal odds (4.65): 10pts</li><li>3 total wins: 24pts</li><li>1 places (2nd/3rd): 4pts</li><li>Proven/suited to Good to Firm: +20pts</li><li>Good trainer (Jonjo & A.J. O'Neill): +8pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Rokathir</span>
+        <span class="race-meta">03-21 &bull; Navan 16:17 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 91</span>
+        <span class="odds-pill">@ 25/2</span>
+        <span class="pos-pill">Finished: 5</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Showurappreciation — 89pts @ 51/20</span> <span class="gap-label gap-pos">We outscore winner by 2pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Market Leader <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>12</td>
+              <td>+12
+                <span class="fd-bar" style="width:36.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Sweet Spot </td>
+              <td>6</td>
+              <td>12</td>
+              <td>+6
+                <span class="fd-bar" style="width:18.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Optimal Odds <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>5</td>
+              <td>+5
+                <span class="fd-bar" style="width:15.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Trainer Reputation </td>
+              <td>15</td>
+              <td>0</td>
+              <td>-15
+                <span class="fd-bar" style="width:45.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Eric Carmen</span>
+        <span class="race-meta">03-21 &bull; Bangor-on-Dee 16:30 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 88</span>
+        <span class="odds-pill">@ 42/5</span>
+        <span class="pos-pill">Finished: 6</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Joeybottles — 22pts @ 43/10</span> <span class="gap-label gap-pos">We outscore winner by 66pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Market Leader <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>12</td>
+              <td>+12
+                <span class="fd-bar" style="width:36.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Optimal Odds <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>10</td>
+              <td>+10
+                <span class="fd-bar" style="width:30.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Sweet Spot </td>
+              <td>6</td>
+              <td>12</td>
+              <td>+6
+                <span class="fd-bar" style="width:18.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Consistency </td>
+              <td>8</td>
+              <td>4</td>
+              <td>-4
+                <span class="fd-bar" style="width:12.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>32</td>
+              <td>0</td>
+              <td>-32
+                <span class="fd-bar" style="width:96.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>20</td>
+              <td>-16</td>
+              <td>-36
+                <span class="fd-bar" style="width:100px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">King Turgeon</span>
+        <span class="race-meta">03-21 &bull; Newbury 16:45 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 76</span>
+        <span class="odds-pill">@ 29/5</span>
+        <span class="pos-pill">Finished: 6</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Havaila — 71pts @ 49/20</span> <span class="gap-label gap-pos">We outscore winner by 5pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Consistency </td>
+              <td>4</td>
+              <td>20</td>
+              <td>+16
+                <span class="fd-bar" style="width:48.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Market Leader <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>12</td>
+              <td>+12
+                <span class="fd-bar" style="width:36.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Optimal Odds <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>5</td>
+              <td>+5
+                <span class="fd-bar" style="width:15.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Trainer Reputation </td>
+              <td>4</td>
+              <td>0</td>
+              <td>-4
+                <span class="fd-bar" style="width:12.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>6</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>16</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>20</td>
+              <td>0</td>
+              <td>-20
+                <span class="fd-bar" style="width:60.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Leagle Aid</span>
+        <span class="race-meta">03-21 &bull; Newcastle 17:00 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 78</span>
+        <span class="odds-pill">@ 29/5</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Alther Walden — 53pts @ 21/10</span> <span class="gap-label gap-pos">We outscore winner by 25pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Market Leader <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>12</td>
+              <td>+12
+                <span class="fd-bar" style="width:36.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Optimal Odds <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>5</td>
+              <td>+5
+                <span class="fd-bar" style="width:15.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Trainer Reputation <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>4</td>
+              <td>+4
+                <span class="fd-bar" style="width:12.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Consistency </td>
+              <td>12</td>
+              <td>4</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>8</td>
+              <td>-16
+                <span class="fd-bar" style="width:48.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Mr Nugget</span>
+        <span class="race-meta">03-21 &bull; Newcastle 19:00 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 96</span>
+        <span class="odds-pill">@ 37/10</span>
+        <span class="pos-pill">Finished: 9</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: Barry&#x27;s Boy — no stored record</span></div>
+      
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Collecting Coin</span>
+        <span class="race-meta">03-22 &bull; Naas 15:12 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 88</span>
+        <span class="odds-pill">@ 4/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Independent Expert — -20pts @ 25/1</span> <span class="gap-label gap-pos">We outscore winner by 108pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Total Wins <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>8</td>
+              <td>+8
+                <span class="fd-bar" style="width:24.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>6</td>
+              <td>0</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Age Bonus </td>
+              <td>6</td>
+              <td>0</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Official Rating Bonus </td>
+              <td>8</td>
+              <td>0</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Consistency </td>
+              <td>12</td>
+              <td>4</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Trainer Form </td>
+              <td>8</td>
+              <td>0</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Jockey Quality </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Sweet Spot </td>
+              <td>0</td>
+              <td>-24</td>
+              <td>-24
+                <span class="fd-bar" style="width:72.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>18</td>
+              <td>-8</td>
+              <td>-26
+                <span class="fd-bar" style="width:78.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Hello Judge</span>
+        <span class="race-meta">03-22 &bull; Carlisle 16:27 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 97</span>
+        <span class="odds-pill">@ 11/2</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Wolfburg — 50pts @ 11/4</span> <span class="gap-label gap-pos">We outscore winner by 47pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Market Leader <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>12</td>
+              <td>+12
+                <span class="fd-bar" style="width:36.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Weight Penalty </td>
+              <td>-5</td>
+              <td>2</td>
+              <td>+7
+                <span class="fd-bar" style="width:21.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Age Bonus </td>
+              <td>-5</td>
+              <td>0</td>
+              <td>+5
+                <span class="fd-bar" style="width:15.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Optimal Odds </td>
+              <td>5</td>
+              <td>10</td>
+              <td>+5
+                <span class="fd-bar" style="width:15.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Consistency </td>
+              <td>4</td>
+              <td>8</td>
+              <td>+4
+                <span class="fd-bar" style="width:12.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>6</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>8</td>
+              <td>-16
+                <span class="fd-bar" style="width:48.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>20</td>
+              <td>-8</td>
+              <td>-28
+                <span class="fd-bar" style="width:84.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>30</td>
+              <td>0</td>
+              <td>-30
+                <span class="fd-bar" style="width:90.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Wicked Thoughts</span>
+        <span class="race-meta">03-24 &bull; Taunton 15:45 &bull; 6-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 81</span>
+        <span class="odds-pill">@ 3/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Ede'iffs Rock — 79pts @ 11/4</span> <span class="gap-label gap-pos">We outscore winner by 2pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Market Leader </td>
+              <td>5</td>
+              <td>12</td>
+              <td>+7
+                <span class="fd-bar" style="width:21.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Weight Penalty </td>
+              <td>-3</td>
+              <td>-1</td>
+              <td>+2
+                <span class="fd-bar" style="width:6.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Age Bonus </td>
+              <td>0</td>
+              <td>-5</td>
+              <td>-5
+                <span class="fd-bar" style="width:15.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Jockey Quality </td>
+              <td>6</td>
+              <td>0</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Near optimal odds (4.65): 10pts</li><li>2 total wins: 16pts</li><li>1 places (2nd/3rd): 4pts</li><li>Proven/suited to Good to Firm: +16pts</li><li>Course winner (from run history, C): +9pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Knock Off Soxs</span>
+        <span class="race-meta">03-24 &bull; Taunton 16:15 &bull; 7-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 88</span>
+        <span class="odds-pill">@ 7/2</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Khafre — 70pts @ 7/4</span> <span class="gap-label gap-pos">We outscore winner by 18pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Market Leader <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>12</td>
+              <td>+12
+                <span class="fd-bar" style="width:36.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Weight Penalty </td>
+              <td>-3</td>
+              <td>-5</td>
+              <td>-2
+                <span class="fd-bar" style="width:6.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Sweet Spot </td>
+              <td>12</td>
+              <td>7</td>
+              <td>-5
+                <span class="fd-bar" style="width:15.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>10</td>
+              <td>5</td>
+              <td>-5
+                <span class="fd-bar" style="width:15.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Consistency </td>
+              <td>12</td>
+              <td>4</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Age Bonus </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Near optimal odds (4.65): 10pts</li><li>2 total wins: 16pts</li><li>3 places (2nd/3rd): 12pts</li><li>Proven/suited to Good to Firm: +16pts</li><li>Course winner (from run history, C): +9pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Karton Plein</span>
+        <span class="race-meta">03-24 &bull; Southwell 16:30 &bull; 11-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 83</span>
+        <span class="odds-pill">@ 7/2</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Codetalker — 53pts @ 6/1</span> <span class="gap-label gap-pos">We outscore winner by 30pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Consistency </td>
+              <td>8</td>
+              <td>12</td>
+              <td>+4
+                <span class="fd-bar" style="width:12.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Weight Penalty </td>
+              <td>2</td>
+              <td>-2</td>
+              <td>-4
+                <span class="fd-bar" style="width:12.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Trainer Reputation </td>
+              <td>8</td>
+              <td>0</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Market Leader </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Near optimal odds (4.65): 10pts</li><li>1 total wins: 8pts</li><li>2 places (2nd/3rd): 8pts</li><li>All-weather (going neutral): +8pts</li><li>Course winner (from run history, C): +9pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Burdett Estate</span>
+        <span class="race-meta">03-24 &bull; Wolverhampton 20:00 &bull; 4-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 82</span>
+        <span class="odds-pill">@ 4/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Merlier — 68pts @ 9/4</span> <span class="gap-label gap-pos">We outscore winner by 14pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Jockey Quality <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>6</td>
+              <td>+6
+                <span class="fd-bar" style="width:18.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>10</td>
+              <td>5</td>
+              <td>-5
+                <span class="fd-bar" style="width:15.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>6</td>
+              <td>0</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Cd Bonus </td>
+              <td>9</td>
+              <td>0</td>
+              <td>-9
+                <span class="fd-bar" style="width:27.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Near optimal odds (4.65): 10pts</li><li>1 total wins: 8pts</li><li>1 places (2nd/3rd): 4pts</li><li>Unexposed 3yo (2 runs, 1W, 50% rate): +15pts</li><li>All-weather (going neutral): +8pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Mr Nugget</span>
+        <span class="race-meta">03-24 &bull; Wolverhampton 20:30 &bull; 8-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 87</span>
+        <span class="odds-pill">@ 9/2</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Farasi Lane — 38pts @ 7/2</span> <span class="gap-label gap-pos">We outscore winner by 49pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Market Leader <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>5</td>
+              <td>+5
+                <span class="fd-bar" style="width:15.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>6</td>
+              <td>0</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Cd Bonus </td>
+              <td>9</td>
+              <td>0</td>
+              <td>-9
+                <span class="fd-bar" style="width:27.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Age Bonus </td>
+              <td>10</td>
+              <td>-5</td>
+              <td>-15
+                <span class="fd-bar" style="width:45.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>0</td>
+              <td>-24
+                <span class="fd-bar" style="width:72.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Near optimal odds (4.65): 10pts</li><li>3 total wins: 24pts</li><li>2 places (2nd/3rd): 8pts</li><li>All-weather (going neutral): +8pts</li><li>Course winner (from run history, C): +9pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">L'aventara</span>
+        <span class="race-meta">03-25 &bull; Hereford 15:30 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 102</span>
+        <span class="odds-pill">@ 2/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Isabella Islay — 60pts @ 5/1</span> <span class="gap-label gap-pos">We outscore winner by 42pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Age Bonus </td>
+              <td>-5</td>
+              <td>10</td>
+              <td>+15
+                <span class="fd-bar" style="width:45.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Unexposed Bonus <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>12</td>
+              <td>+12
+                <span class="fd-bar" style="width:36.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Cd Bonus <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>9</td>
+              <td>+9
+                <span class="fd-bar" style="width:27.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Short Form Improvement <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>8</td>
+              <td>+8
+                <span class="fd-bar" style="width:24.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Consistency <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>4</td>
+              <td>+4
+                <span class="fd-bar" style="width:12.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Weight Penalty <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>2</td>
+              <td>+2
+                <span class="fd-bar" style="width:6.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Unknown Trainer Penalty </td>
+              <td>0</td>
+              <td>-8</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>18</td>
+              <td>6</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Going Suitability </td>
+              <td>16</td>
+              <td>0</td>
+              <td>-16
+                <span class="fd-bar" style="width:48.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Recent Win </td>
+              <td>22</td>
+              <td>0</td>
+              <td>-22
+                <span class="fd-bar" style="width:66.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>0</td>
+              <td>-24
+                <span class="fd-bar" style="width:72.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Cargin Bhui</span>
+        <span class="race-meta">03-27 &bull; Newcastle 20:00 &bull; 12-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 93</span>
+        <span class="odds-pill">@ 7/2</span>
+        <span class="pos-pill">Finished: 5</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Havana Prince — 18pts @ 16/1</span> <span class="gap-label gap-pos">We outscore winner by 75pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Weight Penalty <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>2</td>
+              <td>+2
+                <span class="fd-bar" style="width:6.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Trainer Reputation </td>
+              <td>4</td>
+              <td>0</td>
+              <td>-4
+                <span class="fd-bar" style="width:12.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>6</td>
+              <td>0</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Unknown Trainer Penalty </td>
+              <td>0</td>
+              <td>-8</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Market Leader </td>
+              <td>9</td>
+              <td>0</td>
+              <td>-9
+                <span class="fd-bar" style="width:27.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Sweet Spot </td>
+              <td>12</td>
+              <td>2</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Consistency </td>
+              <td>16</td>
+              <td>4</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>16</td>
+              <td>0</td>
+              <td>-16
+                <span class="fd-bar" style="width:48.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Near optimal odds (4.65): 12pts</li><li>2 total wins: 16pts</li><li>4 places (2nd/3rd): 16pts</li><li>All-weather (going neutral): +8pts</li><li>Decent trainer (T D Barron): +4pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Dmaniac</span>
+        <span class="race-meta">03-28 &bull; Curragh 13:55 &bull; 15-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 100</span>
+        <span class="odds-pill">@ 9/4</span>
+        <span class="pos-pill">Finished: 5</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Bodhi Bear — 53pts @ 8/1</span> <span class="gap-label gap-pos">We outscore winner by 47pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>6</td>
+              <td>0</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Consistency </td>
+              <td>8</td>
+              <td>0</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Market Leader </td>
+              <td>9</td>
+              <td>0</td>
+              <td>-9
+                <span class="fd-bar" style="width:27.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Recent Win </td>
+              <td>24</td>
+              <td>0</td>
+              <td>-24
+                <span class="fd-bar" style="width:72.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Good odds position: 6pts</li><li>Recent win (last race): 24pts</li><li>2 total wins: 16pts</li><li>2 places (2nd/3rd): 8pts</li><li>Consistent form (going prob. soft in March): +8pts</li></ul>
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Belgravian</span>
+        <span class="race-meta">03-28 &bull; Kempton 14:08 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 88</span>
+        <span class="odds-pill">@ 7/2</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Align The Stars — 43pts @ 5/1</span> <span class="gap-label gap-pos">We outscore winner by 45pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Cd Bonus <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>9</td>
+              <td>+9
+                <span class="fd-bar" style="width:27.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>6</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>12</td>
+              <td>6</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Consistency </td>
+              <td>8</td>
+              <td>0</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>0</td>
+              <td>-24
+                <span class="fd-bar" style="width:72.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Triple Double A</span>
+        <span class="race-meta">03-28 &bull; Kempton 14:42 &bull; 0-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 94</span>
+        <span class="odds-pill">@ 8/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Gamrai — 55pts @ 15/2</span> <span class="gap-label gap-pos">We outscore winner by 39pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Cd Bonus <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>9</td>
+              <td>+9
+                <span class="fd-bar" style="width:27.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Consistency </td>
+              <td>4</td>
+              <td>8</td>
+              <td>+4
+                <span class="fd-bar" style="width:12.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Weight Penalty <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>2</td>
+              <td>+2
+                <span class="fd-bar" style="width:6.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>16</td>
+              <td>8</td>
+              <td>-8
+                <span class="fd-bar" style="width:24.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Meeting Focus </td>
+              <td>10</td>
+              <td>0</td>
+              <td>-10
+                <span class="fd-bar" style="width:30.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>18</td>
+              <td>6</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Recent Win </td>
+              <td>24</td>
+              <td>0</td>
+              <td>-24
+                <span class="fd-bar" style="width:72.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      
+    </div>
+  </div>
+  <div class="card gap-card gap-pos">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Eternal Force</span>
+        <span class="race-meta">03-28 &bull; Doncaster 15:32 &bull; 22-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 86</span>
+        <span class="odds-pill">@ 4/1</span>
+        <span class="pos-pill">Finished: 7</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge">Winner: Urban Lion — 55pts @ 9/1</span> <span class="gap-label gap-pos">We outscore winner by 31pts</span></div>
+      <table class="fd-table">
+          <thead><tr><th>Factor</th><th>Ours</th><th>Winner</th><th>Diff</th></tr></thead>
+          <tbody><tr class="fd-pos">
+              <td>Cd Bonus <span class="zero-flag">we had 0</span></td>
+              <td>0</td>
+              <td>9</td>
+              <td>+9
+                <span class="fd-bar" style="width:27.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-pos">
+              <td>Consistency </td>
+              <td>4</td>
+              <td>8</td>
+              <td>+4
+                <span class="fd-bar" style="width:12.0px;background:#ef4444"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Market Leader </td>
+              <td>4</td>
+              <td>0</td>
+              <td>-4
+                <span class="fd-bar" style="width:12.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Distance Suitability </td>
+              <td>12</td>
+              <td>6</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Sweet Spot </td>
+              <td>12</td>
+              <td>6</td>
+              <td>-6
+                <span class="fd-bar" style="width:18.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Optimal Odds </td>
+              <td>12</td>
+              <td>0</td>
+              <td>-12
+                <span class="fd-bar" style="width:36.0px;background:#22c55e"></span>
+              </td></tr><tr class="fd-neg">
+              <td>Total Wins </td>
+              <td>24</td>
+              <td>8</td>
+              <td>-16
+                <span class="fd-bar" style="width:48.0px;background:#22c55e"></span>
+              </td></tr></tbody></table>
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Near optimal odds (4.65): 12pts</li><li>3 total wins: 24pts</li><li>1 places (2nd/3rd): 4pts</li><li>Proven/suited to Good to Soft: +16pts</li><li>Unknown trainer tier (W J Haggas): -8pts</li></ul>
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Shazani</span>
+        <span class="race-meta">03-29 &bull; Doncaster 14:30 &bull; 15-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 79</span>
+        <span class="odds-pill">@ 4/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: Langstone — no stored record</span></div>
+      
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Near optimal odds (4.65): 13pts</li><li>1 total wins: 8pts</li><li>1 places (2nd/3rd): 4pts</li><li>Proven/suited to Soft: +16pts</li><li>Course winner (from run history, C): +9pts</li></ul>
+    </div>
+  </div>
+  <div class="card card-nodata">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="horse-name">Say What You See</span>
+        <span class="race-meta">03-29 &bull; Doncaster 15:05 &bull; 13-runner</span>
+      </div>
+      <div class="card-scores">
+        <span class="score-pill">Our score: 94</span>
+        <span class="odds-pill">@ 3.3/1</span>
+        <span class="pos-pill">Finished: ?</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="winner-row"><span class="winner-badge nomatch">Winner: Jimmy Speaking — no stored record</span></div>
+      
+      <ul class="reasons"><li>Sweet spot (3-9 odds): 12pts</li><li>Near optimal odds (4.65): 13pts</li><li>2 total wins: 16pts</li><li>3 places (2nd/3rd): 12pts</li><li>Proven/suited to Soft: +16pts</li><li>Course winner (from run history, C): +9pts</li></ul>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

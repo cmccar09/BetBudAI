@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test - Betting Picks</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #fff; }
+        .pick { background: #2a2a2a; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #4ade80; }
+        .score { font-size: 24px; font-weight: bold; color: #4ade80; }
+        .coverage { color: #60a5fa; }
+        .error { color: #f87171; }
+        pre { background: #0a0a0a; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🏇 Live API Response Test</h1>
+    <p>Testing: <code>https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com/api/picks/today</code></p>
+    <button onclick="fetchPicks()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Fetch Latest Picks</button>
+    <div id="result"></div>
+
+    <script>
+        async function fetchPicks() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Loading...</p>';
+            
+            try {
+                const response = await fetch('https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com/api/picks/today');
+                const data = await response.json();
+                
+                let html = `<h2>✓ API Response (${new Date().toLocaleTimeString()})</h2>`;
+                html += `<p>Total picks: ${data.picks?.length || 0}</p>`;
+                
+                if (data.picks && data.picks.length > 0) {
+                    data.picks.forEach((pick, i) => {
+                        const score = pick.comprehensive_score || 0;
+                        const coverage = pick.race_coverage_pct || 0;
+                        
+                        html += `
+                            <div class="pick">
+                                <h3>${i+1}. ${pick.horse} @ ${pick.course}</h3>
+                                <div class="score">Score: ${score.toFixed(0)}/100</div>
+                                <div class="coverage">Coverage: ${coverage.toFixed(0)}%</div>
+                                <div style="margin-top: 8px;">
+                                    <div>Race: ${pick.race_name}</div>
+                                    <div>Time: ${pick.race_time}</div>
+                                    <div>Odds: ${pick.odds}</div>
+                                    <div>Show in UI: ${pick.show_in_ui ? '✓ YES' : '✗ NO'}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<p class="error">No picks found</p>';
+                }
+                
+                html += '<h3>Raw JSON:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Auto-fetch on load
+        window.onload = fetchPicks;
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+====================================================================
+  SKY SPORTS FORM PROFILE SCRAPER ΓÇö Cheltenham 2026
+  Date: 2026-03-06
+====================================================================
+
+[1] Loading current Cheltenham picks ...
+  53 unique horses to look up
+    Backmersackme
+    Ballyburn
+    Bambino Fever
+    Billaway
+    Chemical Energy
+    Constitution Hill
+    Crosshill
+    Dance With Debon
+    Dinoblue
+    Doctor Steinberg
+    Down Memory Lane
+    El Fabiolo
+    Energumene
+    Fact To File
+    Favori De Champdou
+    Final Demand
+    Gaelic Warrior
+    Gaillard Du Mesnil
+    Galopin Des Champs
+    Golden Ace
+    Grange Walk
+    Il Est Francais
+    Il Etait Temps
+    Jagwar
+    Jonbon Jr
+    Jungle Boogie
+    Kargese
+    King Rasko Grey
+    Koktail Divin
+    Kopek Des Bordes
+    Lagos All Day
+    Lossiemouth
+    Love Sign d'Aunou
+    Majborough
+    Manlaga
+    Monkfish
+    Murcia
+    Old Park Star
+    Perceval Legallois
+    Poniros
+    Proactif
+    Roc Dino
+    Run To Freedom
+    Sainte Sangria
+    Salvator Mundi
+    Shantreusse
+    Sharp Secret
+    State Man
+    Storm Heart
+    Teahupoo
+    The Irish Avatar
+    Vauban
+    Waterford Whispers
+
+[2] Horse ID discovery (have 0 cached IDs) ...
+  Searching for 53 horse IDs across 94 result pages ...
+  Fetched 94 result pages, found 0 IDs
+  Still missing IDs for: ['backmersackme', 'ballyburn', 'bambino fever', 'billaway', 'chemical energy', 'constitution hill', 'crosshill', 'dance with debon', 'dinoblue', 'doctor steinberg', 'down memory lane', 'el fabiolo', 'energumene', 'fact to file', 'favori de champdou', 'final demand', 'gaelic warrior', 'gaillard du mesnil', 'galopin des champs', 'golden ace', 'grange walk', 'il est francais', 'il etait temps', 'jagwar', 'jonbon jr', 'jungle boogie', 'kargese', 'king rasko grey', 'koktail divin', 'kopek des bordes', 'lagos all day', 'lossiemouth', "love sign d'aunou", 'majborough', 'manlaga', 'monkfish', 'murcia', 'old park star', 'perceval legallois', 'poniros', 'proactif', 'roc dino', 'run to freedom', 'sainte sangria', 'salvator mundi', 'shantreusse', 'sharp secret', 'state man', 'storm heart', 'teahupoo', 'the irish avatar', 'vauban', 'waterford whispers']
+
+  ID map saved: 0 horses ΓåÆ C:\Users\charl\OneDrive\futuregenAI\Betting\_skysports_horse_ids.json
+
+  Discovery mode complete. Exiting.

@@ -1,0 +1,143 @@
+{
+  "Comment": "SureBet Results Poll Pipeline — runs every 30 minutes. Pulls Sporting Life results, updates favourites outcomes, then runs learning to nudge model weights from post-race commentary patterns.",
+  "StartAt": "InjectDate",
+  "States": {
+    "InjectDate": {
+      "Type": "Pass",
+      "Parameters": {
+        "date.$": "States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'), 0)"
+      },
+      "Next": "RefreshSLResults"
+    },
+    "RefreshSLResults": {
+      "Comment": "Settle finished races from Sporting Life fast-results and save commentary fields.",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:surebet-sl-results",
+        "Payload": {
+          "date.$": "$.date"
+        }
+      },
+      "ResultSelector": {
+        "statusCode.$": "$.Payload.statusCode",
+        "date.$": "$.Payload.date",
+        "success.$": "$.Payload.success",
+        "message.$": "$.Payload.message"
+      },
+      "ResultPath": "$.slResultsResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "ResultsPollFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "RefreshFavResults"
+    },
+    "RefreshFavResults": {
+      "Comment": "Update fav_outcome for favourites after each result poll.",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:surebet-fav-results",
+        "Payload": {
+          "date.$": "$.date"
+        }
+      },
+      "ResultSelector": {
+        "success.$": "$.Payload.success"
+      },
+      "ResultPath": "$.favResults",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "RunLearning",
+          "ResultPath": "$.favError",
+          "Comment": "Non-fatal — still run learning."
+        }
+      ],
+      "Next": "RunLearning"
+    },
+    "RunLearning": {
+      "Comment": "Consume fresh losses/commentary and apply bounded weight nudges.",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:eu-west-1:813281204422:function:surebet-learning",
+        "Payload": {
+          "date.$": "$.date"
+        }
+      },
+      "ResultSelector": {
+        "success.$": "$.Payload.success",
+        "results_scanned.$": "$.Payload.results_scanned",
+        "patterns_found.$": "$.Payload.patterns_found",
+        "weight_nudges.$": "$.Payload.weight_nudges"
+      },
+      "ResultPath": "$.learningResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 30,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "ResultsPollComplete",
+          "ResultPath": "$.learningError",
+          "Comment": "Non-fatal — results polling still considered complete."
+        }
+      ],
+      "Next": "ResultsPollComplete"
+    },
+    "ResultsPollComplete": {
+      "Type": "Succeed"
+    },
+    "ResultsPollFailed": {
+      "Type": "Fail",
+      "Error": "ResultsPollFailed",
+      "Cause": "A critical step in the 30-minute results poll pipeline failed."
+    }
+  }
+}

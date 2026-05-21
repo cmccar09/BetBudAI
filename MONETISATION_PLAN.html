@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SureBet AI — Monetisation Plan</title>
+<style>
+  :root {
+    --bg: #0d1117; --card: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e;
+    --gold: #f0b429; --blue: #58a6ff; --green: #3fb950;
+    --orange: #f78166; --purple: #bc8cff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.6; }
+
+  .hero { background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 60%); border-bottom: 1px solid var(--border); padding: 60px 40px 50px; text-align: center; }
+  .hero h1 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 10px; }
+  .hero h1 span { color: var(--gold); }
+  .hero p { color: var(--muted); font-size: 1.05rem; max-width: 600px; margin: 0 auto 30px; }
+  .stats-row { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+  .stat-pill { background: var(--card); border: 1px solid var(--border); border-radius: 50px; padding: 10px 22px; }
+  .stat-pill .val { font-size: 1.5rem; font-weight: 700; color: var(--gold); }
+  .stat-pill .lbl { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  main { max-width: 1060px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  h2 { font-size: 1.25rem; font-weight: 600; color: var(--blue); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+  h2::before { content: ''; display: inline-block; width: 4px; height: 18px; border-radius: 2px; background: var(--blue); }
+  h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  p, li { color: var(--muted); }
+
+  section { margin-bottom: 50px; }
+
+  /* PRIORITY CARDS */
+  .revenue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+  .rev-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 22px; position: relative; transition: border-color .2s; }
+  .rev-card:hover { border-color: var(--blue); }
+  .rev-card .rank { position: absolute; top: 14px; right: 14px; font-size: 0.65rem; font-weight: 700; border-radius: 20px; padding: 3px 10px; text-transform: uppercase; letter-spacing: .05em; }
+  .rank-1 { background: rgba(240,180,41,.15); color: var(--gold); border: 1px solid rgba(240,180,41,.4); }
+  .rank-2 { background: rgba(88,166,255,.15); color: var(--blue); border: 1px solid rgba(88,166,255,.4); }
+  .rank-3 { background: rgba(63,185,80,.15); color: var(--green); border: 1px solid rgba(63,185,80,.4); }
+  .rank-later { background: rgba(139,148,158,.1); color: var(--muted); border: 1px solid var(--border); }
+  .rev-card .icon { font-size: 1.8rem; margin-bottom: 10px; }
+  .rev-card h3 { font-size: 1.05rem; margin-bottom: 6px; }
+  .rev-card .revenue-est { font-size: 0.8rem; color: var(--green); font-weight: 600; margin: 10px 0 6px; }
+  .rev-card ul { padding-left: 18px; }
+  .rev-card li { font-size: 0.82rem; margin-bottom: 3px; }
+  .rev-card .effort { display: inline-block; font-size: 0.7rem; margin-top: 10px; border-radius: 4px; padding: 2px 8px; }
+  .effort-low { background: rgba(63,185,80,.12); color: var(--green); }
+  .effort-mid { background: rgba(240,180,41,.12); color: var(--gold); }
+  .effort-high { background: rgba(247,129,102,.12); color: var(--orange); }
+
+  /* ROADMAP */
+  .roadmap { position: relative; }
+  .roadmap::before { content: ''; position: absolute; left: 22px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+  .rm-item { display: flex; gap: 20px; margin-bottom: 28px; position: relative; }
+  .rm-dot { flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; z-index: 1; }
+  .rm-q1 { background: rgba(240,180,41,.2); border: 2px solid var(--gold); color: var(--gold); }
+  .rm-q2 { background: rgba(88,166,255,.2); border: 2px solid var(--blue); color: var(--blue); }
+  .rm-q3 { background: rgba(63,185,80,.2); border: 2px solid var(--green); color: var(--green); }
+  .rm-q4 { background: rgba(188,140,255,.2); border: 2px solid var(--purple); color: var(--purple); }
+  .rm-content { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; flex: 1; }
+  .rm-content h3 { margin-bottom: 4px; }
+  .rm-content .tasks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .task-tag { font-size: 0.72rem; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 4px; padding: 3px 9px; color: var(--muted); }
+
+  /* LEGAL */
+  .legal-box { background: rgba(247,129,102,.06); border: 1px solid rgba(247,129,102,.3); border-radius: 8px; padding: 20px 24px; }
+  .legal-box h3 { color: var(--orange); margin-bottom: 10px; }
+  .legal-box ul { padding-left: 20px; }
+  .legal-box li { font-size: 0.85rem; margin-bottom: 6px; }
+
+  /* TECH TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: rgba(255,255,255,.04); color: var(--text); font-weight: 600; text-align: left; padding: 10px 14px; border-bottom: 2px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; border-radius: 4px; padding: 2px 7px; text-transform: uppercase; }
+  .b-green { background: rgba(63,185,80,.15); color: var(--green); }
+  .b-gold { background: rgba(240,180,41,.15); color: var(--gold); }
+  .b-blue { background: rgba(88,166,255,.15); color: var(--blue); }
+  .b-red { background: rgba(247,129,102,.15); color: var(--orange); }
+
+  /* PRICING */
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .price-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 22px; text-align: center; }
+  .price-card.featured { border-color: var(--gold); }
+  .price-card .tier { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 8px; }
+  .price-card .amount { font-size: 2rem; font-weight: 700; color: var(--text); }
+  .price-card .amount span { font-size: 0.9rem; color: var(--muted); }
+  .price-card ul { text-align: left; padding-left: 16px; margin-top: 14px; }
+  .price-card li { font-size: 0.8rem; margin-bottom: 5px; }
+  .featured-label { font-size: 0.68rem; background: var(--gold); color: #000; font-weight: 700; border-radius: 20px; padding: 2px 10px; display: inline-block; margin-bottom: 8px; }
+
+  /* PLATFORMS */
+  .platform-list { display: flex; flex-wrap: wrap; gap: 10px; }
+  .platform-chip { background: var(--card); border: 1px solid var(--border); border-radius: 50px; padding: 8px 18px; font-size: 0.82rem; display: flex; align-items: center; gap: 8px; }
+  .platform-chip .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  footer { text-align: center; padding: 30px; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>SureBet AI — <span>Monetisation Plan</span></h1>
+  <p>A structured path from working product to recurring revenue, built on a proven scoring engine with 396 picks across 45 days of live operation.</p>
+  <div class="stats-row">
+    <div class="stat-pill"><div class="val">396</div><div class="lbl">Live UI Picks</div></div>
+    <div class="stat-pill"><div class="val">45</div><div class="lbl">Days Running</div></div>
+    <div class="stat-pill"><div class="val">86.3</div><div class="lbl">Avg Score /100</div></div>
+    <div class="stat-pill"><div class="val">3 / 5</div><div class="lbl">Daily Cap (Wk / Wknd)</div></div>
+    <div class="stat-pill"><div class="val">£50 EW</div><div class="lbl">Model Stake</div></div>
+  </div>
+</div>
+
+<main>
+
+  <!-- REVENUE MODELS -->
+  <section>
+    <h2>Revenue Models — Prioritised</h2>
+    <div class="revenue-grid">
+
+      <div class="rev-card">
+        <div class="rank rank-1">Priority 1</div>
+        <div class="icon">📧</div>
+        <h3>Tipster Subscription (Email / WhatsApp)</h3>
+        <p style="font-size:.83rem">Deliver today's 3–5 picks each morning via email or WhatsApp. Simple, zero infrastructure, cash flows from day one.</p>
+        <div class="revenue-est">£300–£1,500 / month at 30–150 subs</div>
+        <ul>
+          <li>£9.99/mo or £79/yr per subscriber</li>
+          <li>Email via Mailchimp / Substack (free tier)</li>
+          <li>WhatsApp delivery via WhatsApp Business API</li>
+          <li>Send picks 9–10am — horses picked by algorithm daily</li>
+        </ul>
+        <span class="effort effort-low">Low effort — 1–2 weeks to launch</span>
+      </div>
+
+      <div class="rev-card">
+        <div class="rank rank-1">Priority 1</div>
+        <div class="icon">🏆</div>
+        <h3>Tipster Platform Listing</h3>
+        <p style="font-size:.83rem">List on established tipster marketplaces where punters already browse. Instant audience, no marketing needed to start.</p>
+        <div class="revenue-est">Revenue share: 60–80% of subscription fees</div>
+        <ul>
+          <li><strong>Tipstrr</strong> — biggest UK tipster marketplace</li>
+          <li><strong>Betting Gods</strong> — vetted proof-of-profit required</li>
+          <li><strong>SBC (Smart Betting Club)</strong> — high-value subscribers</li>
+          <li>Requires ~3 months verified P&L history first</li>
+        </ul>
+        <span class="effort effort-low">Low effort — submit app after 3-month track record</span>
+      </div>
+
+      <div class="rev-card">
+        <div class="rank rank-2">Priority 2</div>
+        <div class="icon">🔗</div>
+        <h3>Bookmaker Affiliate Marketing</h3>
+        <p style="font-size:.83rem">Earn CPA or revenue share when your subscribers sign up to bookmakers via your affiliate links. Completely passive once set up.</p>
+        <div class="revenue-est">£30–£100 CPA per new depositing customer</div>
+        <ul>
+          <li>Bet365, William Hill, Paddy Power all have affiliate programmes</li>
+          <li>Oddschecker Partners — aggregator affiliate links</li>
+          <li>Add to every pick email: "Best odds at [Bookmaker] → [link]"</li>
+          <li>No gambling licence required for affiliate links</li>
+        </ul>
+        <span class="effort effort-low">Low effort — sign up in 1 day, embed links</span>
+      </div>
+
+      <div class="rev-card">
+        <div class="rank rank-2">Priority 2</div>
+        <div class="icon">📱</div>
+        <h3>Freemium Web App (Current App)</h3>
+        <p style="font-size:.83rem">Keep the app free for basic picks, add a paid tier that unlocks the score breakdown, race intel, and runners table.</p>
+        <div class="revenue-est">£4.99–£14.99/mo gateway</div>
+        <ul>
+          <li>Free: horse name + odds + grade</li>
+          <li>Pro £9.99/mo: score breakdown + race intel + all runners</li>
+          <li>Add Stripe payment → generate JWT/API key → gate Lambda endpoints</li>
+          <li>Uses existing Amplify + Lambda infrastructure</li>
+        </ul>
+        <span class="effort effort-mid">Medium effort — 2–4 weeks dev</span>
+      </div>
+
+      <div class="rev-card">
+        <div class="rank rank-3">Priority 3</div>
+        <div class="icon">🤖</div>
+        <h3>Telegram / Discord Bot</h3>
+        <p style="font-size:.83rem">Bot posts picks automatically to a paid Telegram channel or Discord server. Viral growth potential via referrals.</p>
+        <div class="revenue-est">£5–£15/mo per member × community size</div>
+        <ul>
+          <li>Telegram: Fragment.com to sell channel access</li>
+          <li>Discord: Whop.com memberships</li>
+          <li>Bot calls existing Lambda API and posts formatted picks</li>
+          <li>~50 lines of Python using python-telegram-bot library</li>
+        </ul>
+        <span class="effort effort-mid">Medium effort — 1–2 weeks dev + community building</span>
+      </div>
+
+      <div class="rev-card">
+        <div class="rank rank-later">Later Stage</div>
+        <div class="icon">⚡</div>
+        <h3>API Access (B2B / Developers)</h3>
+        <p style="font-size:.83rem">Expose the scoring engine as a paid API for other tipster services, trading tools, or racing apps.</p>
+        <div class="revenue-est">£49–£299/mo per API consumer</div>
+        <ul>
+          <li>RapidAPI marketplace listing</li>
+          <li>Endpoints: /score-horse, /today-picks, /race-analysis</li>
+          <li>Add API key management to existing Lambda</li>
+          <li>Requires solid track record + documentation first</li>
+        </ul>
+        <span class="effort effort-high">High effort — 4–8 weeks + customer support overhead</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PRICING TIERS -->
+  <section>
+    <h2>Suggested Subscription Pricing</h2>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="tier">Free</div>
+        <div class="amount">£0 <span>/mo</span></div>
+        <ul>
+          <li>Today's top pick (1 horse)</li>
+          <li>Horse name + course + grade</li>
+          <li>No score breakdown</li>
+          <li>No runners table</li>
+        </ul>
+      </div>
+      <div class="price-card featured">
+        <div class="featured-label">⭐ Best Value</div>
+        <div class="tier">Pro</div>
+        <div class="amount">£9.99 <span>/mo</span></div>
+        <ul>
+          <li>All 3–5 daily picks</li>
+          <li>Full score breakdown</li>
+          <li>Race Intel panel</li>
+          <li>All runners + scores</li>
+          <li>Email/WhatsApp delivery</li>
+        </ul>
+      </div>
+      <div class="price-card">
+        <div class="tier">Annual Pro</div>
+        <div class="amount">£79 <span>/yr</span></div>
+        <ul>
+          <li>All Pro features</li>
+          <li>2 months free vs monthly</li>
+          <li>Priority email support</li>
+          <li>Weight-change notifications</li>
+        </ul>
+      </div>
+      <div class="price-card">
+        <div class="tier">VIP</div>
+        <div class="amount">£24.99 <span>/mo</span></div>
+        <ul>
+          <li>All Pro features</li>
+          <li>Weekend specials (5 picks)</li>
+          <li>Live odds alerts (Betfair)</li>
+          <li>Monthly strategy call</li>
+          <li>Direct WhatsApp access</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEGAL -->
+  <section>
+    <h2>⚠️ Legal Requirements (UK)</h2>
+    <div class="legal-box">
+      <h3>What you must know before charging for tips</h3>
+      <ul>
+        <li><strong>Gambling Commission licence:</strong> You do NOT need a licence to provide tips for free, but providing tips as a commercial service (charging money) requires a <strong>Remote Betting Intermediary licence</strong> under the Gambling Act 2005.</li>
+        <li><strong>Tipster exemption:</strong> Many UK tipsters operate under the "information service" framing — providing data/analysis rather than a betting service. Legal advice is strongly recommended before launching a paid service.</li>
+        <li><strong>Affiliate links:</strong> Entirely legal — no licence required. Regulated under ASA/CAP advertising rules (must disclose affiliate relationships).</li>
+        <li><strong>Terms & Conditions:</strong> Must include "for entertainment purposes only", "past performance does not guarantee future results", and problem gambling links (GambleAware).</li>
+        <li><strong>Age verification:</strong> Must prevent under-18s from accessing paid content.</li>
+        <li><strong>Start here:</strong> <em>Gambling Commission website (gamblingcommission.gov.uk)</em> → "Do I need a licence?"</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- TECH REQUIREMENTS -->
+  <section>
+    <h2>Technical Requirements per Revenue Stream</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Revenue Stream</th>
+          <th>What needs building</th>
+          <th>Infrastructure cost</th>
+          <th>Complexity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Email newsletter</strong></td>
+          <td>Substack or Mailchimp account. Script to pull today's picks from Lambda and format email. Cron job at 9am.</td>
+          <td>£0 (free tiers)</td>
+          <td><span class="badge b-green">LOW</span></td>
+        </tr>
+        <tr>
+          <td><strong>WhatsApp delivery</strong></td>
+          <td>WhatsApp Business API (Meta). Script to call API with today's picks. Phone number verification.</td>
+          <td>~£0.005/message</td>
+          <td><span class="badge b-green">LOW</span></td>
+        </tr>
+        <tr>
+          <td><strong>Affiliate links</strong></td>
+          <td>Register with bookmaker affiliate programmes. Add tracking links to emails and app. No code required.</td>
+          <td>£0</td>
+          <td><span class="badge b-green">LOW</span></td>
+        </tr>
+        <tr>
+          <td><strong>Telegram bot</strong></td>
+          <td>python-telegram-bot library. Lambda scheduled at 9am posts picks to paid channel. Whop.com for payment gating.</td>
+          <td>~£10/mo Whop fee</td>
+          <td><span class="badge b-gold">MEDIUM</span></td>
+        </tr>
+        <tr>
+          <td><strong>Freemium web app</strong></td>
+          <td>Stripe integration. User table in DynamoDB. Lambda auth middleware to check subscription status. JWT tokens for authenticated API calls.</td>
+          <td>~£15/mo Stripe + Lambda</td>
+          <td><span class="badge b-gold">MEDIUM</span></td>
+        </tr>
+        <tr>
+          <td><strong>API marketplace</strong></td>
+          <td>API key management in Lambda. Rate limiting. RapidAPI listing. OpenAPI spec documentation.</td>
+          <td>£0 (RapidAPI free tier)</td>
+          <td><span class="badge b-red">HIGH</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PLATFORMS -->
+  <section>
+    <h2>Recommended Platforms to List On</h2>
+    <div class="platform-list">
+      <div class="platform-chip"><div class="dot" style="background:var(--gold)"></div> <strong>Tipstrr</strong> — UK's biggest tipster platform</div>
+      <div class="platform-chip"><div class="dot" style="background:var(--blue)"></div> <strong>Substack</strong> — paid email newsletter (no code)</div>
+      <div class="platform-chip"><div class="dot" style="background:var(--green)"></div> <strong>Whop.com</strong> — Discord/Telegram monetisation</div>
+      <div class="platform-chip"><div class="dot" style="background:var(--orange)"></div> <strong>Betting Gods</strong> — verified tipster network</div>
+      <div class="platform-chip"><div class="dot" style="background:var(--purple)"></div> <strong>RapidAPI</strong> — B2B API marketplace</div>
+      <div class="platform-chip"><div class="dot" style="background:var(--gold)"></div> <strong>SBC</strong> — Smart Betting Club audit</div>
+      <div class="platform-chip"><div class="dot" style="background:var(--blue)"></div> <strong>Oddschecker</strong> — affiliate partner programme</div>
+      <div class="platform-chip"><div class="dot" style="background:var(--green)"></div> <strong>Patreon</strong> — tiered subscription community</div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section>
+    <h2>Implementation Roadmap</h2>
+    <div class="roadmap">
+
+      <div class="rm-item">
+        <div class="rm-dot rm-q1">Q2</div>
+        <div class="rm-content">
+          <h3>April – May 2026 &nbsp;·&nbsp; <span style="color:var(--gold);font-size:.85rem">Start earning £0 → £500/mo</span></h3>
+          <p style="font-size:.83rem;color:var(--muted)">Zero-cost, no-licence-needed steps. Prove the product works commercially.</p>
+          <div class="tasks">
+            <span class="task-tag">✅ Build 3-month verified P&L record</span>
+            <span class="task-tag">Set up Substack free/paid tiers</span>
+            <span class="task-tag">Register Bet365 + Oddschecker affiliates</span>
+            <span class="task-tag">Embed affiliate links in app + emails</span>
+            <span class="task-tag">Add Terms & Conditions / GambleAware banner</span>
+            <span class="task-tag">Morning cron job at 09:00 to send picks email</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rm-item">
+        <div class="rm-dot rm-q2">Q3</div>
+        <div class="rm-content">
+          <h3>June – August 2026 &nbsp;·&nbsp; <span style="color:var(--blue);font-size:.85rem">Scale to £500 → £2,000/mo</span></h3>
+          <p style="font-size:.83rem;color:var(--muted)">Use proof of record to list on platforms and build community.</p>
+          <div class="tasks">
+            <span class="task-tag">Submit to Tipstrr with P&L statement</span>
+            <span class="task-tag">Launch paid Telegram channel (Whop.com)</span>
+            <span class="task-tag">Telegram bot posts picks automatically @ 09:00</span>
+            <span class="task-tag">Add WhatsApp Business delivery</span>
+            <span class="task-tag">Seek legal advice on Gambling Act compliance</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rm-item">
+        <div class="rm-dot rm-q3">Q4</div>
+        <div class="rm-content">
+          <h3>Sep – Nov 2026 &nbsp;·&nbsp; <span style="color:var(--green);font-size:.85rem">Scale to £2,000 → £5,000/mo</span></h3>
+          <p style="font-size:.83rem;color:var(--muted)">Freemium paywall on the web app. Proper subscription management.</p>
+          <div class="tasks">
+            <span class="task-tag">Stripe payment integration</span>
+            <span class="task-tag">DynamoDB subscriber table + JWT auth</span>
+            <span class="task-tag">Gate score breakdown + race intel behind Pro tier</span>
+            <span class="task-tag">SBC audit application (Smart Betting Club)</span>
+            <span class="task-tag">Social media presence (X/Twitter racing community)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rm-item">
+        <div class="rm-dot rm-q4">2027</div>
+        <div class="rm-content">
+          <h3>2027 &nbsp;·&nbsp; <span style="color:var(--purple);font-size:.85rem">Scale to £5,000+/mo</span></h3>
+          <p style="font-size:.83rem;color:var(--muted)">B2B API and potential licensing of the scoring engine itself.</p>
+          <div class="tasks">
+            <span class="task-tag">RapidAPI listing for scoring engine</span>
+            <span class="task-tag">White-label deals with other tipster services</span>
+            <span class="task-tag">Expand to other sports (greyhounds, football)</span>
+            <span class="task-tag">Gambling Commission licence if needed at scale</span>
+            <span class="task-tag">Mobile app (React Native wrapping existing React)</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- QUICK WINS -->
+  <section>
+    <h2>Quickest Wins — Start This Week</h2>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Action</th><th>Time to complete</th><th>Revenue potential</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><strong>Create a free Substack.</strong> Post today's 3 picks every morning. Grow a list before charging.</td>
+          <td><span class="badge b-green">30 mins</span></td>
+          <td>£0 now → paid subscribers in weeks</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><strong>Sign up to Oddschecker Partners affiliate programme</strong> (free). Add links to app's existing picks cards.</td>
+          <td><span class="badge b-green">1–2 hours</span></td>
+          <td>£30–£100 per referred customer</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><strong>Add a "Best odds at Betfair" button</strong> to each pick card in the React app, with your affiliate tracking link.</td>
+          <td><span class="badge b-green">2 hours</span></td>
+          <td>Passive income per click/signup</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td><strong>Start a free public X/Twitter account</strong> (@SureBetAI or similar). Post picks + results daily. Racing community grows fast.</td>
+          <td><span class="badge b-green">1 hour setup</span></td>
+          <td>Builds audience for paid tiers</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td><strong>Add a "Subscribe" CTA</strong> to the app header pointing to Substack. Free traffic from existing app users.</td>
+          <td><span class="badge b-green">1 hour</span></td>
+          <td>Email list growth</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer>
+  SureBet AI Monetisation Plan &nbsp;·&nbsp; Generated March 2026 &nbsp;·&nbsp; This document is for planning purposes only. Consult a solicitor before launching a paid tipster service in the UK.
+</footer>
+
+</body>
+</html>

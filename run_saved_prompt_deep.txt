@@ -1,0 +1,336 @@
+#!/usr/bin/env python3
+"""
+betfair-prompt/run_saved_prompt_deep.py  (robust + metadata aware + JSON mode)
+- Calls LLM per race with your prompt text
+- Retries with backoff, quota detection, market limiting, simple cache
+- Passes market metadata (market_name, venue, market_start_time) to the model
+- JSON output mode with response_format, debug dumps, and strict parsing
+
+Environment: OPENAI_API_KEY must be set; pip install --upgrade openai
+"""
+
+import os, sys, argparse, glob, time, asyncio, csv, io, hashlib, json
+import pandas as pd
+from datetime import datetime, timezone
+from typing import List, Dict, Any, Tuple
+from pathlib import Path
+
+try:
+    from openai import OpenAI
+except Exception:
+    OpenAI = None
+
+REQUIRED_HEADER = [
+    "runner_name","selection_id","market_id","market_name","venue","start_time_dublin",
+    "p_win","p_place","ew_places","ew_fraction","tags","why_now"
+]
+
+def discover_latest_snapshot() -> str | None:
+    matches = sorted(glob.glob("./snapshots/run_*_once.csv"))
+    return matches[-1] if matches else None
+
+def load_snapshots(path: str) -> pd.DataFrame:
+    df = pd.read_csv(path)
+    df.columns = [c.strip().lower() for c in df.columns]
+    return df
+
+def races_from_snapshots(snaps: pd.DataFrame):
+    if "market_id" not in snaps.columns:
+        snaps["market_id"] = "UNKNOWN"
+    return {mid: g.copy() for mid, g in snaps.groupby("market_id")}
+
+def extract_meta(market_df: pd.DataFrame) -> Dict[str,str]:
+    def first_nonempty(cols):
+        for c in cols:
+            if c in market_df.columns:
+                s = market_df[c].dropna()
+                if not s.empty:
+                    v = str(s.astype(str).iloc[0]).strip()
+                    if v:
+                        return v
+        return ""
+    return {
+        "market_name": first_nonempty(["market_name","event_name","marketname"]),
+        "venue": first_nonempty(["venue","event_venue","course","track"]),
+        "market_start_time": first_nonempty(["market_start_time","marketstarttime","start_time","starttime"]),
+    }
+
+def format_race_context(market_df: pd.DataFrame) -> str:
+    cols = []
+    for c in ["runner_name", "selection_id", "best_back", "decimal_odds", "price"]:
+        if c in market_df.columns:
+            cols.append(c)
+    base = []
+    if "selection_id" not in cols: base.append("selection_id")
+    if "runner_name" not in cols:  base.append("runner_name")
+    cols = base + cols
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    w.writerow(cols)
+    for _, row in market_df.iterrows():
+        w.writerow([row.get(c,"") for c in cols])
+    return buf.getvalue()
+
+def clamp_csv_to_header(text: str):
+    # Remove code fences if present
+    t = text.strip()
+    if t.startswith("```"):
+        # try to strip first and last code fence
+        t = t.strip("`")
+        # fallback: remove all fences
+        t = "\n".join([ln for ln in text.splitlines() if not ln.strip().startswith("```")])
+    lines = [ln.strip() for ln in t.splitlines() if ln.strip()]
+    header_idx = -1
+    target = ",".join(REQUIRED_HEADER).lower().replace(" ", "")
+    for i,ln in enumerate(lines):
+        if ln.replace(" ", "").lower().startswith(target):
+            header_idx = i; break
+    if header_idx == -1:
+        for i,ln in enumerate(lines):
+            lowers = [tok.strip().lower() for tok in ln.split(",")]
+            if all(h in lowers for h in REQUIRED_HEADER):
+                header_idx = i; break
+    if header_idx == -1:
+        return []
+    rows = []
+    reader = csv.DictReader(io.StringIO("\n".join(lines[header_idx:])), skipinitialspace=True)
+    for r in reader:
+        rows.append({k.strip(): (r.get(k,"") or "").strip() for k in reader.fieldnames})
+    return [{k: r.get(k,"") for k in REQUIRED_HEADER} for r in rows]
+
+def parse_json_rows(text: str):
+    # strip fences
+    t = text.strip()
+    if t.startswith("```"):
+        t = "\n".join([ln for ln in t.splitlines() if not ln.strip().startswith("```")])
+    try:
+        obj = json.loads(t)
+    except Exception:
+        # try to locate first { and last }
+        try:
+            s = t.find("{")
+            e = t.rfind("}")
+            if s != -1 and e != -1 and e > s:
+                obj = json.loads(t[s:e+1])
+            else:
+                return []
+        except Exception:
+            return []
+    rows = obj.get("rows") if isinstance(obj, dict) else obj
+    if not isinstance(rows, list):
+        return []
+    cleaned = []
+    for r in rows:
+        if not isinstance(r, dict): continue
+        cleaned.append({k: str(r.get(k,"")) for k in REQUIRED_HEADER})
+    return cleaned
+
+async def throttle_loop(q_tasks, rate_limit: float, concurrency: int):
+    sem = asyncio.Semaphore(concurrency)
+    delay = 1.0 / max(rate_limit, 1e-6)
+    last = 0.0
+    results = []
+    async def runner(coro):
+        async with sem:
+            nonlocal last
+            now = time.monotonic()
+            sleep_for = max(0.0, (last + delay) - now)
+            if sleep_for > 0:
+                await asyncio.sleep(sleep_for)
+            res = await coro
+            last = time.monotonic()
+            return res
+    for c in q_tasks:
+        results.append(asyncio.create_task(runner(c)))
+    return await asyncio.gather(*results)
+
+def cache_key(prompt_text: str) -> str:
+    return hashlib.sha256(prompt_text.encode("utf-8")).hexdigest()
+
+def cache_get(cache_dir: Path, key: str) -> str | None:
+    p = cache_dir / f"{key}.txt"
+    if p.exists():
+        try:
+            return p.read_text(encoding="utf-8")
+        except Exception:
+            return None
+    return None
+
+def cache_put(cache_dir: Path, key: str, content: str) -> None:
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    (cache_dir / f"{key}.txt").write_text(content or "", encoding="utf-8")
+
+def _completion_sync(client, model: str, system: str, prompt: str, temperature: float,
+                     max_retries: int = 5, base_sleep: float = 2.0, force_json: bool = False):
+    for attempt in range(max_retries):
+        try:
+            kwargs = dict(
+                model=model,
+                messages=[{"role":"system","content":system},
+                          {"role":"user","content":prompt}],
+                temperature=temperature
+            )
+            if force_json:
+                kwargs["response_format"] = {"type":"json_object"}
+            resp = client.chat.completions.create(**kwargs)
+            content = ""
+            try:
+                content = resp.choices[0].message.content or ""
+            except Exception:
+                content = ""
+            return True, content
+        except Exception as e:
+            msg = str(e)
+            hard = ("insufficient_quota" in msg) or ("quota" in msg.lower() and "exceeded" in msg.lower())
+            retryable = any(k in msg.lower() for k in ["rate limit", "overloaded", "timeout", "temporarily"])
+            if hard:
+                sys.stderr.write("[ERROR] OpenAI insufficient quota.\n")
+                return False, ""
+            if attempt < max_retries - 1 and retryable:
+                sleep = base_sleep * (2 ** attempt)
+                sys.stderr.write(f"[WARN] OpenAI transient error: {msg}. Retrying in {sleep:.1f}s...\n")
+                time.sleep(sleep); continue
+            sys.stderr.write(f"[ERROR] OpenAI error (no more retries): {msg}\n")
+            return False, ""
+    return False, ""
+
+def build_user_prompt(prompt_text: str, market_id: str, race_table_csv: str, meta: Dict[str,str], fmt: str) -> str:
+    nowdt = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M %Z")
+    meta_block = (
+        "Market metadata (do not invent; copy verbatim or leave blank):\n"
+        f"- market_id: {market_id}\n"
+        f"- market_name: {meta.get('market_name','')}\n"
+        f"- venue: {meta.get('venue','')}\n"
+        f"- market_start_time (UTC): {meta.get('market_start_time','')}\n"
+        "If venue or time are blank, leave them blank.\n"
+    )
+    table = f"Context Table (runners & prices snapshot for market_id {market_id}):\n```\n{race_table_csv}\n```"
+    if fmt == "json":
+        tail = (
+            "\nSTRICT OUTPUT RULES (JSON ONLY):\n"
+            "- Return ONLY a JSON object with key 'rows' mapping to a list of runner objects.\n"
+            "- No markdown, no code fences, no commentary.\n"
+            "- Each runner object MUST include keys exactly:\n"
+            f"  {REQUIRED_HEADER}\n"
+        )
+    else:
+        tail = (
+            "\nSTRICT OUTPUT RULES (CSV ONLY):\n"
+            "- Output only the CSV with exact header and rows for these runners.\n"
+            "- Do NOT invent course names or times. If unknown, leave blank.\n"
+            "- Use ';' instead of commas inside free-text fields.\n"
+            "Header:\n"
+            "runner_name,selection_id,market_id,market_name,venue,start_time_dublin,p_win,p_place,ew_places,ew_fraction,tags,why_now\n"
+            f"Set market_id to '{market_id}' for these rows.\n"
+        )
+    return prompt_text + "\nTimestamp: " + nowdt + "\n" + meta_block + "\n" + table + "\n" + tail
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--scope", default="today")
+    ap.add_argument("--prompt", required=True)
+    ap.add_argument("--snapshots", default="")
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--model", default="gpt-4o-mini")
+    ap.add_argument("--concurrency", type=int, default=2)
+    ap.add_argument("--rate_limit", type=float, default=0.5)
+    ap.add_argument("--temp", type=float, default=0.2)
+    ap.add_argument("--system", default="You are a meticulous racing quant generating calibrated per-runner probabilities.")
+    ap.add_argument("--max_retries", type=int, default=5)
+    ap.add_argument("--retry_base_sleep", type=float, default=2.0)
+    ap.add_argument("--limit_markets", type=int, default=0, help="If >0, limit number of markets processed (for testing)")
+    ap.add_argument("--cache_dir", default="./.prompt_cache", help="Cache directory to store per-market responses")
+    ap.add_argument("--format", choices=["csv","json"], default="json", help="Model output format")
+    ap.add_argument("--debug_dir", default="./.llm_debug", help="Save raw LLM outputs here for troubleshooting")
+    args = ap.parse_args()
+
+    if OpenAI is None:
+        print("[ERROR] openai package not installed. Run: pip install --upgrade openai", file=sys.stderr); sys.exit(2)
+    if not os.environ.get("OPENAI_API_KEY"):
+        print("[ERROR] OPENAI_API_KEY is not set in environment.", file=sys.stderr); sys.exit(2)
+
+    client = OpenAI()
+    cache_dir = Path(args.cache_dir)
+    debug_dir = Path(args.debug_dir); debug_dir.mkdir(parents=True, exist_ok=True)
+
+    prompt_text = Path(args.prompt).read_text(encoding="utf-8")
+    snap_path = args.snapshots or discover_latest_snapshot()
+    if not snap_path or not os.path.exists(snap_path):
+        print(f"[ERROR] snapshots file not found: {snap_path}", file=sys.stderr); sys.exit(2)
+    snaps = load_snapshots(snap_path)
+    races = races_from_snapshots(snaps)
+    market_ids = sorted(races.keys())
+    if args.limit_markets and args.limit_markets > 0:
+        market_ids = market_ids[:args.limit_markets]
+    print(f"[INFO] Races to process: {len(market_ids)} (from {snap_path})")
+
+    tasks = []
+    for mid in market_ids:
+        market_df = races[mid]
+        race_table = format_race_context(market_df)
+        meta = extract_meta(market_df)
+        user_prompt = build_user_prompt(prompt_text, mid, race_table, meta, args.format)
+        key = cache_key(user_prompt)
+        async def _one_call(market_id=mid, up=user_prompt, k=key):
+            cached = cache_get(cache_dir, k)
+            if cached is not None and cached.strip():
+                content = cached
+                ok = True
+            else:
+                ok, content = await asyncio.to_thread(
+                    _completion_sync, client, args.model, args.system, up, args.temp,
+                    args.max_retries, args.retry_base_sleep, args.format == "json"
+                )
+                if ok and content:
+                    cache_put(cache_dir, k, content)
+            # Save raw for debugging
+            (debug_dir / f"{market_id}.txt").write_text(content or "", encoding="utf-8")
+            return market_id, content, ok
+        tasks.append(_one_call())
+
+    rows = []
+    try:
+        results = asyncio.run(throttle_loop(tasks, args.rate_limit, args.concurrency))
+    except KeyboardInterrupt:
+        print("[WARN] Interrupted; writing partial results...", file=sys.stderr); results = []
+
+    hard_fail = False
+    for mid, content, ok in results:
+        if not ok:
+            hard_fail = True
+        parsed = []
+        if args.format == "json":
+            parsed = parse_json_rows(content or "")
+        else:
+            parsed = clamp_csv_to_header(content or "")
+        if not parsed:
+            sys.stderr.write(f"[WARN] No {args.format.upper()} parsed for market {mid}; see {args.debug_dir}/{mid}.txt\n")
+            continue
+        for r in parsed:
+            if not r.get("market_id"):
+                r["market_id"] = mid
+        rows.extend(parsed)
+
+    if not rows:
+        print("[ERROR] No rows produced by LLM; cannot write CSV.", file=sys.stderr)
+        sys.exit(90 if hard_fail else 3)
+
+    # Deduplicate by (market_id, runner_name)
+    dedup = {}
+    for r in rows:
+        key = (r.get("market_id",""), r.get("runner_name","").strip().casefold())
+        dedup[key] = r
+    final_rows = list(dedup.values())
+
+    out_df = pd.DataFrame(final_rows)
+    for col in REQUIRED_HEADER:
+        if col not in out_df.columns:
+            out_df[col] = ""
+    out_df = out_df[REQUIRED_HEADER]
+    out_df.to_csv(args.out, index=False)
+    print(f"[OK] Wrote probs CSV → {args.out} (rows={len(out_df)})")
+    if hard_fail:
+        print("[WARN] Some markets were skipped due to quota. Partial CSV written.", file=sys.stderr)
+
+if __name__ == "__main__":
+    main()

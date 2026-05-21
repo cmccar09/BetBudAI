@@ -1,0 +1,17 @@
+  [INFO] 2 horse(s) found in SureBet DynamoDB: Salvator Mundi, Teahupoo
+
+day1_race6: National Hunt Chase @ 16:50
+  SureBet pick : Newton Tornado  score=65
+  MacFitz pick : Newton Tornado  score=65
+  Top 3 scored:
+    Newton Tornado  total=None  tier=None
+    One Big Bang  total=None  tier=None
+    Grand Geste  total=None  tier=None
+
+day1_race7: Conditional Jockeys Handicap Hurdle @ 17:30
+  SureBet pick : Jeriko Du Reponet  score=77
+  MacFitz pick : Jeriko Du Reponet  score=77
+  Top 3 scored:
+    Jeriko Du Reponet  total=None  tier=None
+    Uhavemeinstitches  total=None  tier=None
+    Montregard  total=None  tier=None

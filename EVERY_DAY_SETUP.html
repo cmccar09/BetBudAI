@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Setup — April 2026</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2e3245;
+      --accent: #4f8ef7;
+      --accent2: #34d399;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --code-bg: #10131e;
+      --step-bg: #151823;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 32px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1e2235 0%, #252a40 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    header .icon { font-size: 36px; }
+    header h1 { font-size: 22px; font-weight: 700; color: #fff; }
+    header p  { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .orchestrator-badge {
+      margin-left: auto;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 18px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .orchestrator-badge code { display: block; font-size: 12px; font-weight: 600; }
+    .orchestrator-badge small { font-size: 11px; opacity: 0.85; }
+
+    /* ── Section titles ── */
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 36px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Pipeline steps ── */
+    .pipeline { display: flex; flex-direction: column; gap: 12px; }
+    .step {
+      background: var(--step-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      gap: 0 16px;
+      align-items: start;
+    }
+    .step-num {
+      width: 40px; height: 40px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; color: #fff;
+      flex-shrink: 0;
+    }
+    .step-num.opt  { background: #374151; }
+    .step-body h3  { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .step-body h3 span { color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 6px; }
+    .step-body .script { color: var(--accent2); font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 13px; }
+    .step-body p   { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .step-body .note { color: var(--warn); font-size: 12px; margin-top: 6px; }
+    .step-cmd {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 12px;
+      color: var(--accent2);
+      white-space: nowrap;
+      align-self: center;
+    }
+    .tag-opt {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+      background: #374151; color: var(--muted);
+      border-radius: 4px; padding: 2px 6px;
+      margin-left: 8px; vertical-align: middle;
+    }
+    .tag-core {
+      font-size: 10px; font-weight: 700;
+      background: #1d3a5f; color: var(--accent);
+      border-radius: 4px; padding: 2px 6px;
+      margin-left: 8px; vertical-align: middle;
+    }
+
+    /* ── Morning commands box ── */
+    .cmd-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 13px;
+      line-height: 2;
+    }
+    .cmd-block .comment { color: #4b5563; }
+    .cmd-block .cmd     { color: var(--accent2); }
+    .cmd-block .section-hdr { color: var(--warn); font-weight: 600; margin-top: 10px; }
+    .cmd-block .indent  { color: var(--text); padding-left: 20px; display: block; }
+
+    /* ── Gates table ── */
+    .gates-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .gates-table th {
+      background: #1a1d27; text-align: left; padding: 10px 14px;
+      font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); border-bottom: 1px solid var(--border);
+    }
+    .gates-table td { padding: 10px 14px; border-bottom: 1px solid #1e2133; vertical-align: top; }
+    .gates-table tr:last-child td { border-bottom: none; }
+    .gates-table tr:hover td { background: #1a1f30; }
+    .gate-id {
+      font-family: monospace; font-weight: 700; font-size: 13px;
+      background: #1e2540; color: var(--accent);
+      border-radius: 5px; padding: 2px 8px; white-space: nowrap;
+    }
+    .gate-id.new { background: #1a3a2a; color: var(--accent2); }
+    .lesson-box {
+      background: #1a1800;
+      border: 1px solid #3d3000;
+      border-left: 3px solid var(--warn);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #d4c070;
+      margin-top: 14px;
+    }
+    .lesson-box strong { color: var(--warn); }
+
+    /* ── Scoring engine grid ── */
+    .engine-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+    .engine-card {
+      background: var(--step-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .engine-card code { color: var(--accent2); font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 12px; display: block; margin-bottom: 4px; }
+    .engine-card p { color: var(--muted); font-size: 12px; }
+    .engine-card .badge-direct { font-size: 10px; background: #1d3a5f; color: var(--accent); border-radius: 3px; padding: 1px 5px; }
+    .engine-card .badge-import { font-size: 10px; background: #2a1a3e; color: #a78bfa; border-radius: 3px; padding: 1px 5px; }
+
+    /* ── Infra grid ── */
+    .infra-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+    .infra-card {
+      background: var(--step-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .infra-card .label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .infra-card .value { font-size: 13px; color: var(--text); }
+    .infra-card a { color: var(--accent); text-decoration: none; font-size: 12px; word-break: break-all; }
+    .infra-card a:hover { text-decoration: underline; }
+    .infra-card .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+    /* ── Key files table ── */
+    .files-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .file-row {
+      background: var(--step-bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 10px 14px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .file-row code { color: var(--accent2); font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 12px; white-space: nowrap; min-width: 200px; }
+    .file-row span { color: var(--muted); font-size: 12px; }
+    .file-row.important { border-color: #2e3e5c; }
+    .dot-keep { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); margin-top: 6px; flex-shrink: 0; }
+    .dot-data { width: 6px; height: 6px; border-radius: 50%; background: var(--warn); margin-top: 6px; flex-shrink: 0; }
+    .dot-deploy { width: 6px; height: 6px; border-radius: 50%; background: #a78bfa; margin-top: 6px; flex-shrink: 0; }
+
+    /* ── DST note ── */
+    .dst-note {
+      background: #0f1f30;
+      border: 1px solid #1e3a52;
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #8bb8d4;
+      margin-top: 16px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 48px;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    @media (max-width: 700px) {
+      .files-grid { grid-template-columns: 1fr; }
+      .step { grid-template-columns: 48px 1fr; }
+      .step-cmd { grid-column: 1 / -1; margin-top: 8px; }
+      header { flex-wrap: wrap; }
+      .orchestrator-badge { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header>
+  <div class="icon">🏇</div>
+  <div>
+    <h1>Daily Orchestration</h1>
+    <p>April 2026 — Current Production Setup</p>
+  </div>
+  <div class="orchestrator-badge">
+    <small>Master runner</small>
+    <code>daily_automated_workflow.py</code>
+    <small>python daily_automated_workflow.py</small>
+  </div>
+</header>
+
+<!-- ═══════════════════ PIPELINE ═══════════════════ -->
+<div class="section-title">Step-by-step pipeline</div>
+<div class="pipeline">
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h3>Yesterday's Results <span>— run automatically each morning</span></h3>
+      <div class="script">sl_results_fetcher.py</div>
+      <p>Matches pending DynamoDB picks against the SL fast-results page. Updates outcome = win / placed / loss + profit + SP odds.</p>
+      <p class="note">⚡ DST: race times converted UTC → BST before matching SL local times.</p>
+    </div>
+    <div class="step-cmd">python sl_results_fetcher.py</div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h3>Today's Racecard <span>— MUST run first</span></h3>
+      <div class="script">sl_racecard_fetcher.py</div>
+      <p>Fetches all declared runners from Sporting Life racecard. Writes <code style="color:var(--warn);font-size:12px">racecard_cache.json</code> (keyed by date → course → race → runners). <strong style="color:var(--text)">Source of truth for declared field sizes</strong> — required by the S8 completeness gate.</p>
+    </div>
+    <div class="step-cmd">python sl_racecard_fetcher.py</div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h3>Convert Racecard to Workflow Format</h3>
+      <div class="script">sl_to_workflow_adapter.py</div>
+      <p>Converts <code style="color:var(--warn);font-size:12px">racecard_cache.json</code> → <code style="color:var(--warn);font-size:12px">response_horses.json</code> (the format <code style="font-size:12px">complete_daily_analysis.py</code> expects). Also merges Betfair decimal odds where available.</p>
+    </div>
+    <div class="step-cmd">python sl_to_workflow_adapter.py</div>
+  </div>
+
+  <div class="step">
+    <div class="step-num opt">4</div>
+    <div class="step-body">
+      <h3>Live Betfair Odds Refresh <span class="tag-opt">OPTIONAL</span></h3>
+      <div class="script">betfair_odds_fetcher.py</div>
+      <p>Fetches live Betfair odds and injects them into <code style="color:var(--warn);font-size:12px">response_horses.json</code>. Without this, odds come from SL racecard (SP estimates only — no market_leader signal).</p>
+    </div>
+    <div class="step-cmd">python betfair_odds_fetcher.py</div>
+  </div>
+
+  <div class="step">
+    <div class="step-num opt">5</div>
+    <div class="step-body">
+      <h3>Form Enrichment <span class="tag-opt">AUTO (imported)</span></h3>
+      <div class="script">form_enricher.py</div>
+      <p>Fetches last-6-race history per runner. Unlocks deep_form signals: course_win, distance_win, going_win, etc. Results cached in <code style="color:var(--warn);font-size:12px">form_cache.json</code> — <strong style="color:var(--danger)">do not delete</strong>, takes ~20 min to rebuild.</p>
+    </div>
+    <div class="step-cmd" style="color:var(--muted)">auto-invoked</div>
+  </div>
+
+  <div class="step" style="border-color:#2e3e5c;">
+    <div class="step-num" style="background:var(--accent2);color:#0f1117;">6</div>
+    <div class="step-body">
+      <h3>Main Analysis + Pick Selection <span class="tag-core">CORE</span></h3>
+      <div class="script">complete_daily_analysis.py</div>
+      <p>Scores every horse with the 7-factor model. Runs quality gates S1–S8. Selects top-5 picks. Saves ALL horses to DynamoDB <code style="font-size:12px">SureBetBets</code>.</p>
+      <p style="margin-top:6px;font-size:12px;color:var(--muted)">Depends on: <code style="font-size:11px;color:#8892a4">response_horses.json</code> · <code style="font-size:11px;color:#8892a4">racecard_cache.json</code> · <code style="font-size:11px;color:#8892a4">comprehensive_pick_logic.py</code></p>
+    </div>
+    <div class="step-cmd" style="border-color:#2e3e5c;color:var(--accent2)">python complete_daily_analysis.py</div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">7</div>
+    <div class="step-body">
+      <h3>Notify Picks</h3>
+      <div class="script">notify_picks.py</div>
+      <p>Sends WhatsApp notifications for today's top picks. Times shown in UK local time (BST/GMT), not UTC.</p>
+    </div>
+    <div class="step-cmd">python notify_picks.py</div>
+  </div>
+
+  <div class="step">
+    <div class="step-num opt">8</div>
+    <div class="step-body">
+      <h3>Deploy API <span class="tag-opt">ONLY IF LOGIC CHANGED</span></h3>
+      <div class="script">_deploy_bpapi.py</div>
+      <p>Zips <code style="font-size:12px">_bpapi_patched.py</code> → <code style="font-size:12px">lambda_function.py</code> and deploys to AWS Lambda. Lambda serves DynamoDB picks to the frontend (read-only — no scoring in Lambda).</p>
+    </div>
+    <div class="step-cmd">python _deploy_bpapi.py</div>
+  </div>
+
+</div><!-- /pipeline -->
+
+
+<!-- ═══════════════════ MORNING COMMANDS ═══════════════════ -->
+<div class="section-title">Morning commands (run in order)</div>
+<div class="cmd-block">
+  <span class="cmd">.\.venv\Scripts\Activate.ps1</span><br>
+  <span class="cmd">python sl_racecard_fetcher.py</span>      <span class="comment">  # fetch today's declared runners</span><br>
+  <span class="cmd">python sl_to_workflow_adapter.py</span>   <span class="comment">  # convert to response_horses.json</span><br>
+  <span class="cmd">python betfair_odds_fetcher.py</span>     <span class="comment">  # inject live Betfair odds (optional)</span><br>
+  <span class="cmd">python complete_daily_analysis.py</span>  <span class="comment">  # score all horses, select 5 picks, save to DB</span><br>
+  <span class="cmd">python notify_picks.py</span>             <span class="comment">  # WhatsApp notifications</span><br>
+  <br>
+  <span class="section-hdr"># Check today's picks</span><br>
+  <span class="cmd">.\.venv\Scripts\python.exe -X utf8 _audit_today.py</span><br>
+  <br>
+  <span class="section-hdr"># Record results (run after 7 pm)</span><br>
+  <span class="cmd">python sl_results_fetcher.py</span>
+</div>
+
+
+<!-- ═══════════════════ QUALITY GATES ═══════════════════ -->
+<div class="section-title">Quality gates — <code style="font-size:11px;color:var(--muted)">_passes_quality_gates()</code> in complete_daily_analysis.py</div>
+
+<table class="gates-table">
+  <thead>
+    <tr>
+      <th style="width:60px">Gate</th>
+      <th>Rule</th>
+      <th style="width:90px">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="gate-id">S1</span></td>
+      <td>Non-market-backed picks: score ≥ 85 (with trainer/course-distance anchor) or ≥ 88 (no anchor)</td>
+      <td><span style="color:var(--danger)">BLOCK</span></td>
+    </tr>
+    <tr>
+      <td><span class="gate-id">S2</span></td>
+      <td>At least one contextual anchor required (market, trainer, cd_bonus, unexposed, deep_form)</td>
+      <td><span style="color:var(--danger)">BLOCK</span></td>
+    </tr>
+    <tr>
+      <td><span class="gate-id">S3</span></td>
+      <td>Age-padded picks (age_bonus ≥ 10) without market or trainer backing need score ≥ 92</td>
+      <td><span style="color:var(--danger)">BLOCK</span></td>
+    </tr>
+    <tr>
+      <td><span class="gate-id">S4</span></td>
+      <td>Score gap ≥ 8 vs 2nd-best horse in race (close races = coin flips)</td>
+      <td><span style="color:var(--danger)">BLOCK</span></td>
+    </tr>
+    <tr>
+      <td><span class="gate-id">S5</span></td>
+      <td>Saturday: gap ≥ 15 required; 16+ runner fields additionally need market backing</td>
+      <td><span style="color:var(--danger)">BLOCK</span></td>
+    </tr>
+    <tr>
+      <td><span class="gate-id">S6</span></td>
+      <td>Large field (16+ runners) without market backing: gap ≥ 12</td>
+      <td><span style="color:var(--danger)">BLOCK</span></td>
+    </tr>
+    <tr>
+      <td><span class="gate-id">S7</span></td>
+      <td>Novice / debut-heavy races where ≥ 60% of runners have ≤ 1 career run: skip entirely</td>
+      <td><span style="color:var(--danger)">BLOCK</span></td>
+    </tr>
+    <tr>
+      <td><span class="gate-id new">S8</span></td>
+      <td>
+        <strong>Incomplete field</strong> — SL declared <em>N</em> runners but Betfair returned fewer:<br>
+        <span style="color:var(--danger)">● Missing 2+: always block</span><br>
+        <span style="color:var(--danger)">● Missing 1, not market leader: block</span><br>
+        <span style="color:var(--warn)">● Missing 1, market leader: warning only — allow through</span>
+      </td>
+      <td><span style="color:var(--accent2)">NEW ✓</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="lesson-box">
+  <strong>⚠ Lesson (S8 — 2026-04-01):</strong> Kingcormac (Wincanton 15:20, Class 5) was our top scorer but a 6th
+  runner <em>Starlucky</em> was absent from Betfair — the winner we never analysed. S8 would have blocked this
+  pick automatically. <code style="font-size:12px;color:#d4c070">racecard_cache.json</code> is now cross-referenced
+  on every pick.
+</div>
+
+
+<!-- ═══════════════════ SCORING ENGINE ═══════════════════ -->
+<div class="section-title">Core scoring engine</div>
+<div class="engine-grid">
+  <div class="engine-card">
+    <code>comprehensive_pick_logic.py</code>
+    <span class="badge-import">imported</span>
+    <p>7-factor scoring model, trainer tiers, DEFAULT_WEIGHTS. <code style="font-size:11px">analyze_horse_comprehensive()</code> called per runner.</p>
+  </div>
+  <div class="engine-card">
+    <code>complete_daily_analysis.py</code>
+    <span class="badge-direct">run directly</span>
+    <p>Orchestrates scoring, applies quality gates S1–S8, saves picks to DynamoDB.</p>
+  </div>
+  <div class="engine-card">
+    <code>sl_to_workflow_adapter.py</code>
+    <span class="badge-direct">run directly</span>
+    <p>Converts SL racecard → <code style="font-size:11px">response_horses.json</code> with BST-aware time handling.</p>
+  </div>
+  <div class="engine-card">
+    <code>form_enricher.py</code>
+    <span class="badge-import">imported</span>
+    <p>Deep form signals from Racing Post / SL. Cached in <code style="font-size:11px">form_cache.json</code>.</p>
+  </div>
+  <div class="engine-card">
+    <code>weather_going_inference.py</code>
+    <span class="badge-import">imported</span>
+    <p>Going and weather condition signals, invoked by scoring engine.</p>
+  </div>
+  <div class="engine-card">
+    <code>trainer_form_stats.py</code>
+    <span class="badge-import">imported</span>
+    <p>Trainer recent hot-streak data, feeds trainer_bonus into scoring.</p>
+  </div>
+  <div class="engine-card">
+    <code>betfair_odds_fetcher.py</code>
+    <span class="badge-direct">run directly</span>
+    <p>Live Betfair odds — optional but required for the market_leader signal.</p>
+  </div>
+</div>
+
+<div class="dst-note">
+  <strong>DST / BST notes:</strong>
+  All DB <code style="font-size:12px">race_time</code> values are stored as <strong>UTC</strong>.
+  SL results pages show <strong>UK local time (BST = UTC+1 in summer)</strong>.
+  <code style="font-size:12px">sl_results_fetcher.py</code> converts UTC→BST via
+  <code style="font-size:12px">_to_uk_local_hhmm()</code> before matching.
+  <code style="font-size:12px">notify_picks.py</code> also converts times to local before sending WhatsApp messages.
+</div>
+
+
+<!-- ═══════════════════ INFRASTRUCTURE ═══════════════════ -->
+<div class="section-title">Infrastructure</div>
+<div class="infra-grid">
+  <div class="infra-card">
+    <div class="label">DynamoDB</div>
+    <div class="value">SureBetBets <span style="color:var(--muted);font-size:12px">(eu-west-1)</span></div>
+    <div class="sub">bet_date (partition) · bet_id (sort)</div>
+  </div>
+  <div class="infra-card">
+    <div class="label">Lambda</div>
+    <div class="value">BettingPicksAPI</div>
+    <div class="sub">Read-only from DynamoDB. Source: <code style="font-size:11px">_bpapi_patched.py</code><br>Deploy: <code style="font-size:11px">python _deploy_bpapi.py</code></div>
+  </div>
+  <div class="infra-card">
+    <div class="label">Frontend (React / Amplify)</div>
+    <div class="value"><a href="https://main.d2hmpykfsdweob.amplifyapp.com" target="_blank">main.d2hmpykfsdweob.amplifyapp.com</a></div>
+    <div class="sub">Deploy: <code style="font-size:11px">cd frontend &amp;&amp; npm run build &amp;&amp; python _deploy_frontend.py</code></div>
+  </div>
+  <div class="infra-card">
+    <div class="label">API Gateway</div>
+    <div class="value"><a href="https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com" target="_blank">mnybvagd5m.execute-api.eu-west-1.amazonaws.com</a></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════ KEY FILES ═══════════════════ -->
+<div class="section-title">Key files — do not archive</div>
+<div class="files-grid">
+  <div class="file-row important"><div class="dot-keep"></div><code>complete_daily_analysis.py</code><span>Main pick selection engine</span></div>
+  <div class="file-row important"><div class="dot-keep"></div><code>comprehensive_pick_logic.py</code><span>7-factor scoring, DEFAULT_WEIGHTS, trainer tiers</span></div>
+  <div class="file-row"><div class="dot-keep"></div><code>sl_to_workflow_adapter.py</code><span>Racecard → response_horses.json converter</span></div>
+  <div class="file-row"><div class="dot-keep"></div><code>sl_racecard_fetcher.py</code><span>SL racecard scraper</span></div>
+  <div class="file-row"><div class="dot-keep"></div><code>sl_results_fetcher.py</code><span>SL results matcher — records win/loss in DynamoDB</span></div>
+  <div class="file-row"><div class="dot-keep"></div><code>betfair_odds_fetcher.py</code><span>Live Betfair odds fetcher</span></div>
+  <div class="file-row"><div class="dot-keep"></div><code>form_enricher.py</code><span>Deep form history enrichment</span></div>
+  <div class="file-row"><div class="dot-keep"></div><code>notify_picks.py</code><span>WhatsApp pick notifications (BST times)</span></div>
+  <div class="file-row"><div class="dot-keep"></div><code>weather_going_inference.py</code><span>Going / weather signals</span></div>
+  <div class="file-row"><div class="dot-keep"></div><code>trainer_form_stats.py</code><span>Trainer recent form stats</span></div>
+  <div class="file-row important"><div class="dot-keep"></div><code>daily_automated_workflow.py</code><span>Master orchestration runner</span></div>
+  <div class="file-row"><div class="dot-deploy"></div><code>_bpapi_patched.py</code><span>Lambda API source (deployed by _deploy_bpapi.py)</span></div>
+  <div class="file-row"><div class="dot-deploy"></div><code>_deploy_bpapi.py</code><span>Lambda deployment script</span></div>
+  <div class="file-row"><div class="dot-deploy"></div><code>_deploy_frontend.py</code><span>Frontend deployment script</span></div>
+  <div class="file-row"><div class="dot-data"></div><code>racecard_cache.json</code><span>SL racecard — updated each morning, used by S8 gate</span></div>
+  <div class="file-row"><div class="dot-data"></div><code>form_cache.json</code><span>Deep form cache — keep, ~20 min to rebuild</span></div>
+  <div class="file-row"><div class="dot-data"></div><code>response_horses.json</code><span>Today's races in workflow format — rebuilt each day</span></div>
+</div>
+
+<div style="margin-top:14px;font-size:12px;color:var(--muted);display:flex;gap:20px;">
+  <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent2);margin-right:5px;"></span>Operational script</span>
+  <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#a78bfa;margin-right:5px;"></span>Deployment script</span>
+  <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--warn);margin-right:5px;"></span>Data / cache file</span>
+</div>
+
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer>
+  <span>Daily Setup — April 2026 (current production)</span>
+  <span>Last updated: 2026-04-01</span>
+</footer>
+
+</body>
+</html>

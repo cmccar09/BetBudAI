@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cheltenham Festival Strategy 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-card .label {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        h2 {
+            color: #1e3c72;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            font-size: 2em;
+        }
+        
+        h3 {
+            color: #2a5298;
+            margin: 25px 0 15px 0;
+            font-size: 1.5em;
+        }
+        
+        h4 {
+            color: #444;
+            margin: 20px 0 10px 0;
+            font-size: 1.2em;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .danger-box {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border-left: 5px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .tier-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .tier-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .tier-card.tier-1 {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+        
+        .tier-card.tier-2 {
+            border-color: #ffc107;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        }
+        
+        .tier-card.tier-3 {
+            border-color: #17a2b8;
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        }
+        
+        .tier-card h4 {
+            margin-top: 0;
+            font-size: 1.4em;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #c7254e;
+        }
+        
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        pre code {
+            background: none;
+            color: #f8f8f2;
+            padding: 0;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .checkmark {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .cross {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .day-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+        
+        .race-list {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .race-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .race-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .priority {
+            background: #ffd700;
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .footer {
+            background: #1e3c72;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏆 Cheltenham Festival Strategy 2026</h1>
+            <p class="subtitle">Opinion on ALL Races • Bet on BEST Only (75+ Confidence)</p>
+        </header>
+        
+        <div class="hero-stats">
+            <div class="stat-card">
+                <div class="number">28</div>
+                <div class="label">Races Analyzed</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">10-15</div>
+                <div class="label">Betting Picks</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">40-50%</div>
+                <div class="label">Target Strike Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">£80-120</div>
+                <div class="label">Target Profit</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <h2>Why Our Validated Logic THRIVES at Cheltenham</h2>
+            
+            <div class="success-box">
+                <h3>Perfect Match for Our Strengths ✅</h3>
+                <ol>
+                    <li><strong>Elite Connections Dominate</strong><br>
+                        Willie Mullins, Gordon Elliott, Nicky Henderson, Paul Nicholls<br>
+                        Our +40pts elite trainer/jockey bonus is IDEAL for Festival<br>
+                        <em>Yesterday validated: Mullins/Townend 79pts → WON</em>
+                    </li>
+                    <li><strong>Grade 1/2 Championship Races</strong><br>
+                        NO novice penalties apply (these are championship races)<br>
+                        Our grade vs novice distinction = huge advantage<br>
+                        28 races, mostly Grade 1/2 quality
+                    </li>
+                    <li><strong>Form Horses with History</strong><br>
+                        Recent win bonus (+25pts) applies to festival specialists<br>
+                        Consistency scoring works with established horses<br>
+                        Our 50% strike rate on quality picks should excel here
+                    </li>
+                    <li><strong>Heavy Going Expected</strong><br>
+                        March in Gloucestershire = soft/heavy typical<br>
+                        Our weather-based going analysis fully applies<br>
+                        Going specialists get proper weighting
+                    </li>
+                </ol>
+            </div>
+            
+            <h2>Dual Approach: Opinion on ALL, Bet on BEST</h2>
+            
+            <div class="tier-grid">
+                <div class="tier-card tier-1">
+                    <h4>🎯 Tier 1: BETTING PICKS (75+ points)</h4>
+                    <p><strong>Criteria for actual bets:</strong></p>
+                    <ul>
+                        <li>Score ≥ 75 points (EXCELLENT tier)</li>
+                        <li>Elite connections (Mullins/Elliott/Henderson/Nicholls)</li>
+                        <li>Recent Grade 1/2 form</li>
+                        <li>Course/Festival form bonus</li>
+                        <li>Odds 2.0-8.0 (sweet spot)</li>
+                    </ul>
+                    <p><strong>Expected:</strong> 8-12 betting picks across 4 days (2-3 per day)</p>
+                    <p><strong>Stakes:</strong> £5-£10 per pick</p>
+                </div>
+                
+                <div class="tier-card tier-2">
+                    <h4>👀 Tier 2: STRONG INTEREST (60-74 points)</h4>
+                    <p><strong>Watch list / smaller stakes:</strong></p>
+                    <ul>
+                        <li>Score 60-74 (GOOD tier)</li>
+                        <li>Good connections but not elite</li>
+                        <li>Solid recent form</li>
+                        <li>Monitor for odds movement</li>
+                    </ul>
+                    <p><strong>Expected:</strong> 15-20 picks total</p>
+                    <p><strong>Stakes:</strong> £2-£3 per pick (optional)</p>
+                </div>
+                
+                <div class="tier-card tier-3">
+                    <h4>📊 Tier 3: LEARNING DATA (All others)</h4>
+                    <p><strong>Full analysis but no bet:</strong></p>
+                    <ul>
+                        <li>Score < 60</li>
+                        <li>Analyze for learning/patterns</li>
+                        <li>Track actual winners vs predictions</li>
+                        <li>Build Cheltenham-specific insights</li>
+                    </ul>
+                    <p><strong>Expected:</strong> 60+ analyzed horses</p>
+                    <p><strong>Stakes:</strong> £0 (NO BETS)</p>
+                </div>
+            </div>
+            
+            <h2>Cheltenham-Specific Scoring Enhancements</h2>
+            
+            <div class="info-box">
+                <h3>Additional Bonuses (Added to validated weights)</h3>
+                <pre><code>CHELTENHAM_BONUSES = {
+    'festival_winner_history': 15,     # Previous Cheltenham winner
+    'festival_placed_history': 8,       # Previous Cheltenham place
+    'course_winner': 10,                # Won at Cheltenham before
+    'graded_winner_this_season': 12,   # Grade 1/2 win this season
+    'irish_raider_elite': 8,           # Mullins/Elliott at Festival
+    'champion_jockey': 5,               # Walsh/Townend/Blackmore
+}</code></pre>
+            </div>
+            
+            <h3>Race Type Weighting</h3>
+            <ul>
+                <li><strong>Grade 1 Championship:</strong> Base +10pts (Supreme, Champion Hurdle, Gold Cup, etc.)</li>
+                <li><strong>Grade 1 Novice:</strong> +5pts (still quality, but less predictable)</li>
+                <li><strong>Grade 2/3:</strong> Standard weights</li>
+                <li><strong>Handicaps:</strong> -5pts (more unpredictable)</li>
+            </ul>
+            
+            <h2>4-Day Plan</h2>
+            
+            <div class="day-section">
+                <h3>📅 Day 1 (Tuesday) - Supreme & Arkle Focus</h3>
+                <div class="race-list">
+                    <ul>
+                        <li>Supreme Novices' Hurdle (Grade 1) - Festival opener, quality field</li>
+                        <li>Arkle Chase (Grade 1) - 2-mile championship</li>
+                        <li>Ultima Handicap Chase - Skip or small stake (handicap)</li>
+                        <li><span class="priority">PRIORITY</span> Champion Hurdle (Grade 1) - BET if elite horse scores 75+</li>
+                        <li>Mares' Hurdle (Grade 1) - Willie Mullins dominates historically</li>
+                        <li>Boodles Fred Winter - Analyze but likely skip (handicap)</li>
+                        <li>National Hunt Chase - Amateur riders, lower confidence</li>
+                    </ul>
+                </div>
+                <p><strong>Expected Bets:</strong> 2-3 picks (Champion Hurdle, Arkle, possibly Mares')</p>
+            </div>
+            
+            <div class="day-section">
+                <h3>📅 Day 2 (Wednesday) - Queen Mother & Ballymore</h3>
+                <div class="race-list">
+                    <ul>
+                        <li>Ballymore Novices' Hurdle (Grade 1)</li>
+                        <li>Brown Advisory Novices' Chase (Grade 1)</li>
+                        <li>Coral Cup - Skip (handicap)</li>
+                        <li><span class="priority">PRIORITY</span> Queen Mother Champion Chase (Grade 1) - 2-mile championship</li>
+                        <li>Glenfarclas Cross Country Chase - Skip (specialist race)</li>
+                        <li>Grand Annual - Skip (handicap)</li>
+                        <li>Champion Bumper (Grade 1) - Mullins/Elliott dominate</li>
+                    </ul>
+                </div>
+                <p><strong>Expected Bets:</strong> 2-3 picks (Queen Mother, Ballymore, Champion Bumper)</p>
+            </div>
+            
+            <div class="day-section">
+                <h3>📅 Day 3 (Thursday) - Gold Cup Day</h3>
+                <div class="race-list">
+                    <ul>
+                        <li>Turners Novices' Chase (Grade 1)</li>
+                        <li>Pertemps Final - Skip (handicap)</li>
+                        <li>Ryanair Chase (Grade 1)</li>
+                        <li><span class="priority">PRIORITY</span> Cheltenham Gold Cup (Grade 1) - THE RACE, MANDATORY BET if 75+</li>
+                        <li>Mares' Novices' Hurdle (Grade 2)</li>
+                        <li>Kim Muir - Skip (amateur riders)</li>
+                        <li>Festival Trophy - Skip (handicap)</li>
+                    </ul>
+                </div>
+                <p><strong>Expected Bets:</strong> 2-4 picks (Gold Cup mandatory if quality pick, Ryanair, Turners)</p>
+            </div>
+            
+            <div class="day-section">
+                <h3>📅 Day 4 (Friday) - Stayers' Hurdle</h3>
+                <div class="race-list">
+                    <ul>
+                        <li>Triumph Hurdle (Grade 1) - Juvenile championship</li>
+                        <li>County Hurdle - Skip (handicap)</li>
+                        <li>Albert Bartlett (Grade 1) - Staying novices</li>
+                        <li><span class="priority">PRIORITY</span> Stayers' Hurdle (Grade 1) - Staying championship</li>
+                        <li>Mares' Chase (Grade 2)</li>
+                        <li>Festival Plate - Skip (handicap)</li>
+                        <li>Martin Pipe - Skip (handicap)</li>
+                    </ul>
+                </div>
+                <p><strong>Expected Bets:</strong> 2-3 picks (Stayers' Hurdle, Triumph, Albert Bartlett)</p>
+            </div>
+            
+            <h2>Betting Strategy</h2>
+            
+            <h3>Bankroll Management</h3>
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Amount</th>
+                </tr>
+                <tr>
+                    <td>Total Festival Budget</td>
+                    <td>£500 (set fixed amount)</td>
+                </tr>
+                <tr>
+                    <td>Per Pick (75+)</td>
+                    <td>£5-£10</td>
+                </tr>
+                <tr>
+                    <td>Per Pick (60-74)</td>
+                    <td>£2-£5</td>
+                </tr>
+                <tr>
+                    <td>Max Daily Bets</td>
+                    <td>3-4 actual bets per day</td>
+                </tr>
+                <tr>
+                    <td>Reserve</td>
+                    <td>20% for Day 4 if running well</td>
+                </tr>
+            </table>
+            
+            <h3>Staking Tiers</h3>
+            <ul>
+                <li><strong>90+ points:</strong> £10 (max confidence)</li>
+                <li><strong>80-89 points:</strong> £7.50</li>
+                <li><strong>75-79 points:</strong> £5</li>
+                <li><strong>60-74 points:</strong> £2-£3 (watch list only)</li>
+            </ul>
+            
+            <div class="success-box">
+                <h3>When to Increase Stakes ✅</h3>
+                <ul>
+                    <li class="checkmark">✓</li> Running profit on Days 1-2</li>
+                    <li><span class="checkmark">✓</span> Gold Cup day with 85+ pick</li>
+                    <li><span class="checkmark">✓</span> Multiple factors align (elite connections + festival history + recent Grade 1 win)</li>
+                </ul>
+            </div>
+            
+            <div class="danger-box">
+                <h3>When to SKIP ❌</h3>
+                <ul>
+                    <li><span class="cross">✗</span> Handicaps (too unpredictable even with good analysis)</li>
+                    <li><span class="cross">✗</span> Amateur rider races (form less reliable)</li>
+                    <li><span class="cross">✗</span> Cross country/specialist races</li>
+                    <li><span class="cross">✗</span> Any pick scoring < 60 regardless of odds</li>
+                    <li><span class="cross">✗</span> Odds < 1.8 (not worth the risk even on favorites)</li>
+                </ul>
+            </div>
+            
+            <h2>Expected Performance</h2>
+            
+            <h3>Conservative Estimate</h3>
+            <ul>
+                <li><strong>Total Bets:</strong> 10-12 across 4 days</li>
+                <li><strong>Target Strike Rate:</strong> 40% (4-5 winners)</li>
+                <li><strong>Average Odds:</strong> 4.0</li>
+                <li><strong>Total Stake:</strong> £60-£80</li>
+                <li><strong>Target Profit:</strong> £30-£50 (40-60% ROI)</li>
+            </ul>
+            
+            <h3>Optimistic (If Elite Connections Dominate)</h3>
+            <ul>
+                <li><strong>Total Bets:</strong> 12-15</li>
+                <li><strong>Strike Rate:</strong> 50% (6-8 winners)</li>
+                <li><strong>Average Odds:</strong> 4.5</li>
+                <li><strong>Total Stake:</strong> £80-£100</li>
+                <li><strong>Target Profit:</strong> £80-£120 (80-120% ROI)</li>
+            </ul>
+            
+            <h2>Key Success Factors</h2>
+            
+            <ol>
+                <li><strong>Discipline:</strong> Only bet 75+ scores, ignore temptation</li>
+                <li><strong>Elite Bias:</strong> Mullins/Elliott/Henderson get full weight</li>
+                <li><strong>Grade Focus:</strong> Prioritize Grade 1 championships over novices</li>
+                <li><strong>Form Recency:</strong> Recent Grade 1/2 wins heavily weighted</li>
+                <li><strong>Going:</strong> Soft/Heavy specialists get bonus</li>
+                <li><strong>Festival History:</strong> Previous Cheltenham success = major factor</li>
+            </ol>
+            
+            <h2>Risk Management</h2>
+            
+            <div class="warning-box">
+                <h3>Red Flags to Avoid ⚠️</h3>
+                <ul>
+                    <li>First-time Festival runners (no course form)</li>
+                    <li>Horses stepping up significantly in class</li>
+                    <li>Trainers with poor Festival record</li>
+                    <li>Ground concerns (Good/Firm specialists on Heavy)</li>
+                    <li>Odds drifting significantly pre-race</li>
+                </ul>
+            </div>
+            
+            <h3>When to Hedge</h3>
+            <ul>
+                <li>If 90+ pick wins Day 1, consider laying small on Day 2</li>
+                <li>If losing 3+ bets in a row, reduce stakes</li>
+                <li>If ahead by Day 3, secure profit by reducing Day 4 stakes</li>
+            </ul>
+            
+            <h2>Summary</h2>
+            
+            <div class="success-box">
+                <ul style="list-style: none;">
+                    <li><span class="checkmark">✓</span> <strong>Analyze ALL 28 races</strong> - Full comprehensive scoring for every horse</li>
+                    <li><span class="checkmark">✓</span> <strong>Bet ONLY 75+ confidence</strong> - Elite connections + championship races</li>
+                    <li><span class="checkmark">✓</span> <strong>10-15 total bets</strong> across 4 days (2-4 per day)</li>
+                    <li><span class="checkmark">✓</span> <strong>Skip handicaps</strong> - Not worth the risk even with analysis</li>
+                    <li><span class="checkmark">✓</span> <strong>Target 40-50% strike rate</strong> - Our validated system should excel here</li>
+                    <li><span class="checkmark">✓</span> <strong>Document everything</strong> - Festival = perfect learning opportunity</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <p style="font-size: 1.1em; font-weight: bold; text-align: center;">
+                    The validated Feb 14 logic (elite connections, grade distinction, recent form) is BUILT for Cheltenham.<br>
+                    This is where it should shine brightest. 🏆
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Cheltenham Festival Strategy 2026</strong></p>
+            <p>Validated Logic • Elite Connections • Championship Focus • Disciplined Betting</p>
+            <p style="margin-top: 15px; opacity: 0.8;">Generated: February 15, 2026</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{"statusCode": 200, "body": "{\"message\": \"Learning pipeline complete\", \"stage\": \"learning\", \"target_date\": \"2026-05-20\", \"steps_ok\": 2, \"steps_failed\": 0, \"errors\": [], \"timestamp\": \"2026-05-20T21:42:37.612435+00:00\"}"}

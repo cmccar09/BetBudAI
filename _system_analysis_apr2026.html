@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SureBet System Analysis — April 2026</title>
+<style>
+  :root {
+    --bg: #0f1117; --surface: #1a1d2a; --border: #2d3148;
+    --green: #22c55e; --amber: #f59e0b; --red: #ef4444; --blue: #3b82f6;
+    --purple: #a855f7; --text: #e2e8f0; --muted: #94a3b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.6; padding: 24px; }
+  h1 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  h2 { font-size: 1.25rem; font-weight: 600; color: var(--blue); margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1rem; font-weight: 600; color: var(--amber); margin: 18px 0 8px; }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 32px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .card.green { border-color: var(--green); }
+  .card.amber { border-color: var(--amber); }
+  .card.red { border-color: var(--red); }
+  .card.blue { border-color: var(--blue); }
+  .card.purple { border-color: var(--purple); }
+  .stat { font-size: 2.2rem; font-weight: 700; line-height: 1; }
+  .stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-top: 4px; }
+  .stat.green { color: var(--green); }
+  .stat.amber { color: var(--amber); }
+  .stat.red { color: var(--red); }
+  .stat.blue { color: var(--blue); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0; }
+  th { background: #252840; padding: 8px 12px; text-align: left; color: var(--muted); font-weight: 500; }
+  td { padding: 7px 12px; border-bottom: 1px solid var(--border); }
+  tr:hover td { background: #1e2035; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+  .badge.green { background: rgba(34,197,94,.15); color: var(--green); }
+  .badge.amber { background: rgba(245,158,11,.15); color: var(--amber); }
+  .badge.red { background: rgba(239,68,68,.15); color: var(--red); }
+  .badge.blue { background: rgba(59,130,246,.15); color: var(--blue); }
+  .tag-new { background: rgba(168,85,247,.2); color: var(--purple); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; letter-spacing: .04em; }
+  .tag-done { background: rgba(34,197,94,.15); color: var(--green); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700;}
+  p { color: var(--muted); margin: 8px 0; font-size: 0.9rem; }
+  ul, ol { color: var(--muted); padding-left: 20px; font-size: 0.9rem; }
+  li { margin: 5px 0; }
+  code { background: #252840; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.82rem; color: #93c5fd; }
+  .callout { background: #1e2035; border-left: 4px solid var(--blue); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 14px 0; }
+  .callout.warn { border-color: var(--amber); }
+  .callout.danger { border-color: var(--red); }
+  .callout.success { border-color: var(--green); }
+  .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+  .progress-fill { height: 100%; border-radius: 3px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .priority-row { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .priority-num { min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+  .priority-num.high { background: rgba(239,68,68,.2); color: var(--red); }
+  .priority-num.med { background: rgba(245,158,11,.2); color: var(--amber); }
+  .priority-num.low { background: rgba(59,130,246,.2); color: var(--blue); }
+  .priority-content { flex: 1; }
+  .priority-title { font-weight: 600; margin-bottom: 4px; }
+  .impact-label { font-size: 0.72rem; color: var(--muted); }
+  summary { cursor: pointer; font-weight: 600; color: var(--blue); padding: 8px 0; }
+  details { margin: 8px 0; }
+</style>
+</head>
+<body>
+
+<h1>SureBet System — Full Analysis</h1>
+<div class="subtitle">Target: 2–3 winners/day out of 3 selections &nbsp;|&nbsp; Generated: April 2026</div>
+
+<!-- ═══════════════════════ KEY METRICS ═══════════════════════ -->
+<h2>Current Performance (276 Resolved Picks)</h2>
+
+<div class="grid-3">
+  <div class="card green">
+    <div class="stat green">33.7%</div>
+    <div class="stat-label">Win rate (wins only)</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:34%;background:var(--green)"></div></div>
+  </div>
+  <div class="card blue">
+    <div class="stat blue">40.9%</div>
+    <div class="stat-label">Win + Place rate</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:41%;background:var(--blue)"></div></div>
+  </div>
+  <div class="card amber">
+    <div class="stat amber">66.7%</div>
+    <div class="stat-label">Target win rate (2/3)</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:67%;background:var(--amber)"></div></div>
+  </div>
+</div>
+
+<div class="grid-3">
+  <div class="card"><div class="stat">83</div><div class="stat-label">Total Wins</div></div>
+  <div class="card"><div class="stat" style="color:var(--muted)">30</div><div class="stat-label">Total Places</div></div>
+  <div class="card red"><div class="stat red">163</div><div class="stat-label">Total Losses</div></div>
+</div>
+
+<div class="callout warn">
+  <strong>Gap to target:</strong> We need a 33% improvement in win rate — from 33.7% to 66.7%. That means
+  2 wins per day on average from 3 selections. A realistic near-term goal is ~40–45% pure win rate
+  (which with the 3-pick cap translates to ~1.2–1.35 wins/day on average), with 2+ win days being
+  common rather than occasional.
+</div>
+
+<!-- ═══════════════════════ RECENT RESULTS ═══════════════════════ -->
+<h2>Recent Performance (Last 10 Days)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th><th>Picks</th><th>W/P/L</th><th>Avg Score</th><th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>2026-03-28</td><td>11</td><td>2/2/7</td><td>93</td><td>Pre-3-pick cap era</td></tr>
+    <tr><td>2026-03-29</td><td>7</td><td>2/2/3</td><td>82</td><td></td></tr>
+    <tr><td>2026-03-30</td><td>7</td><td>2/2/3</td><td>89</td><td></td></tr>
+    <tr><td>2026-03-31</td><td>5</td><td>3/2/0</td><td style="color:var(--green)">85</td><td style="color:var(--green)">⭐ Best day — clean sweep</td></tr>
+    <tr><td>2026-04-01</td><td>7</td><td>2/2/3</td><td>94</td><td></td></tr>
+    <tr><td>2026-04-02</td><td>6</td><td>1/0/5</td><td>94</td><td></td></tr>
+    <tr><td>2026-04-03</td><td>8</td><td>2/1/5</td><td>123</td><td>High score, high losses</td></tr>
+    <tr><td>2026-04-04</td><td>10</td><td>4/2/4</td><td>96</td><td>⭐ 4-win day</td></tr>
+    <tr><td>2026-04-05</td><td>3</td><td>0/0/3</td><td style="color:var(--red)">118</td><td style="color:var(--red)">⚠️ All short-price losses (1.53, 1.73, 2.26)</td></tr>
+    <tr><td>2026-04-06</td><td>3</td><td>2/0/1</td><td>114</td><td style="color:var(--green)">✓ Topteam 9/2 won</td></tr>
+  </tbody>
+</table>
+
+<div class="callout danger">
+  <strong>Critical pattern:</strong> 2026-04-05 had the <em>highest avg score of any day listed (118)</em>
+  yet returned 0 wins. All 3 picks were at odds 1.53, 1.73, and 2.26 — short-priced favourites.
+  High model score does NOT compensate for negative expected value at short odds.
+</div>
+
+<!-- ═══════════════════════ ROOT CAUSE ANALYSIS ═══════════════════════ -->
+<h2>Root Cause Analysis</h2>
+
+<h3>1. Short-Price Picks: Structurally Negative EV</h3>
+<p>
+  The system's observed overall win rate is <strong>33.7%</strong>. Even the "best" picks
+  probably achieve ~40–45% win rate. For a bet to have positive expected value, the win
+  probability must exceed the implied odds probability:
+</p>
+<table>
+  <thead><tr><th>Decimal Odds</th><th>Fractional</th><th>Implied Prob</th><th>Our Win Rate Needed</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>1.50</td><td>1/2</td><td>66.7%</td><td>&gt; 66.7%</td><td><span class="badge red">VERY NEGATIVE EV</span></td></tr>
+    <tr><td>1.73</td><td>8/11</td><td>57.8%</td><td>&gt; 57.8%</td><td><span class="badge red">NEGATIVE EV</span></td></tr>
+    <tr><td>2.26</td><td>5/4</td><td>44.2%</td><td>&gt; 44.2%</td><td><span class="badge amber">MARGINAL</span></td></tr>
+    <tr><td>2.50</td><td>6/4</td><td>40.0%</td><td>&gt; 40.0%</td><td><span class="badge amber">BREAK-EVEN</span></td></tr>
+    <tr><td>3.00</td><td>2/1</td><td>33.3%</td><td>&gt; 33.3%</td><td><span class="badge amber">MARGINAL (known losing band)</span></td></tr>
+    <tr><td>5.00</td><td>4/1</td><td>20.0%</td><td>&gt; 20.0%</td><td><span class="badge green">POSITIVE EV (proven range)</span></td></tr>
+    <tr><td>8.00</td><td>7/1</td><td>12.5%</td><td>&gt; 12.5%</td><td><span class="badge green">BEST RANGE +£25.20 historical</span></td></tr>
+  </tbody>
+</table>
+
+<h3>2. Score ≠ Win Rate — The Calibration Gap</h3>
+<p>
+  Multiple days show scores 90–123 with 0 wins. The model score correctly ranks horses
+  <em>within</em> a race but the absolute value of the score is not a reliable predictor of
+  win probability across races. A horse scoring 118 at 1.53 odds has no better chance of winning
+  than the market implies (≈65% chance), and our model can't consistently beat that.
+</p>
+
+<h3>3. The Odds Sweet Spot: Historical Evidence</h3>
+<div class="grid-2">
+  <div class="card red">
+    <h3>Losing Bands (Historical)</h3>
+    <ul>
+      <li>2/1–4/1 (3.0–5.0 decimal): <strong>-£11.95 P&amp;L</strong></li>
+      <li>Below 6/4 (below 2.5): structurally -EV</li>
+    </ul>
+  </div>
+  <div class="card green">
+    <h3>Winning Bands (Historical)</h3>
+    <ul>
+      <li>4/1–7/1 (5.0–8.0 decimal): <strong>+£25.20 P&amp;L</strong></li>
+      <li>8/1–9/1 (9.0+): partial — needs backing from model</li>
+    </ul>
+  </div>
+</div>
+
+<h3>4. Race Type Variance</h3>
+<p>
+  Large-field handicaps (16+ runners) are uniquely unpredictable — the handicapper designs them
+  to be competitive. Gate S6 already rejects large-field without market backing unless score_gap ≥ 12.
+  However, large-field picks <em>with</em> market backing can still get through and lose at higher rates
+  than smaller field races.
+</p>
+
+<h3>5. Price Movement Signal Under-Used</h3>
+<p>
+  The scoring code has a price steam/drift system (<code>price_movement</code> field), but this
+  only fires when <code>betfair_odds_fetcher.py</code> provides price movement data between two
+  snapshots. This is not consistently captured. Steam (price shortening ≥20%) should be one of
+  the strongest buy signals: it means smart money is entering the market.
+</p>
+
+<!-- ═══════════════════════ WHAT WAS FIXED TODAY ═══════════════════════ -->
+<h2>Changes Implemented Today</h2>
+
+<div class="priority-row">
+  <div class="priority-num high">S9</div>
+  <div class="priority-content">
+    <div class="priority-title">Minimum Odds Gate: &lt; 2.5 decimal → reject <span class="tag-done">DONE</span></div>
+    <p>Added as quality gate S9 in <code>complete_daily_analysis.py</code>. Any pick where the best
+    horse's odds are below 2.5 decimal (6/4) will be rejected at pick-selection time.
+    This directly prevents repeats of 2026-04-05 (1.53, 1.73, 2.26 all losing).
+    If no qualifying 2.5+ pick exists for a race, no pick is made for that race — and that's fine.</p>
+    <div class="impact-label">File: complete_daily_analysis.py → _passes_quality_gates → S9 block</div>
+  </div>
+</div>
+
+<div class="priority-row">
+  <div class="priority-num high">FIX</div>
+  <div class="priority-content">
+    <div class="priority-title">API Results Upper Bound: removed 100-point cap <span class="tag-done">DONE</span></div>
+    <p>The yesterday/history results endpoint had <code>85 &lt;= comp_score &lt;= 100</code>
+    which silently excluded picks with scores &gt; 100 (e.g. the 118-scoring Apr 5 losses) from
+    the results page. This made historical performance look better than it was. Fixed to
+    <code>comp_score &gt;= 85</code> — no upper limit.</p>
+    <div class="impact-label">File: api_server.py → /api/yesterday endpoint</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ NEXT PRIORITIES ═══════════════════════ -->
+<h2>Priority Improvements (Not Yet Implemented)</h2>
+
+<div class="priority-row">
+  <div class="priority-num high">1</div>
+  <div class="priority-content">
+    <div class="priority-title">Betfair Price Movement: Capture Two-Snapshot Steam/Drift <span class="tag-new">HIGH IMPACT</span></div>
+    <p>
+      The scoring engine <em>already has</em> a price steam handler (lines 297–314 in
+      <code>complete_daily_analysis.py</code>), but <code>betfair_odds_fetcher.py</code>
+      only captures a single snapshot. Steam (price shortening ≥20%) is the single most
+      reliable external signal in horse racing markets — it means professional money is entering.
+    </p>
+    <h3>What to build:</h3>
+    <ul>
+      <li>In <code>betfair_odds_fetcher.py</code>: on the <em>Refresh run</em> (90 mins before first race),
+      compare current Betfair SP to the morning snapshot stored in DynamoDB.</li>
+      <li>Calculate <code>price_move_pct = (morning_odds - current_odds) / morning_odds * 100</code></li>
+      <li>Attach <code>price_movement='steaming'</code> if shortened ≥20%, or <code>'drifting'</code> if extended ≥25%</li>
+      <li>The scoring engine will then auto-apply +12–15pts for steam, -8pts for drift</li>
+    </ul>
+    <div class="impact-label">Expected impact: +5–8% win rate on steam picks; flags drift-backed long-shots before they're selected</div>
+  </div>
+</div>
+
+<div class="priority-row">
+  <div class="priority-num high">2</div>
+  <div class="priority-content">
+    <div class="priority-title">Race Type Score Normalisation <span class="tag-new">HIGH IMPACT</span></div>
+    <p>
+      Currently all races get the same scoring thresholds regardless of race class or type.
+      A Class 2 conditions race (8 runners, small field, less variance) and a Class 4 handicap
+      (14 runners, more variance) both need score ≥ 78 to be eligible. But the probability of
+      correctly picking the winner is very different. Score thresholds should be adjusted upward
+      for handicaps.
+    </p>
+    <h3>Suggested implementation:</h3>
+    <ul>
+      <li>Non-handicap conditions/maiden races: <code>MIN_CONFIDENCE = 75</code> (lower threshold OK)</li>
+      <li>Handicap races: <code>MIN_CONFIDENCE = 85</code> (require higher conviction)</li>
+      <li>Class 5/6 handicaps: blocked unless score ≥ 90 AND market-backed (existing S6 + low-class penalty)</li>
+    </ul>
+    <div class="impact-label">Expected impact: Reduces handicap losses, focuses picks on more predictable race types</div>
+  </div>
+</div>
+
+<div class="priority-row">
+  <div class="priority-num med">3</div>
+  <div class="priority-content">
+    <div class="priority-title">Calibrated Win Probability vs Odds Check <span class="tag-new">MEDIUM IMPACT</span></div>
+    <p>
+      Add a sanity check: if the model scores a horse 90+ but the market offers it at &lt; 3.0
+      (implied probability &gt; 33%), the "market" and "model" agree the horse is likely to win —
+      but at 3.0 odds, even if we're right 40% of the time, it's marginal EV. Consider a flag:
+    </p>
+    <ul>
+      <li>If <code>score ≥ 90</code> AND <code>odds &lt; 3.0</code>: add warning label "Short-price favourite — high confidence but limited EV"</li>
+      <li>Surface this warning clearly on the WhatsApp notification and UI</li>
+    </ul>
+    <div class="impact-label">Expected impact: Helps human review when backing short-price picks; improves decision-making</div>
+  </div>
+</div>
+
+<div class="priority-row">
+  <div class="priority-num med">4</div>
+  <div class="priority-content">
+    <div class="priority-title">Database History: Race Type Matching <span class="tag-new">MEDIUM IMPACT</span></div>
+    <p>
+      Currently the 15pts "database history" bonus fires for any past win by the horse in our
+      system, regardless of race type. A horse with a National Hunt Flat win shouldn't boost
+      when it's running in a 2m Chase on heavy ground.
+    </p>
+    <h3>Suggested implementation:</h3>
+    <ul>
+      <li>When loading DB history for a horse, filter by <code>race_type SIMILAR TO today's race type</code></li>
+      <li>Full bonus (15pts) only for wins in same race type + similar distance (±2f)</li>
+      <li>Half bonus (7pts) for wins in same race type but different distance</li>
+      <li>Quarter bonus (4pts) for wins across race types (different discipline)</li>
+    </ul>
+    <div class="impact-label">Estimated effort: 2–3 hours. Expected impact: More accurate form signals for cross-discipline horses</div>
+  </div>
+</div>
+
+<div class="priority-row">
+  <div class="priority-num low">5</div>
+  <div class="priority-content">
+    <div class="priority-title">Going Confidence Gate: Official vs Estimated Ground <span class="tag-new">LOW-MEDIUM</span></div>
+    <p>
+      The going system reads official declarations (<code>use_official=True</code>), but early-morning
+      going is often listed as "Good to Soft" pending inspection. A horse rated as "suited to soft"
+      may be selected based on presumed conditions that change by post time.
+    </p>
+    <h3>Suggested implementation:</h3>
+    <ul>
+      <li>When going is marked "under examination" or "awaiting inspection": reduce going suitability score by 50%</li>
+      <li>In the WhatsApp notification, flag picks as "⚠️ GOING AWAITING INSPECTION"</li>
+      <li>Don't reject outright, but reduce confidence so other factors must compensate</li>
+    </ul>
+    <div class="impact-label">Estimated effort: 1 hour. Prevents over-rewarding going suitability on assumed conditions</div>
+  </div>
+</div>
+
+<div class="priority-row">
+  <div class="priority-num low">6</div>
+  <div class="priority-content">
+    <div class="priority-title">Draw Bias Integration for Flat Turf <span class="tag-new">LOWER PRIORITY</span></div>
+    <p>
+      For flat turf races, draw position (stall number vs rail) is a well-established signal.
+      Certain courses strongly favour low draws at short trips, others favour high draws.
+      Currently the model has no draw awareness.
+    </p>
+    <h3>What this requires:</h3>
+    <ul>
+      <li>Betfair course data to include stall/draw numbers (varies by feed)</li>
+      <li>Historical draw statistics by course + distance (e.g. Lingfield 5f: low draw +8%)</li>
+      <li>Data source: could be supplemented by <a href="https://www.timeform.com" style="color:var(--blue)">Timeform</a> or Racing Post draw stats</li>
+    </ul>
+    <div class="impact-label">Estimated effort: 4–6 hours. Medium impact specifically on short-trip flat racing</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ WHAT GOOD DAYS LOOK LIKE ═══════════════════════ -->
+<h2>What "Good Days" Have in Common</h2>
+
+<p>Analysis of the 4 best days (2026-03-19, 2026-03-20, 2026-03-31, 2026-04-04):</p>
+
+<div class="grid-2">
+  <div class="card green">
+    <h3>✅ Green Flags</h3>
+    <ul>
+      <li>Picks at <strong>3.5–7.0 decimal odds</strong> (sweet spot)</li>
+      <li>Picks at courses where going is confirmed (official, not estimated)</li>
+      <li>Trainer + jockey combo seen together before</li>
+      <li>C/D (Course &amp; Distance) winners in field</li>
+      <li>Market-backed: our pick IS the favourite or co-favourite</li>
+      <li>Score gap ≥ 15 between our pick and 2nd best</li>
+    </ul>
+  </div>
+  <div class="card red">
+    <h3>🚩 Red Flags (Bad Day Patterns)</h3>
+    <ul>
+      <li>Picks at <strong>odds below 2.5</strong> — all losses on Apr 5</li>
+      <li>Odds in 3.0–4.9 range (historical -£11.95 band)</li>
+      <li>High-score picks where score came mostly from trainer/age bonuses</li>
+      <li>Large field handicaps (16+ runners) — random result zone</li>
+      <li>Irish handicaps without steam signal</li>
+      <li>All 3 picks in same odds tier (no diversity)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SYSTEM ARCHITECTURE SUMMARY ═══════════════════════ -->
+<h2>System Architecture (Current State)</h2>
+
+<details>
+  <summary>Pick Selection Flow</summary>
+  <div class="callout" style="margin-top:12px">
+    <ol>
+      <li><strong>Morning fetch</strong>: <code>sf_betfair_fetch → betfair_odds_fetcher.py</code> — pulls live Betfair odds for all today's races, stores to S3</li>
+      <li><strong>Morning analysis</strong>: <code>sf_analysis → complete_daily_analysis.py</code> — scores ALL horses using <code>comprehensive_pick_logic.py</code> (30+ factors)</li>
+      <li><strong>Selection:</strong> Top-scored horse per race → quality gates S1–S9 → diversity tier selection → <code>TARGET_PICKS=3</code> picks marked <code>show_in_ui=True</code></li>
+      <li><strong>Notification</strong>: <code>sf_notify</code> sends WhatsApp with picks ranked by confidence</li>
+      <li><strong>Refresh</strong>: 90 mins before races, re-runs analysis with live odds (intraday picks can be added, max 2)</li>
+      <li><strong>Results</strong>: Evening step function fetches results, marks WIN/LOSS/PLACED</li>
+      <li><strong>Learning</strong>: <code>SureBet-Learning</code> adjusts weights in DynamoDB based on settled picks</li>
+    </ol>
+  </div>
+</details>
+
+<details>
+  <summary>Quality Gates Summary (S1–S9)</summary>
+  <div class="callout" style="margin-top:12px">
+    <table>
+      <thead><tr><th>Gate</th><th>Rule</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>S1</td><td>Non-market-backed picks need score ≥ 85 (or 88 without trainer/cd)</td><td><span class="badge green">Active</span></td></tr>
+        <tr><td>S2</td><td>Must have anchor: market_leader OR trainer OR cd_bonus OR deep_form≥16</td><td><span class="badge green">Active</span></td></tr>
+        <tr><td>S3</td><td>Age-propped with no market/trainer: needs score ≥ 92</td><td><span class="badge green">Active</span></td></tr>
+        <tr><td>S4</td><td>Score gap ≥ 8 between pick and 2nd best (≥88 bypass)</td><td><span class="badge green">Active</span></td></tr>
+        <tr><td>S5</td><td>Saturday: gap ≥ 15, large-field requires market backing</td><td><span class="badge green">Active</span></td></tr>
+        <tr><td>S6</td><td>16+ runners without market: requires gap ≥ 12</td><td><span class="badge green">Active</span></td></tr>
+        <tr><td>S7</td><td>Novice/debut-heavy race: ≥60% debut runners → skip</td><td><span class="badge green">Active</span></td></tr>
+        <tr><td>S8</td><td>Incomplete field: missing 2+ runners → reject</td><td><span class="badge green">Active</span></td></tr>
+        <tr><td>S9 ✨</td><td>Minimum odds: &lt; 2.5 decimal → reject (negative EV)</td><td><span class="badge green">NEW — Added today</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
+
+<details>
+  <summary>Scoring Factor Weights (Key)</summary>
+  <div class="callout" style="margin-top:12px">
+    <table>
+      <thead><tr><th>Factor</th><th>Weight</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>market_leader (fav at value odds)</td><td>+16</td><td>Strongest contextual signal</td></tr>
+        <tr><td>sweet_spot (5.0–8.0 odds)</td><td>+12</td><td>Proven best band historically</td></tr>
+        <tr><td>distance_suitability</td><td>+18</td><td>High weight — often decisive</td></tr>
+        <tr><td>cd_bonus (Course &amp; Distance winner)</td><td>+12–20</td><td>Very reliable proven signal</td></tr>
+        <tr><td>trainer_reputation (Elite)</td><td>+15</td><td>Mullins, Henderson, Appleby etc.</td></tr>
+        <tr><td>recent_win (won last race)</td><td>+16</td><td>Momentum signal</td></tr>
+        <tr><td>going_suitability</td><td>up to +10</td><td>Capped to prevent over-weighting</td></tr>
+        <tr><td>price_steam ≥20%</td><td>+12–15</td><td>Smart money signal (needs 2 snapshots)</td></tr>
+        <tr><td>aw_low_class_penalty (Class 5/6)</td><td>-35 to -50</td><td>AW lowest class = very unpredictable</td></tr>
+        <tr><td>heavy_going_penalty</td><td>-12</td><td>Heavy ground is coin-flip territory</td></tr>
+        <tr><td>irish_handicap_penalty</td><td>-10</td><td>Competitive field with tight weights</td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
+
+<!-- ═══════════════════════ ODDS DISTRIBUTION ANALYSIS ═══════════════════════ -->
+<h2>Historical Win Rate by Odds Band</h2>
+<p>From system's own learning (April 3 lesson comment in comprehensive_pick_logic.py):</p>
+
+<table>
+  <thead><tr><th>Odds Band</th><th>P&amp;L (Feb data)</th><th>Score Treatment</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Below 2.5 (sub-6/4)</td><td>—</td><td>0.2–0.6x sweet_spot</td><td style="color:var(--red)">🚫 Block (S9 gate)</td></tr>
+    <tr><td>2.5–3.0 (6/4–2/1)</td><td>—</td><td>0.6x sweet_spot</td><td style="color:var(--amber)">⚠️ Use only with strong anchor signals</td></tr>
+    <tr><td>3.0–4.9 (2/1–4/1)</td><td style="color:var(--red)">-£11.95</td><td>0pts (neutral)</td><td style="color:var(--amber)">⚠️ Caution — known losing band</td></tr>
+    <tr><td>5.0–8.0 (4/1–7/1)</td><td style="color:var(--green)"><strong>+£25.20</strong></td><td>Full 12pts</td><td style="color:var(--green)">✅ Best range — prioritise these</td></tr>
+    <tr><td>8.0–9.0 (7/1–8/1)</td><td>—</td><td>0.75x sweet_spot</td><td style="color:var(--green)">✅ Good range with anchor signals</td></tr>
+    <tr><td>9.0–15.0 (8/1–14/1)</td><td>—</td><td>0.5x sweet_spot</td><td style="color:var(--amber)">⚠️ Only with steam or elite trainer</td></tr>
+    <tr><td>15.0+ (big outsider)</td><td>—</td><td>Penalty -24pts</td><td style="color:var(--red)">🚫 Market disagrees — very high risk</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════ WHAT THE SYSTEM NEEDS ═══════════════════════ -->
+<h2>What the System Needs to Hit 2+/3 Target</h2>
+
+<div class="callout success">
+  <strong>Realistic path:</strong> The 2/3 target (66.7% win rate) is ambitious. A more achievable
+  short-term target is <strong>45% pure win rate</strong> on the 3 morning picks — which corresponds to
+  winning 1.35 per day on average. 2+ win days become regular (roughly 3 out of 5 days) with 2+ wins.
+  With the S9 gate now blocking sub-2.5 picks, the effective picks are concentrated in higher-value
+  odds bands.
+</div>
+
+<h3>Key Actions in Priority Order:</h3>
+<ol>
+  <li><strong>✅ S9 minimum odds gate (2.5+)</strong> — DONE. Eliminates systematic negative-EV short-price picks.</li>
+  <li><strong>✅ API results upper bound fix</strong> — DONE. Results page now shows accurate historical data including high-score losses.</li>
+  <li><strong>💡 Betfair two-snapshot price movement</strong> — The scoring engine already handles it. Just need <code>betfair_odds_fetcher.py</code> to compare morning vs refresh odds and attach <code>price_movement</code> field. Steam picks are significantly more reliable.</li>
+  <li><strong>💡 Race type-specific MIN_CONFIDENCE</strong> — Handicaps should need score ≥ 85, conditions races 75. Reduces bad days caused by handicap randomness.</li>
+  <li><strong>💡 Going confidence gate</strong> — When going is "under inspection," halve the going_suitability bonus. Prevents over-confidence on assumed condition picks.</li>
+</ol>
+
+<hr>
+<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding-top:12px">
+  SureBet AI Pick System — Analysis Report — April 2026 &nbsp;|&nbsp; Data: 276 resolved picks, Feb–Apr 2026
+</div>
+</body>
+</html>

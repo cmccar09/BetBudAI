@@ -1,0 +1,1 @@
+{"statusCode": 404, "headers": {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key", "Access-Control-Allow-Methods": "GET,OPTIONS", "Content-Type": "application/json"}, "body": "{\"success\": false, \"error\": \"Endpoint not found: /api/results/cumulative-roi\"}"}

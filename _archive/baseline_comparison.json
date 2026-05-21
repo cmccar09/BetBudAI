@@ -1,0 +1,76 @@
+{
+  "strategies": [
+    {
+      "name": "Random Selection",
+      "picks": 139,
+      "wins": 41,
+      "strike_rate": 29.496402877697843,
+      "avg_odds": 6.37863309352518,
+      "profit": 52.18000000000001,
+      "roi": 18.769784172661875
+    },
+    {
+      "name": "Mid-Range Odds (3.0-5.0)",
+      "picks": 134,
+      "wins": 37,
+      "strike_rate": 27.611940298507463,
+      "avg_odds": 3.833955223880597,
+      "profit": 15.399999999999977,
+      "roi": 5.746268656716409
+    },
+    {
+      "name": "Current System (85+)",
+      "picks": 30,
+      "wins": 10,
+      "strike_rate": 33.33333333333333,
+      "avg_odds": 4.071,
+      "profit": 2.460000000000001,
+      "roi": 4.100000000000001
+    },
+    {
+      "name": "Always Bet Favorite",
+      "picks": 62,
+      "wins": 23,
+      "strike_rate": 37.096774193548384,
+      "avg_odds": 2.63,
+      "profit": -0.6599999999999966,
+      "roi": -0.5322580645161262
+    },
+    {
+      "name": "Top 2 Favorites",
+      "picks": 124,
+      "wins": 37,
+      "strike_rate": 29.838709677419356,
+      "avg_odds": 3.1902419354838707,
+      "profit": -14.699999999999989,
+      "roi": -5.9274193548387055
+    },
+    {
+      "name": "Recent Winner (form has '1')",
+      "picks": 276,
+      "wins": 61,
+      "strike_rate": 22.10144927536232,
+      "avg_odds": 6.410760869565217,
+      "profit": -38.34000000000003,
+      "roi": -6.945652173913048
+    }
+  ],
+  "best_strategy": {
+    "name": "Random Selection",
+    "picks": 139,
+    "wins": 41,
+    "strike_rate": 29.496402877697843,
+    "avg_odds": 6.37863309352518,
+    "profit": 52.18000000000001,
+    "roi": 18.769784172661875
+  },
+  "current_system": {
+    "name": "Current System (85+)",
+    "picks": 30,
+    "wins": 10,
+    "strike_rate": 33.33333333333333,
+    "avg_odds": 4.071,
+    "profit": 2.460000000000001,
+    "roi": 4.100000000000001
+  }
+}

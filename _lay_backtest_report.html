@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lay the Fav — 7-Day Backtest Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 28px 20px; max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 26px; font-weight: 900; color: #f87171; margin-bottom: 4px; }
+  .sub { color: rgba(255,255,255,0.45); font-size: 13px; margin-bottom: 28px; }
+  .note { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.35); border-radius: 10px; padding: 12px 16px; font-size: 12px; color: #fde68a; margin-bottom: 24px; line-height: 1.6; }
+
+  /* Headline stats */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .stat-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 18px 16px; text-align: center; }
+  .stat-card .val { font-size: 38px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+  .stat-card .lbl { font-size: 11px; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.7px; }
+  .stat-card .sub2 { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 5px; }
+
+  /* Threshold table */
+  .thresh-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.35); margin-bottom: 10px; }
+  table.thresh { width: 100%; border-collapse: collapse; background: rgba(22,27,34,0.95); border-radius: 10px; overflow: hidden; margin-bottom: 28px; border: 1px solid rgba(255,255,255,0.08); }
+  table.thresh th { background: rgba(255,255,255,0.05); padding: 10px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.4); text-align: left; }
+  table.thresh td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .bar-wrap { width: 180px; height: 10px; background: rgba(255,255,255,0.08); border-radius: 5px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 8px; }
+  .bar-fill { height: 100%; border-radius: 5px; }
+  .verdict-pills { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+  .pill { border-radius: 6px; padding: 4px 12px; font-size: 12px; font-weight: 700; border: 1px solid; }
+
+  /* Detail table */
+  table.detail { width: 100%; border-collapse: collapse; background: rgba(22,27,34,0.95); border-radius: 10px; overflow: hidden; margin-bottom: 28px; border: 1px solid rgba(255,255,255,0.08); font-size: 12px; }
+  table.detail th { background: rgba(255,255,255,0.05); padding: 9px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.4); text-align: left; }
+  table.detail td { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; }
+  .flag-chip { display: inline-block; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13); border-radius: 4px; padding: 1px 6px; font-size: 10px; margin: 1px 2px; color: rgba(255,255,255,0.6); }
+  .won-pill  { background: rgba(239,68,68,0.15);  color: #f87171; border: 1px solid rgba(239,68,68,0.35);  border-radius: 5px; padding: 2px 8px; font-weight: 700; font-size: 11px; }
+  .lost-pill { background: rgba(52,211,153,0.12); color: #34d399; border: 1px solid rgba(52,211,153,0.3);  border-radius: 5px; padding: 2px 8px; font-weight: 700; font-size: 11px; }
+  .score-chip { display: inline-block; border-radius: 5px; padding: 2px 8px; font-weight: 800; font-size: 12px; }
+  .footer { text-align: center; font-size: 11px; color: rgba(255,255,255,0.2); margin-top: 32px; }
+</style>
+</head>
+<body>
+
+<h1>🚨 Lay the Favourite — 7-Day Backtest</h1>
+<div class="sub">28 Mar 2026 – 5 Apr 2026 &nbsp;·&nbsp; 26 settled races with favourite outcome known &nbsp;·&nbsp; Generated 5 Apr 2026</div>
+
+<div class="note">
+  <strong>How to read this:</strong> For each settled race we identified the market favourite (lowest odds), scored it for vulnerability (0–18 pts), then checked whether it actually won or lost.
+  A <span style="color:#34d399;font-weight:700">✓ LAY WIN</span> = the favourite was beaten. A <span style="color:#f87171;font-weight:700">✗ LAY LOSS</span> = the favourite won.
+  <br>Only 26 of ~374 races from the week have full result data currently — sample grows as nightly result recording catches up.
+</div>
+
+<!-- Headline Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="val" style="color:#94a3b8">26</div>
+    <div class="lbl">Races Settled</div>
+    <div class="sub2">past 8 days</div>
+  </div>
+  <div class="stat-card">
+    <div class="val" style="color:#fbbf24">3</div>
+    <div class="lbl">Scored 4+ (Caution)</div>
+    <div class="sub2">11.5% of races flagged</div>
+  </div>
+  <div class="stat-card">
+    <div class="val" style="color:#f97316">1</div>
+    <div class="lbl">Scored 6+ (Strong)</div>
+    <div class="sub2">1 strong lay signal</div>
+  </div>
+  <div class="stat-card">
+    <div class="val" style="color:#34d399">66.7%</div>
+    <div class="lbl">Lay Success (4+)</div>
+    <div class="sub2">2 of 3 favs beaten</div>
+  </div>
+  <div class="stat-card">
+    <div class="val" style="color:#34d399">100%</div>
+    <div class="lbl">Lay Success (6+)</div>
+    <div class="sub2">1 of 1 fav beaten</div>
+  </div>
+  <div class="stat-card">
+    <div class="val" style="color:#94a3b8">46.2%</div>
+    <div class="lbl">Overall Fav Loss Rate</div>
+    <div class="sub2">12 of 26 favs beaten</div>
+  </div>
+</div>
+
+<!-- Threshold Breakdown -->
+<div class="thresh-title">Success Rate by Lay Score Threshold</div>
+<table class="thresh">
+  <thead>
+    <tr>
+      <th>Score Threshold</th>
+      <th>Races Flagged</th>
+      <th>Fav Lost (✓)</th>
+      <th>Fav Won (✗)</th>
+      <th>Success Rate</th>
+      <th>vs Base Rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>All races (0+)</strong></td>
+      <td>26</td>
+      <td style="color:#34d399;font-weight:700">12</td>
+      <td style="color:#f87171">14</td>
+      <td>
+        <span style="font-weight:800;color:#94a3b8">46.2%</span>
+        <span class="bar-wrap"><span class="bar-fill" style="width:46%;background:#94a3b8"></span></span>
+      </td>
+      <td style="color:#94a3b8">baseline</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#fbbf24">Score ≥ 4</strong> <span style="font-size:11px;color:rgba(255,255,255,0.4)">(Caution)</span></td>
+      <td>3</td>
+      <td style="color:#34d399;font-weight:700">2</td>
+      <td style="color:#f87171">1</td>
+      <td>
+        <span style="font-weight:800;color:#fbbf24">66.7%</span>
+        <span class="bar-wrap"><span class="bar-fill" style="width:67%;background:#fbbf24"></span></span>
+      </td>
+      <td style="color:#34d399;font-weight:700">+20.5pp ↑</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#f97316">Score ≥ 6</strong> <span style="font-size:11px;color:rgba(255,255,255,0.4)">(Strong Lay)</span></td>
+      <td>1</td>
+      <td style="color:#34d399;font-weight:700">1</td>
+      <td style="color:#f87171">0</td>
+      <td>
+        <span style="font-weight:800;color:#f97316">100%</span>
+        <span class="bar-wrap"><span class="bar-fill" style="width:100%;background:#f97316"></span></span>
+      </td>
+      <td style="color:#34d399;font-weight:700">+53.8pp ↑</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#f87171">Score ≥ 8</strong> <span style="font-size:11px;color:rgba(255,255,255,0.4)">(High Confidence)</span></td>
+      <td style="color:rgba(255,255,255,0.35)">0</td>
+      <td style="color:rgba(255,255,255,0.35)">—</td>
+      <td style="color:rgba(255,255,255,0.35)">—</td>
+      <td style="color:rgba(255,255,255,0.35)">No signals this week</td>
+      <td style="color:rgba(255,255,255,0.35)">—</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#f87171">Score ≥ 10</strong> <span style="font-size:11px;color:rgba(255,255,255,0.4)">(Red Flag)</span></td>
+      <td style="color:rgba(255,255,255,0.35)">0</td>
+      <td style="color:rgba(255,255,255,0.35)">—</td>
+      <td style="color:rgba(255,255,255,0.35)">—</td>
+      <td style="color:rgba(255,255,255,0.35)">No signals this week</td>
+      <td style="color:rgba(255,255,255,0.35)">—</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- High-signal races section -->
+<div class="thresh-title">🚨 Lay Signals (Score ≥ 4) — Full Detail</div>
+
+<!-- Saladins Son — 6 pts — WON THE LAY (fav lost) -->
+<div style="background:rgba(22,27,34,0.95);border:1px solid rgba(52,211,153,0.4);border-left:4px solid #34d399;border-radius:10px;padding:18px 20px;margin-bottom:14px;">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+    <span style="font-size:18px;font-weight:900;color:#58a6ff">16:05</span>
+    <span style="font-size:15px;font-weight:800;color:white">Haydock</span>
+    <span style="font-size:12px;color:rgba(255,255,255,0.4)">Thu 4 Apr 2026</span>
+    <span style="margin-left:auto">
+      <span style="background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.4);border-radius:6px;padding:4px 14px;font-size:13px;font-weight:800">✓ LAY WON — Fav Beaten</span>
+    </span>
+  </div>
+  <div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:220px;">
+      <div style="font-size:22px;font-weight:900;color:white;margin-bottom:6px">Saladins Son</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:4px">@ <strong style="color:#e6edf3">4.50</strong> &nbsp;·&nbsp; Lay Score <strong style="color:#f97316">6 / 18</strong></div>
+      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;">
+        <span class="flag-chip">Going Unproven +2</span>
+        <span class="flag-chip">Trip Unproven +2</span>
+        <span class="flag-chip">Low Score Gap +1</span>
+        <span class="flag-chip">Pace Doubt +1</span>
+      </div>
+    </div>
+    <div style="text-align:center;min-width:90px;">
+      <div style="font-size:40px;font-weight:900;color:#f97316;line-height:1">6</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px">/ 18</div>
+      <div style="width:80px;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;margin:0 auto;">
+        <div style="width:33%;height:100%;background:#f97316;border-radius:4px;"></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);font-size:12px;color:rgba(255,255,255,0.45);">
+    <strong style="color:#34d399">Result:</strong> Favourite was beaten — Lay bet would have been profitable at Betfair exchange odds.
+  </div>
+</div>
+
+<!-- Kimi De Mai — 4 pts — WON THE LAY (fav lost) -->
+<div style="background:rgba(22,27,34,0.95);border:1px solid rgba(52,211,153,0.4);border-left:4px solid #34d399;border-radius:10px;padding:18px 20px;margin-bottom:14px;">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+    <span style="font-size:18px;font-weight:900;color:#58a6ff">14:25</span>
+    <span style="font-size:15px;font-weight:800;color:white">Cork</span>
+    <span style="font-size:12px;color:rgba(255,255,255,0.4)">Sun 5 Apr 2026</span>
+    <span style="background:rgba(88,166,255,0.18);color:#58a6ff;border:1px solid rgba(88,166,255,0.4);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">⚡ OUR PICK</span>
+    <span style="margin-left:auto">
+      <span style="background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.4);border-radius:6px;padding:4px 14px;font-size:13px;font-weight:800">✓ LAY WON — Fav Beaten</span>
+    </span>
+  </div>
+  <div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:220px;">
+      <div style="font-size:22px;font-weight:900;color:white;margin-bottom:6px">Kimi De Mai</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:4px">@ <strong style="color:#e6edf3">1.53</strong> &nbsp;·&nbsp; Lay Score <strong style="color:#fbbf24">4 / 18</strong></div>
+      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;">
+        <span class="flag-chip">Short Price +1</span>
+        <span class="flag-chip">Going Unproven +2</span>
+        <span class="flag-chip">Pace Doubt +1</span>
+      </div>
+    </div>
+    <div style="text-align:center;min-width:90px;">
+      <div style="font-size:40px;font-weight:900;color:#fbbf24;line-height:1">4</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px">/ 18</div>
+      <div style="width:80px;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;margin:0 auto;">
+        <div style="width:22%;height:100%;background:#fbbf24;border-radius:4px;"></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);font-size:12px;color:rgba(255,255,255,0.45);">
+    <strong style="color:#34d399">Result:</strong> Favourite was beaten — despite being odds-on at 8/15, Kimi De Mai lost. Short price vulnerability confirmed.
+  </div>
+</div>
+
+<!-- Dutch Corner — 5 pts — LOST THE LAY (fav won) -->
+<div style="background:rgba(22,27,34,0.95);border:1px solid rgba(239,68,68,0.3);border-left:4px solid #f87171;border-radius:10px;padding:18px 20px;margin-bottom:28px;">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+    <span style="font-size:18px;font-weight:900;color:#58a6ff">14:00</span>
+    <span style="font-size:15px;font-weight:800;color:white">Newton Abbot</span>
+    <span style="font-size:12px;color:rgba(255,255,255,0.4)">Sat 4 Apr 2026</span>
+    <span style="margin-left:auto">
+      <span style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.35);border-radius:6px;padding:4px 14px;font-size:13px;font-weight:800">✗ LAY LOSS — Fav Won</span>
+    </span>
+  </div>
+  <div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:220px;">
+      <div style="font-size:22px;font-weight:900;color:white;margin-bottom:6px">Dutch Corner</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:4px">@ <strong style="color:#e6edf3">2.32</strong> &nbsp;·&nbsp; Lay Score <strong style="color:#fbbf24">5 / 18</strong></div>
+      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;">
+        <span class="flag-chip">Going Unproven +2</span>
+        <span class="flag-chip">Trip Unproven +2</span>
+        <span class="flag-chip">Pace Doubt +1</span>
+      </div>
+    </div>
+    <div style="text-align:center;min-width:90px;">
+      <div style="font-size:40px;font-weight:900;color:#fbbf24;line-height:1">5</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px">/ 18</div>
+      <div style="width:80px;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;margin:0 auto;">
+        <div style="width:28%;height:100%;background:#fbbf24;border-radius:4px;"></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);font-size:12px;color:rgba(255,255,255,0.45);">
+    <strong style="color:#f87171">Result:</strong> Favourite won despite flags — only borderline score (5pts), which is why the model marks it Caution rather than Strong Lay.
+  </div>
+</div>
+
+<!-- Full race table -->
+<div class="thresh-title">All 26 Settled Races — Full Log</div>
+<table class="detail">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Course</th>
+      <th>Favourite</th>
+      <th>Odds</th>
+      <th>Score</th>
+      <th>Flags</th>
+      <th>Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>28 Mar</td><td style="color:#58a6ff;font-weight:700">13:55</td><td>Curragh</td><td>Dmaniac</td><td>3.25</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="lost-pill">✓ BEATEN</span></td></tr>
+    <tr><td>28 Mar</td><td style="color:#58a6ff;font-weight:700">17:08</td><td>Stratford</td><td>Morning Mayhem</td><td>3.25</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">2</span></td><td><span class="flag-chip">Rivals Close</span></td><td><span class="won-pill">✗ WON</span></td></tr>
+    <tr><td>29 Mar</td><td style="color:#58a6ff;font-weight:700">14:30</td><td>Doncaster</td><td>Shazani</td><td>5.00</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="lost-pill">✓ BEATEN</span></td></tr>
+    <tr><td>30 Mar</td><td style="color:#58a6ff;font-weight:700">17:30</td><td>Wolverhampton</td><td>Al Durry</td><td>3.25</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">1</span></td><td><span class="flag-chip">Low Score Gap</span></td><td><span class="won-pill">✗ WON</span></td></tr>
+    <tr><td>30 Mar</td><td style="color:#58a6ff;font-weight:700">18:30</td><td>Wolverhampton</td><td>Layla Liz</td><td>3.25</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">3</span></td><td><span class="flag-chip">Rivals Close</span><span class="flag-chip">Low Score Gap</span></td><td><span class="won-pill">✗ WON</span></td></tr>
+    <tr><td>31 Mar</td><td style="color:#58a6ff;font-weight:700">13:45</td><td>Bangor-on-Dee</td><td>Coumeenoole</td><td>2.88</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">2</span></td><td><span class="flag-chip">Rivals Close</span></td><td><span class="won-pill">✗ WON</span></td></tr>
+    <tr><td>31 Mar</td><td style="color:#58a6ff;font-weight:700">14:15</td><td>Bangor-on-Dee</td><td>Halftheworldaway</td><td>1.91</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">1</span></td><td><span class="flag-chip">Short Price</span></td><td><span class="won-pill">✗ WON</span></td></tr>
+    <tr><td>31 Mar</td><td style="color:#58a6ff;font-weight:700">15:00</td><td>Newcastle</td><td>Fingal's Hill</td><td>3.75</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="won-pill" style="color:#fbbf24;border-color:rgba(251,191,36,0.4)">PLACED</span></td></tr>
+    <tr><td>31 Mar</td><td style="color:#58a6ff;font-weight:700">15:15</td><td>Bangor-on-Dee</td><td>Halftheworldaway</td><td>2.75</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">1</span></td><td><span class="flag-chip">Low Score Gap</span></td><td><span class="won-pill">✗ WON</span></td></tr>
+    <tr><td>31 Mar</td><td style="color:#58a6ff;font-weight:700">19:30</td><td>Wolverhampton</td><td>Simplify</td><td>3.00</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">2</span></td><td><span class="flag-chip">Rivals Close</span></td><td><span class="won-pill">✗ WON</span></td></tr>
+    <tr><td>1 Apr</td><td style="color:#58a6ff;font-weight:700">15:20</td><td>Wincanton</td><td>Kingcormac</td><td>3.25</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="lost-pill">✓ BEATEN</span></td></tr>
+    <tr><td>1 Apr</td><td style="color:#58a6ff;font-weight:700">16:45</td><td>Dundalk</td><td>I'm Spartacus</td><td>4.50</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="lost-pill">✓ BEATEN</span></td></tr>
+    <tr><td>1 Apr</td><td style="color:#58a6ff;font-weight:700">18:30</td><td>Kempton</td><td>Moment Of Light</td><td>2.20</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">1</span></td><td><span class="flag-chip">Short Price</span></td><td><span class="won-pill">✗ WON</span></td></tr>
+    <tr><td>2 Apr</td><td style="color:#58a6ff;font-weight:700">13:40</td><td>Kelso</td><td>Word For Word</td><td>3.25</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">1</span></td><td><span class="flag-chip">Low Score Gap</span></td><td><span class="lost-pill">✓ BEATEN</span></td></tr>
+    <tr><td>2 Apr</td><td style="color:#58a6ff;font-weight:700">14:00</td><td>Chepstow</td><td>Supreme George</td><td>2.75</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="won-pill">✗ WON</span></td></tr>
+    <tr><td>2 Apr</td><td style="color:#58a6ff;font-weight:700">15:07</td><td>Chepstow</td><td>So You Know</td><td>4.50</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="lost-pill">✓ BEATEN</span></td></tr>
+    <tr><td>3 Apr</td><td style="color:#58a6ff;font-weight:700">13:25</td><td>Newcastle</td><td>Stateira</td><td>2.63</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="won-pill">✗ WON</span></td></tr>
+    <tr><td>3 Apr</td><td style="color:#58a6ff;font-weight:700">14:07</td><td>Curragh</td><td>Faiyum</td><td>2.38</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="won-pill" style="color:#fbbf24;border-color:rgba(251,191,36,0.4)">PLACED</span></td></tr>
+    <tr><td>3 Apr</td><td style="color:#58a6ff;font-weight:700">14:35</td><td>Newcastle</td><td>Sir Les Patterson</td><td>5.50</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="lost-pill">✓ BEATEN</span></td></tr>
+    <tr><td>3 Apr</td><td style="color:#58a6ff;font-weight:700">15:10</td><td>Newcastle</td><td>Regal Ulixes</td><td>3.25</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="lost-pill">✓ BEATEN</span></td></tr>
+    <tr><td>4 Apr</td><td style="color:#58a6ff;font-weight:700">12:25</td><td>Musselburgh</td><td>Comic Hero</td><td>3.00</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="lost-pill">✓ BEATEN</span></td></tr>
+    <tr style="background:rgba(239,68,68,0.05)"><td>4 Apr</td><td style="color:#58a6ff;font-weight:700">14:00</td><td>Newton Abbot</td><td>Dutch Corner</td><td>2.32</td><td><span class="score-chip" style="background:rgba(251,191,36,0.15);color:#fbbf24;font-weight:800">5</span></td><td><span class="flag-chip">Going Unproven</span><span class="flag-chip">Trip Unproven</span><span class="flag-chip">Pace Doubt</span></td><td><span class="won-pill">✗ WON</span></td></tr>
+    <tr style="background:rgba(52,211,153,0.04)"><td>4 Apr</td><td style="color:#58a6ff;font-weight:700">17:05</td><td>Haydock</td><td>Saladins Son</td><td>4.50</td><td><span class="score-chip" style="background:rgba(249,115,22,0.2);color:#f97316;font-weight:800">6</span></td><td><span class="flag-chip">Going Unproven</span><span class="flag-chip">Trip Unproven</span><span class="flag-chip">Low Score Gap</span><span class="flag-chip">Pace Doubt</span></td><td><span class="lost-pill">✓ BEATEN</span></td></tr>
+    <tr><td>5 Apr</td><td style="color:#58a6ff;font-weight:700">13:40</td><td>Fairyhouse</td><td>Leader D'allier</td><td>1.73</td><td><span class="score-chip" style="background:rgba(148,163,184,0.1);color:#94a3b8">0</span></td><td>—</td><td><span class="lost-pill">✓ BEATEN</span></td></tr>
+    <tr style="background:rgba(52,211,153,0.04)"><td>5 Apr</td><td style="color:#58a6ff;font-weight:700">14:25</td><td>Cork</td><td><strong>Kimi De Mai</strong></td><td>1.53</td><td><span class="score-chip" style="background:rgba(251,191,36,0.15);color:#fbbf24;font-weight:800">4</span></td><td><span class="flag-chip">Short Price</span><span class="flag-chip">Going Unproven</span><span class="flag-chip">Pace Doubt</span></td><td><span class="lost-pill">✓ BEATEN</span></td></tr>
+    <tr><td>5 Apr</td><td style="color:#f87171;font-weight:700">—</td><td>Fairyhouse</td><td>Zanoosh</td><td>—</td><td>—</td><td>Pending</td><td style="color:rgba(255,255,255,0.3)">⏳ Pending</td></tr>
+  </tbody>
+</table>
+
+<!-- Key insight box -->
+<div style="background:linear-gradient(135deg,rgba(52,211,153,0.1) 0%,rgba(16,185,129,0.06) 100%);border:1px solid rgba(52,211,153,0.3);border-radius:12px;padding:20px 24px;margin-bottom:24px;">
+  <div style="font-size:14px;font-weight:800;color:#34d399;margin-bottom:10px;">📊 Key Takeaway</div>
+  <div style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7;">
+    Of 26 settled races this week, <strong style="color:white">12 favourites were beaten (46.2% base rate)</strong> — the model only flagged 3 as vulnerable (score ≥ 4).
+    <strong style="color:#34d399">2 of those 3 were beaten (66.7%)</strong>, vs 46.2% baseline — a meaningful uplift.
+    The strongest signal was <strong style="color:#f97316">Saladins Son (6pts)</strong>, beaten at Haydock.
+    <strong style="color:#fbbf24">Kimi De Mai (4pts, 8/15 odds-on)</strong> was also beaten today — exactly the type the model is built to catch.
+    <br><br>
+    <strong>Note:</strong> No races scored ≥ 8 this week — the high-confidence threshold (8+) is reserved for horses with multiple compounding structural weaknesses. 
+    As more races settle nightly, the sample will grow and confidence bands will tighten.
+  </div>
+</div>
+
+<div class="footer">
+  SureBet AI · Lay the Favourite Backtest · 26 races · 28 Mar – 5 Apr 2026<br>
+  Results sourced from Betfair exchange data via DynamoDB<br>
+  Small sample — use for model validation, not standalone betting decisions
+</div>
+
+</body>
+</html>

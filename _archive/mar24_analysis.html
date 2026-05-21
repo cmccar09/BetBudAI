@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>March 24, 2026 – Race Results Analysis</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1117; color: #e2e8f0; line-height: 1.6; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 4px; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 36px; }
+  h2 { font-size: 1.2rem; font-weight: 600; color: #cbd5e1; margin: 32px 0 14px; border-left: 3px solid #6366f1; padding-left: 10px; }
+  h3 { font-size: 1rem; font-weight: 600; color: #94a3b8; margin-bottom: 8px; }
+
+  /* Summary row */
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .tile { background: #1e2433; border: 1px solid #2d3748; border-radius: 10px; padding: 18px 20px; text-align: center; }
+  .tile .value { font-size: 2.2rem; font-weight: 800; }
+  .tile .label { font-size: 0.78rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .04em; margin-top: 4px; }
+  .win { color: #22c55e; }
+  .placed { color: #f59e0b; }
+  .loss { color: #ef4444; }
+  .info { color: #818cf8; }
+
+  /* Picks table */
+  .picks-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .picks-table th { background: #1a2035; color: #94a3b8; font-weight: 600; text-align: left; padding: 10px 12px; border-bottom: 1px solid #2d3748; font-size: 0.75rem; text-transform: uppercase; letter-spacing: .05em; }
+  .picks-table td { padding: 10px 12px; border-bottom: 1px solid #1e2433; vertical-align: top; }
+  .picks-table tr:hover td { background: #1a2035; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+  .badge-win { background: #14532d; color: #4ade80; }
+  .badge-placed { background: #78350f; color: #fbbf24; }
+  .badge-loss { background: #450a0a; color: #f87171; }
+  .badge-notpicked { background: #1e293b; color: #64748b; }
+  .score-high { color: #22c55e; font-weight: 700; }
+  .score-mid { color: #f59e0b; font-weight: 700; }
+  .score-low { color: #ef4444; font-weight: 700; }
+  .breakdown-bar { display: flex; flex-wrap: wrap; gap: 4px; }
+  .signal { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 0.72rem; color: #e2e8f0; }
+  .sig-pos { background: #1a3a2a; border: 1px solid #166534; }
+  .sig-neg { background: #3a1a1a; border: 1px solid #991b1b; }
+  .sig-inflate { background: #3a2a1a; border: 1px solid #b45309; }
+
+  /* Weight table */
+  .weight-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .weight-table th { background: #1a2035; color: #94a3b8; font-weight: 600; text-align: left; padding: 8px 12px; border-bottom: 1px solid #2d3748; font-size: 0.75rem; text-transform: uppercase; letter-spacing: .04em; }
+  .weight-table td { padding: 8px 12px; border-bottom: 1px solid #1e2433; }
+  .weight-table tr:hover td { background: #1a2035; }
+  .changed { color: #fbbf24; }
+  .removed { color: #ef4444; font-style: italic; }
+  .arrow-up { color: #22c55e; }
+  .arrow-down { color: #ef4444; }
+
+  /* Analysis box */
+  .analysis-box { background: #1e2433; border: 1px solid #2d3748; border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .analysis-box ul { margin-top: 8px; padding-left: 20px; }
+  .analysis-box li { margin-bottom: 6px; color: #cbd5e1; }
+  .highlight { background: #312e81; border-left: 4px solid #6366f1; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; }
+  .warn-box { background: #451a03; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; }
+  .ok-box { background: #052e16; border-left: 4px solid #22c55e; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; }
+
+  /* Winner comparison */
+  .race-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+  .race-card { background: #1e2433; border: 1px solid #2d3748; border-radius: 10px; padding: 16px 18px; }
+  .race-card .race-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .race-card .race-name { font-weight: 600; color: #e2e8f0; font-size: 0.9rem; }
+  .race-card .race-time { font-size: 0.8rem; color: #64748b; }
+  .horse-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #1e2433; }
+  .horse-row:last-child { border-bottom: none; }
+  .horse-name { font-size: 0.85rem; }
+  .horse-score { font-size: 0.8rem; color: #94a3b8; }
+
+  footer { text-align: center; color: #475569; font-size: 0.78rem; margin-top: 48px; }
+  code { background: #1e2433; padding: 1px 5px; border-radius: 3px; font-size: 0.85em; color: #a5b4fc; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>March 24, 2026 — Race Results Analysis</h1>
+  <p class="subtitle">Post-race review &bull; Weight revert analysis &bull; Refinement recommendations</p>
+
+  <!-- Summary tiles -->
+  <div class="summary-grid">
+    <div class="tile"><div class="value win">WIN</div><div class="label">Stanners Glen</div></div>
+    <div class="tile"><div class="value placed">PLACED</div><div class="label">At The Oche</div></div>
+    <div class="tile"><div class="value loss">3</div><div class="label">Losses (Mar 24 picks)</div></div>
+    <div class="tile"><div class="value info">1</div><div class="label">Picks removed by revert</div></div>
+  </div>
+
+  <!-- All picks with outcomes -->
+  <h2>All Picks With Outcomes Recorded</h2>
+  <table class="picks-table">
+    <thead>
+      <tr>
+        <th>Race Time</th>
+        <th>Course</th>
+        <th>Horse</th>
+        <th>Score</th>
+        <th>Odds (Betfair)</th>
+        <th>Outcome</th>
+        <th>Key Signals</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Mar 23 races stored under Mar 24 bet_date -->
+      <tr>
+        <td>Mar 23 14:45</td>
+        <td>Wincanton</td>
+        <td><strong>At The Oche</strong></td>
+        <td class="score-high">87</td>
+        <td>4.0 (3/1)</td>
+        <td><span class="badge badge-placed">PLACED</span></td>
+        <td>
+          <div class="breakdown-bar">
+            <span class="signal sig-pos">going +16</span>
+            <span class="signal sig-pos">consistency +16</span>
+            <span class="signal sig-pos">market_leader +12</span>
+            <span class="signal sig-pos">sweet_spot +12</span>
+            <span class="signal sig-pos">optimal_odds +10</span>
+            <span class="signal sig-pos">age_bonus +10</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Mar 23 15:15</td>
+        <td>Wincanton</td>
+        <td><strong>Stanners Glen</strong></td>
+        <td class="score-high">87</td>
+        <td>2.1 (EVS)</td>
+        <td><span class="badge badge-win">WIN ✓</span></td>
+        <td>
+          <div class="breakdown-bar">
+            <span class="signal sig-pos">total_wins +16</span>
+            <span class="signal sig-pos">going +16</span>
+            <span class="signal sig-pos">consistency +12</span>
+            <span class="signal sig-pos">market_leader +12</span>
+            <span class="signal sig-pos">cd_bonus +9</span>
+            <span class="signal sig-pos">trainer_rep +8</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Mar 23 20:30</td>
+        <td>Wolverhampton</td>
+        <td><strong>Yorkshire Glory</strong></td>
+        <td class="score-high">96</td>
+        <td>2.5 (6/4)</td>
+        <td><span class="badge badge-win">WIN ✓</span></td>
+        <td>
+          <div class="breakdown-bar">
+            <span class="signal sig-pos">total_wins +40</span>
+            <span class="signal sig-pos">market_leader +12</span>
+            <span class="signal sig-pos">distance +12</span>
+            <span class="signal sig-pos">age_bonus +10</span>
+            <span class="signal sig-pos">going +8</span>
+          </div>
+        </td>
+      </tr>
+      <!-- Mar 24 actual race picks -->
+      <tr>
+        <td>Mar 24 15:45</td>
+        <td>Taunton</td>
+        <td>Wicked Thoughts</td>
+        <td class="score-mid">81</td>
+        <td>4.0 (3/1)</td>
+        <td><span class="badge badge-loss">LOSS</span></td>
+        <td>
+          <div class="breakdown-bar">
+            <span class="signal sig-pos">total_wins +16</span>
+            <span class="signal sig-pos">going +16</span>
+            <span class="signal sig-pos">sweet_spot +12</span>
+            <span class="signal sig-pos">cd_bonus +9</span>
+            <span class="signal sig-pos">jockey +6</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Mar 24 16:15</td>
+        <td>Taunton</td>
+        <td>Knock Off Soxs</td>
+        <td class="score-mid">88</td>
+        <td>4.5 (7/2)</td>
+        <td><span class="badge badge-loss">LOSS</span></td>
+        <td>
+          <div class="breakdown-bar">
+            <span class="signal sig-pos">total_wins +16</span>
+            <span class="signal sig-pos">going +16</span>
+            <span class="signal sig-pos">consistency +12</span>
+            <span class="signal sig-pos">sweet_spot +12</span>
+            <span class="signal sig-pos">optimal_odds +10</span>
+            <span class="signal sig-pos">age_bonus +10</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Mar 24 16:30</td>
+        <td>Southwell</td>
+        <td>Karton Plein</td>
+        <td class="score-mid">83</td>
+        <td>4.5 (7/2)</td>
+        <td><span class="badge badge-loss">LOSS</span></td>
+        <td>
+          <div class="breakdown-bar">
+            <span class="signal sig-pos">market_leader +12</span>
+            <span class="signal sig-pos">sweet_spot +12</span>
+            <span class="signal sig-pos">optimal_odds +10</span>
+            <span class="signal sig-pos">cd_bonus +9</span>
+            <span class="signal sig-pos">trainer_rep +8</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Mar 24 20:00</td>
+        <td>Wolverhampton</td>
+        <td>Burdett Estate</td>
+        <td class="score-mid" style="color:#f59e0b">82→92<br><small style="color:#64748b;font-size:0.7rem">with bonus</small></td>
+        <td>5.0 (4/1)</td>
+        <td><span class="badge badge-loss">LOSS</span></td>
+        <td>
+          <div class="breakdown-bar">
+            <span class="signal sig-inflate">⚠ unexposed_bonus +15</span>
+            <span class="signal sig-pos">sweet_spot +12</span>
+            <span class="signal sig-pos">optimal_odds +10</span>
+            <span class="signal sig-pos">age_bonus +10</span>
+            <span class="signal sig-pos">cd_bonus +9</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Mar 24 20:30</td>
+        <td>Wolverhampton</td>
+        <td>Mr Nugget</td>
+        <td class="score-high">87</td>
+        <td>5.5 (9/2)</td>
+        <td><span class="badge badge-loss">LOSS</span></td>
+        <td>
+          <div class="breakdown-bar">
+            <span class="signal sig-pos">total_wins +24</span>
+            <span class="signal sig-pos">sweet_spot +12</span>
+            <span class="signal sig-pos">optimal_odds +10</span>
+            <span class="signal sig-pos">age_bonus +10</span>
+            <span class="signal sig-pos">cd_bonus +9</span>
+            <span class="signal sig-pos">consistency +8</span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Root cause analysis -->
+  <h2>Root Cause Analysis — Burdett Estate (Blamedworthy Pick)</h2>
+
+  <div class="analysis-box">
+    <div class="warn-box">
+      <strong>Problem: <code>unexposed_bonus</code> artificially inflated Burdett Estate's score</strong><br>
+      Burdett Estate had no market support, no track record, and no going suitability signal — yet scored 82 without the bonus.
+      The <code>unexposed_bonus</code> (+15 pts for ≤4yo, ≤5 career runs, ≥40% win rate) pushed it to 92 and ensured it was displayed as a top pick.
+    </div>
+    <ul>
+      <li><strong>Without <code>unexposed_bonus</code>:</strong> Burdett Estate scores 67 (below 85 threshold → &nbsp;<em>not shown as a pick</em>)</li>
+      <li><strong>With <code>unexposed_bonus</code>:</strong> Score jumps to 82/92 → shown in top 5</li>
+      <li><strong>What the horse actually had:</strong> Only 3 career runs, but no course/distance wins, no market backing, no going-specific form — absence of evidence is not evidence of ability</li>
+      <li><strong>What winning horses had:</strong> Yorkshire Glory, Stanners Glen all had proven race records — <code>total_wins</code> high, <code>going_suitability</code> confirmed, <code>cd_bonus</code> triggered by actual wins</li>
+    </ul>
+    <div class="ok-box">
+      <strong>Fix applied:</strong> The <code>unexposed_bonus</code> block has been removed from <code>comprehensive_pick_logic.py</code>.
+      Burdett Estate would now score 67 and be filtered out. The other March 24 losses (Knock Off Soxs, Mr Nugget) would still appear — they had genuinely strong signals; the race simply didn't go their way.
+    </div>
+  </div>
+
+  <!-- Winner comparison -->
+  <h2>What Winning Horses Had (vs. Losing Picks)</h2>
+
+  <div class="race-cards">
+    <div class="race-card">
+      <div class="race-header">
+        <span class="race-name">Wincanton 15:15 — Stanners Glen</span>
+        <span class="badge badge-win">WIN</span>
+      </div>
+      <h3>Key signals that fired correctly</h3>
+      <div class="horse-row"><span class="horse-name">Going suitability</span><span class="horse-score win">+16</span></div>
+      <div class="horse-row"><span class="horse-name">Total wins form</span><span class="horse-score win">+16</span></div>
+      <div class="horse-row"><span class="horse-name">Consistency (places)</span><span class="horse-score win">+12</span></div>
+      <div class="horse-row"><span class="horse-name">Market leader (fav)</span><span class="horse-score win">+12</span></div>
+      <div class="horse-row"><span class="horse-name">C/D bonus</span><span class="horse-score win">+9</span></div>
+      <div class="horse-row"><span class="horse-name">Trainer reputation</span><span class="horse-score win">+8</span></div>
+    </div>
+    <div class="race-card">
+      <div class="race-header">
+        <span class="race-name">Wolverhampton 20:30 — Yorkshire Glory</span>
+        <span class="badge badge-win">WIN (Mar 23)</span>
+      </div>
+      <h3>Strong proven-form signals</h3>
+      <div class="horse-row"><span class="horse-name">Total wins (many wins)</span><span class="horse-score win">+40</span></div>
+      <div class="horse-row"><span class="horse-name">Market leader</span><span class="horse-score win">+12</span></div>
+      <div class="horse-row"><span class="horse-name">Distance suitability</span><span class="horse-score win">+12</span></div>
+      <div class="horse-row"><span class="horse-name">Age bonus</span><span class="horse-score win">+10</span></div>
+      <div class="horse-row"><span class="horse-name">Going suitability</span><span class="horse-score win">+8</span></div>
+    </div>
+    <div class="race-card">
+      <div class="race-header">
+        <span class="race-name">Taunton 16:15 — Knock Off Soxs</span>
+        <span class="badge badge-loss">LOSS</span>
+      </div>
+      <h3>Missing: market &amp; trainer support</h3>
+      <div class="horse-row"><span class="horse-name">Total wins</span><span class="horse-score win">+16</span></div>
+      <div class="horse-row"><span class="horse-name">Going suitability</span><span class="horse-score win">+16</span></div>
+      <div class="horse-row"><span class="horse-name">Consistency</span><span class="horse-score win">+12</span></div>
+      <div class="horse-row"><span class="horse-name">Market leader</span><span class="horse-score loss">— (none)</span></div>
+      <div class="horse-row"><span class="horse-name">Trainer reputation</span><span class="horse-score loss">— (none)</span></div>
+      <div class="horse-row"><span class="horse-name">Age bonus (padded score)</span><span class="horse-score" style="color:#f59e0b">+10</span></div>
+    </div>
+    <div class="race-card">
+      <div class="race-header">
+        <span class="race-name">Wolverhampton 20:30 — Mr Nugget</span>
+        <span class="badge badge-loss">LOSS</span>
+      </div>
+      <h3>Strong form but no market backing</h3>
+      <div class="horse-row"><span class="horse-name">Total wins (high)</span><span class="horse-score win">+24</span></div>
+      <div class="horse-row"><span class="horse-name">Sweet spot</span><span class="horse-score win">+12</span></div>
+      <div class="horse-row"><span class="horse-name">Market leader</span><span class="horse-score loss">— (none)</span></div>
+      <div class="horse-row"><span class="horse-name">Trainer reputation</span><span class="horse-score loss">— (none)</span></div>
+      <div class="horse-row"><span class="horse-name">C/D bonus</span><span class="horse-score win">+9</span></div>
+    </div>
+  </div>
+
+  <!-- Pattern insight -->
+  <h2>Pattern Insight: What Discriminates Winners From Losers</h2>
+  <div class="analysis-box">
+    <p>Across the March 23–24 data, winners shared a distinct cluster of signals:</p>
+    <ul style="margin-top:12px">
+      <li><strong>Market backing</strong> — all three winning horses fired <code>market_leader</code> (+12 for favourite, +5 for 2nd choice). None of the March 24 losses had it. This is the single clearest discriminator in this sample.</li>
+      <li><strong>Going suitability + form wins combination</strong> — winners had both <code>going_suitability</code> AND high <code>total_wins</code>. Losers often had one but not both.</li>
+      <li><strong>Trainer reputation</strong> — Stanners Glen's winning run was supported by a reputable trainer. Knock Off Soxs and Mr Nugget had no trainer signal.</li>
+      <li><strong>Losses relied on softer signals</strong> — <code>age_bonus</code>, <code>optimal_odds</code>, and <code>sweet_spot</code> contributed heavily to losing picks. These signals are informative but not sufficient alone.</li>
+    </ul>
+    <div class="highlight">
+      <strong>Recommendation:</strong> The <code>market_leader</code> signal (hardcoded at 12 pts in <code>complete_daily_analysis.py</code>) is doing useful work. Consider whether picks without ANY <code>market_leader</code> signal (i.e., not favourite or close 2nd) should require a higher base score (e.g. ≥90 rather than 85) before being displayed.
+    </div>
+  </div>
+
+  <!-- Weight changes table -->
+  <h2>Weight Changes — Monday Revert Applied</h2>
+  <p style="color:#94a3b8; margin-bottom:14px; font-size:0.9rem">Changes from Tuesday's ("Mar 23") weights back to Monday's ("8b66348") baseline. Structural code fixes from Mar 23 are retained.</p>
+  <table class="weight-table">
+    <thead>
+      <tr>
+        <th>Parameter</th>
+        <th>Monday (Baseline)</th>
+        <th>Tuesday (Reverted from)</th>
+        <th>Now (Restored)</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>trainer_reputation</code></td>
+        <td>15</td>
+        <td class="changed">12</td>
+        <td class="arrow-up">15 ↑</td>
+        <td>Restored — Stanners Glen's winning trainer fired this signal</td>
+      </tr>
+      <tr>
+        <td><code>jockey_quality</code></td>
+        <td>12</td>
+        <td class="changed">8</td>
+        <td class="arrow-up">12 ↑</td>
+        <td>Restored — elite jockey tier 1</td>
+      </tr>
+      <tr>
+        <td><code>jockey_tier2</code></td>
+        <td>6</td>
+        <td class="changed">4</td>
+        <td class="arrow-up">6 ↑</td>
+        <td>Restored proportionally</td>
+      </tr>
+      <tr>
+        <td><code>cd_bonus</code></td>
+        <td>18</td>
+        <td class="changed">22</td>
+        <td class="arrow-down">18 ↓</td>
+        <td>Restored — reduces over-weighting of C/D signal</td>
+      </tr>
+      <tr>
+        <td><code>meeting_focus_trainer</code></td>
+        <td>10</td>
+        <td class="changed">7</td>
+        <td class="arrow-up">10 ↑</td>
+        <td>Restored</td>
+      </tr>
+      <tr>
+        <td><code>meeting_focus_jockey</code></td>
+        <td>10</td>
+        <td class="changed">9</td>
+        <td class="arrow-up">10 ↑</td>
+        <td>Restored</td>
+      </tr>
+      <tr>
+        <td><code>unexposed_bonus</code></td>
+        <td class="removed">did not exist</td>
+        <td class="changed">+15 pts inline</td>
+        <td class="removed">REMOVED</td>
+        <td style="color:#ef4444">⚠ Root cause of Burdett Estate false pick. Removed entirely.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Code fixes retained -->
+  <h2>Code Fixes Retained From Mar 23 (Not Reverted)</h2>
+  <div class="analysis-box">
+    <p>These improvements from the Mar 23 commits are <strong>kept</strong> — they fixed real model bugs:</p>
+    <ul style="margin-top:10px">
+      <li><strong>Meeting focus MAX cap</strong> — Previously trainer + jockey + combo all fired independently (up to 30 pts). Now takes <code>max()</code> of the three signals (up to 10 pts). Prevents stacking on a single meeting focus signal.</li>
+      <li><strong>Going suitability cap at 20 pts</strong> — Prevents going being the sole driver of a pick (Kalista Love lesson).</li>
+      <li><strong><code>cd_bonus</code> fallback from <code>prev_results</code></strong> — When <code>cd_marker</code> not in horse data, scans last-race results directly. Ensures Hello Judge-style C/D winners are captured.</li>
+      <li><strong>AW surface detection</strong> — Separates <code>aw_wins</code> from <code>turf_wins</code> in form parsing. AW wins don't count toward soft-turf suitability (Quatre Bras lesson).</li>
+      <li><strong>Longshot penalty for odds &gt;20.0</strong> — Applies <code>-(sweet_spot × 2)</code> ≈ −24 pts to extreme outsiders.</li>
+    </ul>
+  </div>
+
+  <!-- Recommendations -->
+  <h2>Recommendations for Future Refinement</h2>
+  <div class="analysis-box">
+    <div class="highlight">
+      <strong>Suggestion 1 — Market-backed threshold</strong><br>
+      Picks with no <code>market_leader</code> signal (horse not favourite or close 2nd) should require a higher confidence score before display — e.g. raise the minimum to 90 instead of 85 for non-market-backed selections. This would have removed Knock Off Soxs (88) from the March 24 display.
+    </div>
+    <div class="highlight" style="margin-top: 12px">
+      <strong>Suggestion 2 — Trainer reputation as a gate</strong><br>
+      Consider requiring at least one of: <code>market_leader &gt; 0</code>, <code>trainer_reputation &gt; 0</code>, or <code>cd_bonus &gt; 0</code> to qualify for display. Mr Nugget had none of these contextual signals despite high raw form score.
+    </div>
+    <div class="highlight" style="margin-top: 12px">
+      <strong>Suggestion 3 — Monitor age_bonus contributions</strong><br>
+      Several losses scored well partly because of <code>age_bonus</code> (+10 pts). Age alone is not a reliable predictor — if a horse's age_bonus is a significant proportion of its total score without strong form signals, it may indicate a weaker pick.
+    </div>
+    <p style="color:#64748b; font-size:0.82rem; margin-top: 16px">Note: These are pattern observations from a small sample (5 picks, 2 days). Weight changes should only be locked in after validating across a larger dataset.</p>
+  </div>
+
+  <footer>
+    Generated: March 25, 2026 &bull; FuturegenAI Betting System &bull; <em>Internal analysis only</em>
+  </footer>
+</div>
+</body>
+</html>

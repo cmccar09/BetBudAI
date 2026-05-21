@@ -1,0 +1,3125 @@
+{
+  "summary": {
+    "date_range": [
+      "2026-05-07",
+      "2026-05-13"
+    ],
+    "races_analyzed": 220,
+    "hits": 41,
+    "misses": 179,
+    "hit_rate_pct": 18.64,
+    "cause_counts": [
+      [
+        "winner_missing_from_modeled_field",
+        67
+      ],
+      [
+        "potential_improver_flag_noise",
+        53
+      ],
+      [
+        "other_model_miss",
+        39
+      ],
+      [
+        "winner_ranked_6plus",
+        35
+      ],
+      [
+        "winner_double_digit_odds",
+        35
+      ],
+      [
+        "race_had_3plus_nonrunners",
+        15
+      ],
+      [
+        "narrow_gap_10_or_less",
+        10
+      ],
+      [
+        "potential_improver_flagged_actual_winner",
+        4
+      ]
+    ]
+  },
+  "races": [
+    {
+      "race_time": "2026-05-07T12:15:00+00:00",
+      "course": "huntingdon",
+      "winner": "Loriko",
+      "top_pick": "Loriko",
+      "hit": true,
+      "top_score": 113.0,
+      "winner_score": 113.0,
+      "winner_rank": 1,
+      "winner_odds": 1.57,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-07T12:30:00+00:00",
+      "course": "chester",
+      "winner": "Roman Dragon",
+      "top_pick": "Arklow Lad",
+      "hit": false,
+      "top_score": 94.0,
+      "winner_score": 42.0,
+      "winner_rank": 8,
+      "winner_odds": 3.5,
+      "reasons": [
+        "winner_ranked_6plus",
+        "race_had_3plus_nonrunners",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T12:45:00+00:00",
+      "course": "huntingdon",
+      "winner": "Hurricane Bay",
+      "top_pick": "Pep Talking",
+      "hit": false,
+      "top_score": 65.0,
+      "winner_score": -2.0,
+      "winner_rank": 6,
+      "winner_odds": 9.0,
+      "reasons": [
+        "winner_ranked_6plus"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T13:05:00+00:00",
+      "course": "chester",
+      "winner": "Jan Brueghel",
+      "top_pick": "Caturra Lights",
+      "hit": false,
+      "top_score": 25.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T13:15:00+00:00",
+      "course": "huntingdon",
+      "winner": "Catwalk Girl",
+      "top_pick": "Another Day Out",
+      "hit": false,
+      "top_score": 13.0,
+      "winner_score": -4.0,
+      "winner_rank": 3,
+      "winner_odds": 5.3,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T13:25:00+00:00",
+      "course": "windsor",
+      "winner": "Cameley Days",
+      "top_pick": "Cameley Days",
+      "hit": true,
+      "top_score": 82.0,
+      "winner_score": 82.0,
+      "winner_rank": 1,
+      "winner_odds": 7.2,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-07T13:35:00+00:00",
+      "course": "chester",
+      "winner": "Mcmurray",
+      "top_pick": "Constitution River",
+      "hit": false,
+      "top_score": 120.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T13:45:00+00:00",
+      "course": "huntingdon",
+      "winner": "Mermaids Cave",
+      "top_pick": "Hope Rising",
+      "hit": false,
+      "top_score": 60.0,
+      "winner_score": 20.0,
+      "winner_rank": 5,
+      "winner_odds": 4.0,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T13:55:00+00:00",
+      "course": "windsor",
+      "winner": "Jazl",
+      "top_pick": "Starryfield",
+      "hit": false,
+      "top_score": 97.0,
+      "winner_score": 69.0,
+      "winner_rank": 2,
+      "winner_odds": 2.2,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T14:05:00+00:00",
+      "course": "chester",
+      "winner": "Donegal Rose",
+      "top_pick": "Al Qareem",
+      "hit": false,
+      "top_score": 120.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T14:15:00+00:00",
+      "course": "huntingdon",
+      "winner": "Braganza Bay",
+      "top_pick": "Indian Sunbird",
+      "hit": false,
+      "top_score": 8.0,
+      "winner_score": -18.0,
+      "winner_rank": 6,
+      "winner_odds": 6.0,
+      "reasons": [
+        "winner_ranked_6plus"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T14:27:00+00:00",
+      "course": "windsor",
+      "winner": "Zarathos",
+      "top_pick": "Kodi Fire",
+      "hit": false,
+      "top_score": 90.0,
+      "winner_score": 54.0,
+      "winner_rank": 5,
+      "winner_odds": 4.8,
+      "reasons": [
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T14:40:00+00:00",
+      "course": "chester",
+      "winner": "Constitution River",
+      "top_pick": "Cool Molly",
+      "hit": false,
+      "top_score": 120.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T14:50:00+00:00",
+      "course": "huntingdon",
+      "winner": "St Julie",
+      "top_pick": "Island Getaway",
+      "hit": false,
+      "top_score": 27.0,
+      "winner_score": -36.0,
+      "winner_rank": 3,
+      "winner_odds": 4.0,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T15:00:00+00:00",
+      "course": "windsor",
+      "winner": "Moon Over The Sea",
+      "top_pick": "Ricardo Phillips",
+      "hit": false,
+      "top_score": 57.0,
+      "winner_score": 52.0,
+      "winner_rank": 3,
+      "winner_odds": 3.95,
+      "reasons": [
+        "narrow_gap_10_or_less"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T15:10:00+00:00",
+      "course": "chester",
+      "winner": "Jan Brueghel",
+      "top_pick": "Rastnet",
+      "hit": false,
+      "top_score": 95.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T15:35:00+00:00",
+      "course": "windsor",
+      "winner": "Bizou",
+      "top_pick": "Happy Chandler",
+      "hit": false,
+      "top_score": 98.0,
+      "winner_score": 64.0,
+      "winner_rank": 3,
+      "winner_odds": 3.85,
+      "reasons": [
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T15:40:00+00:00",
+      "course": "redcar",
+      "winner": "Song Of The Clouds",
+      "top_pick": "Song Of The Clouds",
+      "hit": true,
+      "top_score": 114.0,
+      "winner_score": 114.0,
+      "winner_rank": 1,
+      "winner_odds": 2.62,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-07T15:45:00+00:00",
+      "course": "chester",
+      "winner": "Mcmurray",
+      "top_pick": "Mythical Bay",
+      "hit": false,
+      "top_score": 123.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T16:02:00+00:00",
+      "course": "wexford",
+      "winner": "Wild Bill Hickok",
+      "top_pick": "Karoline Banbou",
+      "hit": false,
+      "top_score": 116.0,
+      "winner_score": 55.0,
+      "winner_rank": 6,
+      "winner_odds": 13.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T16:10:00+00:00",
+      "course": "windsor",
+      "winner": "Twirler",
+      "top_pick": "Midnight Call",
+      "hit": false,
+      "top_score": 100.0,
+      "winner_score": 41.0,
+      "winner_rank": 6,
+      "winner_odds": 9.0,
+      "reasons": [
+        "winner_ranked_6plus"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T16:15:00+00:00",
+      "course": "redcar",
+      "winner": "One Of Our Own",
+      "top_pick": "Canaria Sun",
+      "hit": false,
+      "top_score": 37.0,
+      "winner_score": 35.0,
+      "winner_rank": 2,
+      "winner_odds": 5.1,
+      "reasons": [
+        "narrow_gap_10_or_less"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T16:35:00+00:00",
+      "course": "wexford",
+      "winner": "Butter Fingers",
+      "top_pick": "Let Him B",
+      "hit": false,
+      "top_score": 95.0,
+      "winner_score": 52.0,
+      "winner_rank": 4,
+      "winner_odds": 4.8,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T16:50:00+00:00",
+      "course": "redcar",
+      "winner": "Run This Way",
+      "top_pick": "Barmyblade",
+      "hit": false,
+      "top_score": 90.0,
+      "winner_score": -9.0,
+      "winner_rank": 8,
+      "winner_odds": 10.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T17:00:00+00:00",
+      "course": "southwell",
+      "winner": "Lauralynn",
+      "top_pick": "Lauralynn",
+      "hit": true,
+      "top_score": 28.0,
+      "winner_score": 28.0,
+      "winner_rank": 1,
+      "winner_odds": 2.5,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-07T17:08:00+00:00",
+      "course": "wexford",
+      "winner": "Crowsatedappletart",
+      "top_pick": "Come On The Lads",
+      "hit": false,
+      "top_score": 81.0,
+      "winner_score": 27.0,
+      "winner_rank": 6,
+      "winner_odds": 14.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T17:20:00+00:00",
+      "course": "redcar",
+      "winner": "Tupero",
+      "top_pick": "Kitsune Power",
+      "hit": false,
+      "top_score": 95.0,
+      "winner_score": 85.0,
+      "winner_rank": 2,
+      "winner_odds": 3.75,
+      "reasons": [
+        "narrow_gap_10_or_less"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T17:30:00+00:00",
+      "course": "southwell",
+      "winner": "Military Leader",
+      "top_pick": "Roaring Ralph",
+      "hit": false,
+      "top_score": 122.0,
+      "winner_score": 63.0,
+      "winner_rank": 6,
+      "winner_odds": 9.8,
+      "reasons": [
+        "winner_ranked_6plus",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T17:38:00+00:00",
+      "course": "wexford",
+      "winner": "D Art D Art",
+      "top_pick": "Eclipse Chaser",
+      "hit": false,
+      "top_score": 106.0,
+      "winner_score": 52.0,
+      "winner_rank": 4,
+      "winner_odds": 11.5,
+      "reasons": [
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T17:50:00+00:00",
+      "course": "redcar",
+      "winner": "Lord Capulet",
+      "top_pick": "Lord Capulet",
+      "hit": true,
+      "top_score": 93.0,
+      "winner_score": 93.0,
+      "winner_rank": 1,
+      "winner_odds": 4.9,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-07T18:00:00+00:00",
+      "course": "southwell",
+      "winner": "Sporting Light",
+      "top_pick": "Sporting Light",
+      "hit": true,
+      "top_score": 85.0,
+      "winner_score": 85.0,
+      "winner_rank": 1,
+      "winner_odds": 4.1,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-07T18:08:00+00:00",
+      "course": "wexford",
+      "winner": "Muskerry Rock",
+      "top_pick": "Muskerry Rock",
+      "hit": true,
+      "top_score": 28.0,
+      "winner_score": 28.0,
+      "winner_rank": 1,
+      "winner_odds": 15.0,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-07T18:20:00+00:00",
+      "course": "redcar",
+      "winner": "Rainbow Nebula",
+      "top_pick": "Double Parked",
+      "hit": false,
+      "top_score": 96.0,
+      "winner_score": 56.0,
+      "winner_rank": 4,
+      "winner_odds": 9.4,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T18:30:00+00:00",
+      "course": "southwell",
+      "winner": "Reputation",
+      "top_pick": "Fort Augustus",
+      "hit": false,
+      "top_score": 87.0,
+      "winner_score": 33.0,
+      "winner_rank": 3,
+      "winner_odds": 11.5,
+      "reasons": [
+        "winner_double_digit_odds",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T18:38:00+00:00",
+      "course": "wexford",
+      "winner": "Wilton Mills Trier",
+      "top_pick": "Five Shiros",
+      "hit": false,
+      "top_score": 29.0,
+      "winner_score": 13.0,
+      "winner_rank": 2,
+      "winner_odds": 7.4,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-07T18:50:00+00:00",
+      "course": "redcar",
+      "winner": "Mohmentous",
+      "top_pick": "Mohmentous",
+      "hit": true,
+      "top_score": 35.0,
+      "winner_score": 35.0,
+      "winner_rank": 1,
+      "winner_odds": 2.2,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-07T19:00:00+00:00",
+      "course": "southwell",
+      "winner": "Mickey Mongoose",
+      "top_pick": "Tickets",
+      "hit": false,
+      "top_score": 60.0,
+      "winner_score": 6.0,
+      "winner_rank": 6,
+      "winner_odds": 11.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T12:30:00+00:00",
+      "course": "chester",
+      "winner": "Roman Dragon",
+      "top_pick": "Respond",
+      "hit": false,
+      "top_score": 130.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "race_had_3plus_nonrunners",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T12:50:00+00:00",
+      "course": "ascot",
+      "winner": "Colori Forever",
+      "top_pick": "Albaydaa",
+      "hit": false,
+      "top_score": 126.0,
+      "winner_score": 104.0,
+      "winner_rank": 2,
+      "winner_odds": 4.5,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T13:05:00+00:00",
+      "course": "chester",
+      "winner": "Jan Brueghel",
+      "top_pick": "Joulany",
+      "hit": false,
+      "top_score": 108.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T13:10:00+00:00",
+      "course": "market rasen",
+      "winner": "Fidendum",
+      "top_pick": "Edelak",
+      "hit": false,
+      "top_score": 78.0,
+      "winner_score": 34.0,
+      "winner_rank": 2,
+      "winner_odds": 2.2,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T13:20:00+00:00",
+      "course": "ascot",
+      "winner": "Bint Archange",
+      "top_pick": "Bint Archange",
+      "hit": true,
+      "top_score": 45.0,
+      "winner_score": 45.0,
+      "winner_rank": 1,
+      "winner_odds": 3.75,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-08T13:35:00+00:00",
+      "course": "chester",
+      "winner": "Mcmurray",
+      "top_pick": "Lambourn",
+      "hit": false,
+      "top_score": 130.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T13:45:00+00:00",
+      "course": "market rasen",
+      "winner": "Classic King",
+      "top_pick": "Lord Of The Glance",
+      "hit": false,
+      "top_score": 112.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T13:55:00+00:00",
+      "course": "ascot",
+      "winner": "Secret Santa",
+      "top_pick": "Gone By",
+      "hit": false,
+      "top_score": 59.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T14:05:00+00:00",
+      "course": "chester",
+      "winner": "Let's Dream",
+      "top_pick": "Peaky Blinder",
+      "hit": false,
+      "top_score": 110.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T14:15:00+00:00",
+      "course": "market rasen",
+      "winner": "Ryebridge",
+      "top_pick": "Jasmin De Cotte",
+      "hit": false,
+      "top_score": 85.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "race_had_3plus_nonrunners"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T14:25:00+00:00",
+      "course": "ascot",
+      "winner": "Outback Heat",
+      "top_pick": "Elements Of Fire",
+      "hit": false,
+      "top_score": 99.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T14:40:00+00:00",
+      "course": "chester",
+      "winner": "Magnetude",
+      "top_pick": "The Good Biscuit",
+      "hit": false,
+      "top_score": 79.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "race_had_3plus_nonrunners",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T14:50:00+00:00",
+      "course": "market rasen",
+      "winner": "Nottodaybobo",
+      "top_pick": "Bumpy Evans",
+      "hit": false,
+      "top_score": 124.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T15:00:00+00:00",
+      "course": "ascot",
+      "winner": "Secret Santa",
+      "top_pick": "Afton Down",
+      "hit": false,
+      "top_score": 70.0,
+      "winner_score": 1.0,
+      "winner_rank": 14,
+      "winner_odds": 12.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T15:10:00+00:00",
+      "course": "chester",
+      "winner": "Jan Brueghel",
+      "top_pick": "Shrimp Shady",
+      "hit": false,
+      "top_score": 105.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T15:20:00+00:00",
+      "course": "market rasen",
+      "winner": "Ryebridge",
+      "top_pick": "Coumeenoole",
+      "hit": false,
+      "top_score": 105.0,
+      "winner_score": 83.0,
+      "winner_rank": 3,
+      "winner_odds": 5.9,
+      "reasons": [
+        "race_had_3plus_nonrunners",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T15:35:00+00:00",
+      "course": "ascot",
+      "winner": "Outback Heat",
+      "top_pick": "Blue Courvoisier",
+      "hit": false,
+      "top_score": 104.0,
+      "winner_score": 58.0,
+      "winner_rank": 7,
+      "winner_odds": 22.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T15:40:00+00:00",
+      "course": "ballinrobe",
+      "winner": "Personified",
+      "top_pick": "Personified",
+      "hit": true,
+      "top_score": 70.0,
+      "winner_score": 70.0,
+      "winner_rank": 1,
+      "winner_odds": 4.4,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-08T15:45:00+00:00",
+      "course": "chester",
+      "winner": "Mcmurray",
+      "top_pick": "Ambishio",
+      "hit": false,
+      "top_score": 108.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "race_had_3plus_nonrunners",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T15:52:00+00:00",
+      "course": "market rasen",
+      "winner": "Nottodaybobo",
+      "top_pick": "De Deli Counter",
+      "hit": false,
+      "top_score": 65.0,
+      "winner_score": 15.0,
+      "winner_rank": 5,
+      "winner_odds": 4.0,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T16:00:00+00:00",
+      "course": "downpatrick",
+      "winner": "Roc Dino",
+      "top_pick": "Roc Dino",
+      "hit": true,
+      "top_score": 81.0,
+      "winner_score": 81.0,
+      "winner_rank": 1,
+      "winner_odds": 1.15,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-08T16:10:00+00:00",
+      "course": "ascot",
+      "winner": "Believitanducan",
+      "top_pick": "Believitanducan",
+      "hit": true,
+      "top_score": 89.0,
+      "winner_score": 89.0,
+      "winner_rank": 1,
+      "winner_odds": 3.05,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-08T16:15:00+00:00",
+      "course": "ballinrobe",
+      "winner": "Glamazon",
+      "top_pick": "Maxminelli",
+      "hit": false,
+      "top_score": 48.0,
+      "winner_score": 23.0,
+      "winner_rank": 2,
+      "winner_odds": 2.36,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T16:20:00+00:00",
+      "course": "chester",
+      "winner": "Let&#x27;s Dream",
+      "top_pick": "Nightsinwhitesatin",
+      "hit": false,
+      "top_score": 102.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T16:35:00+00:00",
+      "course": "downpatrick",
+      "winner": "Sea Of Doubt",
+      "top_pick": "King Gris",
+      "hit": false,
+      "top_score": 79.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T16:45:00+00:00",
+      "course": "ripon",
+      "winner": "Vince L'Amour",
+      "top_pick": "Red Spells Danger",
+      "hit": false,
+      "top_score": 100.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T16:50:00+00:00",
+      "course": "ballinrobe",
+      "winner": "Lough Leane",
+      "top_pick": "Marmeladova",
+      "hit": false,
+      "top_score": 42.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T17:00:00+00:00",
+      "course": "wolverhampton",
+      "winner": "Kakirra",
+      "top_pick": "Havachoc",
+      "hit": false,
+      "top_score": 86.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T17:05:00+00:00",
+      "course": "downpatrick",
+      "winner": "Finnians Row",
+      "top_pick": "Lemmy Caution",
+      "hit": false,
+      "top_score": 35.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T17:15:00+00:00",
+      "course": "ripon",
+      "winner": "U Sure Do",
+      "top_pick": "Hood Wink",
+      "hit": false,
+      "top_score": 62.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T17:22:00+00:00",
+      "course": "ballinrobe",
+      "winner": "Tero D'rosa",
+      "top_pick": "Balance Of Trade",
+      "hit": false,
+      "top_score": 43.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "race_had_3plus_nonrunners"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T17:30:00+00:00",
+      "course": "wolverhampton",
+      "winner": "Seet",
+      "top_pick": "Priscillas Hope",
+      "hit": false,
+      "top_score": 42.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T17:35:00+00:00",
+      "course": "downpatrick",
+      "winner": "Dinoland",
+      "top_pick": "A Snow White Park",
+      "hit": false,
+      "top_score": 35.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "race_had_3plus_nonrunners"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T17:45:00+00:00",
+      "course": "ripon",
+      "winner": "Star Cast",
+      "top_pick": "Betweenthesticks",
+      "hit": false,
+      "top_score": 85.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T17:52:00+00:00",
+      "course": "ballinrobe",
+      "winner": "Trojan Fighter",
+      "top_pick": "Flying Fortress",
+      "hit": false,
+      "top_score": 69.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T18:00:00+00:00",
+      "course": "wolverhampton",
+      "winner": "Pints In Peace",
+      "top_pick": "Caraway",
+      "hit": false,
+      "top_score": 77.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T18:05:00+00:00",
+      "course": "downpatrick",
+      "winner": "Coco's Legacy",
+      "top_pick": "Struck Oil",
+      "hit": false,
+      "top_score": 33.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T18:15:00+00:00",
+      "course": "ripon",
+      "winner": "Vietnorm",
+      "top_pick": "Musical Touch",
+      "hit": false,
+      "top_score": 61.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T18:22:00+00:00",
+      "course": "ballinrobe",
+      "winner": "Satono Chevalier",
+      "top_pick": "Majestic King",
+      "hit": false,
+      "top_score": 51.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T18:30:00+00:00",
+      "course": "wolverhampton",
+      "winner": "Split Elevens",
+      "top_pick": "Silver Lake",
+      "hit": false,
+      "top_score": 82.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T18:35:00+00:00",
+      "course": "downpatrick",
+      "winner": "Dinoland",
+      "top_pick": "Mastermind",
+      "hit": false,
+      "top_score": 32.0,
+      "winner_score": -7.0,
+      "winner_rank": 7,
+      "winner_odds": 17.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds",
+        "race_had_3plus_nonrunners"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T18:45:00+00:00",
+      "course": "ripon",
+      "winner": "U Sure Do",
+      "top_pick": "Star Cast",
+      "hit": false,
+      "top_score": 76.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T18:52:00+00:00",
+      "course": "ballinrobe",
+      "winner": "Trojan Fighter",
+      "top_pick": "Trojan Fighter",
+      "hit": true,
+      "top_score": 48.0,
+      "winner_score": 48.0,
+      "winner_rank": 1,
+      "winner_odds": 2.82,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-08T19:00:00+00:00",
+      "course": "wolverhampton",
+      "winner": "Pints In Peace",
+      "top_pick": "Autumn Affair",
+      "hit": false,
+      "top_score": 61.0,
+      "winner_score": 48.0,
+      "winner_rank": 2,
+      "winner_odds": 5.4,
+      "reasons": [
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T19:05:00+00:00",
+      "course": "downpatrick",
+      "winner": "Coco&#x27;s Legacy",
+      "top_pick": "Culldoo",
+      "hit": false,
+      "top_score": 57.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T19:15:00+00:00",
+      "course": "ripon",
+      "winner": "Vietnorm",
+      "top_pick": "Port Darwin",
+      "hit": false,
+      "top_score": 18.0,
+      "winner_score": -1.0,
+      "winner_rank": 5,
+      "winner_odds": 18.0,
+      "reasons": [
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T19:22:00+00:00",
+      "course": "ballinrobe",
+      "winner": "Satono Chevalier",
+      "top_pick": "Steps In The Sand",
+      "hit": false,
+      "top_score": 40.0,
+      "winner_score": 8.0,
+      "winner_rank": 8,
+      "winner_odds": 23.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T19:30:00+00:00",
+      "course": "wolverhampton",
+      "winner": "Split Elevens",
+      "top_pick": "Homme De Fer",
+      "hit": false,
+      "top_score": 70.0,
+      "winner_score": -6.0,
+      "winner_rank": 10,
+      "winner_odds": 5.7,
+      "reasons": [
+        "winner_ranked_6plus"
+      ]
+    },
+    {
+      "race_time": "2026-05-08T20:00:00+00:00",
+      "course": "wolverhampton",
+      "winner": "Nana&#x27;s Boy George",
+      "top_pick": "Leonie",
+      "hit": false,
+      "top_score": 78.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T11:45:00+00:00",
+      "course": "haydock",
+      "winner": "Matty&#x27;s Getaway",
+      "top_pick": "Serious Chat",
+      "hit": false,
+      "top_score": 131.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T11:55:00+00:00",
+      "course": "lingfield",
+      "winner": "Sweet Reward",
+      "top_pick": "Salamanca City",
+      "hit": false,
+      "top_score": 124.0,
+      "winner_score": 59.0,
+      "winner_rank": 5,
+      "winner_odds": 4.7,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T12:10:00+00:00",
+      "course": "ascot",
+      "winner": "Night In Vegas",
+      "top_pick": "Cuban Heels",
+      "hit": false,
+      "top_score": 25.0,
+      "winner_score": -8.0,
+      "winner_rank": 4,
+      "winner_odds": 16.5,
+      "reasons": [
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T12:15:00+00:00",
+      "course": "haydock",
+      "winner": "Moon Chime",
+      "top_pick": "Made U Blush",
+      "hit": false,
+      "top_score": 103.0,
+      "winner_score": 3.0,
+      "winner_rank": 17,
+      "winner_odds": 26.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T12:22:00+00:00",
+      "course": "killarney",
+      "winner": "North Shore",
+      "top_pick": "Portnahapple",
+      "hit": false,
+      "top_score": 78.0,
+      "winner_score": 26.0,
+      "winner_rank": 2,
+      "winner_odds": 1.99,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T12:28:00+00:00",
+      "course": "lingfield",
+      "winner": "Cameo",
+      "top_pick": "Romantic Symphony",
+      "hit": false,
+      "top_score": 130.0,
+      "winner_score": 87.0,
+      "winner_rank": 4,
+      "winner_odds": 4.0,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T12:33:00+00:00",
+      "course": "naas",
+      "winner": "Carry The Flag",
+      "top_pick": "Carry The Flag",
+      "hit": true,
+      "top_score": 65.0,
+      "winner_score": 65.0,
+      "winner_rank": 1,
+      "winner_odds": 1.48,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-09T12:38:00+00:00",
+      "course": "nottingham",
+      "winner": "Crazy Cubana",
+      "top_pick": "Angel Sense",
+      "hit": false,
+      "top_score": 76.0,
+      "winner_score": 21.0,
+      "winner_rank": 3,
+      "winner_odds": 6.0,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T12:45:00+00:00",
+      "course": "ascot",
+      "winner": "Colori Forever",
+      "top_pick": "Radiant Beauty",
+      "hit": false,
+      "top_score": 95.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T12:48:00+00:00",
+      "course": "haydock",
+      "winner": "Matty&#x27;s Getaway",
+      "top_pick": "Plan De Stan",
+      "hit": false,
+      "top_score": 54.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T12:53:00+00:00",
+      "course": "killarney",
+      "winner": "Magico",
+      "top_pick": "Magico",
+      "hit": true,
+      "top_score": 62.0,
+      "winner_score": 62.0,
+      "winner_rank": 1,
+      "winner_odds": 3.4,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-09T12:58:00+00:00",
+      "course": "lingfield",
+      "winner": "Sweet Reward",
+      "top_pick": "Maho Bay",
+      "hit": false,
+      "top_score": 130.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T13:03:00+00:00",
+      "course": "naas",
+      "winner": "Arctic Steps",
+      "top_pick": "Stone Bear",
+      "hit": false,
+      "top_score": 49.0,
+      "winner_score": 44.0,
+      "winner_rank": 2,
+      "winner_odds": 8.0,
+      "reasons": [
+        "narrow_gap_10_or_less",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T13:08:00+00:00",
+      "course": "nottingham",
+      "winner": "Lighting Thunder",
+      "top_pick": "Lighting Thunder",
+      "hit": true,
+      "top_score": 113.0,
+      "winner_score": 113.0,
+      "winner_rank": 1,
+      "winner_odds": 1.91,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-09T13:20:00+00:00",
+      "course": "ascot",
+      "winner": "Bint Archange",
+      "top_pick": "Mudbir",
+      "hit": false,
+      "top_score": 108.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T13:25:00+00:00",
+      "course": "killarney",
+      "winner": "Sainte Lucie",
+      "top_pick": "Sainte Lucie",
+      "hit": true,
+      "top_score": 130.0,
+      "winner_score": 130.0,
+      "winner_rank": 1,
+      "winner_odds": 2.1,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-09T13:30:00+00:00",
+      "course": "haydock",
+      "winner": "Moon Chime",
+      "top_pick": "Barbury Boy",
+      "hit": false,
+      "top_score": 112.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T13:35:00+00:00",
+      "course": "naas",
+      "winner": "Confucius",
+      "top_pick": "Confucius",
+      "hit": true,
+      "top_score": 83.0,
+      "winner_score": 83.0,
+      "winner_rank": 1,
+      "winner_odds": 1.73,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-09T13:40:00+00:00",
+      "course": "lingfield",
+      "winner": "Cameo",
+      "top_pick": "Royal Velvet",
+      "hit": false,
+      "top_score": 126.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T13:50:00+00:00",
+      "course": "nottingham",
+      "winner": "Crazy Cubana",
+      "top_pick": "Valkyrie Storm",
+      "hit": false,
+      "top_score": 130.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T13:55:00+00:00",
+      "course": "ascot",
+      "winner": "Light Of Paris",
+      "top_pick": "Valedictory",
+      "hit": false,
+      "top_score": 130.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T14:00:00+00:00",
+      "course": "killarney",
+      "winner": "Magico",
+      "top_pick": "Playtime",
+      "hit": false,
+      "top_score": 94.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T14:05:00+00:00",
+      "course": "haydock",
+      "winner": "Mohaaraj",
+      "top_pick": "Silver State",
+      "hit": false,
+      "top_score": 135.0,
+      "winner_score": 63.0,
+      "winner_rank": 5,
+      "winner_odds": 5.5,
+      "reasons": [
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T14:10:00+00:00",
+      "course": "naas",
+      "winner": "Arctic Steps",
+      "top_pick": "Genesis",
+      "hit": false,
+      "top_score": 85.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T14:15:00+00:00",
+      "course": "lingfield",
+      "winner": "Foreseen",
+      "top_pick": "Foreseen",
+      "hit": true,
+      "top_score": 135.0,
+      "winner_score": 135.0,
+      "winner_rank": 1,
+      "winner_odds": 18.5,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-09T14:20:00+00:00",
+      "course": "hexham",
+      "winner": "Tap Tap Shamie",
+      "top_pick": "Tap Tap Shamie",
+      "hit": true,
+      "top_score": 97.0,
+      "winner_score": 97.0,
+      "winner_rank": 1,
+      "winner_odds": 1.08,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-09T14:25:00+00:00",
+      "course": "nottingham",
+      "winner": "Principality",
+      "top_pick": "Orangesandlemons",
+      "hit": false,
+      "top_score": 107.0,
+      "winner_score": 61.0,
+      "winner_rank": 5,
+      "winner_odds": 5.2,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T14:30:00+00:00",
+      "course": "ascot",
+      "winner": "Bolo Neighs",
+      "top_pick": "Sintra",
+      "hit": false,
+      "top_score": 107.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T14:35:00+00:00",
+      "course": "killarney",
+      "winner": "Sainte Lucie",
+      "top_pick": "Butch Cassidy",
+      "hit": false,
+      "top_score": 88.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T14:40:00+00:00",
+      "course": "haydock",
+      "winner": "Salkadan",
+      "top_pick": "Lake Forest",
+      "hit": false,
+      "top_score": 99.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T14:45:00+00:00",
+      "course": "naas",
+      "winner": "Confucius",
+      "top_pick": "Ocean's Breath",
+      "hit": false,
+      "top_score": 92.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T14:50:00+00:00",
+      "course": "lingfield",
+      "winner": "Royal Velvet",
+      "top_pick": "Hardys Hero",
+      "hit": false,
+      "top_score": 101.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T14:55:00+00:00",
+      "course": "hexham",
+      "winner": "Conquer The Breeze",
+      "top_pick": "Conquer The Breeze",
+      "hit": true,
+      "top_score": 51.0,
+      "winner_score": 51.0,
+      "winner_rank": 1,
+      "winner_odds": 2.12,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-09T15:00:00+00:00",
+      "course": "nottingham",
+      "winner": "Valkyrie Storm",
+      "top_pick": "Westgate Warrior",
+      "hit": false,
+      "top_score": 40.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T15:05:00+00:00",
+      "course": "ascot",
+      "winner": "Secret Santa",
+      "top_pick": "Naga",
+      "hit": false,
+      "top_score": 124.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T15:10:00+00:00",
+      "course": "killarney",
+      "winner": "Ragmans Corner",
+      "top_pick": "La Note Verte",
+      "hit": false,
+      "top_score": 135.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T15:15:00+00:00",
+      "course": "haydock",
+      "winner": "Mohaaraj",
+      "top_pick": "City Captain",
+      "hit": false,
+      "top_score": 94.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T15:20:00+00:00",
+      "course": "naas",
+      "winner": "Sparan Nua",
+      "top_pick": "Flower Forest",
+      "hit": false,
+      "top_score": 67.0,
+      "winner_score": 3.0,
+      "winner_rank": 8,
+      "winner_odds": 9.0,
+      "reasons": [
+        "winner_ranked_6plus"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T15:25:00+00:00",
+      "course": "lingfield",
+      "winner": "Harry Brown",
+      "top_pick": "Tuscan Point",
+      "hit": false,
+      "top_score": 121.0,
+      "winner_score": 13.0,
+      "winner_rank": 8,
+      "winner_odds": 10.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T15:30:00+00:00",
+      "course": "hexham",
+      "winner": "No Regrets",
+      "top_pick": "Betterforeveryone",
+      "hit": false,
+      "top_score": 85.0,
+      "winner_score": 60.0,
+      "winner_rank": 6,
+      "winner_odds": 9.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T15:35:00+00:00",
+      "course": "nottingham",
+      "winner": "Dragon Spin",
+      "top_pick": "Go Lockers Go",
+      "hit": false,
+      "top_score": 67.0,
+      "winner_score": 28.0,
+      "winner_rank": 3,
+      "winner_odds": 9.0,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T15:40:00+00:00",
+      "course": "ascot",
+      "winner": "Outback Heat",
+      "top_pick": "Tokyo Joe",
+      "hit": false,
+      "top_score": 81.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-09T15:45:00+00:00",
+      "course": "killarney",
+      "winner": "Pride Of Place",
+      "top_pick": "Omoore Park",
+      "hit": false,
+      "top_score": 55.0,
+      "winner_score": 32.0,
+      "winner_rank": 4,
+      "winner_odds": 6.6,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T12:20:00+00:00",
+      "course": "leopardstown",
+      "winner": "Halon Bay",
+      "top_pick": "Khafar",
+      "hit": false,
+      "top_score": 41.0,
+      "winner_score": -28.0,
+      "winner_rank": 6,
+      "winner_odds": 15.5,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T12:30:00+00:00",
+      "course": "cork",
+      "winner": "Arouet",
+      "top_pick": "Maestro Des Pins",
+      "hit": false,
+      "top_score": 94.0,
+      "winner_score": 41.0,
+      "winner_rank": 3,
+      "winner_odds": 9.0,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T12:55:00+00:00",
+      "course": "leopardstown",
+      "winner": "Cannes",
+      "top_pick": "Antigua",
+      "hit": false,
+      "top_score": 69.0,
+      "winner_score": 59.0,
+      "winner_rank": 2,
+      "winner_odds": 2.38,
+      "reasons": [
+        "narrow_gap_10_or_less"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T13:05:00+00:00",
+      "course": "cork",
+      "winner": "Moon Mission",
+      "top_pick": "Shirzan",
+      "hit": false,
+      "top_score": 74.0,
+      "winner_score": 19.0,
+      "winner_rank": 6,
+      "winner_odds": 17.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T13:17:00+00:00",
+      "course": "ludlow",
+      "winner": "Silvereen",
+      "top_pick": "First Candidate",
+      "hit": false,
+      "top_score": 130.0,
+      "winner_score": 29.0,
+      "winner_rank": 3,
+      "winner_odds": 7.0,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T13:30:00+00:00",
+      "course": "leopardstown",
+      "winner": "City Of Memphis",
+      "top_pick": "City Of Memphis",
+      "hit": true,
+      "top_score": 124.0,
+      "winner_score": 124.0,
+      "winner_rank": 1,
+      "winner_odds": 3.0,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-10T13:40:00+00:00",
+      "course": "cork",
+      "winner": "Local News",
+      "top_pick": "La Cote Fleurie",
+      "hit": false,
+      "top_score": 72.0,
+      "winner_score": -69.0,
+      "winner_rank": 18,
+      "winner_odds": 26.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds",
+        "race_had_3plus_nonrunners",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T13:52:00+00:00",
+      "course": "ludlow",
+      "winner": "Son Of Tyran",
+      "top_pick": "Son Of Tyran",
+      "hit": true,
+      "top_score": 76.0,
+      "winner_score": 76.0,
+      "winner_rank": 1,
+      "winner_odds": 3.05,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-10T14:05:00+00:00",
+      "course": "leopardstown",
+      "winner": "Cannes",
+      "top_pick": "Mississippi River",
+      "hit": false,
+      "top_score": 120.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T14:15:00+00:00",
+      "course": "cork",
+      "winner": "Somersby Roost",
+      "top_pick": "Eastmore",
+      "hit": false,
+      "top_score": 51.0,
+      "winner_score": 4.0,
+      "winner_rank": 8,
+      "winner_odds": 15.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds",
+        "race_had_3plus_nonrunners",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T14:27:00+00:00",
+      "course": "ludlow",
+      "winner": "Zacony Rebel (IRE)",
+      "top_pick": "Hall Lane",
+      "hit": false,
+      "top_score": 98.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T14:40:00+00:00",
+      "course": "leopardstown",
+      "winner": "James J Braddock",
+      "top_pick": "Pierre Bonnard",
+      "hit": false,
+      "top_score": 120.0,
+      "winner_score": 56.0,
+      "winner_rank": 5,
+      "winner_odds": 11.0,
+      "reasons": [
+        "winner_double_digit_odds",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T14:50:00+00:00",
+      "course": "cork",
+      "winner": "Humble Brag",
+      "top_pick": "Way Down South",
+      "hit": false,
+      "top_score": 83.0,
+      "winner_score": 8.0,
+      "winner_rank": 6,
+      "winner_odds": 3.25,
+      "reasons": [
+        "winner_ranked_6plus",
+        "race_had_3plus_nonrunners",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T15:02:00+00:00",
+      "course": "ludlow",
+      "winner": "Pergamon",
+      "top_pick": "Pergamon",
+      "hit": true,
+      "top_score": 106.0,
+      "winner_score": 106.0,
+      "winner_rank": 1,
+      "winner_odds": 2.88,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-10T15:15:00+00:00",
+      "course": "leopardstown",
+      "winner": "Johanna Walsh",
+      "top_pick": "Beatific",
+      "hit": false,
+      "top_score": 50.0,
+      "winner_score": 25.0,
+      "winner_rank": 2,
+      "winner_odds": 3.75,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T15:25:00+00:00",
+      "course": "cork",
+      "winner": "Doctor Du Mesnil",
+      "top_pick": "Doctor Du Mesnil",
+      "hit": true,
+      "top_score": 117.0,
+      "winner_score": 117.0,
+      "winner_rank": 1,
+      "winner_odds": 1.67,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-10T15:37:00+00:00",
+      "course": "ludlow",
+      "winner": "Regal Renaissance",
+      "top_pick": "Claim Du Brizais",
+      "hit": false,
+      "top_score": 126.0,
+      "winner_score": 60.0,
+      "winner_rank": 2,
+      "winner_odds": 2.46,
+      "reasons": [
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T15:50:00+00:00",
+      "course": "leopardstown",
+      "winner": "Truth Be Told",
+      "top_pick": "Genoah",
+      "hit": false,
+      "top_score": 87.0,
+      "winner_score": 32.0,
+      "winner_rank": 7,
+      "winner_odds": 8.0,
+      "reasons": [
+        "winner_ranked_6plus"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T16:00:00+00:00",
+      "course": "cork",
+      "winner": "Annie Button",
+      "top_pick": "Only For Our Man",
+      "hit": false,
+      "top_score": 73.0,
+      "winner_score": -21.0,
+      "winner_rank": 7,
+      "winner_odds": 17.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds",
+        "race_had_3plus_nonrunners",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T16:10:00+00:00",
+      "course": "ludlow",
+      "winner": "Jafimgoso",
+      "top_pick": "Jafimgoso",
+      "hit": true,
+      "top_score": 68.0,
+      "winner_score": 68.0,
+      "winner_rank": 1,
+      "winner_odds": 4.7,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-10T16:20:00+00:00",
+      "course": "leopardstown",
+      "winner": "Darius Dark",
+      "top_pick": "Bay Of Stars",
+      "hit": false,
+      "top_score": 106.0,
+      "winner_score": 54.0,
+      "winner_rank": 4,
+      "winner_odds": 4.0,
+      "reasons": [
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-10T16:30:00+00:00",
+      "course": "cork",
+      "winner": "Aine",
+      "top_pick": "Aine",
+      "hit": true,
+      "top_score": 62.0,
+      "winner_score": 62.0,
+      "winner_rank": 1,
+      "winner_odds": 3.25,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-11T13:30:00+00:00",
+      "course": "catterick",
+      "winner": "Filey Beach",
+      "top_pick": "Crocodile Power",
+      "hit": false,
+      "top_score": 97.0,
+      "winner_score": 33.0,
+      "winner_rank": 4,
+      "winner_odds": 11.5,
+      "reasons": [
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-11T13:42:00+00:00",
+      "course": "southwell",
+      "winner": "Tom Desjy",
+      "top_pick": "Delgany Deadline",
+      "hit": false,
+      "top_score": 112.0,
+      "winner_score": 34.0,
+      "winner_rank": 5,
+      "winner_odds": 6.2,
+      "reasons": [
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-11T14:00:00+00:00",
+      "course": "catterick",
+      "winner": "Zarvali",
+      "top_pick": "Sandy Craic",
+      "hit": false,
+      "top_score": 41.0,
+      "winner_score": 4.0,
+      "winner_rank": 3,
+      "winner_odds": 6.0,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-11T14:12:00+00:00",
+      "course": "southwell",
+      "winner": "Dunkerque",
+      "top_pick": "Seaview Rock",
+      "hit": false,
+      "top_score": 83.0,
+      "winner_score": 73.0,
+      "winner_rank": 2,
+      "winner_odds": 4.6,
+      "reasons": [
+        "narrow_gap_10_or_less"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T13:20:00+00:00",
+      "course": "bath",
+      "winner": "Sovereign Glory",
+      "top_pick": "Jolly Good Fellows",
+      "hit": false,
+      "top_score": 111.0,
+      "winner_score": 41.0,
+      "winner_rank": 3,
+      "winner_odds": 4.8,
+      "reasons": [
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T13:30:00+00:00",
+      "course": "beverley",
+      "winner": "Lovers Leap",
+      "top_pick": "Lovers Leap",
+      "hit": true,
+      "top_score": 76.0,
+      "winner_score": 76.0,
+      "winner_rank": 1,
+      "winner_odds": 1.26,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-12T13:38:00+00:00",
+      "course": "hereford",
+      "winner": "Queensbury Boy",
+      "top_pick": "Court In A Storm",
+      "hit": false,
+      "top_score": 124.0,
+      "winner_score": 49.0,
+      "winner_rank": 2,
+      "winner_odds": 2.02,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T13:50:00+00:00",
+      "course": "bath",
+      "winner": "Thurso",
+      "top_pick": "The Feminine Urge",
+      "hit": false,
+      "top_score": 86.0,
+      "winner_score": 59.0,
+      "winner_rank": 2,
+      "winner_odds": 2.96,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T14:00:00+00:00",
+      "course": "beverley",
+      "winner": "Ronson",
+      "top_pick": "Anchiano",
+      "hit": false,
+      "top_score": 49.0,
+      "winner_score": -16.0,
+      "winner_rank": 4,
+      "winner_odds": 32.0,
+      "reasons": [
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T14:08:00+00:00",
+      "course": "hereford",
+      "winner": "Quick Sharpener",
+      "top_pick": "Delpotro",
+      "hit": false,
+      "top_score": 119.0,
+      "winner_score": 43.0,
+      "winner_rank": 2,
+      "winner_odds": 3.05,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T14:50:00+00:00",
+      "course": "bath",
+      "winner": "Hibernate",
+      "top_pick": "Bobby Dassler",
+      "hit": false,
+      "top_score": 86.0,
+      "winner_score": 86.0,
+      "winner_rank": 1,
+      "winner_odds": 2.88,
+      "reasons": [
+        "narrow_gap_10_or_less"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T15:00:00+00:00",
+      "course": "beverley",
+      "winner": "Dandy Dinmont",
+      "top_pick": "Sherlock",
+      "hit": false,
+      "top_score": 90.0,
+      "winner_score": 18.0,
+      "winner_rank": 8,
+      "winner_odds": 9.8,
+      "reasons": [
+        "winner_ranked_6plus"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T15:10:00+00:00",
+      "course": "hereford",
+      "winner": "Campaign Trail",
+      "top_pick": "Heard That",
+      "hit": false,
+      "top_score": 92.0,
+      "winner_score": 71.0,
+      "winner_rank": 3,
+      "winner_odds": 2.92,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T15:23:00+00:00",
+      "course": "bath",
+      "winner": "Noble Vow",
+      "top_pick": "Galaxy Wonder",
+      "hit": false,
+      "top_score": 123.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T15:35:00+00:00",
+      "course": "beverley",
+      "winner": "Coolree",
+      "top_pick": "Tees George",
+      "hit": false,
+      "top_score": 100.0,
+      "winner_score": 82.0,
+      "winner_rank": 2,
+      "winner_odds": 8.0,
+      "reasons": [
+        "potential_improver_flagged_actual_winner"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T15:45:00+00:00",
+      "course": "hereford",
+      "winner": "Ice Jet",
+      "top_pick": "Ikigai Star",
+      "hit": false,
+      "top_score": 95.0,
+      "winner_score": 85.0,
+      "winner_rank": 2,
+      "winner_odds": 2.9,
+      "reasons": [
+        "narrow_gap_10_or_less"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T16:00:00+00:00",
+      "course": "bath",
+      "winner": "Nammos",
+      "top_pick": "My Ambition",
+      "hit": false,
+      "top_score": 59.0,
+      "winner_score": -24.0,
+      "winner_rank": 8,
+      "winner_odds": 27.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T16:05:00+00:00",
+      "course": "killarney",
+      "winner": "Hi Ho Idaho",
+      "top_pick": "Mergus Serrator",
+      "hit": false,
+      "top_score": 15.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T16:10:00+00:00",
+      "course": "beverley",
+      "winner": "Ciao Capo",
+      "top_pick": "What Fools Believe",
+      "hit": false,
+      "top_score": 70.0,
+      "winner_score": 55.0,
+      "winner_rank": 2,
+      "winner_odds": 4.2,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T16:15:00+00:00",
+      "course": "lingfield",
+      "winner": "Arc Zoosve",
+      "top_pick": "Arc Zoosve",
+      "hit": true,
+      "top_score": 96.0,
+      "winner_score": 96.0,
+      "winner_rank": 1,
+      "winner_odds": 1.76,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-12T16:20:00+00:00",
+      "course": "hereford",
+      "winner": "Lost In The Dream",
+      "top_pick": "Lost In The Dream",
+      "hit": true,
+      "top_score": 82.0,
+      "winner_score": 82.0,
+      "winner_rank": 1,
+      "winner_odds": 2.78,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-12T16:27:00+00:00",
+      "course": "sligo",
+      "winner": "Hey Now",
+      "top_pick": "Casual Water",
+      "hit": false,
+      "top_score": 47.0,
+      "winner_score": 25.0,
+      "winner_rank": 3,
+      "winner_odds": 2.8,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T16:40:00+00:00",
+      "course": "killarney",
+      "winner": "Midnight Jet",
+      "top_pick": "Glyfada",
+      "hit": false,
+      "top_score": 124.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T16:50:00+00:00",
+      "course": "lingfield",
+      "winner": "Savvy Disko",
+      "top_pick": "Always Happy",
+      "hit": false,
+      "top_score": 85.0,
+      "winner_score": 34.0,
+      "winner_rank": 3,
+      "winner_odds": 14.0,
+      "reasons": [
+        "winner_double_digit_odds",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T16:58:00+00:00",
+      "course": "sligo",
+      "winner": "Beir Bua",
+      "top_pick": "Beir Bua",
+      "hit": true,
+      "top_score": 38.0,
+      "winner_score": 38.0,
+      "winner_rank": 1,
+      "winner_odds": 2.72,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-12T17:10:00+00:00",
+      "course": "killarney",
+      "winner": "Burru",
+      "top_pick": "Mystic Bella",
+      "hit": false,
+      "top_score": 46.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T17:20:00+00:00",
+      "course": "lingfield",
+      "winner": "Bright Summer",
+      "top_pick": "Music Academy",
+      "hit": false,
+      "top_score": 65.0,
+      "winner_score": 50.0,
+      "winner_rank": 2,
+      "winner_odds": 2.24,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T17:28:00+00:00",
+      "course": "sligo",
+      "winner": "Bowgate Street",
+      "top_pick": "Centaq",
+      "hit": false,
+      "top_score": 47.0,
+      "winner_score": 22.0,
+      "winner_rank": 3,
+      "winner_odds": 8.4,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T17:40:00+00:00",
+      "course": "killarney",
+      "winner": "Senecia",
+      "top_pick": "Jasmine Affanalis",
+      "hit": false,
+      "top_score": 73.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field",
+        "race_had_3plus_nonrunners"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T17:50:00+00:00",
+      "course": "lingfield",
+      "winner": "Slack Bob",
+      "top_pick": "Thestral",
+      "hit": false,
+      "top_score": 94.0,
+      "winner_score": 70.0,
+      "winner_rank": 2,
+      "winner_odds": 4.7,
+      "reasons": [
+        "potential_improver_flagged_actual_winner"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T17:58:00+00:00",
+      "course": "sligo",
+      "winner": "Speculateur",
+      "top_pick": "Speculateur",
+      "hit": true,
+      "top_score": 68.0,
+      "winner_score": 68.0,
+      "winner_rank": 1,
+      "winner_odds": 1.24,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-12T18:10:00+00:00",
+      "course": "killarney",
+      "winner": "Oneforgonzo",
+      "top_pick": "Celestially",
+      "hit": false,
+      "top_score": 40.0,
+      "winner_score": 0.0,
+      "winner_rank": null,
+      "winner_odds": 0.0,
+      "reasons": [
+        "winner_missing_from_modeled_field"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T18:20:00+00:00",
+      "course": "lingfield",
+      "winner": "Zatsgood",
+      "top_pick": "Frostmagic",
+      "hit": false,
+      "top_score": 87.0,
+      "winner_score": 53.0,
+      "winner_rank": 4,
+      "winner_odds": 2.02,
+      "reasons": [
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T18:28:00+00:00",
+      "course": "sligo",
+      "winner": "The Eggler",
+      "top_pick": "Ilbdare",
+      "hit": false,
+      "top_score": 49.0,
+      "winner_score": -39.0,
+      "winner_rank": 13,
+      "winner_odds": 10.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T18:40:00+00:00",
+      "course": "killarney",
+      "winner": "Factual Fact",
+      "top_pick": "Winning Smut",
+      "hit": false,
+      "top_score": 89.0,
+      "winner_score": 60.0,
+      "winner_rank": 2,
+      "winner_odds": 3.45,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T18:50:00+00:00",
+      "course": "lingfield",
+      "winner": "Handle With Care",
+      "top_pick": "Barefoot Beach",
+      "hit": false,
+      "top_score": 76.0,
+      "winner_score": 28.0,
+      "winner_rank": 9,
+      "winner_odds": 16.5,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T18:58:00+00:00",
+      "course": "sligo",
+      "winner": "Mr Dibbs",
+      "top_pick": "Gerrys Wish",
+      "hit": false,
+      "top_score": 46.0,
+      "winner_score": 6.0,
+      "winner_rank": 5,
+      "winner_odds": 11.5,
+      "reasons": [
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T19:10:00+00:00",
+      "course": "killarney",
+      "winner": "Kizlyar",
+      "top_pick": "Sky Captain",
+      "hit": false,
+      "top_score": 61.0,
+      "winner_score": 6.0,
+      "winner_rank": 6,
+      "winner_odds": 13.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T19:20:00+00:00",
+      "course": "lingfield",
+      "winner": "Yaa Min",
+      "top_pick": "Twilight Moon",
+      "hit": false,
+      "top_score": 104.0,
+      "winner_score": 24.0,
+      "winner_rank": 6,
+      "winner_odds": 6.8,
+      "reasons": [
+        "winner_ranked_6plus"
+      ]
+    },
+    {
+      "race_time": "2026-05-12T19:28:00+00:00",
+      "course": "sligo",
+      "winner": "In A Sonnet",
+      "top_pick": "In A Sonnet",
+      "hit": true,
+      "top_score": 53.0,
+      "winner_score": 50.0,
+      "winner_rank": 1,
+      "winner_odds": 3.15,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-13T12:45:00+00:00",
+      "course": "york",
+      "winner": "Cut A Dash",
+      "top_pick": "Spectacular Diver",
+      "hit": false,
+      "top_score": 50.0,
+      "winner_score": 32.0,
+      "winner_rank": 3,
+      "winner_odds": 4.6,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T13:00:00+00:00",
+      "course": "perth",
+      "winner": "Lowlands",
+      "top_pick": "Kaydence",
+      "hit": false,
+      "top_score": 72.0,
+      "winner_score": 46.0,
+      "winner_rank": 2,
+      "winner_odds": 4.5,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T13:08:00+00:00",
+      "course": "yarmouth",
+      "winner": "Kamaway",
+      "top_pick": "Campani",
+      "hit": false,
+      "top_score": 107.0,
+      "winner_score": 15.0,
+      "winner_rank": 7,
+      "winner_odds": 11.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T13:20:00+00:00",
+      "course": "york",
+      "winner": "Klassleader",
+      "top_pick": "Plage De Havre",
+      "hit": false,
+      "top_score": 120.0,
+      "winner_score": 113.0,
+      "winner_rank": 3,
+      "winner_odds": 3.3,
+      "reasons": [
+        "narrow_gap_10_or_less"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T13:33:00+00:00",
+      "course": "perth",
+      "winner": "Newtown Rambler",
+      "top_pick": "Next Twist",
+      "hit": false,
+      "top_score": 130.0,
+      "winner_score": 69.0,
+      "winner_rank": 5,
+      "winner_odds": 6.4,
+      "reasons": [
+        "potential_improver_flagged_actual_winner"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T13:40:00+00:00",
+      "course": "yarmouth",
+      "winner": "Naana's Sparkle",
+      "top_pick": "Kinswoman",
+      "hit": false,
+      "top_score": 130.0,
+      "winner_score": 83.0,
+      "winner_rank": 3,
+      "winner_odds": 9.8,
+      "reasons": [
+        "race_had_3plus_nonrunners",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T13:55:00+00:00",
+      "course": "york",
+      "winner": "Dark Thirty",
+      "top_pick": "Binhareer",
+      "hit": false,
+      "top_score": 127.0,
+      "winner_score": 14.0,
+      "winner_rank": 12,
+      "winner_odds": 14.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T14:08:00+00:00",
+      "course": "perth",
+      "winner": "Ebselysees",
+      "top_pick": "Ebselysees",
+      "hit": true,
+      "top_score": 112.0,
+      "winner_score": 112.0,
+      "winner_rank": 1,
+      "winner_odds": 9.0,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-13T14:18:00+00:00",
+      "course": "yarmouth",
+      "winner": "Silent Beauty",
+      "top_pick": "Dubai Charm",
+      "hit": false,
+      "top_score": 47.0,
+      "winner_score": 18.0,
+      "winner_rank": 3,
+      "winner_odds": 3.15,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T14:30:00+00:00",
+      "course": "york",
+      "winner": "Elmonjed",
+      "top_pick": "Elmonjed",
+      "hit": true,
+      "top_score": 131.0,
+      "winner_score": 131.0,
+      "winner_rank": 1,
+      "winner_odds": 12.0,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-13T14:43:00+00:00",
+      "course": "perth",
+      "winner": "The Flying Poet",
+      "top_pick": "The Flying Poet",
+      "hit": true,
+      "top_score": 124.0,
+      "winner_score": 124.0,
+      "winner_rank": 1,
+      "winner_odds": 3.3,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-13T14:53:00+00:00",
+      "course": "yarmouth",
+      "winner": "Creative Queen",
+      "top_pick": "Creative Queen",
+      "hit": true,
+      "top_score": 118.0,
+      "winner_score": 118.0,
+      "winner_rank": 1,
+      "winner_odds": 2.76,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-13T15:05:00+00:00",
+      "course": "york",
+      "winner": "Legacy Link",
+      "top_pick": "Sea The Storm",
+      "hit": false,
+      "top_score": 113.0,
+      "winner_score": 86.0,
+      "winner_rank": 3,
+      "winner_odds": 2.44,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T15:18:00+00:00",
+      "course": "perth",
+      "winner": "Theoldboggroad",
+      "top_pick": "Potters Party",
+      "hit": false,
+      "top_score": 88.0,
+      "winner_score": 24.0,
+      "winner_rank": 3,
+      "winner_odds": 17.0,
+      "reasons": [
+        "winner_double_digit_odds",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T15:28:00+00:00",
+      "course": "yarmouth",
+      "winner": "Beagle Bay",
+      "top_pick": "Noble Guest",
+      "hit": false,
+      "top_score": 83.0,
+      "winner_score": 74.0,
+      "winner_rank": 3,
+      "winner_odds": 2.42,
+      "reasons": [
+        "narrow_gap_10_or_less"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T15:40:00+00:00",
+      "course": "york",
+      "winner": "Startled",
+      "top_pick": "Inishbeg",
+      "hit": false,
+      "top_score": 100.0,
+      "winner_score": 82.0,
+      "winner_rank": 2,
+      "winner_odds": 7.0,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T15:47:00+00:00",
+      "course": "punchestown",
+      "winner": "Porcupine Bank",
+      "top_pick": "Noemie De La Vis",
+      "hit": false,
+      "top_score": 117.0,
+      "winner_score": 48.0,
+      "winner_rank": 2,
+      "winner_odds": 7.2,
+      "reasons": [
+        "potential_improver_flagged_actual_winner"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T15:55:00+00:00",
+      "course": "perth",
+      "winner": "Prince Nino",
+      "top_pick": "Dublinofficecallin",
+      "hit": false,
+      "top_score": 101.0,
+      "winner_score": -36.0,
+      "winner_rank": 10,
+      "winner_odds": 40.0,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T16:03:00+00:00",
+      "course": "yarmouth",
+      "winner": "U S S Charleston",
+      "top_pick": "Koffee And Kale",
+      "hit": false,
+      "top_score": 64.0,
+      "winner_score": 34.0,
+      "winner_rank": 3,
+      "winner_odds": 5.0,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T16:09:00+00:00",
+      "course": "bath",
+      "winner": "Nordic Glory",
+      "top_pick": "Wedgewood",
+      "hit": false,
+      "top_score": 41.0,
+      "winner_score": 25.0,
+      "winner_rank": 3,
+      "winner_odds": 12.0,
+      "reasons": [
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T16:15:00+00:00",
+      "course": "york",
+      "winner": "Master Builder",
+      "top_pick": "Minhad",
+      "hit": false,
+      "top_score": 75.0,
+      "winner_score": 33.0,
+      "winner_rank": 5,
+      "winner_odds": 4.8,
+      "reasons": [
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T16:20:00+00:00",
+      "course": "punchestown",
+      "winner": "Switch From Diesel",
+      "top_pick": "Switch From Diesel",
+      "hit": true,
+      "top_score": 68.0,
+      "winner_score": 68.0,
+      "winner_rank": 1,
+      "winner_odds": 2.44,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-13T16:25:00+00:00",
+      "course": "perth",
+      "winner": "Loro White",
+      "top_pick": "Knockeranna Rose",
+      "hit": false,
+      "top_score": 70.0,
+      "winner_score": 19.0,
+      "winner_rank": 5,
+      "winner_odds": 11.5,
+      "reasons": [
+        "winner_double_digit_odds",
+        "potential_improver_flag_noise"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T16:30:00+00:00",
+      "course": "newton abbot",
+      "winner": "Arctic Voyage",
+      "top_pick": "Arctic Voyage",
+      "hit": true,
+      "top_score": 70.0,
+      "winner_score": 70.0,
+      "winner_rank": 1,
+      "winner_odds": 1.66,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-13T16:42:00+00:00",
+      "course": "bath",
+      "winner": "El Lambo",
+      "top_pick": "Tribal Appearance",
+      "hit": false,
+      "top_score": 61.0,
+      "winner_score": 5.0,
+      "winner_rank": 3,
+      "winner_odds": 5.4,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T16:50:00+00:00",
+      "course": "punchestown",
+      "winner": "Whispering Willow",
+      "top_pick": "Hickeys Hill",
+      "hit": false,
+      "top_score": 36.0,
+      "winner_score": -23.0,
+      "winner_rank": 9,
+      "winner_odds": 10.5,
+      "reasons": [
+        "winner_ranked_6plus",
+        "winner_double_digit_odds"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T17:00:00+00:00",
+      "course": "newton abbot",
+      "winner": "Reel Orange",
+      "top_pick": "Evening Tess",
+      "hit": false,
+      "top_score": 81.0,
+      "winner_score": 65.0,
+      "winner_rank": 2,
+      "winner_odds": 3.25,
+      "reasons": [
+        "other_model_miss"
+      ]
+    },
+    {
+      "race_time": "2026-05-13T17:12:00+00:00",
+      "course": "bath",
+      "winner": "Darzah",
+      "top_pick": "Darzah",
+      "hit": true,
+      "top_score": 78.0,
+      "winner_score": 78.0,
+      "winner_rank": 1,
+      "winner_odds": 1.82,
+      "reasons": []
+    },
+    {
+      "race_time": "2026-05-13T17:20:00+00:00",
+      "course": "punchestown",
+      "winner": "Spanish Maid",
+      "top_pick": "Spanish Maid",
+      "hit": true,
+      "top_score": 105.0,
+      "winner_score": 105.0,
+      "winner_rank": 1,
+      "winner_odds": 2.0,
+      "reasons": []
+    }
+  ]
+}

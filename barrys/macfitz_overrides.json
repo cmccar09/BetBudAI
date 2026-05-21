@@ -1,0 +1,221 @@
+{
+  "_description": "MacFitz manual split overrides for Barry's Cheltenham 2026 competition",
+  "_strategy": "MacFitz follows Surebet EXCEPT where a near-tie justifies a different selection. Overrides are keyed by exact race_name from CheltenhamPicks DynamoDB.",
+  "_auto_split_threshold": 3,
+  "_note": "Races with gap <= _auto_split_threshold where no manual override exists will be flagged as NEW_CLOSE_CALL in the HTML regen log but NOT auto-split without human confirmation.",
+  "overrides": {
+    "Conditional Jockeys Handicap Hurdle": {
+      "macfitz_horse": "Sounds Russian",
+      "reason": "Dead heat 93-93 - coin flip, MacFitz takes the alternative runner",
+      "surebet_horse": "Waterford Whispers",
+      "surebet_score": 93,
+      "macfitz_score": 93,
+      "gap": 0,
+      "decided": "2026-03-06",
+      "active": false,
+      "_deactivated": "Sounds Russian not entered for Cheltenham (Betfair ANTEPOST: absent 2026-03-06). Both entries revert to Waterford Whispers."
+    },
+    "Plate Handicap Chase": {
+      "macfitz_horse": "Down Memory Lane",
+      "reason": "1pt gap (94 vs 93) - effectively tied, MacFitz takes alternative",
+      "surebet_horse": "Grange Walk",
+      "surebet_score": 94,
+      "macfitz_score": 93,
+      "gap": 1,
+      "decided": "2026-03-06",
+      "active": false,
+      "_deactivated": "Grange Walk not entered for Cheltenham (Betfair ANTEPOST: absent 2026-03-06). Both entries revert to highest remaining scorer (Down Memory Lane)."
+    },
+    "Arkle Challenge Trophy Chase": {
+      "macfitz_horse": "Lulamba",
+      "reason": "LIVE SPLIT 10/03/2026: Lulamba = Kopek Des Bordes at identical Betfair price (13/8 = 2.6). 4/5 RP tipsters on Lulamba. MacFitz follows course wisdom (Kopek is Cheltenham course winner but Lulamba is clear market co-fav). Dead heat — MacFitz takes Lulamba.",
+      "surebet_horse": "Kopek Des Bordes",
+      "surebet_score": 171,
+      "macfitz_score": 158,
+      "gap": 0,
+      "decided": "2026-03-10",
+      "active": true
+    },
+    "Cheltenham Plate Chase": {
+      "macfitz_horse": "Zurich",
+      "reason": "3pt gap (104 vs 101) — close call, MacFitz takes Zurich as the alternative",
+      "surebet_horse": "Madara",
+      "surebet_score": 104,
+      "macfitz_score": 101,
+      "gap": 3,
+      "decided": "2026-03-09",
+      "active": true
+    },
+    "Glenfarclas Cross Country Chase": {
+      "macfitz_horse": "Favori De Champdou",
+      "reason": "Dead heat 143-143 — coin flip, MacFitz takes Favori De Champdou (Won 2024 Cross Country)",
+      "surebet_horse": "Stumptown",
+      "surebet_score": 143,
+      "macfitz_score": 143,
+      "gap": 0,
+      "decided": "2026-03-09",
+      "active": true
+    },
+    "Champion Bumper": {
+      "macfitz_horse": "Quiryn",
+      "reason": "LIVE SPLIT 11/03/2026: System margin only 1pt (KHC=80 vs Broadway Ted=79) — coin flip. FitzMac takes Quiryn (WP Mullins/Paul Townend, 8/1, unbeaten 4yo; Mullins/Townend combo have dominated this race historically). Market has Love Sign d'Aunou 4/1 fav. Quiryn is strong alternative with Festival jockey advantage.",
+      "surebet_horse": "Keep Him Company",
+      "surebet_score": 80,
+      "macfitz_score": 79,
+      "gap": 1,
+      "decided": "2026-03-11",
+      "active": true
+    },
+    "Kim Muir Handicap Chase": {
+      "macfitz_horse": "Jeriko Du Reponet",
+      "reason": "UPDATED 11/03/2026 official racecard (26 runners): Herakles Westwood now model #1 (59pts, 9/1, Course winner, 3 runs at Cheltenham last 4 starts, Greatrex/Maguire). Jeriko Du Reponet model #2 (55pts, 3/1, topweight OR145, cheekpieces today, top amateur Derek O'Connor). Gap now 4pts. SPLIT maintained: SB=Herakles (model top, 9/1 each-way value, course specialist) / MF=Jeriko (market fav at 3/1, Henderson, proven cheekpiece form in spring handicaps). 5 places EW.",
+      "surebet_horse": "Herakles Westwood",
+      "surebet_score": 59,
+      "macfitz_score": 55,
+      "gap": 4,
+      "decided": "2026-03-11",
+      "active": true
+    },
+    "Brown Advisory Novices' Chase": {
+      "macfitz_horse": "Final Demand",
+      "reason": "5pt gap (128 vs 123) — close call, market has Final Demand (Elliott) as favourite, MacFitz takes Final Demand",
+      "surebet_horse": "Kaid D'Authie",
+      "surebet_score": 128,
+      "macfitz_score": 123,
+      "gap": 5,
+      "decided": "2026-03-11",
+      "active": true
+    },
+    "County Handicap Hurdle": {
+      "macfitz_horse": "Karbau",
+      "reason": "3pt gap (86 vs 83) — close call, MacFitz takes Karbau as the alternative",
+      "surebet_horse": "Absurde",
+      "surebet_score": 86,
+      "macfitz_score": 83,
+      "gap": 3,
+      "decided": "2026-03-09",
+      "active": false,
+      "_deactivated": "10/03/2026 post-Arkle: Karbau became Surebet pick (both agreed). 10/03/2026 post-Fred Winter handicap dampening: Surebet now picks Ndaawi (score 62) — MacFitz has no active override so both revert to Ndaawi. Split stays collapsed."
+    },
+    "Cheltenham Gold Cup": {
+      "macfitz_horse": "Gaelic Warrior",
+      "reason": "UPDATED 11/03/2026 recent_races scoring: Jango Baie now model #1 (135pts) — Arkle 2025 winner, Grade 2 Ascot Nov, CD winner, Henderson/de Boinville, 9/2. Gaelic Warrior model #3 (120pts) — 2025 Gold Cup defending champion, Mullins/Walsh, 10/1. SB=Jango Baie (algorithm top, CD winner, proven at pace). MF=Gaelic Warrior (outstanding class, defending champion, bigger price cover).",
+      "surebet_horse": "Jango Baie",
+      "surebet_score": 127,
+      "macfitz_score": 123,
+      "gap": 4,
+      "decided": "2026-03-11",
+      "active": true
+    },
+    "Close Brothers Mares' Hurdle": {
+      "macfitz_horse": "Wodhooh",
+      "reason": "LIVE SPLIT 12/03/2026: 15pt gap (Wodhooh 120 vs Jade De Grugy 105) — gap widened after recent_races scoring. Jade's last 5 runs are ALL chases (switching discipline today). Wodhooh has 2x C&D Cheltenham wins + Grade 3 Leopardstown win over hurdles. MF=Wodhooh (4/6 fav, CD specialist). SB=Jade De Grugy (Mullins/Townend 11/4, tactical value — if Mullins fires her fresh from chase season she's dangerous).",
+      "surebet_horse": "Jade De Grugy",
+      "surebet_score": 105,
+      "macfitz_score": 120,
+      "gap": 15,
+      "decided": "2026-03-11",
+      "active": true
+    },
+    "Paddy Power Stayers' Hurdle": {
+      "macfitz_horse": "Teahupoo",
+      "reason": "LIVE SPLIT 12/03/2026: 3-way near-tie (Impose Toi 127, Teahupoo 126, Kabral Du Mathan 126) after recent_races scoring. Impose Toi 10/1 surprise model leader — 5 wins including big-field Grade 1s + soft-ground specialist. SB=Kabral Du Mathan (Skelton/Skelton, CD winner, OR bonus). MF=Teahupoo (4/1, multiple Cheltenham CD winner, Kennedy/Elliott — race fitness + course knowledge at peak). STRATEGIC SPLIT: Impose Toi the dark horse both can eye.",
+      "surebet_horse": "Kabral Du Mathan",
+      "surebet_score": 116,
+      "macfitz_score": 124,
+      "gap": 8,
+      "decided": "2026-03-11",
+      "active": true
+    },
+    "Grand Annual Handicap Chase": {
+      "macfitz_horse": "Be Aware",
+      "reason": "LIVE SPLIT 11/03/2026: Surebet=Inthepocket (score 73, cloth #5). FitzMac takes Be Aware (cloth #4, score 71, 5/1 fav, form 88-1222 — three consecutive 2nds, Skelton/Skelton, market best-backed). Only 2pt gap; Be Aware is strongly market-supported and arrives in the best form in the race.",
+      "surebet_horse": "Inthepocket",
+      "surebet_score": 73,
+      "macfitz_score": 71,
+      "gap": 2,
+      "decided": "2026-03-11",
+      "active": true
+    },
+    "Martin Pipe Handicap Hurdle": {
+      "macfitz_horse": "Kel Histoire",
+      "reason": "DAY4 UPDATED 13/03/2026: Sony Bill NOT DECLARED (absent from 26-runner field). SureBet=Nurse Susan (OR 140, dual C+D winner — won Martin Pipe trip at Cheltenham Dec 2025 AND Apr 2025, won Sandown Listed Jan 2026, 14/1-18/1). MacFitz=Kel Histoire (4/1 fav, Kenneally/Mullins). MARKET SIGNAL: moved from 16/1 pre-Festival to 4/1 — biggest move in the race. KEY FORM ANGLE: all recent runs at 2m on soft/heavy (two 5th places at Grade 3 level) but today steps up to 2m4f for first time in handicap — trip change is the improvement angle. Lightly-raced 6yo (only 6 hurdle runs), won 19-runner Cork field at OR 137. Power Prices use Kel Histoire as explicit win selection. Mullins has 5 runners in race; KH is the clear stable target at 4/1. EW VALUE NOTED: Roc Dino 8/1 (5 places — 2nd to two Supreme runners; OR 131 lowest mark; 11-2, lightest weight), Act Of Authority 14/1 (2nd in THIS race last year, D symbol, identical OR).",
+      "surebet_horse": "Nurse Susan",
+      "surebet_score": 74,
+      "macfitz_score": 71,
+      "gap": 3,
+      "decided": "2026-03-13",
+      "active": true
+    },
+    "Ryanair Chase": {
+      "macfitz_horse": "Fact To File",
+      "reason": "LIVE SPLIT 12/03/2026: Jonbon (4/1, score 142) vs Fact To File (6/5, score 125) — 17pt gap. SureBet=Jonbon (Henderson/de Boinville, 2x Arkle CD winner, OR=166, won G1 Dec 2025 — model #1, value at 4/1). MacFitz=Fact To File (defending champion 2024+2025, OR=174, Irish Gold Cup Feb 2026, 6/5 fav — class and fitness angle).",
+      "surebet_horse": "Jonbon",
+      "surebet_score": 142,
+      "macfitz_score": 125,
+      "gap": 17,
+      "decided": "2026-03-12",
+      "active": true
+    },
+    "Jack Richards Novices' Chase": {
+      "macfitz_horse": "Regents Stroll",
+      "reason": "LIVE SWITCH 12/03/2026: Gold Dancer drifted 25/1→40/1, 7lb claimer (S. Cleary-Farrell) booked — clearly NOT the Mullins target (has 4 runners in race). Switched MacFitz to Regents Stroll (9/2, Harry Cobden/Paul Nicholls, D symbol — distance winner). SureBet=Jordans Cross (10/1→9/2 backed, CD winner, Trials Day Jan 2026 on soft/heavy, Honeyball/Twiston-Davies, cloth #10) confirmed hold.",
+      "surebet_horse": "Jordans Cross",
+      "surebet_score": 87,
+      "macfitz_score": 85,
+      "gap": 2,
+      "decided": "2026-03-12",
+      "active": true
+    },
+    "Pertemps Handicap Hurdle": {
+      "macfitz_horse": "Ace Of Spades",
+      "reason": "LIVE SPLIT 12/03/2026: Skelton two-runner race — Supremely West (3/1, H.Skelton) is hammered as stable target; Ace Of Spades (16/1, K.Woods) drifted back after early support. SureBet follows market on Supremely West (D symbol, ran here Oct 2025, 2lb less today, proven progressive handicapper). MacFitz holds Ace Of Spades EW at 16/1 in 6-place Pertemps (C winner, soft/heavy-ground qualifier Jan 2026). Classic Skelton two-hander: back the first string (SW) for points, keep the longer-odds C/D specialist (AOS) for EW coverage.",
+      "surebet_horse": "Supremely West",
+      "surebet_score": 64,
+      "macfitz_score": 62,
+      "gap": 2,
+      "decided": "2026-03-12",
+      "active": true
+    },
+    "JCB Triumph Hurdle": {
+      "macfitz_horse": "Highland Crystal",
+      "reason": "DAY4 SPLIT FINAL 13/03/2026: SB=Minella Study (101, small yard). MacFitz=Highland Crystal (6/1-8/1, Elliott/Kennedy). DEEP FORM ANALYSIS: Highland Crystal beat Saratoga at Naas (heavy, Feb 7) — Saratoga then WON the Fred Winter on Tuesday at this Festival. That is live Festival-level form franking, the strongest in the race. 3/3 unbeaten, won Newbury Listed fillies' in November, controlled Naas win. Selma De Vary (prev pick) ran 2nd to Narciso Has who is ABSENT/INJURED — form unverifiable. Maestro Conti Grade 2 win: One Horse Town 2nd is 25/1 today = weak form. Minella Study: beaten by Wolf Rayet (200/1 today) in prep = deflated form. Highland Crystal's Saratoga connection is the only fully-frankable form line in this race — better value at 6/1+ than Selma at 15/4.",
+      "surebet_horse": "Minella Study",
+      "surebet_score": 101,
+      "macfitz_score": 92,
+      "gap": 9,
+      "decided": "2026-03-13",
+      "active": true
+    },
+    "County Handicap Hurdle": {
+      "macfitz_horse": "Ndaawi",
+      "reason": "DAY4 SPLIT UPDATED 13/03/2026 after deep form analysis: SB=Absurde (155, CD winner 2024 — no hurdle run since April 2025 Plumpton, then Melbourne Cup/Flemington/Caulfield on Flat — cold entry, no hurdles prep). MacFitz=Ndaawi (25/1, Elliott/Meyler). FORM FRANKING: Ndaawi ran 2nd in the 2025 County Hurdle — the winner of that race was Kargese. Kargese WON the Arkle at THIS Festival on Tuesday. Exact same franking pattern as Highland Crystal/Saratoga in the Triumph. Ndaawi also won the 2025 Galway Hurdle (OR 156 but proven at this big-field handicap level). Warmed up with AW Flat run Feb 2026 — fit. OR 156 is the only doubt but his record in Grade 1 handicap hurdles is exceptional. Bowensonfire (prev MF pick) form solid but OR 153 catching his rapid rise from 130.",
+      "surebet_horse": "Absurde",
+      "surebet_score": 64,
+      "macfitz_score": 55,
+      "gap": 9,
+      "decided": "2026-03-13",
+      "active": true
+    },
+    "Mrs Paddy Power Mares' Chase": {
+      "macfitz_horse": "Panic Attack",
+      "reason": "DAY4 SPLIT 13/03/2026: SB=Dinoblue (9/4, Walsh/Mullins, defending CD champion, won this race March 2025, 2 prep wins — Fairyhouse Grade 3, Naas Listed). MacFitz=Panic Attack (5/2, Skelton/Skelton). FORM: Panic Attack won EXACT C+D — Paddy Power Gold Cup Cheltenham 2m4f soft Nov 15 2025 (12 runners). 3/3 wins since including Coral Gold Cup at Newbury (24 runners). Freshest specific course form in race — none run this exact C+D more recently. KEY NOTE: Townend chooses Spindleberry OVER Dinoblue (both Mullins) = stable intelligence flags Spindleberry but Walsh on Dinoblue is still strong. Dinoblue's last win at this meeting was 12 months ago. EW VALUE: Telepathique 50/1 (2nd to Spindleberry Dec, gets 5lb back today, soft suits).",
+      "surebet_horse": "Dinoblue",
+      "surebet_score": 130,
+      "macfitz_score": 112,
+      "gap": 18,
+      "decided": "2026-03-13",
+      "active": true
+    },
+    "St James's Place Hunters' Chase": {
+      "macfitz_horse": "Its On The Line",
+      "reason": "DAY4 SPLIT 12/03/2026: DB model=Chemical Energy (92pts, C) but not in top market contenders. SB=Wonderwall (4/1, CD winner — WON this race 2025, defending champion, Curling stable, goes well fresh after Nov point win). MacFitz=Its On The Line (9/2, runner-up here 3 consecutive years 2023/24/25 — due to win, won Punchestown festival hunters + Down Royal Dec 2025 — strongest possible course form without the win). Two very different angles with excellent coverage.",
+      "surebet_horse": "Wonderwall",
+      "surebet_score": 92,
+      "macfitz_score": 84,
+      "gap": 8,
+      "decided": "2026-03-12",
+      "active": true
+    }
+  }
+}

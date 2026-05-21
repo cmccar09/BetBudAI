@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FuturegenAI Betting — Today's Picks | 16 March 2026</title>
+<style>
+  :root {
+    --green: #16a34a;
+    --gold:  #ca8a04;
+    --blue:  #2563eb;
+    --red:   #dc2626;
+    --bg:    #0f172a;
+    --card:  #1e293b;
+    --border:#334155;
+    --text:  #e2e8f0;
+    --muted: #94a3b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.6; }
+
+  .page-header { background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 60%); border-bottom: 2px solid var(--green); padding: 32px 24px 24px; text-align: center; }
+  .page-header h1 { font-size: 2rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  .page-header .sub { color: var(--muted); font-size: 0.95rem; margin-top: 6px; }
+  .page-header .run-meta { display: inline-flex; gap: 20px; background: rgba(255,255,255,0.06); border-radius: 8px; padding: 8px 20px; margin-top: 14px; font-size: 0.85rem; color: var(--muted); }
+  .page-header .run-meta span b { color: var(--text); }
+
+  .section { max-width: 1100px; margin: 32px auto; padding: 0 20px; }
+  .section-title { font-size: 1.1rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; }
+
+  /* Pick cards */
+  .picks-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+  .pick-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; position: relative; overflow: hidden; }
+  .pick-card.rank-1 { border-color: var(--gold); }
+  .pick-card.rank-2 { border-color: #60a5fa; }
+  .pick-card.rank-3 { border-color: #a78bfa; }
+  .pick-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--gold); }
+  .pick-card.rank-2::before { background: #60a5fa; }
+  .pick-card.rank-3::before { background: #a78bfa; }
+  .pick-rank-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
+  .rank-1 .pick-rank-badge { background: #78350f; color: #fde68a; }
+  .rank-2 .pick-rank-badge { background: #1e3a6e; color: #93c5fd; }
+  .rank-3 .pick-rank-badge { background: #2e1065; color: #c4b5fd; }
+  .horse-name { font-size: 1.5rem; font-weight: 800; color: #fff; }
+  .horse-meta { display: flex; gap: 12px; margin: 8px 0; flex-wrap: wrap; }
+  .horse-meta .chip { background: rgba(255,255,255,0.07); border-radius: 6px; padding: 3px 10px; font-size: 0.82rem; color: var(--muted); }
+  .horse-meta .chip b { color: var(--text); }
+  .score-hero { display: flex; align-items: baseline; gap: 8px; margin: 14px 0 6px; }
+  .score-hero .score-num { font-size: 2.8rem; font-weight: 900; color: var(--green); }
+  .score-hero .score-label { font-size: 0.85rem; color: var(--muted); }
+  .score-bar-wrap { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 16px; }
+  .score-bar { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--green), #4ade80); transition: width 0.3s; }
+  .odds-badge { display: inline-block; background: #166534; color: #bbf7d0; padding: 4px 14px; border-radius: 6px; font-weight: 700; font-size: 1rem; margin-bottom: 12px; }
+
+  /* Breakdown table */
+  .breakdown-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin: 14px 0 8px; }
+  .breakdown-list { list-style: none; }
+  .breakdown-list li { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.85rem; }
+  .breakdown-list li:last-child { border-bottom: none; }
+  .bd-label { flex: 1; color: var(--muted); }
+  .bd-bar-wrap { width: 80px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; }
+  .bd-bar { height: 100%; border-radius: 3px; background: var(--green); }
+  .bd-pts { width: 40px; text-align: right; font-weight: 700; color: var(--text); font-size: 0.85rem; }
+  .bd-pts.neg { color: var(--red); }
+
+  .reasons-box { margin-top: 14px; }
+  .reasons-box .reason { font-size: 0.83rem; color: var(--muted); padding: 3px 0; border-left: 3px solid var(--green); padding-left: 9px; margin-bottom: 4px; background: rgba(255,255,255,0.02); border-radius: 0 4px 4px 0; }
+  .reasons-box .reason b { color: var(--text); }
+
+  /* Model weights table */
+  .weights-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+  .weight-row { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
+  .wt-pts { font-size: 1.3rem; font-weight: 800; color: var(--green); min-width: 40px; }
+  .wt-name { font-size: 0.88rem; color: var(--text); }
+  .wt-desc { font-size: 0.76rem; color: var(--muted); }
+
+  /* Going conditions */
+  .going-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+  .going-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+  .going-card .g-course { font-weight: 700; font-size: 0.9rem; }
+  .going-card .g-going { font-size: 0.82rem; margin-top: 2px; }
+  .soft    { border-left: 4px solid #fb923c; }
+  .gts     { border-left: 4px solid #fbbf24; }
+  .standard{ border-left: 4px solid #60a5fa; }
+
+  /* Learning picks */
+  .learning-table { width: 100%; border-collapse: collapse; }
+  .learning-table th { text-align: left; padding: 8px 12px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border-bottom: 1px solid var(--border); }
+  .learning-table td { padding: 8px 12px; font-size: 0.88rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .learning-table tr:hover td { background: rgba(255,255,255,0.03); }
+  .score-pill { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; }
+  .s-high  { background: #14532d; color: #86efac; }
+  .s-med   { background: #1e3a5f; color: #93c5fd; }
+  .s-low   { background: #292524; color: #a8a29e; }
+
+  /* Methodology */
+  .methodology { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+  .methodology h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; color: #a78bfa; }
+  .methodology p { font-size: 0.88rem; color: var(--muted); margin-bottom: 8px; line-height: 1.7; }
+  .methodology ul { padding-left: 18px; }
+  .methodology ul li { font-size: 0.88rem; color: var(--muted); margin-bottom: 4px; line-height: 1.6; }
+  .methodology ul li b { color: var(--text); }
+
+  .footer { text-align: center; padding: 32px 20px; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 48px; }
+
+  .going-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; font-weight: 600; }
+  .gb-soft { background: #431407; color: #fdba74; }
+  .gb-gts  { background: #422006; color: #fde68a; }
+  .gb-std  { background: #172554; color: #93c5fd; }
+
+  .tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem; background: rgba(255,255,255,0.07); color: var(--muted); margin: 2px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>&#127934; FuturegenAI Racing Picks</h1>
+  <div class="sub">AI-powered horse racing analysis — powered by 14-factor scoring model v4.2</div>
+  <div class="run-meta">
+    <span><b>Date:</b> Monday 16 March 2026</span>
+    <span><b>Races analysed:</b> 21</span>
+    <span><b>Horses rated:</b> 176</span>
+    <span><b>Run time:</b> 13:53 GMT</span>
+    <span><b>Min confidence:</b> 60/100</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ TOP 3 PICKS ═══════════════════════════ -->
+<div class="section">
+  <div class="section-title">&#9733; Top 3 Picks Today</div>
+  <div class="picks-grid">
+
+    <!-- PICK 1 — El Gavilan -->
+    <div class="pick-card rank-1">
+      <span class="pick-rank-badge">&#127941; NAP — Pick #1</span>
+      <div class="horse-name">El Gavilan</div>
+      <div class="horse-meta">
+        <span class="chip">&#127937; <b>Ffos Las</b></span>
+        <span class="chip">&#128336; <b>16:30</b></span>
+        <span class="chip">&#128196; Form: <b>5-P072111</b></span>
+        <span class="chip">&#127959; Trainer: <b>C. Boultbee-Brooks</b></span>
+        <span class="chip"><span class="going-badge gb-soft">Soft</span></span>
+      </div>
+      <div class="score-hero">
+        <span class="score-num">100</span>
+        <span class="score-label">/ 100 pts &nbsp; ELITE confidence</span>
+      </div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:100%"></div></div>
+      <div class="odds-badge">4.20 &nbsp;(3/1)</div>
+      <span class="tag">Race leader</span> <span class="tag">3 wins in form</span> <span class="tag">Soft-ground proven</span> <span class="tag">Near-optimal odds</span>
+
+      <div class="breakdown-title">Score breakdown</div>
+      <ul class="breakdown-list">
+        <li><span class="bd-label">Going suitability (Soft)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:100%"></div></div><span class="bd-pts">+28</span></li>
+        <li><span class="bd-label">Sweet spot (3-9 odds)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:71%"></div></div><span class="bd-pts">+20</span></li>
+        <li><span class="bd-label">Market leader (lowest odds)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:43%"></div></div><span class="bd-pts">+12</span></li>
+        <li><span class="bd-label">Total form wins (3× wins)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:54%"></div></div><span class="bd-pts">+15</span></li>
+        <li><span class="bd-label">Near optimal odds (4.65 avg)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:54%"></div></div><span class="bd-pts">+15</span></li>
+        <li><span class="bd-label">Distance suitability</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:29%"></div></div><span class="bd-pts">+8</span></li>
+        <li><span class="bd-label">Form consistency (places)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:7%"></div></div><span class="bd-pts">+2</span></li>
+      </ul>
+
+      <div class="reasons-box">
+        <div class="breakdown-title">Why we picked this horse</div>
+        <div class="reason">Sweet spot (3-9 odds): <b>20pts</b></div>
+        <div class="reason">Near optimal odds (4.65 UK avg winner): <b>15pts</b></div>
+        <div class="reason">3 total form wins (5-P072111): <b>15pts</b></div>
+        <div class="reason">1 place (2nd/3rd): <b>2pts</b></div>
+        <div class="reason">Proven/suited to Soft going: <b>+28pts</b></div>
+        <div class="reason">Versatile/proven performer (3 form wins) — distance suited: <b>+8pts</b></div>
+        <div class="reason">Race market leader (lowest odds in field): <b>+12pts</b></div>
+      </div>
+    </div>
+
+    <!-- PICK 2 — Queen Of Steel -->
+    <div class="pick-card rank-2">
+      <span class="pick-rank-badge">&#127942; Pick #2</span>
+      <span style="float:right;background:#7f1d1d;color:#fca5a5;padding:3px 10px;border-radius:6px;font-size:0.8rem;font-weight:700;">&#10060; RESULT: 3rd</span>
+      <div style="clear:both"></div>
+      <div class="horse-name">Queen Of Steel</div>
+      <div class="horse-meta">
+        <span class="chip">&#127937; <b>Ffos Las</b></span>
+        <span class="chip">&#128336; <b>14:30</b></span>
+        <span class="chip">&#128196; Form: <b>7611-5312</b></span>
+        <span class="chip">&#127959; Trainer: <b>Fergal O'Brien</b></span>
+        <span class="chip"><span class="going-badge gb-soft">Soft</span></span>
+      </div>
+      <div class="score-hero">
+        <span class="score-num">99</span>
+        <span class="score-label">/ 100 pts &nbsp; ELITE confidence</span>
+      </div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:99%"></div></div>
+      <div class="odds-badge">3.60 &nbsp;(13/5)</div>
+      <span class="tag">Good trainer tier</span> <span class="tag">3 wins in form</span> <span class="tag">Soft-ground proven</span> <span class="tag">Market 2nd choice</span>
+
+      <div class="breakdown-title">Score breakdown</div>
+      <ul class="breakdown-list">
+        <li><span class="bd-label">Going suitability (Soft)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:100%"></div></div><span class="bd-pts">+28</span></li>
+        <li><span class="bd-label">Sweet spot (3-9 odds)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:71%"></div></div><span class="bd-pts">+20</span></li>
+        <li><span class="bd-label">Total form wins (3× wins)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:54%"></div></div><span class="bd-pts">+15</span></li>
+        <li><span class="bd-label">Trainer quality (Fergal O'Brien — Tier 2)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:29%"></div></div><span class="bd-pts">+8</span></li>
+        <li><span class="bd-label">Distance suitability</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:29%"></div></div><span class="bd-pts">+8</span></li>
+        <li><span class="bd-label">Good odds position</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:25%"></div></div><span class="bd-pts">+7</span></li>
+        <li><span class="bd-label">Market 2nd choice</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:18%"></div></div><span class="bd-pts">+5</span></li>
+        <li><span class="bd-label">Form consistency (2 places)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:14%"></div></div><span class="bd-pts">+4</span></li>
+        <li><span class="bd-label">Short odds + good trainer bonus</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:14%"></div></div><span class="bd-pts">+4</span></li>
+      </ul>
+
+      <div class="reasons-box">
+        <div class="breakdown-title">Why we picked this horse</div>
+        <div class="reason">Sweet spot (3-9 odds): <b>20pts</b></div>
+        <div class="reason">Good odds position: <b>7pts</b></div>
+        <div class="reason">3 total form wins (7611-5312): <b>15pts</b></div>
+        <div class="reason">2 place finishes (2nd/3rd): <b>4pts</b></div>
+        <div class="reason">Proven/suited to Soft going: <b>+28pts</b></div>
+        <div class="reason">Good trainer — Fergal O'Brien (Tier 2, consistent strike rate): <b>+8pts</b></div>
+        <div class="reason">Short odds + good trainer synergy: <b>+4pts</b></div>
+        <div class="reason">Versatile/proven performer — distance suited: <b>+8pts</b></div>
+        <div class="reason">Market second choice (within 25% of favourite): <b>+5pts</b></div>
+      </div>
+
+      <div style="margin-top:16px;background:#1c1917;border-radius:10px;padding:14px;border-left:4px solid #f97316;">
+        <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;color:#f97316;margin-bottom:8px;">&#128203; Race Result &amp; Lessons Learned</div>
+        <div style="font-size:0.85rem;color:#e2e8f0;margin-bottom:8px;">
+          <b>1st: Hellfire Princess</b> (4/1, J: B.Macey, T: Kerry Lee) &nbsp;&mdash;&nbsp; our watch-list score: 67<br>
+          <b>2nd: Neeps And Tatties</b> (10/1, J: F.Lambert, T: R.Phillips)<br>
+          <b>3rd: Queen Of Steel</b> (5/2, J: Fern O'Brien (3) claiming, T: Fergal O'Brien) &nbsp;&mdash;&nbsp; our pick
+        </div>
+        <div style="font-size:0.83rem;color:#a8a29e;line-height:1.7;">
+          <b style="color:#fbbf24;">&#9888; Key lessons applied to model v4.3:</b><br>
+          &bull; Class 5 turf fields are also unpredictable — <b>Class 5 turf penalty now added (-17pts)</b> alongside existing AW penalty (-35pts)<br>
+          &bull; Hellfire Princess scored 67 vs our pick's 99 yet won — large score gaps don't guarantee results in Class 5<br>
+          &bull; Jockey claiming allowances matter in Class 5 Soft — Fern O'Brien had a 3lb claim not yet factored in<br>
+          &bull; Kerry Lee, Sam Thomas, Nick Gifford, Jamie Snowden, Ian Williams &amp; 8 more trainers <b>added to Tier 3</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- PICK 3 — El Rojo Grande -->
+    <div class="pick-card rank-3">
+      <span class="pick-rank-badge">&#127943; Pick #3</span>
+      <div class="horse-name">El Rojo Grande</div>
+      <div class="horse-meta">
+        <span class="chip">&#127937; <b>Ffos Las</b></span>
+        <span class="chip">&#128336; <b>15:00</b></span>
+        <span class="chip">&#128196; Form: <b>2-2521112</b></span>
+        <span class="chip">&#127959; Trainer: <b>Katy Price</b></span>
+        <span class="chip"><span class="going-badge gb-soft">Soft</span></span>
+      </div>
+      <div class="score-hero">
+        <span class="score-num">98</span>
+        <span class="score-label">/ 100 pts &nbsp; ELITE confidence</span>
+      </div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:98%"></div></div>
+      <div class="odds-badge">3.35 &nbsp;(9/4)</div>
+      <span class="tag">Race leader</span> <span class="tag">3 wins in form</span> <span class="tag">4 places</span> <span class="tag">Soft-ground proven</span>
+
+      <div class="breakdown-title">Score breakdown</div>
+      <ul class="breakdown-list">
+        <li><span class="bd-label">Going suitability (Soft)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:100%"></div></div><span class="bd-pts">+28</span></li>
+        <li><span class="bd-label">Sweet spot (3-9 odds)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:71%"></div></div><span class="bd-pts">+20</span></li>
+        <li><span class="bd-label">Total form wins (3× wins)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:54%"></div></div><span class="bd-pts">+15</span></li>
+        <li><span class="bd-label">Market leader (lowest odds)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:43%"></div></div><span class="bd-pts">+12</span></li>
+        <li><span class="bd-label">Form consistency (4 places)</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:29%"></div></div><span class="bd-pts">+8</span></li>
+        <li><span class="bd-label">Distance suitability</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:29%"></div></div><span class="bd-pts">+8</span></li>
+        <li><span class="bd-label">Good odds position</span><div class="bd-bar-wrap"><div class="bd-bar" style="width:25%"></div></div><span class="bd-pts">+7</span></li>
+      </ul>
+
+      <div class="reasons-box">
+        <div class="breakdown-title">Why we picked this horse</div>
+        <div class="reason">Sweet spot (3-9 odds): <b>20pts</b></div>
+        <div class="reason">Good odds position (near 4.65 UK avg winner): <b>7pts</b></div>
+        <div class="reason">3 total form wins (2-2521112): <b>15pts</b></div>
+        <div class="reason">4 place finishes (2nd/3rd) — very consistent: <b>8pts</b></div>
+        <div class="reason">Proven/suited to Soft going — 3+ wins = versatile: <b>+28pts</b></div>
+        <div class="reason">Proven distance performer (multiple wins suggesting suited): <b>+8pts</b></div>
+        <div class="reason">Race market leader (lowest odds in field): <b>+12pts</b></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════ GOING CONDITIONS ═══════════════════════════ -->
+<div class="section">
+  <div class="section-title">&#9925; Going Conditions Today</div>
+  <div class="going-grid">
+    <div class="going-card soft"><div class="g-course">Ffos Las</div><div class="g-going"><span class="going-badge gb-soft">Soft</span> &nbsp; 7.3mm rainfall</div></div>
+    <div class="going-card soft"><div class="g-course">Plumpton</div><div class="g-going"><span class="going-badge gb-soft">Soft</span> &nbsp; 7.4mm rainfall</div></div>
+    <div class="going-card soft"><div class="g-course">Carlisle</div><div class="g-going"><span class="going-badge gb-soft">Soft</span> &nbsp; 10.7mm rainfall</div></div>
+    <div class="going-card soft"><div class="g-course">Taunton</div><div class="g-going"><span class="going-badge gb-soft">Soft</span> &nbsp; 7.9mm rainfall</div></div>
+    <div class="going-card soft"><div class="g-course">Fairyhouse</div><div class="g-going"><span class="going-badge gb-soft">Soft</span> &nbsp; 8.2mm rainfall</div></div>
+    <div class="going-card gts"><div class="g-course">Sedgefield</div><div class="g-going"><span class="going-badge gb-gts">Good to Soft</span> &nbsp; 4.0mm</div></div>
+    <div class="going-card gts"><div class="g-course">Kelso</div><div class="g-going"><span class="going-badge gb-gts">Good to Soft</span> &nbsp; 4.7mm</div></div>
+    <div class="going-card standard"><div class="g-course">Wolverhampton (AW)</div><div class="g-going"><span class="going-badge gb-std">Standard (AW)</span></div></div>
+    <div class="going-card standard"><div class="g-course">Kempton (AW)</div><div class="g-going"><span class="going-badge gb-std">Standard (AW)</span></div></div>
+    <div class="going-card standard"><div class="g-course">Newcastle (AW)</div><div class="g-going"><span class="going-badge gb-std">Standard (AW)</span></div></div>
+    <div class="going-card standard"><div class="g-course">Southwell (AW)</div><div class="g-going"><span class="going-badge gb-std">Standard (AW)</span></div></div>
+    <div class="going-card standard"><div class="g-course">Lingfield (AW)</div><div class="g-going"><span class="going-badge gb-std">Standard (AW)</span></div></div>
+  </div>
+  <p style="font-size:0.82rem; color:var(--muted); margin-top:12px;">Going inferred via Open-Meteo 3-day precipitation + March seasonal bias factor. Soft ground evidence is the primary discriminator: horses with 2+ wins proven in soft/heavy conditions receive double the base going points (2× 16 = 32pts max in extreme going).</p>
+</div>
+
+<!-- ═══════════════════════════ SCORING MODEL ═══════════════════════════ -->
+<div class="section">
+  <div class="section-title">&#9881; Scoring Model — v4.2 Weights (16 March 2026 rebalance)</div>
+  <div class="weights-grid">
+    <div class="weight-row"><div class="wt-pts">28</div><div><div class="wt-name">Going Suitability</div><div class="wt-desc">Doubled in extreme going (Soft/Heavy). Key UK NH discriminator.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">22</div><div><div class="wt-name">Recent Win</div><div class="wt-desc">Last-race winner. Single strongest predictor. Raised from 15.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">20</div><div><div class="wt-name">Sweet Spot (odds)</div><div class="wt-desc">Full points 3-9 decimal. Graduated scale beyond range.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">18</div><div><div class="wt-name">Distance Suitability (C/D)</div><div class="wt-desc">Proven course &amp; distance winner. Raised from 12.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">18</div><div><div class="wt-name">CD Bonus (C/D marker)</div><div class="wt-desc">Explicit C or D marker in form flags. Raised from 12.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">16</div><div><div class="wt-name">Going Suitability (base)</div><div class="wt-desc">Base allocation before doubling for extreme going.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">15</div><div><div class="wt-name">Elite Trainer — Tier 1</div><div class="wt-desc">Mullins, Elliott, Henderson, Nicholls, De Bromhead. Reduced from 25.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">12</div><div><div class="wt-name">Market Leader Bonus</div><div class="wt-desc">Race favourite — market wisdom signal.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">12</div><div><div class="wt-name">Elite Jockey — Tier 1</div><div class="wt-desc">Townend, Kennedy, Blackmore, Walsh, Moore, Buick, Dettori, Murphy.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">12</div><div><div class="wt-name">Course Bonus</div><div class="wt-desc">Course has already produced a winner today — track conditions confirmed.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">10</div><div><div class="wt-name">Optimal Odds</div><div class="wt-desc">Within ±1.0 of 4.65 UK average winning SP.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">8</div><div><div class="wt-name">Total Form Wins</div><div class="wt-desc">8pts per win digit in form string. Raised from 5.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">8</div><div><div class="wt-name">Good Trainer — Tier 2</div><div class="wt-desc">Skelton, O'Brien, Lavelle, Murphy, Cromwell, King, Bailey, etc.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">8</div><div><div class="wt-name">Official Rating Bonus</div><div class="wt-desc">NEW: OR ≥155 = +8pts (championship class). OR ≥140 = +4pts.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">8</div><div><div class="wt-name">Jockey-Course Bonus</div><div class="wt-desc">NEW: ≥30% win rate at this course from historical DynamoDB data.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">8</div><div><div class="wt-name">Relative Weight Bonus</div><div class="wt-desc">NEW: 10+ lbs below field average weight = competitive advantage.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">7</div><div><div class="wt-name">Favourite Correction</div><div class="wt-desc">Capped at 7pts. Elite trainer (Tier 1) only. Reduced from 12.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">6</div><div><div class="wt-name">Good Jockey — Tier 2</div><div class="wt-desc">Cobden, de Boinville, Russell, Frost, Scudamore, Coleman, Doyle.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">4</div><div><div class="wt-name">Decent Trainer — Tier 3</div><div class="wt-desc">Pipe, Wadham, Mulholland, Longsdon, Easterby, Dods, Tizzard.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">4</div><div><div class="wt-name">Form Consistency</div><div class="wt-desc">4pts per place (2nd/3rd). Raised from 2.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">−10</div><div><div class="wt-name">Relative Weight Penalty</div><div class="wt-desc">10+ lbs above field average = burden penalty.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">−15</div><div><div class="wt-name">Novice Race Penalty</div><div class="wt-desc">Novice/maiden races are less predictable. Flat penalty applied.</div></div></div>
+    <div class="weight-row"><div class="wt-pts">−35</div><div><div class="wt-name">AW Low Class Penalty</div><div class="wt-desc">Class 5/6 all-weather handicaps: handicapper-designed unpredictability.</div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ TRAINER TIERS ═══════════════════════════ -->
+<div class="section">
+  <div class="section-title">&#127959; Trainer &amp; Jockey Tier System</div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+    <div class="methodology">
+      <h3>Trainer Tiers</h3>
+      <ul>
+        <li><b>Tier 1 (+15pts):</b> W.P. Mullins, Gordon Elliott, Nicky Henderson, Paul Nicholls, Henry De Bromhead</li>
+        <li><b>Tier 2 (+8pts):</b> Skelton, McCain, Fry, Lavelle, King, Bailey, Williams, Hobbs, O'Neill, Fergal O'Brien, Olly Murphy, Cromwell, Greatrex</li>
+        <li><b>Tier 3 (+4pts):</b> David Pipe, Wadham, Neil King, Mulholland, Longsdon, Colin Tizzard, Easterby, Dods, Carroll, Barron</li>
+        <li><b>Special rule:</b> David Pipe receives a 50% penalty in Soft/Heavy going (Lesson: Feb-2026 Kempton analysis)</li>
+      </ul>
+    </div>
+    <div class="methodology">
+      <h3>Jockey Tiers</h3>
+      <ul>
+        <li><b>Tier 1 (+12pts):</b> Paul Townend, Jack Kennedy, Rachael Blackmore, Mark Walsh, Ryan Moore, William Buick, Frankie Dettori, Oisin Murphy</li>
+        <li><b>Tier 2 (+6pts):</b> Davy Russell, Patrick Mullins, Danny Mullins, Harry Cobden, Nico de Boinville, Harry Skelton, Sam Twiston-Davies, Bryony Frost, Tom Scudamore, Aidan Coleman, Jim Crowley, Tom Marquand, Hollie Doyle</li>
+        <li><b>Claiming jockeys:</b> Weight allowance (e.g. 5lb claim) = bonus points, especially in Soft/Heavy going</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ LEARNING PICKS (WATCH LIST) ═══════════════════════════ -->
+<div class="section">
+  <div class="section-title">&#128202; Watch List — High-Scoring Non-Picks (Score ≥ 65)</div>
+  <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px;">These horses scored well but weren't selected as a top-3 pick (different race / lower score than picks). Worth monitoring.</p>
+  <table class="learning-table">
+    <thead>
+      <tr>
+        <th>Horse</th>
+        <th>Course</th>
+        <th>Time</th>
+        <th>Odds</th>
+        <th>Score</th>
+        <th>Form</th>
+        <th>Trainer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><b>Beauzon</b></td><td>Wolverhampton (AW)</td><td>19:30</td><td>3.95</td><td><span class="score-pill s-high">87</span></td><td>31111111</td><td>Ian Williams</td></tr>
+      <tr><td><b>Jukebox Fury</b></td><td>Ffos Las</td><td>16:30</td><td>7.80</td><td><span class="score-pill s-high">83</span></td><td>P0/5011-</td><td>Nicky Henderson &#11088;</td></tr>
+      <tr><td><b>Al Sayah</b></td><td>Plumpton</td><td>15:45</td><td>6.20</td><td><span class="score-pill s-high">79</span></td><td>112-11234</td><td>Neil Mulholland</td></tr>
+      <tr><td><b>Alfies Princess</b></td><td>Ffos Las</td><td>16:00</td><td>7.00</td><td><span class="score-pill s-high">77</span></td><td>11532/2-17</td><td>Sam Thomas</td></tr>
+      <tr><td><b>Face Dmusic</b></td><td>Ffos Las</td><td>16:00</td><td>5.20</td><td><span class="score-pill s-high">76</span></td><td>PP4P4312</td><td>Katy Price</td></tr>
+      <tr><td><b>Eliza Dolittle</b></td><td>Plumpton</td><td>16:45</td><td>4.10</td><td><span class="score-pill s-high">74</span></td><td>1661-5521</td><td>Nick Gifford</td></tr>
+      <tr><td><b>Big City Roller</b></td><td>Ffos Las</td><td>16:00</td><td>10.00</td><td><span class="score-pill s-med">67</span></td><td>12/1-516</td><td>Charlie Longsdon</td></tr>
+      <tr><td><b>Hellfire Princess</b></td><td>Ffos Las</td><td>14:30</td><td>5.90</td><td><span class="score-pill s-med">67</span></td><td>61/24-0164</td><td>Kerry Lee</td></tr>
+      <tr><td><b>La Marquise</b></td><td>Plumpton</td><td>15:45</td><td>5.40</td><td><span class="score-pill s-med">67</span></td><td>713/18-543</td><td>Jamie Snowden</td></tr>
+      <tr><td><b>Lon Chaney</b></td><td>Ffos Las</td><td>15:30</td><td>2.70</td><td><span class="score-pill s-med">66</span></td><td>5219</td><td>Olly Murphy &#10003;</td></tr>
+      <tr><td><b>Crimson Rambler</b></td><td>Wolverhampton (AW)</td><td>20:30</td><td>3.20</td><td><span class="score-pill s-med">66</span></td><td>876-22211</td><td>George Scott</td></tr>
+      <tr><td><b>Kool Kid</b></td><td>Plumpton</td><td>14:45</td><td>2.76</td><td><span class="score-pill s-med">65</span></td><td>1-633361</td><td>Joe Tizzard</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:0.78rem;color:var(--muted);margin-top:8px;">&#11088; = Elite Tier 1 trainer &nbsp; &#10003; = Tier 2 trainer</p>
+</div>
+
+<!-- ═══════════════════════════ METHODOLOGY ═══════════════════════════ -->
+<div class="section">
+  <div class="section-title">&#128161; Scoring Methodology</div>
+  <div class="methodology">
+    <h3>How the 14-Factor Model Works</h3>
+    <p>Each horse is scored across 14 independent factors totalling up to ~150pts (no hard cap). Scores above 60 are considered confidence-grade. Each race's best-scoring horse is identified, then the top 3 cross-race bests become today's picks.</p>
+    
+    <h3 style="margin-top:16px;">Factor Hierarchy (most to least impactful)</h3>
+    <ul>
+      <li><b>Going Suitability (up to 32pts):</b> In Soft/Heavy ground, horses that have proven form in testing conditions earn double base points. Unproven horses (0 wins) in extreme going receive a penalty.</li>
+      <li><b>Recent Win (+22pts):</b> Last-to-race winner is the single strongest predictor. Captures peak fitness and confidence.</li>
+      <li><b>Odds Sweet Spot (+12pts):</b> 3-9 decimal range covers ~70% of UK winners. Graduated scale outside this range.</li>
+      <li><b>C/D Win Marker (+18pts):</b> Explicit Course and Distance winner badge from racecard. Primary evidence of suitability.</li>
+      <li><b>Distance Suitability (+18pts):</b> Proven at the target trip — uses C/D marker as primary evidence, form win count as proxy.</li>
+      <li><b>Trainer Tier (+4–15pts):</b> 3-tier system from elite (Mullins/Henderson) to decent. Elite bonus capped lower than old flat bonus to avoid over-penalising weaker picks.</li>
+      <li><b>Jockey Quality (+6–12pts):</b> 2-tier system from champion joskeys to very good jockeys. Claiming jockeys also rewarded in soft going (+allowance × 2).</li>
+      <li><b>NEW — Jockey Course Familiarity (+4–8pts):</b> DynamoDB tracks wins/runs per jockey per course. ≥30% win rate = full bonus. Grows over time as results are recorded.</li>
+      <li><b>NEW — Relative Weight (+/-8pts):</b> Weight within field context: 10+ lbs lighter than average = advantage. 10+ lbs heavier = burden. Requires Betfair RUNNER_METADATA weight data.</li>
+      <li><b>NEW — Official Rating Bonus (+4–8pts):</b> OR ≥155 = championship class (+8pts). OR ≥140 = Group/Grade 2-3 class (+4pts).</li>
+      <li><b>Market Leader (+12pts):</b> Race favourite aggregates all public information — when AI agrees with market, confidence is reinforced.</li>
+      <li><b>Form Wins (+8pts each) &amp; Consistency (+4pts each place):</b> Raised from 5/2 to reward horses with evidence of winning.</li>
+      <li><b>Going Penalty (up to −32pts):</b> Zero wins in extreme going = full base penalty. Removed for Graded races (elite horses are trained for all conditions).</li>
+      <li><b>AW Low Class Penalty (−35pts):</b> Class 5/6 AW handicaps are unpredictable by design. System aggressively avoids these.</li>
+    </ul>
+
+    <h3 style="margin-top:16px;">Self-Learning System</h3>
+    <p>After each day's racing completes, <code>daily_learning.py</code> fetches settled results from Betfair, compares our picks to actual winners, and nudges factor weights in DynamoDB (±0.3–1.5pts). Over time this adapts the model to recent track/going biases. The system also now records <b>jockey-course combinations</b> (wins/runs) which will power the familiarity bonus in future scans.</p>
+
+    <h3 style="margin-top:16px;">Data Pipeline</h3>
+    <p>Betfair API → <code>betfair_odds_fetcher.py</code> (now extracts JOCKEY_NAME, WEIGHT_VALUE, AGE, OFFICIAL_RATING from RUNNER_METADATA) → <code>complete_daily_analysis.py</code> (scores with field-relative weights) → DynamoDB SureBetBets → Lambda API → React frontend (Amplify)</p>
+  </div>
+</div>
+
+<div class="footer">
+  Generated by FuturegenAI Betting System &nbsp;|&nbsp; 16 March 2026 13:53 GMT &nbsp;|&nbsp; Scoring model v4.2 &nbsp;|&nbsp; 176 horses rated across 21 races
+  <br>For entertainment and analysis purposes only. Please bet responsibly.
+</div>
+
+</body>
+</html>

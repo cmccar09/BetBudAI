@@ -1,0 +1,187 @@
+{
+  "final demand": {
+    "id": 1334278,
+    "slug": "final-demand-ire"
+  },
+  "ballyburn": {
+    "id": 1243568,
+    "slug": "ballyburn-ire"
+  },
+  "lossiemouth": {
+    "id": 1026727,
+    "slug": "lossiemouth"
+  },
+  "chemical energy": {
+    "id": 1122689,
+    "slug": "chemical-energy-ire"
+  },
+  "bambino fever": {
+    "id": 1334636,
+    "slug": "bambino-fever-ire"
+  },
+  "energumene": {
+    "id": 1073254,
+    "slug": "energumene-fr",
+    "source_race": 1295285
+  },
+  "salvator mundi": {
+    "id": 1250501,
+    "slug": "salvator-mundi-fr",
+    "source_race": 1295138
+  },
+  "kopek des bordes": {
+    "id": 1297916,
+    "slug": "kopek-des-bordes-fr",
+    "source_race": 1295138
+  },
+  "majborough": {
+    "id": 1248413,
+    "slug": "majborough-fr",
+    "source_race": 1295139
+  },
+  "state man": {
+    "id": 1091506,
+    "slug": "state-man-fr",
+    "source_race": 1295142
+  },
+  "golden ace": {
+    "id": 1233046,
+    "slug": "golden-ace",
+    "source_race": 1295142
+  },
+  "constitution hill": {
+    "id": 1185772,
+    "slug": "constitution-hill",
+    "source_race": 1295142
+  },
+  "murcia": {
+    "id": 1295470,
+    "slug": "murcia-fr",
+    "source_race": 1295143
+  },
+  "il est francais": {
+    "id": 1178083,
+    "slug": "il-est-francais-fr",
+    "source_race": 1295474
+  },
+  "jungle boogie": {
+    "id": 1046236,
+    "slug": "jungle-boogie-ire",
+    "source_race": 1295474
+  },
+  "fact to file": {
+    "id": 1204301,
+    "slug": "fact-to-file-fr",
+    "source_race": 1295474
+  },
+  "teahupoo": {
+    "id": 1127958,
+    "slug": "teahupoo-fr",
+    "source_race": 1295475
+  },
+  "jagwar": {
+    "id": 1229287,
+    "slug": "jagwar-fr",
+    "source_race": 1295476
+  },
+  "poniros": {
+    "id": 1275767,
+    "slug": "poniros",
+    "source_race": 1295671
+  },
+  "dinoblue": {
+    "id": 1144091,
+    "slug": "dinoblue-fr",
+    "source_race": 1295673
+  },
+  "galopin des champs": {
+    "id": 1071297,
+    "slug": "galopin-des-champs-fr",
+    "source_race": 1295675
+  },
+  "backmersackme": {
+    "id": 1298152,
+    "slug": "backmersackme-ire",
+    "source_race": 1295813
+  },
+  "manlaga": {
+    "id": 1342637,
+    "slug": "manlaga-ire",
+    "source_race": 1296020
+  },
+  "favori de champdou": {
+    "id": 1073529,
+    "slug": "favori-de-champdou-fr",
+    "source_race": 1352953
+  },
+  "gaelic warrior": {
+    "id": 1156344,
+    "slug": "gaelic-warrior-ger",
+    "source_race": 1350786
+  },
+  "roc dino": {
+    "id": 1332967,
+    "slug": "roc-dino-fr",
+    "source_race": 1350816
+  },
+  "storm heart": {
+    "id": 1226600,
+    "slug": "storm-heart-fr",
+    "source_race": 1350848
+  },
+  "waterford whispers": {
+    "id": 1248279,
+    "slug": "waterford-whispers-ire",
+    "source_race": 1350857
+  },
+  "koktail divin": {
+    "id": 1270709,
+    "slug": "koktail-divin-fr",
+    "source_race": 1350965
+  },
+  "fastorslow": {
+    "id": 1060265,
+    "slug": "fastorslow-fr",
+    "source_race": 1350967
+  },
+  "king rasko grey": {
+    "id": 1301447,
+    "slug": "king-rasko-grey-fr",
+    "source_race": 1350970
+  },
+  "el fabiolo": {
+    "id": 1117906,
+    "slug": "el-fabiolo-fr",
+    "source_race": 1351213
+  },
+  "il etait temps": {
+    "id": 1156407,
+    "slug": "il-etait-temps-fr",
+    "source_race": 1345448
+  },
+  "old park star": {
+    "id": 1328251,
+    "slug": "old-park-star-ire",
+    "source_race": 1347684
+  },
+  "vauban": {
+    "id": 1155892,
+    "slug": "vauban-fr",
+    "source_race": 1124960
+  },
+  "gaillard du mesnil": {
+    "id": 1065099,
+    "slug": "gaillard-du-mesnil-fr",
+    "source_race": 1130969
+  },
+  "doctor steinberg": {
+    "id": 1297913,
+    "slug": "doctor-steinberg-ire",
+    "source_race": 1222261
+  },
+  "down memory lane": {
+    "id": 1244299,
+    "slug": "down-memory-lane-ire",
+    "source_race": 1324920
+  }
+}

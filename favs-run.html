@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Favs-Run — Lay the Favourite Report</title>
+<style>
+  :root {
+    --bg:        #0d1117;
+    --panel:     #161b22;
+    --border:    #30363d;
+    --accent:    #58a6ff;
+    --green:     #3fb950;
+    --amber:     #d29922;
+    --red:       #f85149;
+    --muted:     #8b949e;
+    --text:      #e6edf3;
+    --text2:     #c9d1d9;
+    --tag-bg:    #21262d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px; line-height: 1.6; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1c2333 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 48px 24px;
+  }
+  .header-logo { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .header h1 { font-size: 28px; font-weight: 700; }
+  .header h1 span { color: var(--red); }
+  .header-sub { margin-top: 6px; color: var(--muted); font-size: 13px; }
+  .header-meta { margin-top: 16px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .meta-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--tag-bg); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 12px; font-size: 12px; color: var(--muted);
+  }
+  .meta-pill b { color: var(--text2); }
+
+  /* Legend */
+  .legend { display: flex; gap: 24px; padding: 16px 48px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* Scoring table */
+  .scoring-panel { margin: 24px 48px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 20px 24px; }
+  .scoring-panel h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+  .scoring-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 6px 24px; }
+  .scoring-row { display: flex; align-items: baseline; gap: 8px; font-size: 12px; }
+  .scoring-pts { color: var(--amber); font-weight: 700; min-width: 24px; }
+  .scoring-label { color: var(--text2); font-weight: 600; }
+  .scoring-desc { color: var(--muted); }
+
+  /* Cards */
+  .cards-section { padding: 24px 48px; }
+  .section-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 16px; }
+
+  .race-card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; margin-bottom: 16px; overflow: hidden;
+  }
+  .race-card.vc-red    { border-left: 4px solid #f85149; }
+  .race-card.vc-amber  { border-left: 4px solid #f97316; }
+  .race-card.vc-yellow { border-left: 4px solid #d29922; }
+  .race-card.vc-green  { border-left: 4px solid #3fb950; }
+
+  .card-header {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 12px 20px; border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+  .card-time { font-weight: 700; color: var(--accent); font-size: 15px; min-width: 40px; }
+  .card-course { font-weight: 600; color: var(--text); }
+  .card-race { flex: 1; color: var(--muted); font-size: 12px; }
+  .our-pick-badge {
+    background: #1a3a52; color: var(--accent); border: 1px solid #2d5a80;
+    border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 600;
+  }
+  .card-verdict {
+    border: 1px solid; border-radius: 5px; padding: 3px 10px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  .card-body { display: flex; align-items: center; padding: 16px 20px; gap: 20px; }
+  .card-main { flex: 1; }
+  .horse-name { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .horse-meta { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .meta-item { font-size: 12px; color: var(--muted); }
+  .meta-item b { color: var(--text2); }
+
+  .card-score-block { text-align: center; min-width: 80px; }
+  .lay-score { font-size: 40px; font-weight: 700; line-height: 1; }
+  .lay-score-denom { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .score-bar-wrap { width: 70px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .score-bar { height: 100%; border-radius: 3px; transition: width 0.3s; }
+
+  .card-flags { padding: 8px 20px 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+    background: var(--tag-bg); color: var(--text2); border: 1px solid var(--border);
+  }
+  .chip-short_price { background: #1a1a2e; color: #a78bfa; border-color: #4c1d95; }
+  .chip-rivals_close { background: #1f2d3d; color: #60a5fa; border-color: #1d4ed8; }
+  .chip-trip_new     { background: #1f2a1f; color: #6ee7b7; border-color: #065f46; }
+  .chip-going_unproven { background: #1f2a1f; color: #34d399; border-color: #064e3b; }
+  .chip-draw_poor    { background: #2a1f0a; color: #fbbf24; border-color: #92400e; }
+  .chip-layoff       { background: #271a1a; color: #fca5a5; border-color: #7f1d1d; }
+  .chip-pace_doubt   { background: #1a1f27; color: #93c5fd; border-color: #1e3a5f; }
+  .chip-drift           { background: #271f0a; color: #fcd34d; border-color: #78350f; }
+  .chip-class_up        { background: #2d1b3d; color: #c084fc; border-color: #6b21a8; }
+  .chip-trainer_track   { background: #1a2040; color: #a5b4fc; border-color: #4338ca; }
+  .chip-trainer_cold    { background: #1a1a30; color: #818cf8; border-color: #3730a3; }
+  .chip-trainer_multiple { background: #200a2a; color: #e879f9; border-color: #7e22ce; }
+
+  .detail-list { padding: 0 20px 14px 36px; }
+  .detail-list li { font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+  .detail-list li::marker { color: var(--amber); }
+
+  /* Summary table */
+  .table-section { padding: 0 48px 40px; }
+  .summary-table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .summary-table th { background: var(--tag-bg); color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  .summary-table td { padding: 10px 14px; border-bottom: 1px solid rgba(48,54,61,0.5); font-size: 13px; }
+  .summary-table tr:last-child td { border-bottom: none; }
+  .summary-table tr:hover td { background: rgba(255,255,255,0.03); }
+  .verdict-pill { border: 1px solid; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+
+  .footer { text-align: center; padding: 24px; color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">SureBet System &nbsp;·&nbsp; Favs-Run</div>
+  <h1>Lay the <span>Favourite</span> Report</h1>
+  <div class="header-sub">Read-only parallel analysis — does not affect picks, weights or UI</div>
+  <div class="header-meta">
+    <div class="meta-pill"><span class="dot" style="background:#58a6ff"></span>Generated <b>13 Apr 2026 15:00</b></div>
+    <div class="meta-pill"><span class="dot" style="background:#8b949e"></span>Analysed <b>6</b> short-price favourites</div>
+    <div class="meta-pill"><span class="dot" style="background:#d29922"></span>Caution+ <b>5</b></div>
+    <div class="meta-pill"><span class="dot" style="background:#f97316"></span>Strong Lay <b>1</b></div>
+    <div class="meta-pill"><span class="dot" style="background:#f85149"></span>Red Flag <b>0</b></div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div>0–3 = Leave alone</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#d29922"></div>4–9 = Caution / take a look</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div>10–12 = Strong lay</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f85149"></div>13+ = Strong lay candidate</div>
+</div>
+
+<div class="scoring-panel">
+  <h3>Scoring Factors</h3>
+  <div class="scoring-grid">
+    <div class="scoring-row"><span class="scoring-pts">+4</span><span class="scoring-label">Class</span><span class="scoring-desc">Moving up in class</span></div>
+    <div class="scoring-row"><span class="scoring-pts">+2</span><span class="scoring-label">Trip</span><span class="scoring-desc">New distance (up or down)</span></div>
+    <div class="scoring-row"><span class="scoring-pts">+2</span><span class="scoring-label">Going</span><span class="scoring-desc">Unproven on current going</span></div>
+    <div class="scoring-row"><span class="scoring-pts">+1</span><span class="scoring-label">Draw</span><span class="scoring-desc">Poor draw on this track</span></div>
+    <div class="scoring-row"><span class="scoring-pts">+1</span><span class="scoring-label">Layoff</span><span class="scoring-desc">30–90 days off</span></div>
+    <div class="scoring-row"><span class="scoring-pts">+1</span><span class="scoring-label">Pace</span><span class="scoring-desc">Pace may not suit</span></div>
+    <div class="scoring-row"><span class="scoring-pts">+2</span><span class="scoring-label">Rivals</span><span class="scoring-desc">Creditable threats (2nd/3rd favs)</span></div>
+    <div class="scoring-row"><span class="scoring-pts">+1</span><span class="scoring-label">Drift</span><span class="scoring-desc">Market drift — open vs current</span></div>
+    <div class="scoring-row"><span class="scoring-pts">+1</span><span class="scoring-label">Price</span><span class="scoring-desc">5/4 or less / odds-on</span></div>
+    <div class="scoring-row"><span class="scoring-pts">+1</span><span class="scoring-label">Trainer@Track</span><span class="scoring-desc">Trainer win rate at that track</span></div>
+    <div class="scoring-row"><span class="scoring-pts">+1</span><span class="scoring-label">TrainerCold</span><span class="scoring-desc">Trainer cold last 14 days</span></div>
+    <div class="scoring-row"><span class="scoring-pts">+1</span><span class="scoring-label">MultiRunner</span><span class="scoring-desc">Trainer with multiple runners</span></div>
+  </div>
+</div>
+
+<div class="cards-section">
+  <div class="section-title">Race-by-Race Analysis — sorted by Lay Score</div>
+  
+  <div class="race-card vc-amber">
+    <div class="card-header">
+      <div class="card-time">16:10</div>
+      <div class="card-course">Fakenham</div>
+      <div class="card-race">Fakenham 16:10</div>
+      
+      <div class="card-verdict" style="color:#f97316;background:#2a1508;border-color:#f97316">
+        STRONG LAY
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-main">
+        <div class="horse-name">Mister Splash</div>
+        <div class="horse-meta">
+          <span class="meta-item">@ <b>2.04</b></span>
+          <span class="meta-item">Sys&nbsp;Score: <b>21</b></span>
+          <span class="meta-item">Score&nbsp;Gap: <b>0</b></span>
+          <span class="meta-item">Form: <b>—</b></span>
+          <span class="meta-item">Runners: <b>4</b></span>
+        </div>
+        <div class="horse-meta" style="margin-top:4px">
+          <span class="meta-item">Trainer: <b>E. Turner</b></span>
+          <span class="meta-item">Jockey: <b>Mr Paddy Barlow</b></span>
+        </div>
+      </div>
+      <div class="card-score-block">
+        <div class="lay-score" style="color:#f97316">11</div>
+        <div class="lay-score-denom">/ 18</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:61%;background:#f97316"></div></div>
+      </div>
+    </div>
+    <div class="card-flags"><span class="chip chip-short_price">Price +1</span><span class="chip chip-rivals_close">Rivals +2</span><span class="chip chip-going_unproven">Going +2</span><span class="chip chip-trip_new">Trip +2</span><span class="chip chip-pace_doubt">Pace +1</span><span class="chip chip-trainer_track">Trainer@Track +1</span><span class="chip chip-trainer_cold">TrainerCold +1</span><span class="chip chip-drift">Drift +1</span></div>
+    <ul class="detail-list"><li>Short price (5/4 or less) — market may overshorten</li><li>Rivals close: 2nd (On Lovers Walk) scored 26 vs fav 21 (124%)</li><li>Going suitability = 0 — unproven on today's ground</li><li>Distance suitability = 0 & no CD bonus — unproven at this trip</li><li>No going suitability or recent win signal — pace may not suit</li><li>Trainer (E. Turner) — no quality tier status at this track (win rate unverified)</li><li>Trainer (E. Turner) — no meeting focus & no win in recent form (cold indicator)</li><li>Score gap = 0 — our model does not separate the favourite clearly</li></ul>
+  </div>
+  <div class="race-card vc-yellow">
+    <div class="card-header">
+      <div class="card-time">18:30</div>
+      <div class="card-course">Newcastle</div>
+      <div class="card-race">Newcastle 18:30</div>
+      
+      <div class="card-verdict" style="color:#d29922;background:#2a1f0a;border-color:#d29922">
+        CAUTION / TAKE A LOOK
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-main">
+        <div class="horse-name">Eddaari</div>
+        <div class="horse-meta">
+          <span class="meta-item">@ <b>1.91</b></span>
+          <span class="meta-item">Sys&nbsp;Score: <b>55</b></span>
+          <span class="meta-item">Score&nbsp;Gap: <b>0</b></span>
+          <span class="meta-item">Form: <b>632-</b></span>
+          <span class="meta-item">Runners: <b>8</b></span>
+        </div>
+        <div class="horse-meta" style="margin-top:4px">
+          <span class="meta-item">Trainer: <b>S & E Crisford</b></span>
+          <span class="meta-item">Jockey: <b>Harry Davies</b></span>
+        </div>
+      </div>
+      <div class="card-score-block">
+        <div class="lay-score" style="color:#d29922">8</div>
+        <div class="lay-score-denom">/ 18</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:44%;background:#d29922"></div></div>
+      </div>
+    </div>
+    <div class="card-flags"><span class="chip chip-short_price">Price +1</span><span class="chip chip-rivals_close">Rivals +2</span><span class="chip chip-trip_new">Trip +2</span><span class="chip chip-trainer_track">Trainer@Track +1</span><span class="chip chip-trainer_cold">TrainerCold +1</span><span class="chip chip-drift">Drift +1</span></div>
+    <ul class="detail-list"><li>Short price (5/4 or less) — market may overshorten</li><li>Rivals close: 2nd (Far Far Out) scored 54 vs fav 55 (98%)</li><li>Distance suitability = 0 & no CD bonus — unproven at this trip</li><li>Trainer (S & E Crisford) — no quality tier status at this track (win rate unverified)</li><li>Trainer (S & E Crisford) — no meeting focus & no win in recent form (cold indicator)</li><li>Score gap = 0 — our model does not separate the favourite clearly</li></ul>
+  </div>
+  <div class="race-card vc-yellow">
+    <div class="card-header">
+      <div class="card-time">13:00</div>
+      <div class="card-course">Hexham</div>
+      <div class="card-race">Hexham 13:00</div>
+      
+      <div class="card-verdict" style="color:#d29922;background:#2a1f0a;border-color:#d29922">
+        CAUTION / TAKE A LOOK
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-main">
+        <div class="horse-name">Blues Singer</div>
+        <div class="horse-meta">
+          <span class="meta-item">@ <b>2.24</b></span>
+          <span class="meta-item">Sys&nbsp;Score: <b>88</b></span>
+          <span class="meta-item">Score&nbsp;Gap: <b>34</b></span>
+          <span class="meta-item">Form: <b>1/204-391</b></span>
+          <span class="meta-item">Runners: <b>12</b></span>
+        </div>
+        <div class="horse-meta" style="margin-top:4px">
+          <span class="meta-item">Trainer: <b>Alan King</b></span>
+          <span class="meta-item">Jockey: <b>Tom Bellamy</b></span>
+        </div>
+      </div>
+      <div class="card-score-block">
+        <div class="lay-score" style="color:#d29922">5</div>
+        <div class="lay-score-denom">/ 18</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:27%;background:#d29922"></div></div>
+      </div>
+    </div>
+    <div class="card-flags"><span class="chip chip-short_price">Price +1</span><span class="chip chip-going_unproven">Going +2</span><span class="chip chip-layoff">Layoff +1</span><span class="chip chip-pace_doubt">Pace +1</span></div>
+    <ul class="detail-list"><li>Short price (5/4 or less) — market may overshorten</li><li>Going suitability = 0 — unproven on today's ground</li><li>Significant layoff flagged in selection reasons</li><li>No going suitability or recent win signal — pace may not suit</li></ul>
+  </div>
+  <div class="race-card vc-yellow">
+    <div class="card-header">
+      <div class="card-time">15:40</div>
+      <div class="card-course">Fakenham</div>
+      <div class="card-race">Fakenham 15:40</div>
+      
+      <div class="card-verdict" style="color:#d29922;background:#2a1f0a;border-color:#d29922">
+        CAUTION / TAKE A LOOK
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-main">
+        <div class="horse-name">Jamada</div>
+        <div class="horse-meta">
+          <span class="meta-item">@ <b>1.72</b></span>
+          <span class="meta-item">Sys&nbsp;Score: <b>71</b></span>
+          <span class="meta-item">Score&nbsp;Gap: <b>41</b></span>
+          <span class="meta-item">Form: <b>471-2523</b></span>
+          <span class="meta-item">Runners: <b>4</b></span>
+        </div>
+        <div class="horse-meta" style="margin-top:4px">
+          <span class="meta-item">Trainer: <b>Olly Murphy</b></span>
+          <span class="meta-item">Jockey: <b>Sean Bowen</b></span>
+        </div>
+      </div>
+      <div class="card-score-block">
+        <div class="lay-score" style="color:#d29922">5</div>
+        <div class="lay-score-denom">/ 18</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:27%;background:#d29922"></div></div>
+      </div>
+    </div>
+    <div class="card-flags"><span class="chip chip-short_price">Price +1</span><span class="chip chip-going_unproven">Going +2</span><span class="chip chip-pace_doubt">Pace +1</span><span class="chip chip-trainer_cold">TrainerCold +1</span></div>
+    <ul class="detail-list"><li>Short price (5/4 or less) — market may overshorten</li><li>Going suitability = 0 — unproven on today's ground</li><li>No going suitability or recent win signal — pace may not suit</li><li>Trainer (Olly Murphy) — no meeting focus & no win in recent form (cold indicator)</li></ul>
+  </div>
+  <div class="race-card vc-yellow">
+    <div class="card-header">
+      <div class="card-time">15:52</div>
+      <div class="card-course">Leicester</div>
+      <div class="card-race">Leicester 15:52</div>
+      
+      <div class="card-verdict" style="color:#d29922;background:#2a1f0a;border-color:#d29922">
+        CAUTION / TAKE A LOOK
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-main">
+        <div class="horse-name">Engross</div>
+        <div class="horse-meta">
+          <span class="meta-item">@ <b>1.93</b></span>
+          <span class="meta-item">Sys&nbsp;Score: <b>102</b></span>
+          <span class="meta-item">Score&nbsp;Gap: <b>34</b></span>
+          <span class="meta-item">Form: <b>774-1</b></span>
+          <span class="meta-item">Runners: <b>5</b></span>
+        </div>
+        <div class="horse-meta" style="margin-top:4px">
+          <span class="meta-item">Trainer: <b>James Fanshawe</b></span>
+          <span class="meta-item">Jockey: <b>Daniel Muscutt</b></span>
+        </div>
+      </div>
+      <div class="card-score-block">
+        <div class="lay-score" style="color:#d29922">5</div>
+        <div class="lay-score-denom">/ 18</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:27%;background:#d29922"></div></div>
+      </div>
+    </div>
+    <div class="card-flags"><span class="chip chip-short_price">Price +1</span><span class="chip chip-trip_new">Trip +2</span><span class="chip chip-layoff">Layoff +1</span><span class="chip chip-trainer_track">Trainer@Track +1</span></div>
+    <ul class="detail-list"><li>Short price (5/4 or less) — market may overshorten</li><li>Distance suitability = 0 & no CD bonus — unproven at this trip</li><li>Significant layoff flagged in selection reasons</li><li>Trainer (James Fanshawe) — no quality tier status at this track (win rate unverified)</li></ul>
+  </div>
+  <div class="race-card vc-green">
+    <div class="card-header">
+      <div class="card-time">17:30</div>
+      <div class="card-course">Newcastle</div>
+      <div class="card-race">Newcastle 17:30</div>
+      
+      <div class="card-verdict" style="color:#3fb950;background:#0d2318;border-color:#3fb950">
+        LEAVE ALONE
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-main">
+        <div class="horse-name">Noelan Star</div>
+        <div class="horse-meta">
+          <span class="meta-item">@ <b>1.57</b></span>
+          <span class="meta-item">Sys&nbsp;Score: <b>-7</b></span>
+          <span class="meta-item">Score&nbsp;Gap: <b>16</b></span>
+          <span class="meta-item">Form: <b>1-</b></span>
+          <span class="meta-item">Runners: <b>11</b></span>
+        </div>
+        <div class="horse-meta" style="margin-top:4px">
+          <span class="meta-item">Trainer: <b>E Bethell</b></span>
+          <span class="meta-item">Jockey: <b>Callum Rodriguez</b></span>
+        </div>
+      </div>
+      <div class="card-score-block">
+        <div class="lay-score" style="color:#3fb950">3</div>
+        <div class="lay-score-denom">/ 18</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:16%;background:#3fb950"></div></div>
+      </div>
+    </div>
+    <div class="card-flags"><span class="chip chip-short_price">Price +1</span><span class="chip chip-trainer_track">Trainer@Track +1</span><span class="chip chip-trainer_multiple">MultiRunner +1</span></div>
+    <ul class="detail-list"><li>Short price (5/4 or less) — market may overshorten</li><li>Trainer (E Bethell) — no quality tier status at this track (win rate unverified)</li><li>Trainer (E Bethell) has 2 runners in race — possible divided loyalties</li></ul>
+  </div>
+</div>
+
+<div class="table-section">
+  <div class="section-title" style="padding-bottom:12px">Summary Table</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>Date</th><th>Time</th><th>Course</th><th>Favourite</th>
+        <th>Odds</th><th>Sys Score</th><th>Score Gap</th><th>Lay Score</th><th>Verdict</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+    <tr>
+      <td>2026-04-13</td>
+      <td>16:10</td>
+      <td>Fakenham</td>
+      <td><b>Mister Splash</b></td>
+      <td>2.04</td>
+      <td>21</td>
+      <td>0</td>
+      <td style="color:#f97316;font-weight:700">11</td>
+      <td><span class="verdict-pill" style="color:#f97316;background:#2a1508;border-color:#f97316">STRONG LAY</span></td>
+    </tr>
+    <tr>
+      <td>2026-04-13</td>
+      <td>18:30</td>
+      <td>Newcastle</td>
+      <td><b>Eddaari</b></td>
+      <td>1.91</td>
+      <td>55</td>
+      <td>0</td>
+      <td style="color:#d29922;font-weight:700">8</td>
+      <td><span class="verdict-pill" style="color:#d29922;background:#2a1f0a;border-color:#d29922">CAUTION / TAKE A LOOK</span></td>
+    </tr>
+    <tr>
+      <td>2026-04-13</td>
+      <td>13:00</td>
+      <td>Hexham</td>
+      <td><b>Blues Singer</b></td>
+      <td>2.24</td>
+      <td>88</td>
+      <td>34</td>
+      <td style="color:#d29922;font-weight:700">5</td>
+      <td><span class="verdict-pill" style="color:#d29922;background:#2a1f0a;border-color:#d29922">CAUTION / TAKE A LOOK</span></td>
+    </tr>
+    <tr>
+      <td>2026-04-13</td>
+      <td>15:40</td>
+      <td>Fakenham</td>
+      <td><b>Jamada</b></td>
+      <td>1.72</td>
+      <td>71</td>
+      <td>41</td>
+      <td style="color:#d29922;font-weight:700">5</td>
+      <td><span class="verdict-pill" style="color:#d29922;background:#2a1f0a;border-color:#d29922">CAUTION / TAKE A LOOK</span></td>
+    </tr>
+    <tr>
+      <td>2026-04-13</td>
+      <td>15:52</td>
+      <td>Leicester</td>
+      <td><b>Engross</b></td>
+      <td>1.93</td>
+      <td>102</td>
+      <td>34</td>
+      <td style="color:#d29922;font-weight:700">5</td>
+      <td><span class="verdict-pill" style="color:#d29922;background:#2a1f0a;border-color:#d29922">CAUTION / TAKE A LOOK</span></td>
+    </tr>
+    <tr>
+      <td>2026-04-13</td>
+      <td>17:30</td>
+      <td>Newcastle</td>
+      <td><b>Noelan Star</b></td>
+      <td>1.57</td>
+      <td>-7</td>
+      <td>16</td>
+      <td style="color:#3fb950;font-weight:700">3</td>
+      <td><span class="verdict-pill" style="color:#3fb950;background:#0d2318;border-color:#3fb950">LEAVE ALONE</span></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="footer">
+  Favs-Run v1.0 &nbsp;·&nbsp; Weights v4.5 &nbsp;·&nbsp; Read-only parallel run &nbsp;·&nbsp; 13 Apr 2026 15:00
+</div>
+</body>
+</html>

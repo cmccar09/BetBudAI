@@ -1,0 +1,709 @@
+# Automated Learning System - Deployment Guide
+
+**Version**: 1.0  
+**Date**: May 20, 2026  
+**Deployment Window**: Tonight (21:15 UTC)  
+**Expected Impact**: +20-30 winners/week
+
+---
+
+## Quick Start (For Tonight's Deployment)
+
+### Prerequisites Check (5 minutes)
+
+```bash
+# 1. Verify AWS credentials
+aws sts get-caller-identity
+
+# 2. Verify region
+echo $AWS_REGION  # Should be: eu-west-1
+
+# 3. Check existing tables
+aws dynamodb list-tables --region eu-west-1 | grep SureBetBets
+
+# 4. Verify Lambda role exists
+aws iam get-role --role-name lambda-execution-role
+```
+
+### Deployment Steps (15 minutes)
+
+#### Step 1: Update Lambda Role ARN
+
+```bash
+cd /c/Users/charl/OneDrive/futuregenAI/BetBudAI
+
+# Edit deployment script
+nano scripts/deploy_learning_pipeline.sh
+
+# Update this line (around line 26):
+# LAMBDA_ROLE="arn:aws:iam::YOUR_ACCOUNT_ID:role/lambda-execution-role"
+# Replace YOUR_ACCOUNT_ID with your AWS account ID
+```
+
+**Get your account ID**:
+```bash
+aws sts get-caller-identity --query Account --output text
+```
+
+#### Step 2: Run Deployment Script
+
+```bash
+# Make executable
+chmod +x scripts/deploy_learning_pipeline.sh
+
+# Run deployment
+./scripts/deploy_learning_pipeline.sh
+```
+
+**What this does**:
+- ✅ Creates 2 DynamoDB tables (if not exist)
+- ✅ Packages Lambda function with dependencies
+- ✅ Deploys/updates Lambda function
+- ✅ Sets environment variables
+- ✅ Configures permissions
+- ✅ Runs test invocation
+
+**Expected output**:
+```
+[INFO] Starting Learning Pipeline Deployment
+[INFO] Region: eu-west-1
+[INFO] Dry Run: false
+
+[SUCCESS] BetBudAI_LearningInsights table created
+[SUCCESS] BetBudAI_WeightChangelog table created
+[SUCCESS] Lambda package created
+[SUCCESS] Lambda function deployed
+[SUCCESS] Lambda permissions configured
+[SUCCESS] Lambda invocation successful
+
+Deployment complete!
+```
+
+#### Step 3: Update Evening Pipeline Handler
+
+```bash
+# Open handler file
+nano backend/pipeline/evening/handler.py
+
+# Add learning integration code AFTER line 97 (after optional analysis)
+# Copy code from EVENING_PIPELINE_INTEGRATION.md
+```
+
+**Code to add** (around line 97, after `if run_analysis:`):
+
+```python
+        # Trigger automated learning (ADDED 2026-05-20)
+        if run_analysis:
+            try:
+                from backend.pipeline.evening.learning_integration import (
+                    invoke_learning_orchestrator,
+                    generate_enhanced_daily_report
+                )
+
+                logger.info("[evening-pipeline] Triggering automated learning...")
+                learning_results = invoke_learning_orchestrator(target_date, event)
+
+                if learning_results.get('status') == 'success':
+                    logger.info(
+                        f"[evening-pipeline] Learning complete: "
+                        f"Analyzed {learning_results.get('races_analyzed', 0)} races, "
+                        f"deployed {learning_results.get('adjustments_deployed', 0)} adjustments"
+                    )
+                    analysis_results['automated_learning'] = learning_results
+
+                    # Generate enhanced report
+                    enhanced_report = generate_enhanced_daily_report(
+                        base_report={'roi_data': analysis_results.get('daily_roi', {})},
+                        learning_results=learning_results,
+                        target_date=target_date
+                    )
+
+                    analysis_results['enhanced_report_text'] = enhanced_report
+
+                else:
+                    logger.warning(
+                        f"[evening-pipeline] Learning skipped: "
+                        f"{learning_results.get('reason', learning_results.get('error', 'unknown'))}"
+                    )
+                    analysis_results['automated_learning'] = learning_results
+
+            except Exception as e:
+                logger.error(f"[evening-pipeline] Learning failed: {e}", exc_info=True)
+                analysis_results['automated_learning'] = {'status': 'error', 'error': str(e)}
+```
+
+**Save the file** (Ctrl+X, Y, Enter)
+
+#### Step 4: Deploy Updated Evening Pipeline
+
+```bash
+cd backend/pipeline
+python deploy_lambdas.py
+
+# Or manually deploy evening handler:
+cd backend/pipeline/evening
+zip -r handler.zip handler.py ../../config ../../core
+aws lambda update-function-code \
+  --function-name surebet-evening-pipeline \
+  --zip-file fileb://handler.zip \
+  --region eu-west-1
+```
+
+#### Step 5: Deploy CloudWatch Dashboard
+
+```bash
+cd /c/Users/charl/OneDrive/futuregenAI/BetBudAI
+
+aws cloudwatch put-dashboard \
+  --dashboard-name BetBudAI-Learning \
+  --dashboard-body file://cloudwatch_dashboard.json \
+  --region eu-west-1
+
+echo "Dashboard URL: https://console.aws.amazon.com/cloudwatch/home?region=eu-west-1#dashboards:name=BetBudAI-Learning"
+```
+
+#### Step 6: Verify Deployment
+
+```bash
+# Test learning Lambda (dry run)
+aws lambda invoke \
+  --function-name betbudai-learning-orchestrator \
+  --payload '{
+    "target_date": "2026-05-19",
+    "learning_confidence_threshold": 0.80,
+    "learning_auto_deploy": false,
+    "learning_dry_run": true,
+    "learning_max_races": 5
+  }' \
+  --region eu-west-1 \
+  /tmp/learning_test.json
+
+# Check results
+cat /tmp/learning_test.json | jq .
+
+# Should see:
+# {
+#   "statusCode": 200,
+#   "body": "{\"status\":\"success\",\"races_analyzed\":5,...}"
+# }
+```
+
+---
+
+## Production Deployment Checklist
+
+### Phase 1: Pre-Deployment (Complete Now)
+
+- [ ] **AWS Setup**
+  - [ ] AWS CLI configured and authenticated
+  - [ ] Correct region set (eu-west-1)
+  - [ ] Lambda execution role exists
+  - [ ] IAM permissions verified
+
+- [ ] **Code Review**
+  - [ ] Review `learning_integration.py` logic
+  - [ ] Review pattern detection rules
+  - [ ] Verify confidence threshold (0.80)
+  - [ ] Check weight change limits (±50%)
+
+- [ ] **Infrastructure**
+  - [ ] Run `deploy_learning_pipeline.sh`
+  - [ ] Verify DynamoDB tables created
+  - [ ] Verify Lambda function deployed
+  - [ ] Test Lambda invocation (dry run)
+
+- [ ] **Evening Pipeline**
+  - [ ] Add learning integration code to handler
+  - [ ] Deploy updated evening handler
+  - [ ] Verify integration via CloudWatch logs
+
+- [ ] **Monitoring**
+  - [ ] Deploy CloudWatch dashboard
+  - [ ] Open dashboard and verify widgets load
+  - [ ] Set up SNS topic for alerts (optional)
+
+### Phase 2: First Run (Tonight 21:15 UTC)
+
+- [ ] **Pre-Flight Check (20:50 UTC)**
+  - [ ] CloudWatch dashboard open
+  - [ ] Lambda logs tailing: `/aws/lambda/betbudai-learning-orchestrator`
+  - [ ] DynamoDB console open (monitor writes)
+  - [ ] Email ready to receive daily report
+
+- [ ] **During Execution (21:15-21:20 UTC)**
+  - [ ] Watch CloudWatch logs for:
+    - "Triggering automated learning..."
+    - "Learning complete: Analyzed X races..."
+    - "Deployed X adjustments"
+  - [ ] Monitor Lambda execution time (<10 seconds expected)
+  - [ ] Check for errors or warnings
+
+- [ ] **Post-Execution (21:25 UTC)**
+  - [ ] Verify email report received with learning section
+  - [ ] Check DynamoDB tables:
+    - `BetBudAI_LearningInsights`: Should have 1 new record
+    - `BetBudAI_WeightChangelog`: Should have N records (0-5 expected)
+  - [ ] Review deployed adjustments in CloudWatch dashboard
+  - [ ] Document any issues in deployment log
+
+### Phase 3: Day 1 Monitoring (May 21, 2026)
+
+- [ ] **Morning Review (09:00 UTC)**
+  - [ ] Review learning session from last night
+  - [ ] Check patterns detected
+  - [ ] Verify weight adjustments reasonable
+  - [ ] Review CloudWatch metrics
+
+- [ ] **Evening Review (21:30 UTC)**
+  - [ ] Watch second learning run
+  - [ ] Compare patterns Day 1 vs Day 2
+  - [ ] Monitor for consistency
+  - [ ] Document observations
+
+### Phase 4: Week 1 Review (May 27, 2026)
+
+- [ ] **Performance Analysis**
+  - [ ] Calculate 7-day strike rate vs previous week
+  - [ ] Calculate 7-day ROI vs previous week
+  - [ ] Count total adjustments deployed
+  - [ ] Identify most frequent patterns
+
+- [ ] **System Health**
+  - [ ] Review Lambda execution times
+  - [ ] Check error count (target: 0)
+  - [ ] Verify DynamoDB costs reasonable
+  - [ ] Monitor CloudWatch alarm status
+
+- [ ] **Decision Point**
+  - [ ] If strike rate improved 5%+: Continue with current settings
+  - [ ] If strike rate flat: Lower confidence threshold to 0.75
+  - [ ] If strike rate declined 5%+: Enable dry run, investigate
+
+---
+
+## Configuration Reference
+
+### Lambda Environment Variables
+
+| Variable | Production | Testing | Description |
+|----------|-----------|---------|-------------|
+| `CONFIDENCE_THRESHOLD` | 0.80 | 0.70 | Min confidence to deploy |
+| `ENABLE_AUTO_DEPLOY` | true | false | Auto-deploy adjustments |
+| `DRY_RUN` | false | true | Log only, don't deploy |
+| `MAX_WORKERS` | 10 | 5 | Parallel analysis workers |
+
+**Change environment variables**:
+```bash
+aws lambda update-function-configuration \
+  --function-name betbudai-learning-orchestrator \
+  --environment "Variables={
+    CONFIDENCE_THRESHOLD=0.80,
+    ENABLE_AUTO_DEPLOY=true,
+    DRY_RUN=false,
+    MAX_WORKERS=10
+  }" \
+  --region eu-west-1
+```
+
+### Pattern Detection Thresholds
+
+| Threshold | Default | Description |
+|-----------|---------|-------------|
+| **Pattern Frequency** | 20% | Min % of races to trigger pattern |
+| **Confidence Base** | Varies | Base confidence per pattern type |
+| **Confidence Boost** | +10% | Per 10% frequency increase |
+| **Max Change** | ±50% | Max weight change per adjustment |
+
+### DynamoDB Tables
+
+| Table | Purpose | Billing | TTL |
+|-------|---------|---------|-----|
+| `SureBetBets` | Main data source | PAY_PER_REQUEST | None |
+| `BetBudAI_LearningInsights` | Learning sessions | PAY_PER_REQUEST | 90 days |
+| `BetBudAI_WeightChangelog` | Weight history | PAY_PER_REQUEST | None |
+
+---
+
+## Monitoring Guide
+
+### CloudWatch Dashboard
+
+**URL**: https://console.aws.amazon.com/cloudwatch/home?region=eu-west-1#dashboards:name=BetBudAI-Learning
+
+**Key Widgets**:
+1. **Daily Learning Activity**: Races analyzed, insights generated, patterns detected
+2. **Weight Adjustments**: Proposed vs deployed
+3. **Performance Metrics**: Strike rate, ROI (7-day rolling)
+4. **Lambda Performance**: Execution time, errors
+5. **Pattern Frequency**: Miss patterns, win patterns
+6. **Recent Events**: Live log stream
+
+### CloudWatch Logs
+
+**Learning Lambda logs**:
+```bash
+# Tail logs in real-time
+aws logs tail /aws/lambda/betbudai-learning-orchestrator \
+  --follow \
+  --format short \
+  --region eu-west-1
+
+# Query last 24 hours
+aws logs filter-log-events \
+  --log-group-name /aws/lambda/betbudai-learning-orchestrator \
+  --start-time $(date -u -d '24 hours ago' +%s)000 \
+  --region eu-west-1
+```
+
+**Evening pipeline logs**:
+```bash
+aws logs tail /aws/lambda/surebet-evening-pipeline \
+  --follow \
+  --filter-pattern "learning" \
+  --region eu-west-1
+```
+
+### Key Metrics to Watch
+
+#### Daily (First Week)
+- **Races Analyzed**: 10-30 (depends on racing schedule)
+- **Patterns Detected**: 2-8
+- **Adjustments Proposed**: 3-10
+- **Adjustments Deployed**: 0-5 (high confidence only)
+- **Lambda Execution Time**: <10 seconds
+- **Errors**: 0
+
+#### Weekly (After Week 1)
+- **Strike Rate**: +5-10% improvement
+- **ROI**: +5% improvement
+- **Weight Stability**: <3 adjustments/day (system converging)
+- **Pattern Consistency**: Same patterns detected 3+ times
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+#### 1. Lambda Function Not Found
+
+**Error**: `ResourceNotFoundException: Function not found`
+
+**Solution**:
+```bash
+# Verify Lambda exists
+aws lambda get-function --function-name betbudai-learning-orchestrator --region eu-west-1
+
+# If not found, redeploy
+./scripts/deploy_learning_pipeline.sh
+```
+
+#### 2. DynamoDB Table Not Found
+
+**Error**: `ResourceNotFoundException: Requested resource not found`
+
+**Solution**:
+```bash
+# Check if tables exist
+aws dynamodb describe-table --table-name BetBudAI_LearningInsights --region eu-west-1
+aws dynamodb describe-table --table-name BetBudAI_WeightChangelog --region eu-west-1
+
+# If not found, create manually
+aws dynamodb create-table \
+  --table-name BetBudAI_LearningInsights \
+  --attribute-definitions \
+    AttributeName=analysis_date,AttributeType=S \
+    AttributeName=analysis_type,AttributeType=S \
+  --key-schema \
+    AttributeName=analysis_date,KeyType=HASH \
+    AttributeName=analysis_type,KeyType=RANGE \
+  --billing-mode PAY_PER_REQUEST \
+  --region eu-west-1
+```
+
+#### 3. Permission Denied Errors
+
+**Error**: `AccessDeniedException: User is not authorized`
+
+**Solution**:
+```bash
+# Check Lambda execution role permissions
+aws lambda get-function-configuration \
+  --function-name betbudai-learning-orchestrator \
+  --query Role \
+  --output text
+
+# Verify role has these policies:
+# - AWSLambdaBasicExecutionRole
+# - DynamoDB read/write access to all 3 tables
+# - Lambda invoke permission (for evening pipeline)
+```
+
+**Required IAM Policy**:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:eu-west-1:*:table/SureBetBets",
+        "arn:aws:dynamodb:eu-west-1:*:table/SureBetBets/index/*",
+        "arn:aws:dynamodb:eu-west-1:*:table/BetBudAI_LearningInsights",
+        "arn:aws:dynamodb:eu-west-1:*:table/BetBudAI_WeightChangelog"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:eu-west-1:*:*"
+    }
+  ]
+}
+```
+
+#### 4. Import Errors in Lambda
+
+**Error**: `ModuleNotFoundError: No module named 'backend'`
+
+**Solution**:
+```bash
+# Verify Lambda package includes backend modules
+cd _lambda_deploy_learning
+unzip -l lambda_package.zip | grep backend
+
+# Should see:
+# backend/
+# backend/pipeline/
+# backend/config/
+# backend/core/
+
+# If missing, redeploy
+cd ..
+./scripts/deploy_learning_pipeline.sh
+```
+
+#### 5. Learning Runs But No Adjustments
+
+**Symptom**: Learning completes successfully but deploys 0 adjustments for 3+ days
+
+**Diagnosis**:
+```bash
+# Check learning insights
+aws dynamodb query \
+  --table-name BetBudAI_LearningInsights \
+  --key-condition-expression "analysis_date = :date" \
+  --expression-attribute-values '{":date": {"S": "2026-05-20"}}' \
+  --region eu-west-1 \
+  | jq '.Items[0].patterns_detected'
+```
+
+**Possible causes**:
+1. Confidence threshold too high (>0.80)
+2. Pattern frequency not reaching 20% threshold
+3. Not enough races analyzed (need 10+ races)
+
+**Solutions**:
+```bash
+# Option 1: Lower confidence threshold temporarily
+aws lambda update-function-configuration \
+  --function-name betbudai-learning-orchestrator \
+  --environment "Variables={CONFIDENCE_THRESHOLD=0.70,...}" \
+  --region eu-west-1
+
+# Option 2: Wait for more data (give it 5-7 days)
+
+# Option 3: Review pattern detection logic
+# Edit backend/pipeline/evening/learning_integration.py
+# Adjust pattern frequency threshold from 0.20 to 0.15
+```
+
+---
+
+## Rollback Plan
+
+### Emergency Rollback (If Things Go Wrong)
+
+#### Scenario 1: Strike Rate Drops Significantly
+
+**If strike rate drops 5%+ after learning deployment**:
+
+```bash
+# 1. Immediately enable dry run mode
+aws lambda update-function-configuration \
+  --function-name betbudai-learning-orchestrator \
+  --environment "Variables={
+    CONFIDENCE_THRESHOLD=0.80,
+    ENABLE_AUTO_DEPLOY=false,
+    DRY_RUN=true,
+    MAX_WORKERS=10
+  }" \
+  --region eu-west-1
+
+# 2. Review recent weight changes
+aws dynamodb query \
+  --table-name BetBudAI_WeightChangelog \
+  --key-condition-expression "change_date = :date" \
+  --expression-attribute-values '{":date": {"S": "2026-05-20"}}' \
+  --region eu-west-1 \
+  | jq '.Items[]'
+
+# 3. Restore Emergency V3 weights (known good)
+cd /c/Users/charl/OneDrive/futuregenAI/BetBudAI
+python scripts/deploy_emergency_v3.py
+
+# 4. Investigate root cause
+# - Review patterns that triggered adjustments
+# - Check if adjustments were too aggressive
+# - Analyze races that contributed to drop
+```
+
+#### Scenario 2: Lambda Errors/Failures
+
+**If Lambda fails repeatedly**:
+
+```bash
+# 1. Disable learning in evening pipeline
+# Edit backend/pipeline/evening/handler.py
+# Change: run_analysis = event.get('run_analysis', True)
+# To:     run_analysis = False  # TEMPORARY: Disable learning
+
+# 2. Redeploy evening pipeline without learning
+cd backend/pipeline/evening
+# ... redeploy commands ...
+
+# 3. Fix Lambda issue offline
+# 4. Test thoroughly with dry run
+# 5. Re-enable gradually
+```
+
+#### Scenario 3: DynamoDB Costs Spike
+
+**If DynamoDB costs exceed budget**:
+
+```bash
+# 1. Check table metrics
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/DynamoDB \
+  --metric-name ConsumedWriteCapacityUnits \
+  --dimensions Name=TableName,Value=BetBudAI_LearningInsights \
+  --start-time $(date -u -d '24 hours ago' --iso-8601=seconds) \
+  --end-time $(date -u --iso-8601=seconds) \
+  --period 3600 \
+  --statistics Sum \
+  --region eu-west-1
+
+# 2. If excessive, reduce learning frequency
+# - Only run learning 3x/week instead of daily
+# - Reduce max_races from 50 to 25
+# - Increase pattern frequency threshold to reduce writes
+```
+
+---
+
+## Post-Deployment Tasks
+
+### Immediate (Tonight After First Run)
+
+1. **Review CloudWatch logs** for errors or warnings
+2. **Check email report** for learning insights section
+3. **Verify DynamoDB records** created correctly
+4. **Document adjustments** deployed (if any)
+5. **Update team** on deployment status
+
+### Day 2-7 (Daily Reviews)
+
+1. **Morning**: Review previous night's learning session
+2. **Document patterns** detected consistently
+3. **Track strike rate** daily (compare to baseline)
+4. **Monitor Lambda costs** (CloudWatch billing alerts)
+5. **Weekly summary** on Day 7
+
+### Week 2-4 (Optimization Phase)
+
+1. **Analyze trends**: Which patterns most frequent?
+2. **Tune thresholds**: Adjust confidence if needed
+3. **Add win analysis**: Extend to analyze successful picks
+4. **Historical backtest**: Run learning on last 30 days data
+5. **A/B testing**: Prepare framework for comparing approaches
+
+---
+
+## Success Criteria
+
+### Week 1 (May 20-27, 2026)
+
+- ✅ Learning runs successfully every evening (7/7 days)
+- ✅ Zero critical errors in production
+- ✅ 10-30 races analyzed per day
+- ✅ 2-5 weight adjustments deployed
+- ✅ Strike rate maintains baseline or improves
+
+### Week 4 (Jun 10-17, 2026)
+
+- ✅ Strike rate improved 5-10% vs baseline
+- ✅ ROI improved 5%+ vs baseline
+- ✅ Weight adjustments stabilize (<3/day)
+- ✅ Pattern detection consistent
+- ✅ Team confident in system
+
+### Month 3 (Aug 2026)
+
+- ✅ Strike rate 50-55% (target achieved)
+- ✅ ROI +10-15% (target achieved)
+- ✅ Automated learning trusted and stable
+- ✅ Ready for advanced features (A/B testing, etc.)
+
+---
+
+## Support Contacts
+
+### Technical Issues
+- **AWS Lambda**: Check CloudWatch logs first
+- **DynamoDB**: Verify table exists and permissions correct
+- **Integration**: Review evening pipeline logs
+
+### Escalation
+- **Strike rate drop >5%**: Enable dry run immediately
+- **Lambda errors >3**: Investigate root cause before next run
+- **DynamoDB costs spike**: Reduce learning frequency
+
+---
+
+## Next Steps After Successful Deployment
+
+1. ✅ **Tonight (21:15 UTC)**: First production run
+2. ✅ **Tomorrow (09:00 UTC)**: Review first run results
+3. ✅ **Day 7 (May 27)**: Week 1 retrospective
+4. ✅ **Week 2**: Lower confidence threshold if needed
+5. ✅ **Week 3**: Add win pattern analysis
+6. ✅ **Week 4**: Historical backtest and validation
+7. ✅ **Month 2**: Implement A/B testing framework
+8. ✅ **Month 3**: Full production optimization
+
+---
+
+**Ready to deploy?**
+
+```bash
+cd /c/Users/charl/OneDrive/futuregenAI/BetBudAI
+./scripts/deploy_learning_pipeline.sh
+```
+
+**Good luck! The system is designed to learn and improve every day.**
+
+---
+
+*Last updated: May 20, 2026*  
+*Version: 1.0*  
+*Status: Ready for Production*

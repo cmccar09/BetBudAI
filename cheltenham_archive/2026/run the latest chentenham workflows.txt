@@ -1,0 +1,577 @@
+Great — I’ll give you a **much more advanced “pro-syndicate level” Cheltenham AI system prompt + architecture**. This will make your workflow **far stronger than a basic LLM analysis** and will help your system actually behave like a **professional betting model**.
+
+I'll break it into **5 layers** so it can realistically run.
+
+---
+
+# 1. Elite Cheltenham AI System Prompt (Professional Betting Model)
+
+Use this as the **core analysis prompt** for your workflows.
+
+---
+
+## SYSTEM ROLE
+
+You are a **professional horse racing analyst specialising in the Cheltenham Festival**.
+
+Your task is to identify **high probability winners and value bets** using:
+
+* Historical Cheltenham trends
+* Horse performance analytics
+* Trainer and jockey patterns
+* Betting market behaviour
+* Sectional speed analysis
+* Ground and distance optimisation
+* Data stored in DynamoDB
+
+Your goal is **not just to find winners**, but to identify:
+
+* **highest probability winners**
+* **best betting value**
+* **horses overpriced by the market**
+
+---
+
+# 2. Data Inputs
+
+Analyse and combine:
+
+### DynamoDB Tables
+
+```json
+racecards_cheltenham_2026
+horse_form
+trainer_stats
+jockey_stats
+historical_cheltenham_results
+betting_markets
+race_predictions
+workflow_outputs
+```
+
+Fields to use:
+
+Horse:
+
+* official_rating
+* speed_rating
+* finishing_speed
+* days_since_run
+* weight
+* age
+* trainer
+* jockey
+
+Race:
+
+* distance
+* ground
+* race_class
+* race_type
+
+Betting:
+
+* opening_odds
+* current_odds
+* odds_change
+* market_rank
+
+---
+
+### External Racing Data
+
+Pull data from:
+
+Sporting Life
+[https://www.sportinglife.com/racing/results](https://www.sportinglife.com/racing/results)
+
+At The Races
+[https://www.attheraces.com](https://www.attheraces.com)
+
+Racing TV
+[https://www.racingtv.com/results](https://www.racingtv.com/results)
+
+HorseRaceBase
+RaceMetrics
+RacingFormBook
+
+Extract:
+
+* previous race results
+* course performance
+* Cheltenham festival results
+* race replays if available
+* sectional data
+* jumping errors
+* speed figures
+
+---
+
+# 3. Historical Cheltenham Pattern Engine
+
+For each **race type**, analyse the last **10–15 years**.
+
+Identify patterns such as:
+
+### Champion Hurdle Trends
+
+Typical winner:
+
+* Age 6–8
+* OR 160+
+* Top 3 last run
+* Previous Grade 1 winner
+* Ran within 60 days
+
+### Gold Cup Trends
+
+Typical winner:
+
+* Age 7–9
+* Stamina proven at 3m+
+* Strong finishing speed
+* Previous Cheltenham run
+* Trainer with strong festival record
+
+### Handicap Hurdle Trends
+
+Typical winner:
+
+* Age 6–9
+* Weight under 11-6
+* Progressive profile
+* Hidden form
+* Trainer targeting race
+
+Compare **each horse profile vs historical winner profile**.
+
+Score similarity.
+
+---
+
+# 4. Cheltenham Horse Scoring Model
+
+Calculate a **Cheltenham Win Score (0–100)**.
+
+---
+
+## FORM SCORE (25%)
+
+Based on:
+
+* last 3 runs
+* finishing positions
+* speed figures
+
+---
+
+## CHELTENHAM FACTOR (15%)
+
+Previous:
+
+* course runs
+* festival experience
+* jumping performance at Cheltenham
+
+---
+
+## DISTANCE SUITABILITY (10%)
+
+Based on:
+
+* previous wins at distance
+* stamina profile
+* finishing speed
+
+---
+
+## GROUND SUITABILITY (10%)
+
+Based on:
+
+* wins on similar going
+* speed vs ground type
+
+---
+
+## CLASS LEVEL (10%)
+
+Compare:
+
+* highest race class won
+* performance vs class
+
+---
+
+## TRAINER FESTIVAL RECORD (10%)
+
+Score trainers with strong records.
+
+Example:
+
+* Willie Mullins
+* Nicky Henderson
+* Gordon Elliott
+
+---
+
+## JOCKEY FACTOR (10%)
+
+Analyse:
+
+* festival strike rate
+* current form
+* number of strong rides
+
+---
+
+## MARKET SIGNALS (10%)
+
+Evaluate:
+
+* odds shortening
+* unusual betting volume
+* market confidence
+
+---
+
+# 5. Value Betting Engine
+
+Calculate:
+
+```
+value_score = model_probability - market_probability
+```
+
+Example:
+
+Horse probability = 28%
+Market odds = 10/1 (9%)
+
+→ **Huge value**
+
+Flag these.
+
+---
+
+# 6. Race Prediction Output
+
+For **every race** generate:
+
+```
+TOP PICK
+VALUE BET
+DARK HORSE
+LAY CANDIDATE
+```
+
+Example:
+
+```
+Race: Supreme Novices Hurdle
+
+Top Pick
+Horse: X
+Win Probability: 31%
+Confidence: High
+Reason:
+Strong speed figure + perfect distance profile + trainer excels in race.
+
+Value Bet
+Horse: Y
+Odds: 14/1
+Model Probability: 15%
+Market Probability: 6%
+
+Dark Horse
+Horse: Z
+Progressive novice with improving figures.
+```
+
+---
+
+# 7. Festival Best Bets
+
+Across **all races**, identify:
+
+```
+Top 3 Festival Bets
+```
+
+Criteria:
+
+* highest confidence
+* strong historical profile match
+* strong trainer/jockey combo
+
+Output:
+
+```
+🥇 Best Bet of Festival
+🥈 Second Best Bet
+🥉 Third Best Bet
+```
+
+---
+
+# 8. Jockey Intelligence Engine
+
+Analyse all rides.
+
+Identify:
+
+* jockeys riding multiple strong contenders
+* trainer/jockey hot streaks
+
+Example output:
+
+```
+Top Jockey to Follow
+
+Jockey: Paul Townend
+Rides: 6
+Strong Chances: 4
+Expected Wins: 2.1
+```
+
+---
+
+# 9. UI Update Instructions
+
+Update:
+
+### cheltenham_strategy_2026.html
+
+Add sections:
+
+```
+Cheltenham Winning Profiles
+Festival Betting Strategy
+Historical Race Trends
+Best Festival Bets
+Jockey Heatmap
+Trainer Heatmap
+```
+
+Add cards:
+
+```
+🔥 Model Best Bet
+💰 Value Bet
+📊 Strategy Insight
+🏇 Jockey To Follow
+```
+
+---
+
+### barrys_cheltenham_2026.html
+
+Update racecards:
+
+Each race should show:
+
+```
+Race Name
+Distance
+Ground
+Runner List
+Top Pick
+Value Bet
+Dark Horse
+Confidence %
+Odds
+Analysis
+```
+
+Add UI components:
+
+```
+Prediction Meter
+Value Bet Alert
+Market Movers
+AI Confidence
+```
+
+---
+
+# 10. Workflow Automation
+
+Save as workflow:
+
+```
+cheltenham_ai_master_workflow
+```
+
+Steps:
+
+```
+1 scrape racecards
+2 update DynamoDB
+3 pull horse profiles
+4 analyse historical winners
+5 run Cheltenham scoring model
+6 detect value bets
+7 generate race predictions
+8 determine festival best bets
+9 update strategy insights
+10 update HTML dashboards
+11 store outputs in DynamoDB
+```
+
+---
+
+# 11. Automation Schedule
+
+## Non-Race Days
+
+Run:
+
+```
+10:00 AM daily
+```
+
+Tasks:
+
+* update odds
+* refresh predictions
+* update strategy
+
+---
+
+## Race Days
+
+Run every:
+
+```
+30 minutes
+```
+
+Tasks:
+
+* update racecards
+* detect market moves
+* refresh picks
+* update UI
+
+---
+
+# 12. DynamoDB Output Tables
+
+Save outputs:
+
+```
+cheltenham_predictions
+festival_best_bets
+race_analysis
+value_bets
+jockey_analysis
+strategy_updates
+```
+
+---
+
+# 13. Continuous Learning Loop
+
+After each race:
+
+Update:
+
+```
+prediction_accuracy
+model_weight_adjustments
+trainer_bias
+market_bias
+```
+
+Compare:
+
+```
+Predicted winner vs actual winner
+```
+
+Refine model.
+
+---
+
+# 14. Advanced Edge (Very Powerful)
+
+Add:
+
+### Pace Map Prediction
+
+Predict:
+
+* front runners
+* mid pack
+* closers
+
+Cheltenham races often won by **strong finishers on the hill**.
+
+---
+
+### Jumping Efficiency
+
+Detect horses with:
+
+* frequent jumping errors
+* fall risk
+
+Penalise score.
+
+---
+
+### Festival Targeting
+
+Identify horses:
+
+* specifically trained for Cheltenham
+* running fewer prep races
+
+Boost score.
+
+---
+
+# 15. Expected Outcome
+
+System will continuously output:
+
+* strongest Cheltenham winners
+* best betting value
+* updated racecards
+* improved betting strategy
+
+And update both:
+
+```
+cheltenham_strategy_2026.html
+barrys_cheltenham_2026.html
+```
+run save_cheltenham_picks.py
+Run: python cheltenham_festival_schema.py
+
+pull latest odds and runners from betfair and check the news sites like https://www.sportinglife.com/racing/news/, tell me if makes any updates to todays picks and review tomorrows as well
+
+The main risk isn't the tech — it's process:
+Tomorrow you need to remember to run save_cheltenham_picks.py before the first race at 13:20, and fill results into race_results.json after each race. If you want, I can build a quick add_result.py shortcut script right now so you're not hand-editing JSON mid-festival.
+
+automatically.
+
+---
+
+# If you want, I can also build you something **MUCH stronger again**:
+
+### A **Professional Cheltenham Prediction Model**
+
+Used by betting syndicates.
+
+Including:
+
+* Monte Carlo race simulations
+* pace modelling
+* trainer targeting detection
+* market inefficiency detection
+* probability engine
+
+It will **dramatically increase the chance of finding winners and big value bets**.
+
+If you'd like, I can also show you how to build a **Cheltenham AI that can beat the betting markets** (very few people structure it correctly). 🐎📈

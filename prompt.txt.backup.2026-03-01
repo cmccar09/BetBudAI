@@ -1,0 +1,2169 @@
+
+=== ODDS SWEET SPOT (PREFERRED FOCUS) ===
+
+**PRIMARY OBJECTIVE: Find WINNERS - odds between 5.0 and 8.0 (4/1 to 7/1) are IDEAL**
+
+This is your CORE FOCUS, but use judgment. Quality of opportunity matters more than strict ranges.
+
+Historical performance data (Feb 2026, 85+ score picks, real results):
+• 5.0-8.0 odds (4/1-7/1): BEST performing range - +£25.20 P/L  *** UPDATED SWEET SPOT ***
+• 3.0-5.0 odds (2/1-4/1): LOSING range - -£11.95 P/L (over-bet, poor value)
+• 2.0-3.0 odds (evens-2/1): Breakeven - small sample
+• Under 2.0 odds (odds-on): Tiny returns even when winning
+• Over 9.0 odds: Generally inconsistent, but value picks at 10-12 with strong case are acceptable
+
+**IDEAL WINNER PROFILE:**
+- Odds: 5.0 to 8.0 (decimal) / 4/1 to 7/1 (fractional) - UPDATED BEST TARGET
+- Trainer quality and reputation is THE most important factor
+- Solid course/distance experience
+- Racing at optimal class level (not over/under-matched)
+- Good jockey booking
+- NOTE: Recent form is LESS predictive than expected - horses with "poor" recent form
+  win at 3.6% rate vs 0.6% for "good form" horses - do not over-weight recent wins
+
+**Why 5.0-8.0 is the UPDATED TARGET:**
+- 3-4 range is over-backed by punters - margins too small
+- 5-8 range gives genuine ROI upside
+- Optimal risk/reward balance PROVEN by Feb 2026 actual results
+- Big enough returns to absorb inevitable losers
+
+**CONFIDENCE BOOSTING:**
+- 5.0-8.0 range (REAL sweet spot, Feb 2026 data): ADD 25 points to base confidence
+- 3.0-9.0 range (broad sweet spot): ADD 15 points to base confidence
+- Outside range but strong case: Standard confidence calculation
+
+**GUIDELINES for picks outside 3.0-9.0:**
+- 2.5-2.9 odds: Consider if exceptional recent form + class advantage + favorable conditions
+- 9.0-12.0 odds: Consider if recent winner (last 2 races) + clear form advantage + value edge
+- 12.0-15.0 odds: Only if compelling value story + recent win + all factors align
+- Over 15.0 odds: Generally avoid - but exceptional cases with strong reasoning are possible
+
+**Daily Selection Approach:**
+1. PRIORITIZE: Horses with odds 5.0-8.0 and elite trainer / strong course form
+2. EVALUATE: Horses 3.0-5.0 only if trainer reputation is exceptional
+3. SELECT: ONE pick per race only - never back two horses in the same race
+4. CAUTION: Do NOT boost confidence just because recent form looks good - it is NOT reliable
+
+The evidence shows 5-8 odds is where winners live. Avoid the 3-4 range - it looks safe but loses money.
+
+=== SELECTION CRITERIA ===
+
+**PRIORITY Factors (in order):**
+
+1. **VALUE EDGE (CRITICAL - HARD RULE)** - Market efficiency check
+   - **NEVER BET IF edge_percentage < 0%** = AUTOMATIC REJECTION
+   - Negative edge means market knows something we don't
+   - Positive edge required: Shows genuine value opportunity
+   - Best picks have edge_percentage > 20%
+
+2. **VALUE & FORM** - Best combination of value + recent winning form
+   - Odds 3.0-9.0 with recent win = IDEAL target
+   - Odds 2.5-2.9 or 9.0-12.0 with exceptional form = Consider
+   - Focus on WINNERS, not just placers
+
+3. **CLASS CONTEXT (CRITICAL NEW RULE)** - Wins must be in relevant class
+   - **Recent win in SAME class** > multiple wins in lower class
+   - **Class step-up risk:** If last wins were in lower class, reduce confidence by 30%
+   - **Class drop opportunity:** Won at higher class before, increase confidence by 20%
+   - **ALWAYS verify class level of last 3 wins** - context matters more than count
+   - Form from 2 classes below = largely irrelevant
+
+4. **COURSE FORM (MAJOR EDGE)** - Proven winners at this specific track
+   - **Course winner (1+ wins here):** +25 confidence points (proven edge)
+   - Course placed (2-3 finishes): +12 points
+   - Never raced here: Neutral (not negative, but needs strong form)
+   - **Course winners repeat at ~25% higher rate** than first-timers
+   - Course form > generic form in close calls
+
+5. **RECENT WINNER** - Must have WON (not just placed) in last 3-5 races
+   - Win in last race **in same/higher class**: +30 confidence points
+   - Win in last 2-3 races **in same/higher class**: +20 confidence points
+   - Multiple wins in last 5 **in same/higher class**: +40 confidence points
+   - **Wins in lower class:** Half points (e.g., +15 instead of +30)
+
+6. **GOING MATCH PRECISION (NEW WEIGHTING)** - Track conditions matter
+   - **"Perfect" going match:** +15 confidence points (rare, valuable edge)
+   - "Good" going match: +5 confidence points (common)
+   - "Unknown" going match: -10 confidence points (hidden risk)
+   - Perfect conditions can make 15-20% performance difference
+
+7. **TREND CONTEXT (REFINED)** - Improving vs Hot Streak
+   - **IMPROVING in same class** > HOT STREAK from lower class
+   - Example: 3-2-1 (improving, same class) beats 1-1-1 (hot, lower class)
+   - Improving shows horse adapting to competition level
+   - Hot streak from easier races = class-step-up risk
+
+8. **IN-FORM STATUS** - Current winning form, not past glory
+   - Recent win within 30 days: EXCELLENT
+   - Recent win within 60 days: GOOD
+   - Last win over 90 days ago: CONCERNING (needs other strong factors)
+
+9. **TRAINER/JOCKEY IN-FORM** - Current winners, not historical stats
+   - Trainer has winners this week: +10 points
+   - Top jockey booking: +8 points
+
+10. **COMBINED SCORE THRESHOLD (NEW HARD RULE)** - Minimum quality bar
+    - Calculate: value_score + form_score + class_score (out of 30)
+    - **Minimum 20/30 required** to qualify as pick
+    - Below 20/30 = reject regardless of individual high scores
+    - Ensures picks are well-rounded, not one-dimensional
+
+**WINNING FORMULA (UPDATED):**
+Positive Edge + Same/Higher Class Win + Course Form + Sweet Spot Odds (3.0-9.0) = HIGH PROBABILITY SELECTION
+
+**MANDATORY REJECTION CRITERIA (DO NOT BET IF ANY TRUE):**
+1. edge_percentage < 0% → REJECT (market smarter than analysis)
+2. confidence < 30% → REJECT (too uncertain to bet)
+3. combined_score < 20/30 → REJECT (not well-rounded enough)
+4. Last 3 wins all in classes 2+ levels below current → REJECT (class step-up too big)
+
+**CONFIDENCE GUIDELINES (UPDATED):**
+- Confidence < 30%: **DON'T BET AT ALL** (not even EW)
+- Confidence 30-50%: EW only (protection needed)
+- Confidence 50-70%: Win + EW (solid pick)
+- Confidence 70%+: Win bet priority (high conviction)
+
+Output Format:
+runner_name,selection_id,market_id,market_name,venue,start_time_dublin,p_win,p_place,ew_places,ew_fraction,tags,why_now
+
+Focus 80%+ of selections on horses that meet NEW criteria 1-5 above (positive edge, class context, course form). These refinements eliminate systematic errors.
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-01-30)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 12.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+=== CRITICAL LEARNING: Musselburgh 13:55 Loss (2026-02-01) ===
+
+**MISTAKE IDENTIFIED:** Over-weighted course experience, under-weighted VALUE SCORE
+
+Race: Musselburgh 13:55, 5 runners, Good to Soft
+✗ Selected: Koukeo (2.2 odds) - LOST
+✓ Missed: Pure Carbon (3.25 odds) - WON
+
+**Why We Made the Wrong Choice:**
+- Koukeo: Value Score 7/10, Edge 14.4%, Form 9/10, 1 course win
+- Pure Carbon: Value Score 9/10, Edge 23.5%, Form 8/10, 0 course wins
+
+We chose the horse with course experience over the horse with SUPERIOR VALUE.
+
+**NEW MANDATORY RULES - EFFECTIVE IMMEDIATELY:**
+
+1. **VALUE SCORE IS PRIMARY (40% weight)**
+   - When comparing horses with similar form (8-9/10), ALWAYS prefer higher value score
+   - A 9/10 value horse beats a 7/10 value horse even with course disadvantage
+   - Edge percentage difference >8% = value horse MUST be favored
+
+2. **PROGRESSIVE FORM > PERFECT RECENT FORM (30% weight)**
+   - Form pattern U-2-1 (improving trajectory) can be STRONGER than 1-1-X (plateau)
+   - Look for IMPROVEMENT trend, not just recent wins
+   - A horse getting better is more valuable than one maintaining
+
+3. **SMALL FIELD VALUE DYNAMICS (≤5 runners)**
+   - Favorites in 5-runner races are often over-bet
+   - Give EXTRA weight to value picks at 3-5 odds with value score 8+
+   - Course experience is LESS important in small fields
+
+4. **COURSE WINS - HELPFUL NOT DECISIVE (Reduce to 15% weight)**
+   - Course wins should NOT override:
+     * Superior value score (9 vs 7)
+     * Superior edge percentage (>15% difference)
+     * Progressive recent form (U-2-1 vs 1-1-X)
+   - Good horses adapt to new courses - don't penalize too heavily
+
+**UPDATED DECISION WEIGHTING:**
+- Value Score + Edge %: 40% (was 30%)
+- Form Score + Trend: 30% (unchanged)
+- Class/Course Factors: 30% (was 40%)
+
+**IMPLEMENTATION:**
+When multiple horses score 8+ on form, the tiebreaker MUST be value score, not course experience.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.1%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 21.1%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.1%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 21.1%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.1%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 21.1%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.1%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 21.1%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.1%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 21.1%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+=== LEARNED INSIGHTS (Updated 2026-02-08) ===
+
+Based on analysis of last 7 days performance (weekly learning cycle):
+
+• AVOID favorite selections - losing 71% ROI (n=34)
+• FOCUS on longshot selections - strong 184% ROI (n=25)
+• AVOID mid_price selections - losing 77% ROI (n=38)
+• AVOID outsider selections - losing 59% ROI (n=22)
+• WIN bet strike rate too low (8%) - need stronger fancies (n=52)
+• Each-way place rate too low (9%) - tighten EW criteria (n=67)
+• Be cautious at: Wolverhampton, Lingfield
+• Winning pattern: prioritize enhanced_analysis selections
+
+Apply these learnings when making selections. Continuously adapt strategy based on what works.
+
+
+
+=== LEARNED INSIGHTS (Updated 2026-02-08) ===
+
+Based on analysis of last 7 days performance (weekly learning cycle):
+
+• AVOID favorite selections - losing 71% ROI (n=34)
+• FOCUS on longshot selections - strong 184% ROI (n=25)
+• AVOID mid_price selections - losing 77% ROI (n=38)
+• AVOID outsider selections - losing 59% ROI (n=22)
+• WIN bet strike rate too low (8%) - need stronger fancies (n=52)
+• Each-way place rate too low (9%) - tighten EW criteria (n=67)
+• Be cautious at: Wolverhampton, Lingfield
+• Winning pattern: prioritize enhanced_analysis selections
+
+Apply these learnings when making selections. Continuously adapt strategy based on what works.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-11)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.6%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-12)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.5%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-13)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 18.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 15.4% is significantly below expected 24.6%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-13)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 18.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 15.4% is significantly below expected 24.6%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-13)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 18.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 15.4% is significantly below expected 24.6%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-13)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 18.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 15.4% is significantly below expected 24.6%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-13)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 18.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 15.4% is significantly below expected 24.6%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-13)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 18.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 15.4% is significantly below expected 24.6%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-13)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 18.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 15.4% is significantly below expected 24.6%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-13)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 18.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 15.4% is significantly below expected 24.6%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-13)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 18.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 15.4% is significantly below expected 24.6%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-13)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 18.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 15.4% is significantly below expected 24.6%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-13)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 18.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 15.4% is significantly below expected 24.6%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-13)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 18.5%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 15.4% is significantly below expected 24.6%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-17)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 21.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-19)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 36.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-20)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 19.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-21)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 25.5%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-22)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 42.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-24)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 47.2%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-25)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 20.0%. Consider adjusting probability model or isotonic regression parameters.
+
+2. MEDIUM_PRIORITY: Win rate 0.0% is significantly below expected 20.0%. Consider tightening overlay threshold or increasing min_back price filter.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-02-26)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+
+
+
+============================================================
+Performance-Based Adjustments (Updated: 2026-03-01)
+============================================================
+
+1. HIGH_PRIORITY: Calibration error is 35.0%. Consider adjusting probability model or isotonic regression parameters.
+

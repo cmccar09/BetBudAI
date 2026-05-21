@@ -1,0 +1,1 @@
+{"statusCode": 403, "headers": {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-admin-token", "Access-Control-Allow-Methods": "GET,POST,OPTIONS", "Content-Type": "application/json"}, "body": "{\"success\": false, \"error\": \"Forbidden\"}"}

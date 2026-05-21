@@ -1,0 +1,51 @@
+{
+  "generated": "2026-02-23 09:38:34",
+  "dataset_size": 488,
+  "findings": [
+    "WARNING Current system marginally profitable (ROI: 4.1%)",
+    "ERROR Current system BEATEN by Random Selection (18.8% vs 4.1%)",
+    "SUCCESS Edge exists: Best strategy achieves 18.8% ROI",
+    "WARNING MODERATE DATA: 488 races (recommended 500+)"
+  ],
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "action": "SWITCH TO: Random Selection",
+      "reason": "Improves ROI by 14.7% (4.1% \u2192 18.8%)",
+      "steps": [
+        "Implement Random Selection strategy",
+        "Paper trade for 1 week to validate",
+        "Monitor performance against backtest expectations"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "COLLECT MORE HISTORICAL DATA",
+      "reason": "Only 488 races - need 500+ for reliable conclusions",
+      "steps": [
+        "Import historical race data from Racing Post API",
+        "Or wait to accumulate more results over time",
+        "Re-run backtest with larger dataset"
+      ]
+    }
+  ],
+  "best_baseline": {
+    "name": "Random Selection",
+    "picks": 139,
+    "wins": 41,
+    "strike_rate": 29.496402877697843,
+    "avg_odds": 6.37863309352518,
+    "profit": 52.18000000000001,
+    "roi": 18.769784172661875
+  },
+  "current_system": {
+    "name": "Current System (85+)",
+    "picks": 30,
+    "wins": 10,
+    "strike_rate": 33.33333333333333,
+    "avg_odds": 4.071,
+    "profit": 2.460000000000001,
+    "roi": 4.100000000000001
+  },
+  "best_factors": []
+}

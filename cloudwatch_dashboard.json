@@ -1,0 +1,243 @@
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 0,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "BetBudAI/Learning", "RacesAnalyzed", { "stat": "Sum", "label": "Races Analyzed" } ],
+          [ ".", "InsightsGenerated", { "stat": "Sum", "label": "Insights Generated" } ],
+          [ ".", "PatternsDetected", { "stat": "Sum", "label": "Patterns Detected" } ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-1",
+        "title": "Daily Learning Activity",
+        "period": 86400,
+        "yAxis": {
+          "left": {
+            "min": 0
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 0,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "BetBudAI/Learning", "AdjustmentsProposed", { "stat": "Sum", "label": "Adjustments Proposed" } ],
+          [ ".", "AdjustmentsDeployed", { "stat": "Sum", "label": "Adjustments Deployed" } ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-1",
+        "title": "Weight Adjustments",
+        "period": 86400,
+        "yAxis": {
+          "left": {
+            "min": 0
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 6,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "BetBudAI/Performance", "StrikeRate", { "stat": "Average", "label": "Strike Rate (%)" } ],
+          [ ".", "ROI", { "stat": "Average", "label": "ROI (%)" } ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-1",
+        "title": "Performance Metrics (7-Day Rolling)",
+        "period": 86400,
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "max": 100
+          }
+        },
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "Target Strike Rate",
+              "value": 35,
+              "fill": "above",
+              "color": "#2ca02c"
+            },
+            {
+              "label": "Target ROI",
+              "value": 10,
+              "fill": "above",
+              "color": "#1f77b4"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 6,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "AWS/Lambda", "Duration", { "stat": "Average", "label": "Avg Duration (ms)" } ],
+          [ "...", { "stat": "Maximum", "label": "Max Duration (ms)" } ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-1",
+        "title": "Learning Lambda Performance",
+        "period": 300,
+        "yAxis": {
+          "left": {
+            "min": 0
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 12,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "BetBudAI/Learning", "ConsistentPlacerBias", { "stat": "Sum", "label": "Consistent Placer Bias" } ],
+          [ ".", "ClassAdvantageMissed", { "stat": "Sum", "label": "Class Advantage Missed" } ],
+          [ ".", "CourseFormUnderweight", { "stat": "Sum", "label": "Course Form Underweight" } ],
+          [ ".", "TrainerFormUnderweight", { "stat": "Sum", "label": "Trainer Form Underweight" } ],
+          [ ".", "MarketOverreliance", { "stat": "Sum", "label": "Market Overreliance" } ]
+        ],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "eu-west-1",
+        "title": "Miss Pattern Frequency",
+        "period": 86400
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 12,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "BetBudAI/Learning", "ImproverSuccess", { "stat": "Sum", "label": "Improver Success" } ],
+          [ ".", "ClassDropSuccess", { "stat": "Sum", "label": "Class Drop Success" } ],
+          [ ".", "CourseSpecialistSuccess", { "stat": "Sum", "label": "Course Specialist Success" } ]
+        ],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "eu-west-1",
+        "title": "Win Pattern Frequency",
+        "period": 86400
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 12,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "AWS/Lambda", "Errors", { "stat": "Sum", "label": "Errors" } ],
+          [ ".", "Throttles", { "stat": "Sum", "label": "Throttles" } ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-1",
+        "title": "Lambda Errors & Throttles",
+        "period": 300,
+        "yAxis": {
+          "left": {
+            "min": 0
+          }
+        }
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 18,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE '/aws/lambda/betbudai-learning-orchestrator'\n| fields @timestamp, @message\n| filter @message like /LearningOrchestrator/ or @message like /Adjustment/\n| sort @timestamp desc\n| limit 50",
+        "region": "eu-west-1",
+        "stacked": false,
+        "title": "Recent Learning Events",
+        "view": "table"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 24,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "BetBudAI/Learning", "AverageConfidence", { "stat": "Average", "label": "Avg Adjustment Confidence" } ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-1",
+        "title": "Adjustment Confidence Level",
+        "period": 86400,
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "max": 100
+          }
+        },
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "Deployment Threshold",
+              "value": 80,
+              "fill": "above",
+              "color": "#2ca02c"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 24,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [ "BetBudAI/Performance", "DailyPicks", { "stat": "Sum", "label": "Total Picks" } ],
+          [ ".", "DailyWinners", { "stat": "Sum", "label": "Winners" } ],
+          [ ".", "DailyLosses", { "stat": "Sum", "label": "Losses" } ]
+        ],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "eu-west-1",
+        "title": "Daily Picks Breakdown",
+        "period": 86400
+      }
+    }
+  ]
+}
