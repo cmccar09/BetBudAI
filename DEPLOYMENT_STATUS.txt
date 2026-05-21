@@ -1,0 +1,46 @@
+BetBudAI Deployment Status - May 21, 2026
+==========================================
+
+PRODUCTION ENVIRONMENT
+---------------------
+✅ Platform: Cloudflare Pages
+✅ Production URL: https://www.betbudai.com/ (LIVE with SSL)
+✅ Cloudflare URL: https://betbudai.pages.dev/
+✅ Build Version: May 11, 2026
+✅ Deployment: Manual upload to Cloudflare
+
+CUSTOM DOMAIN STATUS
+--------------------
+✅ www.betbudai.com - ACTIVE with SSL certificate
+   DNS: betbudai.pages.dev (CNAME) ✅
+   Status: Live and working
+
+CLEANUP COMPLETED
+-----------------
+✅ Deleted old Git-based app (d2hmpykfsdweob)
+✅ Removed 14 old frontend deployment zip files
+✅ Kept production build: betbudai-production.zip (400KB)
+✅ Kept all backend Lambda deployment files
+✅ Created AMPLIFY_DEPLOYMENT.md documentation
+
+BETTING SYSTEM STATUS
+---------------------
+⚠️ REQUIRES DAILY MANUAL RUN
+   Picks generation runs on LOCAL LAPTOP (not AWS)
+   Must run at 11:00 AM BST for 1:00 PM deadline
+
+✅ Unicode encoding bug FIXED (May 21, 2026)
+✅ Performance: +57.8% ROI, 62% strike rate
+
+NEXT STEPS
+----------
+1. ⚠️ URGENT: Set up daily automation OR set 11am alarm
+2. Run: setup_daily_picks_schedule.ps1 (as Administrator)
+3. Or manually: double-click GENERATE_PICKS_NOW.bat at 11am daily
+
+FILE STRUCTURE
+--------------
+betbudai-production.zip     - Current deployed version (May 11 build)
+AMPLIFY_DEPLOYMENT.md       - Full deployment guide
+DEPLOYMENT_STATUS.txt       - This file
+backend/*.zip              - Lambda function deployments (kept)

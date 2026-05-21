@@ -296,20 +296,20 @@ def load_intraday_learnings():
     try:
         with open('intraday_learnings.json', 'r') as f:
             learnings = json.load(f)
-            print("✓ Loaded intraday learnings from earlier races")
+            print("[OK] Loaded intraday learnings from earlier races")
             
             # Display key insights
             for learning in learnings.get('learnings', []):
                 if learning['type'] == 'HOT_TRAINERS':
                     trainers = [t[0] for t in learning['data'][:3]]
-                    print(f"  🔥 Hot trainers today: {', '.join(trainers)}")
+                    print(f"  [HOT] Hot trainers today: {', '.join(trainers)}")
                 elif learning['type'] == 'WINNING_ODDS_RANGE':
                     category, stats = learning['data']
-                    print(f"  💰 Best odds range: {category} ({stats['win_rate']*100:.0f}% win rate)")
+                    print(f"  [WIN] Best odds range: {category} ({stats['win_rate']*100:.0f}% win rate)")
             print()
             return learnings
     except FileNotFoundError:
-        print("ℹ️  No intraday learnings available (run intraday_learning_system.py first)")
+        print("[INFO]  No intraday learnings available (run intraday_learning_system.py first)")
         print()
         return None
 
