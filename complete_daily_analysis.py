@@ -308,6 +308,26 @@ def analyze_and_save_all():
     _existing_ui_count = len(_existing_ui)
     now_utc = datetime.now(timezone.utc)
     cutoff  = now_utc + timedelta(minutes=15)
+
+    # PICK LOCK: once it's past 12:00 UTC (1pm BST) and we already have picks,
+    # freeze them for the rest of the day — no additions, no removals.
+    # This preserves the morning selection even if later refreshes would swap picks.
+    _LOCK_HOUR_UTC = 12
+    if now_utc.hour >= _LOCK_HOUR_UTC and _existing_ui_count >= 1:
+        print(f"  PICKS LOCKED at {now_utc.strftime('%H:%M')} UTC — "
+              f"{_existing_ui_count} picks set; skipping selection pass.")
+        return {
+            'statusCode': 200,
+            'body': json.dumps({
+                'success': True,
+                'picks_locked': True,
+                'picks_count': _existing_ui_count,
+                'date': today,
+                'message': f'Picks locked since {_LOCK_HOUR_UTC:02d}:00 UTC. '
+                           f'{_existing_ui_count} picks stand for today.'
+            })
+        }
+
     # Count UI picks whose races are PAST or within the 15-min cutoff as "locked".
     # These races won't appear in this analysis run, so their show_in_ui=True
     # records persist untouched.  Only races AFTER the cutoff are truly

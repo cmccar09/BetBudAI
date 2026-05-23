@@ -747,47 +747,24 @@ def get_today_picks(headers):
     official_items = [item for item in official_items if float(item.get('stake', 0)) <= 10]
     watchlist_items = [item for item in watchlist_items if float(item.get('stake', 0) or 0) <= 10]
     
-    # DEMO MODE: On Jan 20, 2026, show ALL picks regardless of time
-    # This allows showing past races during the demo
-    if today == '2026-01-20':
-        print(f"DEMO MODE: Showing all {len(official_items)} picks for {today}")
-        future_picks = official_items
-        future_watchlist = watchlist_items
-    else:
-        # Filter out races that have already started
-        from datetime import timezone as _tz
-        now_utc = datetime.now(_tz.utc)
-        future_picks = []
-        future_watchlist = []
-        
-        for item in official_items:
-            race_time_str = item.get('race_time', '')
-            if race_time_str:
-                try:
-                    # Parse race time (ISO format with offset) and compare in UTC
-                    race_time = datetime.fromisoformat(race_time_str.replace('Z', '+00:00'))
-                    if race_time.astimezone(_tz.utc) > now_utc:
-                        future_picks.append(item)
-                except Exception as e:
-                    print(f"Error parsing race time {race_time_str}: {e}")
-                    # Include if we can't parse (safer than excluding)
-                    future_picks.append(item)
-            else:
-                # Include if no race time (safer than excluding)
-                future_picks.append(item)
+    # Show ALL of today's picks regardless of race time — once picks are locked at 1pm,
+    # subscribers checking the app at 3pm or 5pm should see the full day's selections.
+    # Tag each pick with race_started so the UI can style past vs upcoming differently.
+    from datetime import timezone as _tz
+    now_utc = datetime.now(_tz.utc)
 
-        for item in watchlist_items:
+    def _tag_race_status(items):
+        for item in items:
             race_time_str = item.get('race_time', '')
-            if race_time_str:
-                try:
-                    race_time = datetime.fromisoformat(race_time_str.replace('Z', '+00:00'))
-                    if race_time.astimezone(_tz.utc) > now_utc:
-                        future_watchlist.append(item)
-                except Exception as e:
-                    print(f"Error parsing watchlist race time {race_time_str}: {e}")
-                    future_watchlist.append(item)
-            else:
-                future_watchlist.append(item)
+            try:
+                rt = datetime.fromisoformat(race_time_str.replace('Z', '+00:00'))
+                item['race_started'] = rt.astimezone(_tz.utc) <= now_utc
+            except Exception:
+                item['race_started'] = False
+        return items
+
+    future_picks = _tag_race_status(official_items)
+    future_watchlist = _tag_race_status(watchlist_items)
     
     # Defer one-pick-per-race until after miss-audit correction is applied.
 
