@@ -1122,7 +1122,12 @@ def get_punchestown_tomorrow_picks(headers, event):
                 'chester': {
                     '16:10': 'Shrimp Shady',
                 }
-            }
+            },
+            '2026-05-23': {
+                'curragh': {
+                    '13:55': 'Purview',
+                }
+            },
         }
 
         def _featured_pick_override(date_str, course_name, local_race_time):
