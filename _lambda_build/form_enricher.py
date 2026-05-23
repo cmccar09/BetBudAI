@@ -114,7 +114,8 @@ _load_sl_ids()
 # ---------------------------------------------------------------------------
 # Today's pre-fetched form data (populated by enrich_runners)
 # ---------------------------------------------------------------------------
-_today_form = {}    # horse_name.lower() → list[run_dict]
+_today_form = {}       # horse_name.lower() → list[run_dict]
+_today_tf_stars = {}   # horse_name.lower() → int (1-5 Timeform star rating)
 
 # ---------------------------------------------------------------------------
 # HTTP helper
@@ -303,31 +304,32 @@ def _parse_sl_runs(prev_results: list, max_runs: int = 6) -> list[dict]:
     return runs
 
 
-def _fetch_sl_race_form(race_url: str) -> dict:
+def _fetch_sl_race_form(race_url: str) -> tuple:
     """
     Fetch one SL race racecard page.
-    Returns { horse_name_lower: [run_dicts] } for all runners.
-    Also updates _sl_id_map with any new horse IDs discovered.
+    Returns ({ horse_name_lower: [run_dicts] }, { horse_name_lower: tf_stars },
+             { horse_name_lower: horse_id }) — thread-safe, no global mutation.
     """
-    global _sl_ids_dirty
     html = _http_get(race_url, timeout=15)
     if not html:
-        return {}
+        return {}, {}, {}
 
     m = re.search(
         r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>',
         html, re.DOTALL
     )
     if not m:
-        return {}
+        return {}, {}, {}
 
     try:
         nd = json.loads(m.group(1))
         rides = nd['props']['pageProps']['race']['rides']
     except (KeyError, ValueError):
-        return {}
+        return {}, {}, {}
 
     result = {}
+    tf_stars_result = {}
+    new_ids = {}
     for ride in rides:
         horse = ride.get('horse', {})
         name = horse.get('name', '').strip()
@@ -335,11 +337,15 @@ def _fetch_sl_race_form(race_url: str) -> dict:
             continue
         h_id = (horse.get('horse_reference') or {}).get('id')
         if h_id and name.lower() not in _sl_id_map:
-            _sl_id_map[name.lower()] = int(h_id)
-            _sl_ids_dirty = True
+            new_ids[name.lower()] = int(h_id)
         prev_results = horse.get('previous_results', [])
         result[name.lower()] = _parse_sl_runs(prev_results)
-    return result
+        tf_stars = ride.get('timeform_stars')
+        if isinstance(tf_stars, dict):
+            tf_stars = tf_stars.get('value')
+        if tf_stars and isinstance(tf_stars, (int, float)):
+            tf_stars_result[name.lower()] = int(tf_stars)
+    return result, tf_stars_result, new_ids
 
 
 # ---------------------------------------------------------------------------
@@ -477,74 +483,97 @@ def fetch_form(horse_name: str, max_runs: int = 6, force_refresh: bool = False) 
 
 def enrich_runners(races: list[dict], verbose: bool = True) -> list[dict]:
     """
-    Add 'form_runs' list to every runner in every race.
-    Pre-fetches all SL race racecard pages for today's venues (1 request/race),
-    then injects form data into each runner. Mutates races in-place and returns them.
+    Add 'form_runs' + 'timeform_stars' to every runner in every race.
+    Fetches all SL race racecard pages in parallel (fan-out) so enrichment
+    completes before the scoring engine runs its selection pass.
     """
-    global _today_form
+    global _today_form, _today_tf_stars, _sl_ids_dirty
 
-    # Step 1: Get today's SL race URLs (indexed by venue slug)
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    # Step 1: Get today's SL race URLs (one index fetch covers all venues)
     today = datetime.now().strftime('%Y-%m-%d')
     if verbose:
-        print(f"  [form] Fetching SL race URLs for {today}…")
+        print(f"  [form] Fetching SL race index for {today}…")
     sl_race_urls = _get_sl_race_urls(today)
+    n_urls = sum(len(v) for v in sl_race_urls.values())
     if verbose:
-        n_urls = sum(len(v) for v in sl_race_urls.values())
         print(f"  [form] Found {n_urls} race URLs across {len(sl_race_urls)} venues")
 
-    # Step 2: For each distinct venue in our races, fetch all its SL race racecard pages
-    fetched_venues = set()
+    # Step 2: Build the set of URLs relevant to today's races
+    all_urls = []
+    seen_urls = set()
     for race in races:
         venue = race.get('course') or race.get('venue') or ''
         vs = _venue_slug(venue)
-        if vs in fetched_venues:
-            continue
-
-        # Look up SL URLs for this venue (exact or partial match)
         sl_urls = sl_race_urls.get(vs, [])
         if not sl_urls:
             for sl_venue, urls in sl_race_urls.items():
                 if vs and (vs in sl_venue or sl_venue in vs):
                     sl_urls = urls
                     break
-
-        if not sl_urls:
-            continue
-
-        fetched_venues.add(vs)
-        for race_url in sl_urls:
-            race_form = _fetch_sl_race_form(race_url)
-            _today_form.update(race_form)
-            time.sleep(0.4)
+        for u in sl_urls:
+            if u not in seen_urls:
+                seen_urls.add(u)
+                all_urls.append(u)
 
     if verbose:
-        print(f"  [form] Pre-fetched form for {len(_today_form)} horses across {len(fetched_venues)} venues")
+        print(f"  [form] Fan-out fetch: {len(all_urls)} race pages — parallel (max 10 workers)…")
 
-    # Save any newly discovered horse IDs
+    # Step 3: Fetch all race pages in parallel — collect results thread-safely
+    merged_form: dict = {}
+    merged_tf: dict = {}
+    merged_ids: dict = {}
+
+    with ThreadPoolExecutor(max_workers=min(len(all_urls), 10)) as pool:
+        futures = {pool.submit(_fetch_sl_race_form, url): url for url in all_urls}
+        for future in as_completed(futures):
+            try:
+                race_form, tf_stars_map, new_ids = future.result()
+                merged_form.update(race_form)
+                merged_tf.update(tf_stars_map)
+                merged_ids.update(new_ids)
+            except Exception as exc:
+                print(f"  [form] Warning: race page fetch error — {exc}")
+
+    # Merge into globals after all threads complete (no race conditions)
+    _today_form.update(merged_form)
+    _today_tf_stars.update(merged_tf)
+    for name, h_id in merged_ids.items():
+        if name not in _sl_id_map:
+            _sl_id_map[name] = h_id
+            _sl_ids_dirty = True
+
     _save_sl_ids()
 
-    # Step 3: Inject form_runs into each runner
+    if verbose:
+        print(f"  [form] Pre-fetched form for {len(_today_form)} horses | "
+              f"Timeform stars: {len(_today_tf_stars)} horses")
+
+    # Step 4: Inject form_runs + timeform_stars into each runner
     total_horses = sum(len(r.get('runners', [])) for r in races)
     done = 0
     enriched = 0
+    tf_count = 0
     for race in races:
         for runner in race.get('runners', []):
             name = runner.get('name') or runner.get('horse') or ''
             if name:
-                # Strip country suffix like (IRE), (USA)
                 name_clean = re.sub(r'\s*\([A-Z]{2,3}\)\s*$', '', name).strip()
                 runs = fetch_form(name_clean)
                 runner['form_runs'] = runs
+                tf = _today_tf_stars.get(name_clean.lower())
+                if tf:
+                    runner['timeform_stars'] = tf
+                    tf_count += 1
                 done += 1
                 if runs:
                     enriched += 1
-                if verbose:
-                    status = f"✓ {len(runs)} runs" if runs else "✗ no data"
-                    print(f"  [{done}/{total_horses}] {name}: {status}")
 
     if verbose:
-        print(f"  [form] Enriched {enriched}/{done} runners with form data")
-    return races
+        pct = round(100 * enriched / done) if done else 0
+        print(f"  [form] Enriched {enriched}/{done} runners ({pct}%) | "
+              f"Timeform stars: {tf_count} runners")
     return races
 
 

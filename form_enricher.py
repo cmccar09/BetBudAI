@@ -1,5 +1,11 @@
 """
-FORM ENRICHER — Fetches detailed last-6-race history from Sporting Life for each runner.
+FORM ENRICHER — Two-source parallel enrichment for every runner.
+
+Sources (run in parallel, SL first, Racing API fills gaps):
+  1. Sporting Life racecard scraping — parses __NEXT_DATA__ JSON to get ALL meetings
+     (25 venues today vs 8 featured previously), covers UK/Irish/international field.
+  2. The Racing API (theracingapi.com) — structured API, covers ~95%+ UK/Irish field
+     when plan includes racecards endpoint. Set RACING_API_KEY env var as "username:password".
 
 Data per run:
   date            : "2026-01-17"
@@ -8,21 +14,21 @@ Data per run:
   going           : "Good to Soft"
   position        : 1
   field_size      : 10
-  official_rating : 124         # OR on that day (None if sourced from racecard)
+  official_rating : 124
   race_class      : "4"
-  beaten_lengths  : 2.25        # None if sourced from racecard
+  beaten_lengths  : 2.25
 
 Signals unlocked:
   - exact_course_win       +20pts
   - exact_distance_win     +20pts
   - going_win_match        +16pts
   - fresh_days_optimal     +10pts
-  - close_2nd_last_time    +14pts  (needs beaten_lengths — profile fetch only)
-  - or_trajectory_up       +10pts  (needs official_rating — profile fetch only)
+  - close_2nd_last_time    +14pts  (needs beaten_lengths)
+  - or_trajectory_up       +10pts  (needs official_rating)
   - big_field_win          +8pts
 
 Fetch strategy:
-  1. enrich_runners() pre-fetches today's SL race racecard pages (1 request/race).
+  1. enrich_runners() fans out SL scraping + Racing API call simultaneously.
      Every runner in today's races gets form data immediately.
   2. fetch_form() on a single horse: checks _today_form cache, then falls back to
      the SL profile page (/racing/profiles/horse/{id}) if the horse ID is known.
@@ -114,7 +120,8 @@ _load_sl_ids()
 # ---------------------------------------------------------------------------
 # Today's pre-fetched form data (populated by enrich_runners)
 # ---------------------------------------------------------------------------
-_today_form = {}    # horse_name.lower() → list[run_dict]
+_today_form = {}       # horse_name.lower() → list[run_dict]
+_today_tf_stars = {}   # horse_name.lower() → int (1-5 Timeform star rating)
 
 # ---------------------------------------------------------------------------
 # HTTP helper
@@ -249,9 +256,10 @@ _sl_race_url_cache = {}   # date_str → result dict (one fetch per process per 
 
 def _get_sl_race_urls(date_str: str = None) -> dict:
     """
-    Fetch the SL main racecard page and extract all race URLs for date_str (default today).
+    Fetch the SL main racecard page and extract all race URLs for ALL meetings today.
+    Parses __NEXT_DATA__ JSON to get every meeting's race IDs (25 venues, not just 8
+    featured), then constructs racecard URLs directly from race IDs.
     Returns { "venue-slug": ["https://...", ...], ... }
-    Caches the result in-memory so the racecard page is only fetched once per date.
     """
     today = date_str or datetime.now(timezone.utc).strftime('%Y-%m-%d')
     if today in _sl_race_url_cache:
@@ -264,16 +272,47 @@ def _get_sl_race_urls(date_str: str = None) -> dict:
         return {}
 
     result = {}
-    seen = set()
-    for m in _SL_RACE_URL_RE.finditer(html):
-        path, d, venue, _race_id = m.group(1), m.group(2), m.group(3), m.group(4)
-        if d != today:
-            continue
-        if path in seen:
-            continue
-        seen.add(path)
-        full_url = 'https://www.sportinglife.com' + path
-        result.setdefault(venue, []).append(full_url)
+
+    # Primary: parse __NEXT_DATA__ — covers ALL meetings (UK, Irish, international)
+    nd_match = re.search(
+        r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>',
+        html, re.DOTALL
+    )
+    if nd_match:
+        try:
+            nd = json.loads(nd_match.group(1))
+            meetings = nd['props']['pageProps']['meetings']
+            for meeting in meetings:
+                ms = meeting.get('meeting_summary', {})
+                course = ms.get('course', {})
+                venue_name = course.get('name', '') if isinstance(course, dict) else str(course)
+                if not venue_name:
+                    continue
+                venue_slug = _venue_slug(venue_name)
+                for race in meeting.get('races', []):
+                    race_ref = race.get('race_summary_reference', {})
+                    race_id = race_ref.get('id') if isinstance(race_ref, dict) else None
+                    if not race_id:
+                        continue
+                    race_url = (
+                        f'https://www.sportinglife.com/racing/racecards'
+                        f'/{today}/{venue_slug}/racecard/{race_id}/racecard'
+                    )
+                    result.setdefault(venue_slug, []).append(race_url)
+        except (KeyError, ValueError, TypeError):
+            pass
+
+    # Fallback: regex HTML link extraction (featured meetings only)
+    if not result:
+        seen: set = set()
+        for m in _SL_RACE_URL_RE.finditer(html):
+            path, d, venue, _race_id = m.group(1), m.group(2), m.group(3), m.group(4)
+            if d != today:
+                continue
+            if path in seen:
+                continue
+            seen.add(path)
+            result.setdefault(venue, []).append('https://www.sportinglife.com' + path)
 
     _sl_race_url_cache[today] = result
     return result
@@ -303,31 +342,32 @@ def _parse_sl_runs(prev_results: list, max_runs: int = 6) -> list[dict]:
     return runs
 
 
-def _fetch_sl_race_form(race_url: str) -> dict:
+def _fetch_sl_race_form(race_url: str) -> tuple:
     """
     Fetch one SL race racecard page.
-    Returns { horse_name_lower: [run_dicts] } for all runners.
-    Also updates _sl_id_map with any new horse IDs discovered.
+    Returns ({ horse_name_lower: [run_dicts] }, { horse_name_lower: tf_stars },
+             { horse_name_lower: horse_id }) — thread-safe, no global mutation.
     """
-    global _sl_ids_dirty
     html = _http_get(race_url, timeout=15)
     if not html:
-        return {}
+        return {}, {}, {}
 
     m = re.search(
         r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>',
         html, re.DOTALL
     )
     if not m:
-        return {}
+        return {}, {}, {}
 
     try:
         nd = json.loads(m.group(1))
         rides = nd['props']['pageProps']['race']['rides']
     except (KeyError, ValueError):
-        return {}
+        return {}, {}, {}
 
     result = {}
+    tf_stars_result = {}
+    new_ids = {}
     for ride in rides:
         horse = ride.get('horse', {})
         name = horse.get('name', '').strip()
@@ -335,11 +375,15 @@ def _fetch_sl_race_form(race_url: str) -> dict:
             continue
         h_id = (horse.get('horse_reference') or {}).get('id')
         if h_id and name.lower() not in _sl_id_map:
-            _sl_id_map[name.lower()] = int(h_id)
-            _sl_ids_dirty = True
+            new_ids[name.lower()] = int(h_id)
         prev_results = horse.get('previous_results', [])
         result[name.lower()] = _parse_sl_runs(prev_results)
-    return result
+        tf_stars = ride.get('timeform_stars')
+        if isinstance(tf_stars, dict):
+            tf_stars = tf_stars.get('value')
+        if tf_stars and isinstance(tf_stars, (int, float)):
+            tf_stars_result[name.lower()] = int(tf_stars)
+    return result, tf_stars_result, new_ids
 
 
 # ---------------------------------------------------------------------------
@@ -421,6 +465,112 @@ def parse_pp_form_text(text: str) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
+# The Racing API (theracingapi.com) — second enrichment source
+# ---------------------------------------------------------------------------
+
+def _parse_racing_api_runs(past_results: list, max_runs: int = 6) -> list[dict]:
+    """Convert theracingapi.com past_results entries to our standard run_dict format."""
+    runs = []
+    for r in past_results[:max_runs]:
+        pos = None
+        pos_raw = r.get('position') or r.get('finishing_position') or r.get('pos') or ''
+        try:
+            pos = int(str(pos_raw).replace('st', '').replace('nd', '').replace('rd', '').replace('th', '').strip())
+        except (ValueError, TypeError):
+            pass
+
+        dist_f = None
+        dist_raw = r.get('distance_f') or r.get('distance') or ''
+        try:
+            dist_f = float(dist_raw) if isinstance(dist_raw, (int, float)) else _dist_to_furlongs(str(dist_raw))
+        except Exception:
+            pass
+
+        going_raw = (r.get('going') or r.get('going_description') or r.get('ground') or '')
+        field = _safe_int(r.get('runners') or r.get('field_size') or r.get('number_of_runners'))
+        beaten = _parse_beaten_lengths(str(r.get('beaten_lengths') or r.get('btn') or r.get('dist') or ''))
+
+        runs.append({
+            'date':             str(r.get('date') or r.get('race_date') or ''),
+            'course':           str(r.get('course') or r.get('course_name') or ''),
+            'distance_f':       dist_f,
+            'going':            _norm_going(str(going_raw)),
+            'position':         pos,
+            'field_size':       field,
+            'official_rating':  _safe_int(r.get('official_rating') or r.get('or')),
+            'race_class':       str(r.get('class') or r.get('race_class') or ''),
+            'beaten_lengths':   beaten,
+        })
+    return runs
+
+
+def fetch_racing_api_form(date_str: str, api_key: str) -> dict:
+    """
+    Fetch runner form from theracingapi.com for all UK/Irish races on date_str.
+    Runs in parallel alongside SL scraping — fills in horses SL missed.
+
+    api_key format: "username:password" from theracingapi.com signup (free tier).
+    Set via RACING_API_KEY Lambda env var.
+
+    Returns { horse_name_lower: [run_dicts] }
+    """
+    if not api_key or ':' not in api_key:
+        return {}
+
+    import base64
+    encoded = base64.b64encode(api_key.encode()).decode()
+    headers_auth = {
+        'Authorization': f'Basic {encoded}',
+        'Accept': 'application/json',
+    }
+
+    # Try pro endpoint first (has full past_results), fall back to standard
+    for endpoint in (
+        f'https://api.theracingapi.com/v1/racecards/pro?date={date_str}',
+        f'https://api.theracingapi.com/v1/racecards?date={date_str}',
+    ):
+        try:
+            resp = requests.get(endpoint, headers=headers_auth, timeout=25)
+            if resp.status_code == 401:
+                print(f'  [racing_api] Auth failed — check RACING_API_KEY')
+                return {}
+            if resp.status_code == 403:
+                print(f'  [racing_api] Plan does not include {endpoint.split("?")[0].split("/")[-1]} endpoint — trying next')
+                continue
+            if resp.status_code != 200:
+                print(f'  [racing_api] HTTP {resp.status_code} from {endpoint}')
+                continue
+            data = resp.json()
+            break
+        except Exception as exc:
+            print(f'  [racing_api] Request error: {exc}')
+            return {}
+    else:
+        return {}
+
+    result: dict = {}
+    races = data.get('racecards') or data.get('races') or []
+    for race in races:
+        runners = race.get('runners') or []
+        for runner in runners:
+            name = str(runner.get('horse') or runner.get('horse_name') or '').strip()
+            if not name:
+                continue
+            name_key = re.sub(r'\s*\([A-Z]{2,3}\)\s*$', '', name).strip().lower()
+            # past_results / results / form_history — try all keys the API may use
+            past = (runner.get('past_results')
+                    or runner.get('results')
+                    or runner.get('form_history')
+                    or runner.get('form') or [])
+            if isinstance(past, list) and past:
+                runs = _parse_racing_api_runs(past)
+                if runs:
+                    result[name_key] = runs
+
+    return result
+
+
+# ---------------------------------------------------------------------------
 # Main public entry points
 # ---------------------------------------------------------------------------
 
@@ -475,76 +625,134 @@ def fetch_form(horse_name: str, max_runs: int = 6, force_refresh: bool = False) 
     return []
 
 
-def enrich_runners(races: list[dict], verbose: bool = True) -> list[dict]:
-    """
-    Add 'form_runs' list to every runner in every race.
-    Pre-fetches all SL race racecard pages for today's venues (1 request/race),
-    then injects form data into each runner. Mutates races in-place and returns them.
-    """
-    global _today_form
+def _sl_fan_out(all_urls: list) -> tuple:
+    """Fetch all SL race pages in parallel. Returns (form_dict, tf_dict, new_ids_dict)."""
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    merged_form: dict = {}
+    merged_tf: dict = {}
+    merged_ids: dict = {}
+    if not all_urls:
+        return merged_form, merged_tf, merged_ids
+    with ThreadPoolExecutor(max_workers=min(len(all_urls), 10)) as pool:
+        futures = {pool.submit(_fetch_sl_race_form, url): url for url in all_urls}
+        for future in as_completed(futures):
+            try:
+                race_form, tf_stars_map, new_ids = future.result()
+                merged_form.update(race_form)
+                merged_tf.update(tf_stars_map)
+                merged_ids.update(new_ids)
+            except Exception as exc:
+                print(f"  [sl] Warning: race page error — {exc}")
+    return merged_form, merged_tf, merged_ids
 
-    # Step 1: Get today's SL race URLs (indexed by venue slug)
+
+def enrich_runners(races: list[dict], verbose: bool = True,
+                   racing_api_key: str = '') -> list[dict]:
+    """
+    Parallel two-source enrichment — SL scraping + Racing API run simultaneously.
+    SL data takes priority; Racing API fills every horse SL missed.
+    Set racing_api_key='username:password' from theracingapi.com (free tier).
+    """
+    global _today_form, _today_tf_stars, _sl_ids_dirty
+
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    import os
+
+    api_key = racing_api_key or os.environ.get('RACING_API_KEY', '')
     today = datetime.now().strftime('%Y-%m-%d')
-    if verbose:
-        print(f"  [form] Fetching SL race URLs for {today}…")
-    sl_race_urls = _get_sl_race_urls(today)
-    if verbose:
-        n_urls = sum(len(v) for v in sl_race_urls.values())
-        print(f"  [form] Found {n_urls} race URLs across {len(sl_race_urls)} venues")
 
-    # Step 2: For each distinct venue in our races, fetch all its SL race racecard pages
-    fetched_venues = set()
+    # ── Collect SL race URLs for today's venues ───────────────────────────────
+    if verbose:
+        print(f"  [form] Fetching SL race index for {today}…")
+    sl_race_urls = _get_sl_race_urls(today)
+    n_urls = sum(len(v) for v in sl_race_urls.values())
+    if verbose:
+        print(f"  [form] SL: {n_urls} race URLs | Racing API: {'enabled' if api_key else 'no key — skipping'}")
+
+    all_sl_urls = []
+    seen_urls: set = set()
     for race in races:
         venue = race.get('course') or race.get('venue') or ''
         vs = _venue_slug(venue)
-        if vs in fetched_venues:
-            continue
-
-        # Look up SL URLs for this venue (exact or partial match)
         sl_urls = sl_race_urls.get(vs, [])
         if not sl_urls:
             for sl_venue, urls in sl_race_urls.items():
                 if vs and (vs in sl_venue or sl_venue in vs):
                     sl_urls = urls
                     break
+        for u in sl_urls:
+            if u not in seen_urls:
+                seen_urls.add(u)
+                all_sl_urls.append(u)
 
-        if not sl_urls:
-            continue
-
-        fetched_venues.add(vs)
-        for race_url in sl_urls:
-            race_form = _fetch_sl_race_form(race_url)
-            _today_form.update(race_form)
-            time.sleep(0.4)
-
+    # ── Fan-out: SL pages + Racing API call run simultaneously ────────────────
     if verbose:
-        print(f"  [form] Pre-fetched form for {len(_today_form)} horses across {len(fetched_venues)} venues")
+        sources = f"SL ({len(all_sl_urls)} pages)"
+        if api_key:
+            sources += " + Racing API"
+        print(f"  [form] Fan-out: {sources}…")
 
-    # Save any newly discovered horse IDs
+    with ThreadPoolExecutor(max_workers=2) as outer_pool:
+        sl_future  = outer_pool.submit(_sl_fan_out, all_sl_urls)
+        ra_future  = outer_pool.submit(fetch_racing_api_form, today, api_key)
+
+        sl_form, sl_tf, sl_ids = sl_future.result()
+        ra_form = ra_future.result()
+
+    # ── Merge: SL first, Racing API fills gaps ────────────────────────────────
+    _today_form.update(sl_form)
+    _today_tf_stars.update(sl_tf)
+    for name, h_id in sl_ids.items():
+        if name not in _sl_id_map:
+            _sl_id_map[name] = h_id
+            _sl_ids_dirty = True
     _save_sl_ids()
 
-    # Step 3: Inject form_runs into each runner
+    ra_filled = 0
+    for name, runs in ra_form.items():
+        if name not in _today_form or not _today_form[name]:
+            _today_form[name] = runs
+            ra_filled += 1
+
+    if verbose:
+        print(f"  [form] SL: {len(sl_form)} horses | "
+              f"Racing API: {len(ra_form)} horses ({ra_filled} gap-fills) | "
+              f"Total pool: {len(_today_form)} horses")
+
+    # ── Inject form_runs + timeform_stars into each runner ────────────────────
     total_horses = sum(len(r.get('runners', [])) for r in races)
-    done = 0
     enriched = 0
+    tf_count = 0
+    ra_count = 0
     for race in races:
         for runner in race.get('runners', []):
             name = runner.get('name') or runner.get('horse') or ''
-            if name:
-                # Strip country suffix like (IRE), (USA)
-                name_clean = re.sub(r'\s*\([A-Z]{2,3}\)\s*$', '', name).strip()
-                runs = fetch_form(name_clean)
-                runner['form_runs'] = runs
-                done += 1
-                if runs:
-                    enriched += 1
-                if verbose:
-                    status = f"✓ {len(runs)} runs" if runs else "✗ no data"
-                    print(f"  [{done}/{total_horses}] {name}: {status}")
+            if not name:
+                continue
+            name_clean = re.sub(r'\s*\([A-Z]{2,3}\)\s*$', '', name).strip()
+            name_key = name_clean.lower()
+
+            runs = fetch_form(name_clean)
+            runner['form_runs'] = runs
+            if runs:
+                enriched += 1
+                # Tag source so manifest can report it
+                if name_key in ra_form and name_key not in sl_form:
+                    runner['form_source'] = 'racing_api'
+                    ra_count += 1
+                else:
+                    runner['form_source'] = 'sl'
+
+            tf = _today_tf_stars.get(name_key)
+            if tf:
+                runner['timeform_stars'] = tf
+                tf_count += 1
 
     if verbose:
-        print(f"  [form] Enriched {enriched}/{done} runners with form data")
-    return races
+        pct = round(100 * enriched / total_horses) if total_horses else 0
+        print(f"  [form] Enriched {enriched}/{total_horses} ({pct}%) — "
+              f"SL: {enriched - ra_count} | Racing API gaps filled: {ra_count} | "
+              f"Timeform stars: {tf_count}")
     return races
 
 

@@ -286,93 +286,101 @@ def lambda_handler(event, context):
     print(f"Event keys: {event.keys()}")
     print(f"Path check - 'workflow/run' in path: {'workflow/run' in path}")
     
+    def _ensure_cors(response):
+        if not isinstance(response, dict):
+            return response
+        response_headers = response.get('headers', {}) or {}
+        response_headers.update(headers)
+        response['headers'] = response_headers
+        return response
+
     try:
         # Route requests - check more specific paths first
         if 'cheltenham/picks/save' in path:
-            return save_cheltenham_picks_lambda(headers)
+            response = save_cheltenham_picks_lambda(headers)
         elif 'cheltenham/picks' in path:
-            return get_cheltenham_picks_lambda(headers, event)
+            response = get_cheltenham_picks_lambda(headers, event)
         elif 'cheltenham/races' in path:
-            return get_cheltenham_races_lambda(headers)
+            response = get_cheltenham_races_lambda(headers)
         elif 'favs-run' in path:
-            return get_favs_run_lambda(headers, event)
+            response = get_favs_run_lambda(headers, event)
         elif 'learning/apply' in path:
-            return apply_learning_lambda(headers, event)
+            response = apply_learning_lambda(headers, event)
         elif 'results/auto-record' in path:
-            return auto_record_pending_results(headers)
+            response = auto_record_pending_results(headers)
         elif 'admin/agentic-gate' in path and method == 'GET':
-            return admin_get_agentic_gate(headers, event)
+            response = admin_get_agentic_gate(headers, event)
         elif 'admin/agentic-gate' in path and method == 'POST':
-            return admin_save_agentic_gate(headers, event)
+            response = admin_save_agentic_gate(headers, event)
         elif 'admin/config' in path and method == 'GET':
-            return admin_get_config(headers, event)
+            response = admin_get_config(headers, event)
         elif 'admin/config' in path and method == 'POST':
-            return admin_save_config(headers, event)
+            response = admin_save_config(headers, event)
         elif 'admin/subscribers/role' in path and method == 'POST':
-            return admin_update_subscriber_role(headers, event)
+            response = admin_update_subscriber_role(headers, event)
         elif 'admin/subscribers' in path and method == 'GET':
-            return admin_get_subscribers(headers, event)
+            response = admin_get_subscribers(headers, event)
         elif 'forgot-password' in path and method == 'POST':
-            return forgot_password(headers, event)
+            response = forgot_password(headers, event)
         elif 'reset-password' in path and method == 'POST':
-            return reset_password(headers, event)
+            response = reset_password(headers, event)
         elif 'login' in path and method == 'POST':
-            return login_subscriber(headers, event)
+            response = login_subscriber(headers, event)
         elif 'verify-email' in path:
-            return verify_email_token(headers, event)
+            response = verify_email_token(headers, event)
         elif 'register' in path and method == 'POST':
-            return register_subscriber(headers, event)
+            response = register_subscriber(headers, event)
         elif 'create-checkout-session' in path and method == 'POST':
-            return create_checkout_session(headers, event)
+            response = create_checkout_session(headers, event)
         elif 'stripe-webhook' in path and method == 'POST':
-            return handle_stripe_webhook(headers, event)
+            response = handle_stripe_webhook(headers, event)
         elif 'subscription-status' in path and method == 'POST':
-            return get_subscription_status(headers, event)
+            response = get_subscription_status(headers, event)
         elif 'customer-portal' in path and method == 'POST':
-            return create_customer_portal(headers, event)
+            response = create_customer_portal(headers, event)
         elif 'cancel-subscription' in path and method == 'POST':
-            return cancel_subscription(headers, event)
+            response = cancel_subscription(headers, event)
         elif 'daily-email-preference' in path and method == 'POST':
-            return update_daily_email_preference(headers, event)
+            response = update_daily_email_preference(headers, event)
         elif 'daily-picks-ready-email/send' in path and method == 'POST':
-            return maybe_send_daily_picks_ready_email(headers, event)
+            response = maybe_send_daily_picks_ready_email(headers, event)
         elif 'results/latest-winner' in path:
-            return get_latest_winner(headers)
+            response = get_latest_winner(headers)
         elif 'results/export-csv' in path:
-            return export_roi_csv(headers)
+            response = export_roi_csv(headers)
         elif 'results/cumulative-roi' in path:
-            return get_cumulative_roi(headers)
+            response = get_cumulative_roi(headers)
         elif 'results/yesterday' in path:
-            return check_yesterday_results(headers)
+            response = check_yesterday_results(headers)
         elif 'results/today' in path or path.endswith('/results'):
-            return check_today_results(headers)
+            response = check_today_results(headers)
         elif 'picks/greyhounds' in path:
-            return get_greyhound_picks(headers)
+            response = get_greyhound_picks(headers)
         elif 'picks/featured-meeting' in path and method == 'GET':
-            return get_punchestown_tomorrow_picks(headers, event)
+            response = get_punchestown_tomorrow_picks(headers, event)
         elif 'picks/punchestown-tomorrow' in path and method == 'GET':
-            return get_punchestown_tomorrow_picks(headers, event)
+            response = get_punchestown_tomorrow_picks(headers, event)
         elif 'picks/yesterday' in path:
-            return get_yesterday_picks(headers)
+            response = get_yesterday_picks(headers)
         elif 'picks/analysis-quality' in path:
-            return get_analysis_quality(headers, event)
+            response = get_analysis_quality(headers, event)
         elif 'picks/today' in path:
-            return get_today_picks(headers)
+            response = get_today_picks(headers)
         elif 'major-race-analysis/run' in path and method == 'POST':
-            return run_major_race_analysis(headers, event)
+            response = run_major_race_analysis(headers, event)
         elif 'major-race-analysis' in path and method == 'GET':
-            return get_major_race_analysis(headers)
+            response = get_major_race_analysis(headers)
         elif 'workflow/run' in path or 'workflow' in path:
-            return trigger_workflow(headers)
+            response = trigger_workflow(headers)
         elif 'picks' in path:
-            return get_all_picks(headers)
+            response = get_all_picks(headers)
         elif 'health' in path:
-            return get_health(headers)
+            response = get_health(headers)
         elif path == '/':
             # Root path - return API info
-            return {
+            response = {
                 'statusCode': 200,
-                'headers': headers,
+                'headers': headers.copy(),
                 'body': json.dumps({
                     'service': 'Betting Picks API',
                     'endpoints': [
@@ -387,25 +395,25 @@ def lambda_handler(event, context):
                 })
             }
         else:
-            return {
+            response = {
                 'statusCode': 404,
-                'headers': headers,
+                'headers': headers.copy(),
                 'body': json.dumps({
                     'success': False,
                     'error': f'Endpoint not found: {path}'
                 })
             }
-    
+        return _ensure_cors(response)
     except Exception as e:
         print(f"Error: {str(e)}")
-        return {
+        return _ensure_cors({
             'statusCode': 500,
-            'headers': headers,
+            'headers': headers.copy(),
             'body': json.dumps({
                 'success': False,
                 'error': str(e)
             })
-        }
+        })
 
 def get_all_picks(headers):
     """Get all picks from DynamoDB"""
@@ -909,12 +917,12 @@ def get_today_picks(headers):
     future_watchlist = future_watchlist[:2]
     future_watchlist.sort(key=lambda x: x.get('race_time', ''))
 
-    # Map reasons -> selection_reasons for UI compatibility
+    # Preserve selection_reasons from DynamoDB; fall back to legacy 'reasons' field
     race_fields = {}
     for pick in future_picks:
-        pick['selection_reasons'] = pick.get('reasons', [])
+        pick['selection_reasons'] = pick.get('selection_reasons') or pick.get('reasons', [])
     for pick in future_watchlist:
-        pick['selection_reasons'] = pick.get('reasons', [])
+        pick['selection_reasons'] = pick.get('selection_reasons') or pick.get('reasons', [])
 
     top_calls = _compute_top_calls(future_picks)
     _persist_daily_top_calls(today, top_calls)
@@ -950,6 +958,10 @@ def get_today_picks(headers):
         # Next run is next hour at :15
         next_run = (now + timedelta(hours=1)).replace(minute=15, second=0, microsecond=0)
     
+    # Compute overall form coverage from all horse items for today
+    coverage_values = [float(it.get('race_coverage_pct', 0) or 0) for it in horse_items if it.get('race_coverage_pct') is not None]
+    overall_coverage_pct = round(sum(coverage_values) / len(coverage_values), 1) if coverage_values else None
+
     return {
         'statusCode': 200,
         'headers': headers,
@@ -965,6 +977,7 @@ def get_today_picks(headers):
             'race_fields': race_fields,
             'top_calls': top_calls,
             'payload_status': payload_status,
+            'form_coverage_pct': overall_coverage_pct,
             'message': 'No selections met the criteria' if len(future_picks) == 0 else f'{len(future_picks)} official + {len(future_watchlist)} watchlist upcoming races'
         })
     }
@@ -6313,12 +6326,22 @@ def get_analysis_quality(headers, event):
             status = 'PARTIAL'
             verdict = 'WARN - Some picks have incomplete data'
 
+        # Find when the pipeline last ran (most recent created_at/updated_at on any item)
+        timestamps = []
+        for item in items:
+            for ts_field in ('created_at', 'updated_at', 'analysis_timestamp', 'last_updated'):
+                ts = item.get(ts_field)
+                if ts:
+                    timestamps.append(str(ts))
+        pipeline_ran_at = max(timestamps) if timestamps else None
+
         # Build detailed report
         report = {
             'success': True,
             'status': status,
             'verdict': verdict,
             'date': target_date,
+            'pipeline_ran_at': pipeline_ran_at,
             'summary': {
                 'total_horses_analyzed': total,
                 'ui_picks_selected': len(ui_picks),

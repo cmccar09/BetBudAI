@@ -993,6 +993,7 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
   const [allPicks, setAllPicks] = useState([]);
   const [serverTopCalls, setServerTopCalls] = useState(null);
   const [payloadStatus, setPayloadStatus] = useState(null);
+  const [formCoveragePct, setFormCoveragePct] = useState(null);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState(null);
   const [cumulRoi, setCumulRoi] = useState(null);
@@ -1000,6 +1001,7 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
   const [now, setNow]           = useState(new Date());
   const [upgradeLoading, setUpgradeLoading] = useState(null);
   const [upgradeError, setUpgradeError]     = useState(null);
+  const [expandedCards, setExpandedCards]   = useState(new Set());
 
   const doSubscribe = async (tier) => {
     if (!authUser?.email) return;
@@ -1034,23 +1036,21 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
   const loadPicks = async () => {
     setLoading(true); setError(null);
     try {
-      const [res, roiRes] = await Promise.all([
-        fetch(API_BASE_URL + '/api/results/today'),
-        fetch(API_BASE_URL + '/api/results/cumulative-roi'),
-      ]);
+      const res = await fetch(API_BASE_URL + '/api/results/today');
       const data = await res.json();
-      const roiData = await roiRes.json().catch(() => null);
-      if (roiData?.success) setCumulRoi(roiData);
       if (data.success) {
         const picks = (data.picks || []).filter(p => p.show_in_ui !== false);
-        // Sort by score descending so the same top 2 are deterministic all day
         picks.sort((a, b) => parseFloat(b.comprehensive_score || b.score || 0) - parseFloat(a.comprehensive_score || a.score || 0));
         setAllPicks(picks);
         setServerTopCalls(data.top_calls || null);
         setPayloadStatus(data.payload_status || null);
+        if (data.form_coverage_pct != null) setFormCoveragePct(data.form_coverage_pct);
       } else setError(data.error || 'Failed to load picks');
     } catch (err) { setError('Network error: ' + err.message); }
     finally { setLoading(false); }
+    // Load ROI in background — don't block picks display
+    fetch(API_BASE_URL + '/api/results/cumulative-roi')
+      .then(r => r.json()).then(d => { if (d?.success) setCumulRoi(d); }).catch(() => null);
   };
 
   // Free tier: top 2 picks only, remove once race is over
@@ -1156,14 +1156,12 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
   if (loading) return <div style={{ textAlign:'center', padding:'60px 20px', color:'white' }}><div style={{ fontSize:'18px', opacity:0.8 }}>Loading today's picks...</div></div>;
   if (error) return <div style={{ background:'rgba(239,68,68,0.15)', border:'1px solid #ef4444', borderRadius:'10px', padding:'24px', textAlign:'center', color:'white' }}><div style={{ fontWeight:'700', marginBottom:'6px' }}>Error loading picks</div><div style={{ fontSize:'13px', opacity:0.8, marginBottom:'16px' }}>{error}</div><button onClick={loadPicks} style={{ background:'#059669', border:'none', borderRadius:'6px', color:'white', padding:'8px 20px', cursor:'pointer', fontWeight:'700' }}>Retry</button></div>;
 
-  // Don't reveal picks until 1pm Dublin time — selections may change as new info arrives
-  const dublinHour = parseInt(now.toLocaleString('en-GB', { hour:'numeric', hour12:false, timeZone:'Europe/Dublin' }));
-  if (dublinHour < 13) return (
+  if (allPicks.length === 0) return (
     <div style={{ textAlign:'center', padding:'60px 20px' }}>
       <div style={{ fontSize:'48px', marginBottom:'16px' }}>🐎</div>
       <div style={{ fontSize:'20px', fontWeight:'800', color:'white', marginBottom:'8px' }}>Today's Picks</div>
-      <div style={{ fontSize:'15px', color:'rgba(255,255,255,0.7)', lineHeight:'1.7' }}>Picks are finalised and published at <strong style={{ color:'#34d399' }}>1:00pm</strong> daily.</div>
-      <div style={{ fontSize:'13px', color:'rgba(255,255,255,0.45)', marginTop:'12px' }}>Our AI is analysing today's races, odds, going and form data.<br/>Check back after 1pm for your selections.</div>
+      <div style={{ fontSize:'15px', color:'rgba(255,255,255,0.7)', lineHeight:'1.7' }}>Our AI is analysing today's races — picks will appear here as soon as they're ready.</div>
+      <div style={{ fontSize:'13px', color:'rgba(255,255,255,0.45)', marginTop:'12px' }}>Odds, going and form data are being processed now.<br/>Check back shortly or hit Refresh.</div>
     </div>
   );
 
@@ -1260,8 +1258,8 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
       {/* Picks */}
       {visiblePicks.length === 0 ? (
         <div style={{ background:'rgba(255,255,255,0.08)', borderRadius:'12px', padding:'48px 24px', textAlign:'center', color:'rgba(255,255,255,0.7)' }}>
-          <div style={{ fontSize:'18px', fontWeight:'700', color:'white', marginBottom:'8px' }}>{allPicks.length > 0 ? "Today's free picks have finished" : 'No picks yet today'}</div>
-          <div style={{ fontSize:'14px' }}>{allPicks.length > 0 ? 'Upgrade to Top 4 Picks and Intraday for full daily coverage including results.' : 'Picks are published daily at 1pm. Check back then.'}</div>
+          <div style={{ fontSize:'18px', fontWeight:'700', color:'white', marginBottom:'8px' }}>{allPicks.length > 0 ? "Today's free picks have finished" : 'Picks being finalised'}</div>
+          <div style={{ fontSize:'14px' }}>{allPicks.length > 0 ? 'Upgrade to Top 4 Picks and Intraday for full daily coverage including results.' : 'Our AI is processing today\'s races — check back shortly.'}</div>
         </div>
       ) : (
         <div style={{ display:'flex', flexDirection:'column', gap:'16px' }}>
@@ -1313,6 +1311,48 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
                   {pick.form && <span style={{ background:'#f3f4f6', borderRadius:'5px', padding:'2px 8px', fontFamily:'monospace', fontWeight:'700', color:'#1e3a5f', letterSpacing:'1px' }}>Form: {pick.form}</span>}
                   {renderScoreGapBadge(pick.score_gap)}
                 </div>
+                {/* Selection reasons */}
+                {(() => {
+                  const reasons = bestKeyReasons(pick.selection_reasons, 3).length > 0
+                    ? bestKeyReasons(pick.selection_reasons, 3)
+                    : reasonsFromBreakdown(pick.score_breakdown, 3);
+                  return reasons.length > 0 ? (
+                    <div style={{ display:'flex', flexWrap:'wrap', gap:'5px', marginTop:'8px' }}>
+                      {reasons.map((r, ri) => (
+                        <span key={ri} style={{ background:'rgba(30,58,95,0.08)', color:'#1e3a5f', border:'1px solid rgba(30,58,95,0.15)', borderRadius:'5px', padding:'2px 8px', fontSize:'11px', fontWeight:'600' }}>{r}</span>
+                      ))}
+                    </div>
+                  ) : null;
+                })()}
+                {/* EV / Kelly / Race coverage / Timeform stars */}
+                {(pick.expected_value != null || pick.kelly_fraction != null || pick.race_coverage_pct != null || pick.timeform_stars != null) && (
+                  <div style={{ display:'flex', gap:'8px', marginTop:'8px', flexWrap:'wrap', alignItems:'center' }}>
+                    {pick.expected_value != null && (() => {
+                      const ev = parseFloat(pick.expected_value);
+                      const pos = ev > 0;
+                      return (
+                        <span style={{ background: pos ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.1)', color: pos ? '#065f46' : '#991b1b', border:`1px solid ${pos ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.25)'}`, borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>
+                          EV {pos ? '+' : ''}{ev.toFixed(2)}
+                        </span>
+                      );
+                    })()}
+                    {pick.kelly_fraction != null && parseFloat(pick.kelly_fraction) > 0 && (
+                      <span style={{ background:'rgba(59,130,246,0.1)', color:'#1d4ed8', border:'1px solid rgba(59,130,246,0.25)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>
+                        Kelly {(parseFloat(pick.kelly_fraction) * 100).toFixed(1)}%
+                      </span>
+                    )}
+                    {pick.race_coverage_pct != null && (
+                      <span style={{ background:'rgba(107,114,128,0.08)', color:'#374151', border:'1px solid rgba(107,114,128,0.2)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'600' }}>
+                        {parseFloat(pick.race_coverage_pct).toFixed(0)}% race data
+                      </span>
+                    )}
+                    {pick.timeform_stars != null && parseFloat(pick.timeform_stars) >= 1 && (
+                      <span style={{ color:'#d97706', fontSize:'13px', fontWeight:'700', letterSpacing:'1px' }}>
+                        {'★'.repeat(Math.min(5, Math.max(1, Math.round(parseFloat(pick.timeform_stars)))))}
+                      </span>
+                    )}
+                  </div>
+                )}
                 {/* Score badge */}
                 {(() => {
                   const score = parseFloat(pick.comprehensive_score || pick.score || 0);
@@ -1322,6 +1362,50 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
                       <span style={{ background: tier.bg, color:'white', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'800' }}>{tier.label}</span>
                       <span style={{ fontSize:'12px', fontWeight:'700', color:'#1e3a5f', marginLeft:'8px' }}>Score: {score.toFixed(0)}</span>
                     </div>
+                  );
+                })()}
+                {/* Race card expander */}
+                {pick.all_horses && pick.all_horses.length > 1 && (() => {
+                  const cardKey = pick.bet_id || `free-${idx}`;
+                  const isOpen = expandedCards.has(cardKey);
+                  const sorted = [...pick.all_horses].sort((a,b) => parseFloat(b.score||0) - parseFloat(a.score||0));
+                  const maxSc = parseFloat(sorted[0]?.score || 1) || 1;
+                  return (
+                    <>
+                      <button onClick={() => setExpandedCards(prev => { const n = new Set(prev); isOpen ? n.delete(cardKey) : n.add(cardKey); return n; })}
+                        style={{ marginTop:'12px', width:'100%', background:'rgba(30,58,95,0.07)', border:'1px solid rgba(30,58,95,0.18)', borderRadius:'6px', padding:'7px 14px', fontSize:'12px', fontWeight:'700', color:'#1e3a5f', cursor:'pointer', textAlign:'center' }}>
+                        {isOpen ? 'Hide Race Card' : `Full Race Card — ${pick.all_horses.length} runners`}
+                      </button>
+                      {isOpen && (
+                        <div style={{ marginTop:'10px', border:'1px solid rgba(30,58,95,0.15)', borderRadius:'8px', overflow:'hidden' }}>
+                          <div style={{ background:'#1e3a5f', color:'white', padding:'7px 12px', fontSize:'11px', fontWeight:'800', textTransform:'uppercase', letterSpacing:'0.5px' }}>
+                            AI Scoring — Full Field
+                          </div>
+                          {sorted.map((h, hi) => {
+                            const isOurPick = (h.horse||'').toLowerCase() === (pick.horse||'').toLowerCase();
+                            const sc = parseFloat(h.score || 0);
+                            const barPct = maxSc > 0 ? Math.max(0, Math.min(100, (sc / maxSc) * 100)) : 0;
+                            return (
+                              <div key={hi} style={{ padding:'8px 12px', background: isOurPick ? 'rgba(16,185,129,0.1)' : hi%2===0 ? 'white' : 'rgba(0,0,0,0.02)', borderTop: hi>0 ? '1px solid rgba(0,0,0,0.06)' : 'none', display:'flex', alignItems:'center', gap:'10px' }}>
+                                <span style={{ width:'22px', textAlign:'center', fontSize:'11px', fontWeight:'800', color: hi===0?'#d97706':hi===1?'#6b7280':'#9ca3af', flexShrink:0 }}>#{hi+1}</span>
+                                <div style={{ flex:1, minWidth:0 }}>
+                                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'3px' }}>
+                                    <span style={{ fontSize:'13px', fontWeight: isOurPick?'800':'600', color: isOurPick?'#065f46':'#111', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                                      {h.horse}{isOurPick && <span style={{ fontSize:'9px', background:'#10b981', color:'white', borderRadius:'3px', padding:'1px 5px', marginLeft:'5px' }}>PICK</span>}
+                                    </span>
+                                    <span style={{ fontSize:'11px', fontWeight:'700', color:'#1e3a5f', flexShrink:0, marginLeft:'6px' }}>{sc>0?'+':''}{sc.toFixed(0)}pts</span>
+                                  </div>
+                                  <div style={{ height:'4px', background:'rgba(0,0,0,0.08)', borderRadius:'2px', overflow:'hidden' }}>
+                                    <div style={{ width:`${barPct}%`, height:'100%', background: isOurPick?'#10b981':'#3b82f6', borderRadius:'2px' }} />
+                                  </div>
+                                </div>
+                                <span style={{ fontSize:'11px', color:'#6b7280', flexShrink:0, minWidth:'36px', textAlign:'right' }}>{h.odds ? toFractional(h.odds) : '—'}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
                   );
                 })()}
               </div>
@@ -2064,7 +2148,7 @@ function MyAccountView({ authUser, onLogout, accountSettingsRequest }) {
           {tier !== 'free' && (
             <div>
               <div style={labelStyle}>Price</div>
-              <div style={valueStyle}>{tier === 'vip' ? '\u20ac49.99/mo' : '\u20ac9.99/mo'}</div>
+              <div style={valueStyle}>{tier === 'vip' ? '\u20ac29.99/mo' : '\u20ac9.99/mo'}</div>
             </div>
           )}
           {periodEnd && (
@@ -2161,6 +2245,7 @@ function Top5PicksView() {
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState(null);
   const [releasePending, setReleasePending] = useState(null);
+  const [formCoveragePct, setFormCoveragePct] = useState(null);
   const [cumulRoi, setCumulRoi] = useState(null);
   const [latestWinner5, setLatestWinner5] = useState(null);
   const [yesterdaySummary5, setYesterdaySummary5] = useState(null);
@@ -2168,6 +2253,7 @@ function Top5PicksView() {
   const [yesterdayDate5, setYesterdayDate5] = useState('');
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
   const [now, setNow]           = useState(new Date());
+  const [expandedCards5, setExpandedCards5] = useState(new Set());
 
   // Dublin-timezone-aware helpers — all time comparisons must use Dublin tz
   // to match displayed times (which use Europe/Dublin)
@@ -2206,13 +2292,11 @@ function Top5PicksView() {
   const loadPicks = async () => {
     setLoading(true); setError(null); setReleasePending(null);
     try {
-      const [res, roiRes] = await Promise.all([
-        fetch(API_BASE_URL + '/api/results/today'),
-        fetch(API_BASE_URL + '/api/results/cumulative-roi'),
-      ]);
+      const res = await fetch(API_BASE_URL + '/api/results/today');
       const data = await res.json();
-      const roiData = await roiRes.json().catch(() => null);
-      if (roiData?.success) setCumulRoi(roiData);
+      // Load ROI in background — don't block picks display
+      fetch(API_BASE_URL + '/api/results/cumulative-roi')
+        .then(r => r.json()).then(d => { if (d?.success) setCumulRoi(d); }).catch(() => null);
       if (data.success) {
         if (data.analysis_pending) {
           setReleasePending(data.pending_reason || 'Final checks still running');
@@ -2249,6 +2333,7 @@ function Top5PicksView() {
         setAllPicks(picks);
         setWatchlistPicks(watchlist);
         setDroppedPicks(dropped);
+        if (data.form_coverage_pct != null) setFormCoveragePct(data.form_coverage_pct);
       } else setError(data.error || 'Failed to load picks');
     } catch (err) { setError('Network error: ' + err.message); }
     finally { setLoading(false); }
@@ -2333,15 +2418,13 @@ function Top5PicksView() {
   if (loading) return <div style={{ textAlign:'center', padding:'60px 20px', color:'white' }}><div style={{ fontSize:'18px', opacity:0.8 }}>Loading all picks...</div></div>;
   if (error) return <div style={{ background:'rgba(239,68,68,0.15)', border:'1px solid #ef4444', borderRadius:'10px', padding:'24px', textAlign:'center', color:'white' }}><div style={{ fontWeight:'700', marginBottom:'6px' }}>Error loading picks</div><div style={{ fontSize:'13px', opacity:0.8, marginBottom:'16px' }}>{error}</div><button onClick={loadPicks} style={{ background:'#059669', border:'none', borderRadius:'6px', color:'white', padding:'8px 20px', cursor:'pointer', fontWeight:'700' }}>Retry</button></div>;
 
-  // Don't reveal picks until 1pm Dublin time — selections may change as new info arrives
-  const dublinHour5 = parseInt(now.toLocaleString('en-GB', { hour:'numeric', hour12:false, timeZone:'Europe/Dublin' }));
-  if (dublinHour5 < 13) return (
+  if (allPicks.length === 0 && !loading) return (
     <div style={{ textAlign:'center', padding:'60px 20px' }}>
       <div style={{ fontSize:'48px', marginBottom:'16px' }}>🏆</div>
       <div style={{ fontSize:'20px', fontWeight:'800', color:'white', marginBottom:'8px' }}>Top {displayPickCount} Picks and Intraday</div>
-      <div style={{ fontSize:'15px', color:'rgba(255,255,255,0.7)', lineHeight:'1.7' }}>Today's official picks are finalised and published at <strong style={{ color:'#a78bfa' }}>1:00pm</strong>. Most days include <strong>{displayPickCount}</strong> total picks (4 official + up to 2 watchlist).</div>
-      <div style={{ fontSize:'13px', color:'rgba(255,255,255,0.45)', marginTop:'12px' }}>Our AI is analysing today's races, odds, going and form data.<br/>Check back after 1pm for your full selections.</div>
-      <div style={{ marginTop:'14px', fontSize:'12px', color:'rgba(255,255,255,0.55)', lineHeight:'1.6' }}>A daily email is sent around 1:20pm to your profile email once picks are settled, including results in the format winners out of total picks. Research and educational purposes only. BetBudAI is not a betting site, not a bookmaker, and not financial or betting advice. Always bet responsibly and only risk what you can afford to lose.</div>
+      <div style={{ fontSize:'15px', color:'rgba(255,255,255,0.7)', lineHeight:'1.7' }}>Our AI is analysing today's races — picks will appear here as soon as they're ready.</div>
+      <div style={{ fontSize:'13px', color:'rgba(255,255,255,0.45)', marginTop:'12px' }}>Odds, going and form data are being processed now. Check back shortly or hit Refresh.</div>
+      <div style={{ marginTop:'14px', fontSize:'12px', color:'rgba(255,255,255,0.55)', lineHeight:'1.6' }}>A daily email is sent to your profile email once picks are settled. Research and educational purposes only. Always bet responsibly.</div>
     </div>
   );
 
@@ -2458,6 +2541,21 @@ function Top5PicksView() {
         </div>
       )}
 
+      {/* Form coverage quality bar */}
+      {formCoveragePct != null && !releasePending && (
+        <div style={{ display:'flex', alignItems:'center', gap:'10px', background:'rgba(16,185,129,0.08)', border:'1px solid rgba(16,185,129,0.25)', borderRadius:'8px', padding:'8px 14px', marginBottom:'12px' }}>
+          <div style={{ flex:1, height:'5px', background:'rgba(255,255,255,0.12)', borderRadius:'3px', overflow:'hidden' }}>
+            <div style={{ width:`${Math.min(100, formCoveragePct)}%`, height:'100%', background: formCoveragePct >= 75 ? '#10b981' : formCoveragePct >= 50 ? '#f59e0b' : '#ef4444', borderRadius:'3px' }} />
+          </div>
+          <span style={{ fontSize:'11px', fontWeight:'700', color: formCoveragePct >= 75 ? '#34d399' : formCoveragePct >= 50 ? '#fbbf24' : '#f87171', whiteSpace:'nowrap' }}>
+            {formCoveragePct.toFixed(0)}% form data
+          </span>
+          <span style={{ fontSize:'11px', color:'rgba(255,255,255,0.4)' }}>
+            {formCoveragePct >= 75 ? 'High confidence analysis' : formCoveragePct >= 50 ? 'Good analysis coverage' : 'Limited coverage — check back later'}
+          </span>
+        </div>
+      )}
+
       {/* Official Picks */}
       {(() => {
         const officialPicksAll = allPicks.filter(p => !p.is_dropped);
@@ -2538,6 +2636,48 @@ function Top5PicksView() {
                   {pick.form && <span style={{ background:'#f3f4f6', borderRadius:'5px', padding:'2px 8px', fontFamily:'monospace', fontWeight:'700', color:'#1e3a5f', letterSpacing:'1px' }}>Form: {pick.form}</span>}
                   {renderScoreGapBadge(pick.score_gap)}
                 </div>
+                {/* Selection reasons */}
+                {(() => {
+                  const reasons = bestKeyReasons(pick.selection_reasons, 3).length > 0
+                    ? bestKeyReasons(pick.selection_reasons, 3)
+                    : reasonsFromBreakdown(pick.score_breakdown, 3);
+                  return reasons.length > 0 ? (
+                    <div style={{ display:'flex', flexWrap:'wrap', gap:'5px', marginTop:'8px' }}>
+                      {reasons.map((r, ri) => (
+                        <span key={ri} style={{ background:'rgba(30,58,95,0.08)', color:'#1e3a5f', border:'1px solid rgba(30,58,95,0.15)', borderRadius:'5px', padding:'2px 8px', fontSize:'11px', fontWeight:'600' }}>{r}</span>
+                      ))}
+                    </div>
+                  ) : null;
+                })()}
+                {/* EV / Kelly / Race coverage / Timeform stars */}
+                {(pick.expected_value != null || pick.kelly_fraction != null || pick.race_coverage_pct != null || pick.timeform_stars != null) && (
+                  <div style={{ display:'flex', gap:'8px', marginTop:'8px', flexWrap:'wrap', alignItems:'center' }}>
+                    {pick.expected_value != null && (() => {
+                      const ev = parseFloat(pick.expected_value);
+                      const pos = ev > 0;
+                      return (
+                        <span style={{ background: pos ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.1)', color: pos ? '#065f46' : '#991b1b', border:`1px solid ${pos ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.25)'}`, borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>
+                          EV {pos ? '+' : ''}{ev.toFixed(2)}
+                        </span>
+                      );
+                    })()}
+                    {pick.kelly_fraction != null && parseFloat(pick.kelly_fraction) > 0 && (
+                      <span style={{ background:'rgba(59,130,246,0.1)', color:'#1d4ed8', border:'1px solid rgba(59,130,246,0.25)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>
+                        Kelly {(parseFloat(pick.kelly_fraction) * 100).toFixed(1)}%
+                      </span>
+                    )}
+                    {pick.race_coverage_pct != null && (
+                      <span style={{ background:'rgba(107,114,128,0.08)', color:'#374151', border:'1px solid rgba(107,114,128,0.2)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'600' }}>
+                        {parseFloat(pick.race_coverage_pct).toFixed(0)}% race data
+                      </span>
+                    )}
+                    {pick.timeform_stars != null && parseFloat(pick.timeform_stars) >= 1 && (
+                      <span style={{ color:'#d97706', fontSize:'13px', fontWeight:'700', letterSpacing:'1px' }}>
+                        {'★'.repeat(Math.min(5, Math.max(1, Math.round(parseFloat(pick.timeform_stars)))))}
+                      </span>
+                    )}
+                  </div>
+                )}
                 {/* Score badge */}
                 {(() => {
                   const score = parseFloat(pick.comprehensive_score || pick.score || 0);
@@ -2558,6 +2698,50 @@ function Top5PicksView() {
                     )}
                   </div>
                 )}
+                {/* Race card expander */}
+                {pick.all_horses && pick.all_horses.length > 1 && (() => {
+                  const cardKey = pick.bet_id || `p5-${idx}`;
+                  const isOpen = expandedCards5.has(cardKey);
+                  const sorted = [...pick.all_horses].sort((a,b) => parseFloat(b.score||0) - parseFloat(a.score||0));
+                  const maxSc = parseFloat(sorted[0]?.score || 1) || 1;
+                  return (
+                    <>
+                      <button onClick={() => setExpandedCards5(prev => { const n = new Set(prev); isOpen ? n.delete(cardKey) : n.add(cardKey); return n; })}
+                        style={{ marginTop:'12px', width:'100%', background:'rgba(30,58,95,0.07)', border:'1px solid rgba(30,58,95,0.18)', borderRadius:'6px', padding:'7px 14px', fontSize:'12px', fontWeight:'700', color:'#1e3a5f', cursor:'pointer', textAlign:'center' }}>
+                        {isOpen ? 'Hide Race Card' : `Full Race Card — ${pick.all_horses.length} runners`}
+                      </button>
+                      {isOpen && (
+                        <div style={{ marginTop:'10px', border:'1px solid rgba(30,58,95,0.15)', borderRadius:'8px', overflow:'hidden' }}>
+                          <div style={{ background:'#1e3a5f', color:'white', padding:'7px 12px', fontSize:'11px', fontWeight:'800', textTransform:'uppercase', letterSpacing:'0.5px' }}>
+                            AI Scoring — Full Field
+                          </div>
+                          {sorted.map((h, hi) => {
+                            const isOurPick = (h.horse||'').toLowerCase() === (pick.horse||'').toLowerCase();
+                            const sc = parseFloat(h.score || 0);
+                            const barPct = maxSc > 0 ? Math.max(0, Math.min(100, (sc / maxSc) * 100)) : 0;
+                            return (
+                              <div key={hi} style={{ padding:'8px 12px', background: isOurPick ? 'rgba(16,185,129,0.1)' : hi%2===0 ? 'white' : 'rgba(0,0,0,0.02)', borderTop: hi>0 ? '1px solid rgba(0,0,0,0.06)' : 'none', display:'flex', alignItems:'center', gap:'10px' }}>
+                                <span style={{ width:'22px', textAlign:'center', fontSize:'11px', fontWeight:'800', color: hi===0?'#d97706':hi===1?'#6b7280':'#9ca3af', flexShrink:0 }}>#{hi+1}</span>
+                                <div style={{ flex:1, minWidth:0 }}>
+                                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'3px' }}>
+                                    <span style={{ fontSize:'13px', fontWeight: isOurPick?'800':'600', color: isOurPick?'#065f46':'#111', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                                      {h.horse}{isOurPick && <span style={{ fontSize:'9px', background:'#10b981', color:'white', borderRadius:'3px', padding:'1px 5px', marginLeft:'5px' }}>PICK</span>}
+                                    </span>
+                                    <span style={{ fontSize:'11px', fontWeight:'700', color:'#1e3a5f', flexShrink:0, marginLeft:'6px' }}>{sc>0?'+':''}{sc.toFixed(0)}pts</span>
+                                  </div>
+                                  <div style={{ height:'4px', background:'rgba(0,0,0,0.08)', borderRadius:'2px', overflow:'hidden' }}>
+                                    <div style={{ width:`${barPct}%`, height:'100%', background: isOurPick?'#10b981':'#3b82f6', borderRadius:'2px' }} />
+                                  </div>
+                                </div>
+                                <span style={{ fontSize:'11px', color:'#6b7280', flexShrink:0, minWidth:'36px', textAlign:'right' }}>{h.odds ? toFractional(h.odds) : '—'}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             );
         };
@@ -2705,6 +2889,11 @@ function AnalysisQualityReport({ date }) {
             <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginTop: '2px' }}>
               {quality.summary.total_horses_analyzed} horses analyzed · {quality.summary.ui_picks_selected} picks selected
             </div>
+            {quality.pipeline_ran_at && (
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', marginTop: '3px' }}>
+                Jobs ran: {new Date(quality.pipeline_ran_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })} UTC
+              </div>
+            )}
           </div>
         </div>
         <div style={{

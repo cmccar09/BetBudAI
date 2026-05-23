@@ -225,15 +225,41 @@ def analyze_and_save_all():
     # Without this step all deep_form signals score 0 for every horse.
     _form_total_horses = sum(len(r.get('runners', [])) for r in races)
     _form_enriched_count = 0
+    # Minimum form coverage before selections are locked in.
+    # If the first pass is below this threshold the enricher retries once with a
+    # fresh cache — this catches transient SL scraping failures at pipeline start.
+    _FORM_COVERAGE_GATE = 25   # percent of field that must have SL form data
+
     if _FORM_ENRICHER_AVAILABLE:
-        print(f"\n[STAGE 1/5] Deep form enrichment — {_form_total_horses} horses from Racing Post/SL...")
+        print(f"\n[STAGE 1/5] Deep form enrichment (fan-out) — {_form_total_horses} horses from SL...")
         races = _form_enrich(races, verbose=True)
         _form_enriched_count = sum(
             1 for race in races for runner in race.get('runners', [])
             if runner.get('form_runs')
         )
-        print(f"  ✓ Form enriched {_form_enriched_count}/{_form_total_horses} horses "
-              f"({round(100*_form_enriched_count/_form_total_horses) if _form_total_horses else 0}%)")
+        _form_pct_pass1 = round(100 * _form_enriched_count / _form_total_horses) if _form_total_horses else 0
+        print(f"  Pass 1: {_form_enriched_count}/{_form_total_horses} horses enriched ({_form_pct_pass1}%)")
+
+        if _form_pct_pass1 < _FORM_COVERAGE_GATE:
+            print(f"  ⚠ Coverage {_form_pct_pass1}% below {_FORM_COVERAGE_GATE}% gate — retrying enrichment (pass 2)...")
+            # Clear cached empty entries so the retry actually re-fetches
+            import form_enricher as _fe_mod
+            _fe_mod._today_form.clear()
+            _fe_mod._today_tf_stars.clear()
+            races = _form_enrich(races, verbose=False)
+            _form_enriched_count = sum(
+                1 for race in races for runner in race.get('runners', [])
+                if runner.get('form_runs')
+            )
+            _form_pct_pass2 = round(100 * _form_enriched_count / _form_total_horses) if _form_total_horses else 0
+            print(f"  Pass 2: {_form_enriched_count}/{_form_total_horses} horses enriched ({_form_pct_pass2}%)")
+            if _form_pct_pass2 < _FORM_COVERAGE_GATE:
+                print(f"  ⚠ COVERAGE STILL LOW ({_form_pct_pass2}%) after retry — "
+                      f"selections will reflect available data only. SL may be rate-limiting.")
+            else:
+                print(f"  ✓ Coverage gate passed after retry ({_form_pct_pass2}%)")
+        else:
+            print(f"  ✓ Coverage gate passed ({_form_pct_pass1}%)")
     else:
         print("[STAGE 1/5] Form enrichment unavailable — deep form signals will score 0")
 

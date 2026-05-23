@@ -18,6 +18,7 @@ This ensures:
 """
 
 import json
+import os
 import boto3
 from boto3.dynamodb.conditions import Attr
 from datetime import datetime, timezone, timedelta
@@ -225,15 +226,43 @@ def analyze_and_save_all():
     # Without this step all deep_form signals score 0 for every horse.
     _form_total_horses = sum(len(r.get('runners', [])) for r in races)
     _form_enriched_count = 0
+    # Minimum form coverage before selections are locked in.
+    # If the first pass is below this threshold the enricher retries once with a
+    # fresh cache — this catches transient SL scraping failures at pipeline start.
+    _FORM_COVERAGE_GATE = 25   # percent of field that must have SL form data
+
     if _FORM_ENRICHER_AVAILABLE:
-        print(f"\n[STAGE 1/5] Deep form enrichment — {_form_total_horses} horses from Racing Post/SL...")
-        races = _form_enrich(races, verbose=True)
+        _racing_api_key = os.environ.get('RACING_API_KEY', '')
+        _source_label = "SL + Racing API" if _racing_api_key else "SL only (set RACING_API_KEY for full coverage)"
+        print(f"\n[STAGE 1/5] Deep form enrichment (parallel fan-out) — {_form_total_horses} horses | {_source_label}")
+
+        races = _form_enrich(races, verbose=True, racing_api_key=_racing_api_key)
         _form_enriched_count = sum(
             1 for race in races for runner in race.get('runners', [])
             if runner.get('form_runs')
         )
-        print(f"  ✓ Form enriched {_form_enriched_count}/{_form_total_horses} horses "
-              f"({round(100*_form_enriched_count/_form_total_horses) if _form_total_horses else 0}%)")
+        _form_pct_pass1 = round(100 * _form_enriched_count / _form_total_horses) if _form_total_horses else 0
+        print(f"  Pass 1 total: {_form_enriched_count}/{_form_total_horses} horses enriched ({_form_pct_pass1}%)")
+
+        if _form_pct_pass1 < _FORM_COVERAGE_GATE:
+            print(f"  ⚠ Coverage {_form_pct_pass1}% below {_FORM_COVERAGE_GATE}% gate — retrying (pass 2)…")
+            import form_enricher as _fe_mod
+            _fe_mod._today_form.clear()
+            _fe_mod._today_tf_stars.clear()
+            races = _form_enrich(races, verbose=False, racing_api_key=_racing_api_key)
+            _form_enriched_count = sum(
+                1 for race in races for runner in race.get('runners', [])
+                if runner.get('form_runs')
+            )
+            _form_pct_pass2 = round(100 * _form_enriched_count / _form_total_horses) if _form_total_horses else 0
+            print(f"  Pass 2 total: {_form_enriched_count}/{_form_total_horses} horses enriched ({_form_pct_pass2}%)")
+            if _form_pct_pass2 < _FORM_COVERAGE_GATE:
+                print(f"  ⚠ COVERAGE STILL LOW ({_form_pct_pass2}%) — selections reflect available data. "
+                      f"{'Check RACING_API_KEY is set correctly.' if not _racing_api_key else 'Racing API may be rate-limited.'}")
+            else:
+                print(f"  ✓ Coverage gate passed after retry ({_form_pct_pass2}%)")
+        else:
+            print(f"  ✓ Coverage gate passed ({_form_pct_pass1}%)")
     else:
         print("[STAGE 1/5] Form enrichment unavailable — deep form signals will score 0")
 
