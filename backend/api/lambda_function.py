@@ -2225,7 +2225,9 @@ def check_today_results(headers):
     today = datetime.now().strftime('%Y-%m-%d')
 
     # Release safety gate: after 1pm BST (12:00 UTC), only publish picks if
-    # today's final analysis manifest is fresh and marked fully complete.
+    # today's analysis manifest exists and is marked fully complete.
+    # No run_time freshness check — morning run at 08:30 UTC is the final run;
+    # picks are locked at 12:00 UTC so no later rescore will happen.
     now_utc = datetime.now(_tz.utc)
     if 12 <= now_utc.hour < 13:
         try:
@@ -2233,13 +2235,7 @@ def check_today_results(headers):
             _manifest_today = str(_m.get('today', '')) == today
             _manifest_complete = bool(_m.get('analysis_fully_complete', False))
             _run_time = str(_m.get('run_time', '') or '')
-            _fresh_min_utc = os.environ.get('PICKS_RELEASE_MIN_RUN_UTC', '11:45')
-            _fresh_dt = datetime.strptime(f"{today} {_fresh_min_utc}", "%Y-%m-%d %H:%M").replace(tzinfo=_tz.utc)
-            _run_dt = None
-            if _run_time:
-                _run_dt = datetime.fromisoformat(_run_time.replace('Z', '+00:00')).astimezone(_tz.utc)
-            _is_fresh = bool(_run_dt and _run_dt >= _fresh_dt)
-            if not (_manifest_today and _manifest_complete and _is_fresh):
+            if not (_manifest_today and _manifest_complete):
                 return {
                     'statusCode': 200,
                     'headers': headers,
@@ -2262,7 +2258,6 @@ def check_today_results(headers):
                             'today': _m.get('today'),
                             'analysis_fully_complete': _m.get('analysis_fully_complete'),
                             'run_time': _run_time,
-                            'fresh_min_utc': _fresh_min_utc,
                         }
                     })
                 }
