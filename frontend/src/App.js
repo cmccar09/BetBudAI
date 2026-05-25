@@ -518,7 +518,6 @@ function App() {
       laythe: 'VIP Rollers',
       account: 'My Account',
       admin: 'Admin',
-      yesterday: 'Latest Results',
     };
 
     trackPageView(page, {
@@ -709,7 +708,6 @@ function App() {
           { key:'home',      label:'Home',             emoji:'🏠', sub:'About & sign in',     gated: false, tierRequired: null },
           { key:'picks5',    label:'Daily Picks',      emoji:'🏆', sub:'4+ tips daily',       gated: true, tierRequired: 'premium' },
           { key:'punchestown', label: featuredMeetingMeta?.tabLabel || 'Featured Meet', emoji:'🐎', sub: featuredMeetingMeta?.subLabel || '2 watchlist selections', gated: false, tierRequired: null },
-          { key:'yesterday', label:'All Results',      emoji:'📊', sub:'Live ROI tracking',    gated: true, tierRequired: 'premium' },
           { key:'laythe',    label:'VIP Rollers',      emoji:'👑', sub:'Lay the Favourite',   gated: true, tierRequired: 'vip' },
           { key:'majors',    label:'Major Races',      emoji:'🏆', sub:'Ante-post + previews', gated: true, tierRequired: 'premium' },
           ...(isAuthenticated ? [{ key:'account', label:'My Account', emoji:'👤', sub:'Profile & billing', gated: true, tierRequired: 'premium' }] : []),
@@ -773,7 +771,6 @@ function App() {
           const pageConfig = [
             { key:'home',      tierRequired: null, component: () => <HomePageView onAuthSuccess={handleAuthSuccess} isAuthenticated={isAuthenticated} authUser={authUser} accountSettingsRequest={accountSettingsRequest} /> },
             { key:'punchestown', tierRequired: null, component: () => <PunchestownTomorrowView /> },
-            { key:'yesterday', tierRequired: 'premium', component: () => <YesterdayResultsView isFreeUser={!hasPaidEntitlement} /> },
             { key:'picks',    tierRequired: 'premium', component: () => <Top5PicksView /> },
             { key:'picks5',   tierRequired: 'premium', component: () => <Top5PicksView /> },
             { key:'laythe',   tierRequired: 'vip', component: () => <LayTheFavView /> },
@@ -2833,6 +2830,11 @@ function Top5PicksView() {
 
       {/* Analysis Quality Report */}
       <AnalysisQualityReport date={new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Dublin' })} />
+
+      {/* Latest Results — merged from the retired All Results page */}
+      <div style={{ marginTop:'32px' }}>
+        <YesterdayResultsView isFreeUser={false} />
+      </div>
 
       <div style={{ marginTop:'28px', padding:'16px 20px', background:'rgba(255,255,255,0.07)', borderRadius:'10px', color:'rgba(255,255,255,0.6)', fontSize:'12px', textAlign:'center', lineHeight:'1.6' }}>
         All daily picks · Results update automatically after each race · Research and education tool only (not a betting site) · Always bet responsibly.
