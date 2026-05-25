@@ -2461,13 +2461,6 @@ function Top5PicksView() {
         <button onClick={loadPicks} style={{ background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.4)', borderRadius:'8px', color:'white', padding:'8px 18px', cursor:'pointer', fontSize:'13px', fontWeight:'600' }}>Refresh</button>
       </div>
 
-      <div style={{ background:'rgba(59,130,246,0.10)', border:'1px solid rgba(96,165,250,0.35)', borderRadius:'10px', padding:'11px 14px', marginBottom:'16px' }}>
-        <div style={{ color:'#93c5fd', fontSize:'13px', fontWeight:'700' }}>Email update around 1:20pm</div>
-        <div style={{ color:'rgba(255,255,255,0.68)', fontSize:'12px', lineHeight:'1.6', marginTop:'4px' }}>
-          Once today's picks are settled, we send a daily "picks ready" email to your profile email with a link back to BetBudAI and a winners-out-of-total summary (for example 4 out of 6). Selections can still change in exceptional race-day cases (for example non-runners, late market shifts, or late data updates), so always re-check this page before betting. Research and educational purposes only. BetBudAI is not a betting site. Always bet responsibly.
-        </div>
-      </div>
-
       {/* Today's Winners Banner */}
       {(() => {
         const winners = winnersToday;
@@ -2745,16 +2738,8 @@ function Top5PicksView() {
 
         return (
         <div style={{ display:'flex', flexDirection:'column', gap:'16px' }}>
-          <div style={{ background:'rgba(16,185,129,0.10)', border:'1px solid rgba(16,185,129,0.35)', borderRadius:'10px', padding:'10px 14px' }}>
-            <div style={{ fontSize:'13px', fontWeight:'700', color:'#34d399' }}>✅ Official Picks ({upcomingCount})</div>
-            <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.6)', marginTop:'4px' }}>These are the bettable selections that have not started yet. They are not replaced by watchlist items.</div>
-          </div>
           {upcomingPicks.length > 0 && (
             <>
-              <div style={{ marginTop:'8px', padding:'10px 16px', background:'rgba(16,185,129,0.08)', border:'1px solid rgba(16,185,129,0.25)', borderRadius:'10px' }}>
-                <div style={{ fontSize:'13px', fontWeight:'700', color:'#34d399' }}>🟢 Upcoming ({upcomingPicks.length})</div>
-                <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.55)', marginTop:'4px' }}>Races that have not started yet.</div>
-              </div>
               {upcomingPicks.map((pick, idx) => renderPickCard(pick, idx))}
             </>
           )}
