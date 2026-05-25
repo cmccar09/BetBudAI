@@ -1057,37 +1057,39 @@ def analyze_and_save_all():
         return -4                  # 21% WR and below — penalise
 
     def _selection_score(r):
-        raw = r['best']['score']
         odds = float(r['best'].get('odds', 99))
         bd = r['best']['item'].get('score_breakdown', {})
 
-        # Count positive signals firing
+        # Recover pre-cap raw score.  r['best']['score'] = GENERAL_CAP + ml_bonus (136
+        # for all capped picks).  score_cap is stored as negative e.g. -42.
+        # pre_cap = r['best']['score'] - ml_bonus - score_cap
+        #         = 136 - 16 - (-42) = 162  (differentiates picks that all hit the cap)
+        _ml   = float(bd.get('market_leader', 0) or 0)
+        _cap  = float(bd.get('score_cap', 0) or 0)
+        pre_cap = r['best']['score'] - _ml - _cap
+
+        # Count positive signals firing (on pre-cap score basis)
         _sig_count = sum(1 for k in ('market_leader','deep_form','trainer_reputation',
                                      'going_suitability','cd_bonus','jockey_quality','price_steam')
                          if float(bd.get(k, 0) or 0) > 0)
 
-        # WINNER PROFILE BONUS — 30-day data: rank-1 winners avg 2.8 signals, avg score 93.
-        # Horses with 2-3 clean focused signals + ML + score 80-115 are the true win pattern.
-        # Adding +8 to push these over over-scored but scattered horses.
-        _ml = float(bd.get('market_leader', 0) or 0)
+        # WINNER PROFILE BONUS — 30-day data: winners avg 2.8 signals, avg pre-cap score ~95.
+        # Clean 2-3 signal picks with market backing in the 78-125 pre-cap range win most.
         _winner_profile = (
             _ml > 0
             and 2 <= _sig_count <= 3
-            and 78 <= raw <= 120
+            and 78 <= pre_cap <= 125
         )
         _winner_bonus = 8 if _winner_profile else 0
 
-        # SIGNAL BLOAT PENALTY — 30-day data: losers avg 3.7 signals, placed avg 3.3.
-        # Horses with 5+ signals and score > 120 are over-appreciated by the market:
-        # they place far more than they win (25% WR vs 40% for cleaner picks).
-        # This avoids selecting the "obvious favourite" that the market has fully priced in.
+        # SIGNAL BLOAT PENALTY — losers avg 3.7 signals; 5+ signals = over-priced fav.
         _bloat_penalty = 0
-        if _sig_count >= 5 and raw > 120:
+        if _sig_count >= 5 and pre_cap > 130:
             _bloat_penalty = 10
-        elif _sig_count >= 4 and raw > 130:
+        elif _sig_count >= 4 and pre_cap > 145:
             _bloat_penalty = 5
 
-        return raw + _odds_preference_bonus(odds) + _winner_bonus - _bloat_penalty
+        return pre_cap + _odds_preference_bonus(odds) + _winner_bonus - _bloat_penalty
 
     eligible.sort(key=lambda r: _selection_score(r), reverse=True)
 
@@ -1118,10 +1120,17 @@ def analyze_and_save_all():
     # Sort final picks: rank 1 = highest composite selection score
     top_picks.sort(key=lambda r: _selection_score(r), reverse=True)
 
-    # Pre-compute selection_rank_score for each UI pick so it can be persisted.
-    # This differentiates picks that all hit the GENERAL_CAP + same market_leader bonus.
+    # Pre-compute selection_rank_score (pre-cap signal strength) for each UI pick.
+    # Stored for display — shows true model conviction without the cap squash.
+    # Sort uses _selection_score() (pre_cap + odds_pref + bonuses); display uses pre_cap only.
+    def _pre_cap_score(r):
+        bd   = r['best']['item'].get('score_breakdown', {})
+        _ml  = float(bd.get('market_leader', 0) or 0)
+        _cap = float(bd.get('score_cap', 0) or 0)
+        return r['best']['score'] - _ml - _cap
+
     _selection_rank_scores = {
-        r['best']['item']['bet_id']: _selection_score(r)
+        r['best']['item']['bet_id']: _pre_cap_score(r)
         for r in top_picks
     }
 

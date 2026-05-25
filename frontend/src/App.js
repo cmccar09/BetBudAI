@@ -1069,9 +1069,9 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
 
   const tierInfo = score => {
     const s = parseFloat(score || 0);
-    if (s >= 130) return { bg: '#d97706', label: 'ELITE' };
-    if (s >= 122) return { bg: '#059669', label: 'STRONG' };
-    if (s >= 114) return { bg: '#3b82f6', label: 'GOOD' };
+    if (s >= 145) return { bg: '#d97706', label: 'ELITE' };
+    if (s >= 125) return { bg: '#059669', label: 'STRONG' };
+    if (s >= 100) return { bg: '#3b82f6', label: 'GOOD' };
     return { bg: '#0891b2', label: 'VALUE' };
   };
 
