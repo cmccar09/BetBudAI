@@ -218,6 +218,29 @@ def analyze_and_save_all():
     # Load SL declared field sizes for S8 completeness gate
     sl_declared = load_sl_declared_field_sizes()
 
+    # ── STAGE 0: Load learning insights from previous night's cycle ──────────
+    # sf_learning writes insights to DynamoDB bet_date='LEARNING_INSIGHTS'.
+    # Reading them here surfaces patterns (e.g. "mid_price ROI +35%") in Lambda
+    # logs so each morning's run shows the model's current self-knowledge.
+    try:
+        _insights_resp = table.get_item(Key={'bet_date': 'LEARNING_INSIGHTS', 'bet_id': 'latest'})
+        _learning_item = _insights_resp.get('Item', {})
+        if _learning_item:
+            import json as _json
+            _raw_insights = _learning_item.get('insights', '[]')
+            _insights_list = _json.loads(_raw_insights) if isinstance(_raw_insights, str) else _raw_insights
+            _updated = _learning_item.get('updated_at', 'unknown')
+            print(f"\n[STAGE 0] Learning insights (updated {_updated}):")
+            if _insights_list:
+                for _ins in _insights_list[:10]:
+                    print(f"  ▶ {_ins}")
+            else:
+                print("  (no actionable insights yet — need more settled results)")
+        else:
+            print("\n[STAGE 0] No learning insights found — learning cycle may not have run yet")
+    except Exception as _li_e:
+        print(f"\n[STAGE 0] Could not load learning insights (non-fatal): {_li_e}")
+
     # ── STAGE 1: Deep form enrichment ────────────────────────────────────────
     # Fetches last-6-race run history from Racing Post / Sporting Life for every
     # runner and injects it as 'form_runs'. The scoring engine reads this to fire
@@ -226,6 +249,7 @@ def analyze_and_save_all():
     # Without this step all deep_form signals score 0 for every horse.
     _form_total_horses = sum(len(r.get('runners', [])) for r in races)
     _form_enriched_count = 0
+    _final_form_pct = 0  # set after enrichment passes; stored on every saved pick
     # Minimum form coverage before selections are locked in.
     # If the first pass is below this threshold the enricher retries once with a
     # fresh cache — this catches transient SL scraping failures at pipeline start.
@@ -244,6 +268,7 @@ def analyze_and_save_all():
         _form_pct_pass1 = round(100 * _form_enriched_count / _form_total_horses) if _form_total_horses else 0
         print(f"  Pass 1 total: {_form_enriched_count}/{_form_total_horses} horses enriched ({_form_pct_pass1}%)")
 
+        _final_form_pct = _form_pct_pass1
         if _form_pct_pass1 < _FORM_COVERAGE_GATE:
             print(f"  ⚠ Coverage {_form_pct_pass1}% below {_FORM_COVERAGE_GATE}% gate — retrying (pass 2)…")
             import form_enricher as _fe_mod
@@ -255,10 +280,28 @@ def analyze_and_save_all():
                 if runner.get('form_runs')
             )
             _form_pct_pass2 = round(100 * _form_enriched_count / _form_total_horses) if _form_total_horses else 0
+            _final_form_pct = _form_pct_pass2
             print(f"  Pass 2 total: {_form_enriched_count}/{_form_total_horses} horses enriched ({_form_pct_pass2}%)")
             if _form_pct_pass2 < _FORM_COVERAGE_GATE:
-                print(f"  ⚠ COVERAGE STILL LOW ({_form_pct_pass2}%) — selections reflect available data. "
-                      f"{'Check RACING_API_KEY is set correctly.' if not _racing_api_key else 'Racing API may be rate-limited.'}")
+                _cov_msg = (f"COVERAGE STILL LOW ({_form_pct_pass2}%) after 2 passes — "
+                            f"picks today are built on sparse form data.\n"
+                            f"Total horses: {_form_total_horses} | Enriched: {_form_enriched_count}\n"
+                            f"{'Racing API may be rate-limited.' if _racing_api_key else 'RACING_API_KEY not set.'}")
+                print(f"  ⚠ {_cov_msg}")
+                try:
+                    import boto3 as _boto3
+                    _ses = _boto3.client('ses', region_name='eu-west-1')
+                    _ses.send_email(
+                        Source='charles.mccarthy@gmail.com',
+                        Destination={'ToAddresses': ['charles.mccarthy@gmail.com']},
+                        Message={
+                            'Subject': {'Data': f'⚠ BetBudAI: Low form coverage ({_form_pct_pass2}%) — picks at risk'},
+                            'Body': {'Text': {'Data': _cov_msg}},
+                        }
+                    )
+                    print("  [ALERT] Low-coverage email sent via SES")
+                except Exception as _ses_e:
+                    print(f"  [ALERT] SES send failed (non-fatal): {_ses_e}")
             else:
                 print(f"  ✓ Coverage gate passed after retry ({_form_pct_pass2}%)")
         else:
@@ -597,8 +640,9 @@ def analyze_and_save_all():
                 'market_id':           market_id,
                 'market_name':         market_name,
                 'selection_id':        runner.get('selectionId', 0),
-                'race_coverage_pct':   Decimal('100'),
+                'race_coverage_pct':   Decimal(str(_final_form_pct)),
                 'race_total_count':    len(runners),
+                'form_enriched':       bool(runner.get('form_runs')),
                 'created_at':          datetime.now(timezone.utc).isoformat(),
                 'updated_at':          datetime.now(timezone.utc).isoformat(),
                 # Horse history from DB
@@ -850,27 +894,30 @@ def analyze_and_save_all():
             print(f"  [GATE-S8 WARNING] {r['best']['horse']} score={score:.0f}: "
                   f"1 undeclared runner missing but pick is market leader \u2014 allowing through.")
 
-        # S9 — Minimum odds gate (2026-04-06, refined 2026-04-07, relaxed 2026-04-17, tightened 2026-05-25)
-        # LESSON 2026-05-24: 7-day data shows favorites (<2.5 odds) = -9.6% ROI; mid-price = +142.1% ROI.
-        # Minnie Hauk (1.95) and True Love (1.91) both placed but didn't win — score>=90 exception was
-        # letting short-priced horses through that consistently fail to return profit at those prices.
-        # Hard floor raised to 2.2 (no exceptions). 2.2-2.5 zone still requires score>=90.
+        # S9 — Minimum odds gate (2026-04-06, refined 2026-04-07, relaxed 2026-04-17)
+        # RECALIBRATED 2026-05-25 from 30-day winner analysis (102 ranked picks):
+        #   2.0-2.5 odds band = 55% WR (best performing band) — floor of 2.2 was blocking our best zone.
+        #   1.0-2.0 band = 33% WR (small sample). Absolute floor kept at 1.5 to block genuinely odds-on picks.
+        #   Winners avg score 93 (not 110+) — the odds floor was right to exist but 2.2 was too high.
+        #   Minnie Hauk (1.95)/True Love (1.91) placed: same-trainer rival penalty explains this (3 O'Brien runners)
+        #   not the odds themselves. Causeway (1.95) won in a DIFFERENT race same day with clean profile.
+        # Rule: anything below 1.5 blocked; 1.5-2.5 requires score>=85 (empirically the best band, high threshold).
         _min_odds = 2.5
         _best_odds = float(r['best'].get('odds', 99))
-        # Absolute floor: nothing below 2.2 regardless of score
-        if _best_odds < 2.2:
+        # Absolute floor at 1.5 — genuinely odds-on in a competitive race is not value
+        if _best_odds < 1.5:
             print(f"  [GATE-S9 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                  f"odds {_best_odds:.2f} below absolute floor (2.2) — "
-                  f"7-day data: favorites ROI -9.6%, lesson 2026-05-24")
+                  f"odds {_best_odds:.2f} below absolute floor (1.5) — odds-on in competitive field")
             return False
-        # 2.2-2.5: allow only high-scoring picks (score >= 90)
+        # 1.5-2.5: allow if score >= 85 (tighter threshold — these must be high-conviction picks)
         if _best_odds < _min_odds:
-            if score >= 90:
-                print(f"  [GATE-S9 ELITE] {r['best']['horse']} score={score:.0f}: "
-                      f"odds {_best_odds:.2f} in 2.2-2.5 zone, high score — allowing")
+            if score >= 85:
+                print(f"  [GATE-S9 SHORT-PRICE] {r['best']['horse']} score={score:.0f}: "
+                      f"odds {_best_odds:.2f} in 1.5-2.5 zone, high score — allowing "
+                      f"(30d data: 2.0-2.5 band = 55% WR)")
             else:
                 print(f"  [GATE-S9 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                      f"odds {_best_odds:.2f} < {_min_odds:.2f} (needs score>=90 to waive)")
+                      f"odds {_best_odds:.2f} < {_min_odds:.2f} (needs score>=85 in 1.5-2.5 zone)")
                 return False
 
         # S10 — Irish NHF bumper short-priced favourite gate (2026-04-06)
@@ -903,15 +950,16 @@ def analyze_and_save_all():
                       f"need score>=110 OR >=2 bumper wins. Lesson: Boundfornowhere 2026-04-06 (104→lost 80/1)")
                 return False
 
-        # S11 — Expected Value gate (2026-04-07, tightened 2026-05-25)
+        # S11 — Expected Value gate (2026-04-07, recalibrated 2026-05-25)
         # Core principle from value betting theory: EV = p×d - 1.
         # If EV < -0.15, the model says we're giving away more than 15 cents per £1 staked.
-        # TIGHTENED 2026-05-25: short-priced picks (odds < 2.5) get NO score bypass —
-        # 7-day data shows favorites consistently -EV regardless of model score.
-        # Scores >= 95 bypass only for odds >= 2.5 where calibration uncertainty is meaningful.
+        # RECALIBRATED 2026-05-25: 30-day data shows 2.0-2.5 odds band wins 55% — far above the
+        # 25% our model estimates for score-90 picks. Our _win_prob_pct() is conservative, making
+        # the EV gate too aggressive for genuine short-priced winners. Score >= 95 bypass restored
+        # regardless of odds (was temporarily restricted to odds >= 2.5 — too broad a restriction).
         _wp = _win_prob_pct(score)
         _ev = _expected_value(_wp, _best_odds)
-        _ev_bypass = score >= 95 and _best_odds >= 2.5
+        _ev_bypass = score >= 95  # restored: score >= 95 is genuine model conviction at any odds
         if _ev < -0.15 and not _ev_bypass:
             print(f"  [GATE-S11 REJECTED] {r['best']['horse']} score={score:.0f}: "
                   f"EV={_ev:+.3f} (win_prob={_wp}%, odds={_best_odds:.2f}) — "
@@ -1011,7 +1059,35 @@ def analyze_and_save_all():
     def _selection_score(r):
         raw = r['best']['score']
         odds = float(r['best'].get('odds', 99))
-        return raw + _odds_preference_bonus(odds)
+        bd = r['best']['item'].get('score_breakdown', {})
+
+        # Count positive signals firing
+        _sig_count = sum(1 for k in ('market_leader','deep_form','trainer_reputation',
+                                     'going_suitability','cd_bonus','jockey_quality','price_steam')
+                         if float(bd.get(k, 0) or 0) > 0)
+
+        # WINNER PROFILE BONUS — 30-day data: rank-1 winners avg 2.8 signals, avg score 93.
+        # Horses with 2-3 clean focused signals + ML + score 80-115 are the true win pattern.
+        # Adding +8 to push these over over-scored but scattered horses.
+        _ml = float(bd.get('market_leader', 0) or 0)
+        _winner_profile = (
+            _ml > 0
+            and 2 <= _sig_count <= 3
+            and 78 <= raw <= 120
+        )
+        _winner_bonus = 8 if _winner_profile else 0
+
+        # SIGNAL BLOAT PENALTY — 30-day data: losers avg 3.7 signals, placed avg 3.3.
+        # Horses with 5+ signals and score > 120 are over-appreciated by the market:
+        # they place far more than they win (25% WR vs 40% for cleaner picks).
+        # This avoids selecting the "obvious favourite" that the market has fully priced in.
+        _bloat_penalty = 0
+        if _sig_count >= 5 and raw > 120:
+            _bloat_penalty = 10
+        elif _sig_count >= 4 and raw > 130:
+            _bloat_penalty = 5
+
+        return raw + _odds_preference_bonus(odds) + _winner_bonus - _bloat_penalty
 
     eligible.sort(key=lambda r: _selection_score(r), reverse=True)
 
@@ -1041,6 +1117,13 @@ def analyze_and_save_all():
 
     # Sort final picks: rank 1 = highest composite selection score
     top_picks.sort(key=lambda r: _selection_score(r), reverse=True)
+
+    # Pre-compute selection_rank_score for each UI pick so it can be persisted.
+    # This differentiates picks that all hit the GENERAL_CAP + same market_leader bonus.
+    _selection_rank_scores = {
+        r['best']['item']['bet_id']: _selection_score(r)
+        for r in top_picks
+    }
 
     # Build a set of bet_ids for the top picks
     top_bet_ids = {r['best']['item']['bet_id']: rank
@@ -1112,6 +1195,10 @@ def analyze_and_save_all():
                 item['stake']       = Decimal(str(_stake_pts))
                 item['stake_pts']   = _stake_pts
                 item['bet_type']    = 'Each Way'
+                # Store the selection ranking score — differentiates picks that all hit
+                # the score cap at the same value. UI uses this as the displayed confidence.
+                _sel_rank = _selection_rank_scores.get(bid, float(r['score']))
+                item['selection_rank_score'] = Decimal(str(round(float(_sel_rank), 0)))
             item['sl_declared_count']   = _sl_decl
             item['missing_runners']     = _race_missing
             item['all_horses']          = _all_horses_list  # full field for UI display

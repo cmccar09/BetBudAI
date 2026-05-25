@@ -1040,7 +1040,7 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
       const data = await res.json();
       if (data.success) {
         const picks = (data.picks || []).filter(p => p.show_in_ui !== false);
-        picks.sort((a, b) => parseFloat(b.comprehensive_score || b.score || 0) - parseFloat(a.comprehensive_score || a.score || 0));
+        picks.sort((a, b) => parseFloat(b.selection_rank_score || b.comprehensive_score || b.score || 0) - parseFloat(a.selection_rank_score || a.comprehensive_score || a.score || 0));
         setAllPicks(picks);
         setServerTopCalls(data.top_calls || null);
         setPayloadStatus(data.payload_status || null);
@@ -1069,13 +1069,13 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
 
   const tierInfo = score => {
     const s = parseFloat(score || 0);
-    if (s >= 95) return { bg: '#d97706', label: 'ELITE' };
-    if (s >= 90) return { bg: '#059669', label: 'STRONG' };
-    if (s >= 80) return { bg: '#3b82f6', label: 'GOOD' };
+    if (s >= 130) return { bg: '#d97706', label: 'ELITE' };
+    if (s >= 122) return { bg: '#059669', label: 'STRONG' };
+    if (s >= 114) return { bg: '#3b82f6', label: 'GOOD' };
     return { bg: '#0891b2', label: 'VALUE' };
   };
 
-  const getScore = (pick) => parseFloat(pick?.comprehensive_score || pick?.score || 0);
+  const getScore = (pick) => parseFloat(pick?.selection_rank_score || pick?.comprehensive_score || pick?.score || 0);
   const getGap = (pick) => parseFloat(pick?.score_gap || 0);
   const getOdds = (pick) => {
     const raw = pick?.odds;
@@ -1355,7 +1355,7 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
                 )}
                 {/* Score badge */}
                 {(() => {
-                  const score = parseFloat(pick.comprehensive_score || pick.score || 0);
+                  const score = parseFloat(pick.selection_rank_score || pick.comprehensive_score || pick.score || 0);
                   if (!score) return null;
                   return (
                     <div style={{ marginTop:'10px', padding:'10px 14px', background:`${tier.bg}18`, borderRadius:'8px', borderLeft:`3px solid ${tier.bg}` }}>
@@ -2306,7 +2306,7 @@ function Top5PicksView() {
         const watchlist = (data.watchlist || []).filter(p => p.is_watchlist === true || (p.pick_type === 'watchlist'));
         const dropped = (data.dropped || []).filter(p => p.is_dropped === true);
         // Assign rank by score (highest first)
-        picks.sort((a, b) => parseFloat(b.comprehensive_score || b.score || 0) - parseFloat(a.comprehensive_score || a.score || 0));
+        picks.sort((a, b) => parseFloat(b.selection_rank_score || b.comprehensive_score || b.score || 0) - parseFloat(a.selection_rank_score || a.comprehensive_score || a.score || 0));
         picks.forEach((p, i) => { p.originalRank = i + 1; });
         // Then sort by race time ascending (soonest first) — use Dublin tz strings for consistency
         picks.sort((a, b) => {
@@ -2680,7 +2680,7 @@ function Top5PicksView() {
                 )}
                 {/* Score badge */}
                 {(() => {
-                  const score = parseFloat(pick.comprehensive_score || pick.score || 0);
+                  const score = parseFloat(pick.selection_rank_score || pick.comprehensive_score || pick.score || 0);
                   if (!score) return null;
                   return (
                     <div style={{ marginTop:'10px', padding:'10px 14px', background:`${tier.bg}18`, borderRadius:'8px', borderLeft:`3px solid ${tier.bg}` }}>
