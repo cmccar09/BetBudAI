@@ -850,23 +850,24 @@ def analyze_and_save_all():
             print(f"  [GATE-S8 WARNING] {r['best']['horse']} score={score:.0f}: "
                   f"1 undeclared runner missing but pick is market leader \u2014 allowing through.")
 
-        # S9 — Minimum odds gate (2026-04-06, refined 2026-04-07, relaxed 2026-04-17)
-        # LESSON 2026-04-17: Gold Star Hero (1.72, score 102) WON but was blocked by 2.0 floor.
-        # Galaxy Wonder (2.44, score 124) blocked by EV check (non-monotonic win_prob made EV<0).
-        # Fix: lower absolute floor to 1.5, allow 1.5-2.5 for score>=90 (no EV gate — our
-        # EV calculation is not reliable enough at short prices to be a hard gate).
+        # S9 — Minimum odds gate (2026-04-06, refined 2026-04-07, relaxed 2026-04-17, tightened 2026-05-25)
+        # LESSON 2026-05-24: 7-day data shows favorites (<2.5 odds) = -9.6% ROI; mid-price = +142.1% ROI.
+        # Minnie Hauk (1.95) and True Love (1.91) both placed but didn't win — score>=90 exception was
+        # letting short-priced horses through that consistently fail to return profit at those prices.
+        # Hard floor raised to 2.2 (no exceptions). 2.2-2.5 zone still requires score>=90.
         _min_odds = 2.5
         _best_odds = float(r['best'].get('odds', 99))
-        # Absolute floor: nothing below 1.5 regardless of score
-        if _best_odds < 1.5:
+        # Absolute floor: nothing below 2.2 regardless of score
+        if _best_odds < 2.2:
             print(f"  [GATE-S9 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                  f"odds {_best_odds:.2f} below absolute floor (1.5) — unbeatable for any system")
+                  f"odds {_best_odds:.2f} below absolute floor (2.2) — "
+                  f"7-day data: favorites ROI -9.6%, lesson 2026-05-24")
             return False
-        # 1.5-2.5: allow high-scoring picks (score >= 90)
+        # 2.2-2.5: allow only high-scoring picks (score >= 90)
         if _best_odds < _min_odds:
             if score >= 90:
                 print(f"  [GATE-S9 ELITE] {r['best']['horse']} score={score:.0f}: "
-                      f"odds {_best_odds:.2f} below 2.5 but high score — allowing")
+                      f"odds {_best_odds:.2f} in 2.2-2.5 zone, high score — allowing")
             else:
                 print(f"  [GATE-S9 REJECTED] {r['best']['horse']} score={score:.0f}: "
                       f"odds {_best_odds:.2f} < {_min_odds:.2f} (needs score>=90 to waive)")
@@ -902,17 +903,16 @@ def analyze_and_save_all():
                       f"need score>=110 OR >=2 bumper wins. Lesson: Boundfornowhere 2026-04-06 (104→lost 80/1)")
                 return False
 
-        # S11 — Expected Value gate (2026-04-07)
+        # S11 — Expected Value gate (2026-04-07, tightened 2026-05-25)
         # Core principle from value betting theory: EV = p×d - 1.
         # If EV < -0.15, the model says we're giving away more than 15 cents per £1 staked.
-        # Even with calibration uncertainty in win_probability, EV < -0.15 is a clear signal
-        # that odds are too short for our estimated probability of winning.
-        # Scores >= 95 (ELITE) bypass: at ELITE confidence our probability estimate likely
-        # understates true chance (50%+ calibrated, may genuinely be 55-60%).
-        # Source: "Efficiency of Racetrack Betting Markets", Kelly (1956), Sharp Sports Betting.
+        # TIGHTENED 2026-05-25: short-priced picks (odds < 2.5) get NO score bypass —
+        # 7-day data shows favorites consistently -EV regardless of model score.
+        # Scores >= 95 bypass only for odds >= 2.5 where calibration uncertainty is meaningful.
         _wp = _win_prob_pct(score)
         _ev = _expected_value(_wp, _best_odds)
-        if _ev < -0.15 and score < 95:
+        _ev_bypass = score >= 95 and _best_odds >= 2.5
+        if _ev < -0.15 and not _ev_bypass:
             print(f"  [GATE-S11 REJECTED] {r['best']['horse']} score={score:.0f}: "
                   f"EV={_ev:+.3f} (win_prob={_wp}%, odds={_best_odds:.2f}) — "
                   f"negative expected value > 15% loss per unit staked")
