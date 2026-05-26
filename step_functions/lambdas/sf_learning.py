@@ -89,14 +89,40 @@ def _load_results_from_dynamodb(table):
     return results
 
 
-def _persist_insights(table, insights, date_str):
-    """Save learning insights to DynamoDB for next analysis cycle to consume."""
+def _persist_insights(table, insights, analysis, date_str):
+    """Save learning insights + structured signals to DynamoDB.
+
+    Structured fields consumed by complete_daily_analysis.py STAGE 0:
+      odds_roi     — {category: {roi, win_rate, n}} for categories with ≥5 bets
+      best_courses — venue names with ≥5 bets and ≥40% win rate
+    """
+    # Build odds_roi from raw analysis buckets
+    odds_roi = {}
+    for cat, stats in (analysis.get('by_odds_range') or {}).items():
+        n = int(stats.get('total', 0))
+        if n >= 5:
+            roi = round(float(stats['roi']) / n * 100, 1)
+            wr  = round(float(stats['wins']) / n * 100, 1)
+            odds_roi[cat] = {'roi': roi, 'win_rate': wr, 'n': n}
+
+    # Best courses: ≥5 bets, ≥40% WR
+    best_courses = [
+        course for course, stats in (analysis.get('by_course') or {}).items()
+        if int(stats.get('total', 0)) >= 5
+        and int(stats.get('wins', 0)) / int(stats.get('total', 1)) >= 0.40
+    ]
+
+    print(f"[sf_learning] odds_roi signals: {odds_roi}")
+    print(f"[sf_learning] best_courses: {best_courses}")
+
     table.put_item(Item={
-        'bet_date'        : 'LEARNING_INSIGHTS',
-        'bet_id'          : 'latest',
-        'date'            : date_str,
-        'insights'        : json.dumps(insights, default=str),
-        'updated_at'      : datetime.datetime.utcnow().isoformat(),
+        'bet_date'    : 'LEARNING_INSIGHTS',
+        'bet_id'      : 'latest',
+        'date'        : date_str,
+        'insights'    : json.dumps(insights,      default=str),
+        'odds_roi'    : json.dumps(odds_roi,       default=str),
+        'best_courses': json.dumps(best_courses,   default=str),
+        'updated_at'  : datetime.datetime.utcnow().isoformat(),
     })
 
 
@@ -113,6 +139,33 @@ def lambda_handler(event, context):
     print(f"[sf_learning] {len(results)} settled picks found")
 
     if not results:
+        # On Mon-Sat (weekdays + Saturday), 0 settled results almost always means
+        # sf_results_fetch.py failed to match market_id/selection_id — alert so we
+        # catch the results settlement gap before the learning cycle falls too far behind.
+        _today_dow = datetime.datetime.utcnow().weekday()  # 0=Mon … 6=Sun
+        if _today_dow != 6:  # not Sunday (no UK racing)
+            try:
+                import boto3 as _boto3
+                _ses = _boto3.client('ses', region_name=REGION)
+                _ses.send_email(
+                    Source='charles.mccarthy@gmail.com',
+                    Destination={'ToAddresses': ['charles.mccarthy@gmail.com']},
+                    Message={
+                        'Subject': {'Data': f'⚠ BetBudAI: Learning cycle found 0 settled results ({date_str})'},
+                        'Body': {'Text': {'Data': (
+                            f"sf_learning ran for {date_str} but found 0 settled picks.\n\n"
+                            f"This usually means sf_results_fetch.py failed to match market_id/selection_id "
+                            f"for today's picks. Check:\n"
+                            f"  1. CloudWatch logs for surebet-results-fetch Lambda\n"
+                            f"  2. DynamoDB SureBetBets — today's picks still show outcome='pending'\n"
+                            f"  3. Betfair session token may have expired\n\n"
+                            f"Without settled results, learning weights will not update."
+                        )}},
+                    }
+                )
+                print(f"[sf_learning] ⚠ 0 settled results alert sent via SES")
+            except Exception as _ses_e:
+                print(f"[sf_learning] SES alert failed (non-fatal): {_ses_e}")
         print("[sf_learning] No results to learn from — skipping")
         return {'success': True, 'date': date_str, 'results_scanned': 0, 'patterns_found': 0, 'insights': []}
 
@@ -124,7 +177,7 @@ def lambda_handler(event, context):
     print("[sf_learning] Generating insights ...")
     insights = generate_learning_insights(analysis)
 
-    _persist_insights(table, insights, date_str)
+    _persist_insights(table, insights, analysis, date_str)
 
     patterns_found = sum(
         len(v) if isinstance(v, (list, dict)) else 1

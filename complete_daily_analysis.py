@@ -218,24 +218,36 @@ def analyze_and_save_all():
     # Load SL declared field sizes for S8 completeness gate
     sl_declared = load_sl_declared_field_sizes()
 
-    # ── STAGE 0: Load learning insights from previous night's cycle ──────────
-    # sf_learning writes insights to DynamoDB bet_date='LEARNING_INSIGHTS'.
-    # Reading them here surfaces patterns (e.g. "mid_price ROI +35%") in Lambda
-    # logs so each morning's run shows the model's current self-knowledge.
+    # ── STAGE 0: Load learning insights + structured signals ─────────────────
+    # sf_learning writes insights AND structured odds_roi / best_courses to
+    # DynamoDB nightly. We consume both here: text insights for logging, structured
+    # signals for live score adjustment in _selection_score() below.
+    import json as _json
+    _learning_odds_roi    = {}   # cat -> {roi, win_rate, n}  e.g. 'favorite': {roi:-19.6, n:18}
+    _learning_best_courses = []  # venue names with ≥40% WR and ≥5 bets
     try:
         _insights_resp = table.get_item(Key={'bet_date': 'LEARNING_INSIGHTS', 'bet_id': 'latest'})
         _learning_item = _insights_resp.get('Item', {})
         if _learning_item:
-            import json as _json
-            _raw_insights = _learning_item.get('insights', '[]')
+            _updated       = _learning_item.get('updated_at', 'unknown')
+            _raw_insights  = _learning_item.get('insights', '[]')
             _insights_list = _json.loads(_raw_insights) if isinstance(_raw_insights, str) else _raw_insights
-            _updated = _learning_item.get('updated_at', 'unknown')
+            _raw_odds_roi  = _learning_item.get('odds_roi', '{}')
+            _learning_odds_roi = _json.loads(_raw_odds_roi) if isinstance(_raw_odds_roi, str) else (_raw_odds_roi or {})
+            _raw_courses   = _learning_item.get('best_courses', '[]')
+            _learning_best_courses = _json.loads(_raw_courses) if isinstance(_raw_courses, str) else (_raw_courses or [])
+
             print(f"\n[STAGE 0] Learning insights (updated {_updated}):")
             if _insights_list:
                 for _ins in _insights_list[:10]:
                     print(f"  ▶ {_ins}")
             else:
-                print("  (no actionable insights yet — need more settled results)")
+                print("  (no actionable text insights yet)")
+            if _learning_odds_roi:
+                for _cat, _d in _learning_odds_roi.items():
+                    print(f"  📊 {_cat}: ROI {_d.get('roi',0):+.1f}%  WR {_d.get('win_rate',0):.0f}%  n={_d.get('n',0)}")
+            if _learning_best_courses:
+                print(f"  🏟  Best courses: {', '.join(_learning_best_courses)}")
         else:
             print("\n[STAGE 0] No learning insights found — learning cycle may not have run yet")
     except Exception as _li_e:
@@ -1056,9 +1068,39 @@ def analyze_and_save_all():
         if odds < 5.0:  return 0   # 31% WR band — neutral
         return -4                  # 21% WR and below — penalise
 
+    def _learning_odds_adjustment(odds):
+        """Data-driven bonus/penalty from nightly learning cycle's odds ROI analysis.
+        Reads _learning_odds_roi (captured from STAGE 0 DynamoDB read).
+        Falls back to 0 if no data or insufficient sample (n < 5)."""
+        if odds <= 3.0:    cat = 'favorite'
+        elif odds <= 6.0:  cat = 'mid_price'
+        elif odds <= 12.0: cat = 'outsider'
+        else:              cat = 'longshot'
+        d   = _learning_odds_roi.get(cat, {})
+        n   = int(d.get('n', 0))
+        if n < 5: return 0
+        roi = float(d.get('roi', 0))
+        if roi >=  80: return  6
+        if roi >=  40: return  4
+        if roi >=  10: return  2
+        if roi >= -10: return  0
+        if roi >= -30: return -3
+        return -6
+
+    def _learning_course_bonus(venue):
+        """Bonus for venues flagged as high-performing by the learning cycle (≥40% WR, ≥5 bets)."""
+        if not _learning_best_courses: return 0
+        v = str(venue or '').lower().strip()
+        for c in _learning_best_courses:
+            cl = c.lower().strip()
+            if cl in v or v in cl:
+                return 4
+        return 0
+
     def _selection_score(r):
-        odds = float(r['best'].get('odds', 99))
-        bd = r['best']['item'].get('score_breakdown', {})
+        odds  = float(r['best'].get('odds', 99))
+        bd    = r['best']['item'].get('score_breakdown', {})
+        venue = r.get('venue', '')
 
         # Recover pre-cap raw score.  r['best']['score'] = GENERAL_CAP + ml_bonus (136
         # for all capped picks).  score_cap is stored as negative e.g. -42.
@@ -1089,7 +1131,12 @@ def analyze_and_save_all():
         elif _sig_count >= 4 and pre_cap > 145:
             _bloat_penalty = 5
 
-        return pre_cap + _odds_preference_bonus(odds) + _winner_bonus - _bloat_penalty
+        return (pre_cap
+                + _odds_preference_bonus(odds)
+                + _learning_odds_adjustment(odds)
+                + _learning_course_bonus(venue)
+                + _winner_bonus
+                - _bloat_penalty)
 
     eligible.sort(key=lambda r: _selection_score(r), reverse=True)
 
