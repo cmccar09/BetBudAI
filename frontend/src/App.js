@@ -5636,7 +5636,7 @@ function LayTheFavView() {
                 </tr>
               </thead>
               <tbody>
-                {dailyHistory.slice(0, 14).map((day, idx) => {
+                {dailyHistory.slice(0, 3).map((day, idx) => {
                   const s = day.summary || {};
                   return (
                     <tr key={`${day.date}-${idx}`} style={{ borderBottom:'1px solid rgba(255,255,255,0.08)' }}>
