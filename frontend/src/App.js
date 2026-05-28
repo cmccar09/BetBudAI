@@ -164,6 +164,35 @@ function reasonsFromBreakdown(sb, n = 2) {
   return entries.slice(0, n).map(([k]) => SB_LABELS[k] || k.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase()));
 }
 
+// Classify race type from Betfair market_name — mirrors Python _classify_race_type()
+// Used as fallback when pick.race_type is not stored (picks before 2026-05-28)
+function classifyRaceType(marketName) {
+  const mn = (marketName || '').toUpperCase();
+  if (mn.includes('CHS') || mn.includes('CHASE')) {
+    if (mn.includes('NOV'))  return 'Novice Chase';
+    if (mn.includes('HCAP')) return 'Handicap Chase';
+    return 'Chase';
+  }
+  if (mn.includes('HRD') || mn.includes('HURDLE')) {
+    if (mn.includes('NOV'))  return 'Novice Hurdle';
+    if (mn.includes('JUV'))  return 'Juvenile Hurdle';
+    if (mn.includes('HCAP') || mn.endsWith(' H')) return 'Handicap Hurdle';
+    return 'Hurdle';
+  }
+  if (mn.includes('NHF') || mn.includes('BUMPER')) return 'NH Flat/Bumper';
+  if (mn.includes('MDN') || mn.includes('MAIDEN')) return 'Maiden';
+  if (mn.includes('HCAP'))  return 'Flat Handicap';
+  if (mn.includes('GRP') || mn.includes('GROUP')) return 'Group Race';
+  if (mn.includes('LIST') || mn.includes('LISTED')) return 'Listed Race';
+  if (mn.includes('STKS') || mn.includes('STAKES')) return 'Conditions Stakes';
+  if (mn.includes('CLMR') || mn.includes('CLAIM')) return 'Claimer';
+  if (mn.includes('SELL')) return 'Seller';
+  return null;
+}
+function pickRaceType(pick) {
+  return pick.race_type || classifyRaceType(pick.market_name) || null;
+}
+
 // Parse UTC race_time string and display in BST (Europe/Dublin)
 function fmtUtcTime(rt) {
   if (!rt) return '';
@@ -1278,7 +1307,7 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
                       <div style={{ fontSize: isMobile ? '17px' : '20px', fontWeight:'800', color:'#111' }}>{pick.horse || 'Unknown'}</div>
                       <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', marginTop:'6px', alignItems:'center' }}>
                         {pick.course && <span style={{ background:'#1e3a5f', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'700' }}>{pick.course}</span>}
-                        {pick.race_type && <span style={{ background:'#7c3aed', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'11px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.4px' }}>{pick.race_type}</span>}
+                        {pickRaceType(pick) && <span style={{ background:'#7c3aed', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'11px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.4px' }}>{pickRaceType(pick)}</span>}
                         {ft.date && <span style={{ background:'#f3f4f6', color:'#374151', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'600' }}>{ft.date}</span>}
                         {ft.time && <span style={{ background:'#ecfdf5', color:'#065f46', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'700', border:'1px solid #a7f3d0' }}>{ft.time}</span>}
                       </div>
@@ -2594,7 +2623,7 @@ function Top5PicksView() {
                       </div>
                       <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', marginTop:'6px', alignItems:'center' }}>
                         {pick.course && <span style={{ background:'#1e3a5f', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'700' }}>{pick.course}</span>}
-                        {pick.race_type && <span style={{ background:'#7c3aed', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'11px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.4px' }}>{pick.race_type}</span>}
+                        {pickRaceType(pick) && <span style={{ background:'#7c3aed', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'11px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.4px' }}>{pickRaceType(pick)}</span>}
                         {ft.date && <span style={{ background:'#f3f4f6', color:'#374151', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'600' }}>{ft.date}</span>}
                         {ft.time && <span style={{ background:'#ecfdf5', color:'#065f46', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'700', border:'1px solid #a7f3d0' }}>{ft.time}</span>}
                       </div>
