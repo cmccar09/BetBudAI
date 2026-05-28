@@ -350,7 +350,7 @@ def analyze_and_save_all():
     # Without this guard, 3 new picks are added per 2-hour refresh → 9+ picks/day.
     # Weekends have more racing cards → allow 8 picks; weekdays capped at 5.
     _dow = datetime.now(timezone.utc).weekday()  # 0=Mon … 6=Sun
-    MAX_DAILY_UI_PICKS = 5   # 2026-04-17: Hard cap — 5 picks/day every day (free see 2, paid see 5)
+    MAX_DAILY_UI_PICKS = 2 if _dow == 6 else 5  # Sunday capped at 2 (lower-grade cards, 25% WR vs 38% Sat)
     from boto3.dynamodb.conditions import Key as _Key
     _existing_resp = table.query(KeyConditionExpression=_Key('bet_date').eq(today))
     _existing_items = _existing_resp.get('Items', [])
@@ -1062,16 +1062,20 @@ def analyze_and_save_all():
     # This shifts selection toward shorter-priced horses when scores are close,
     # without ignoring a genuinely high-scoring longer-odds pick.
     def _odds_preference_bonus(odds):
-        """Backtest-calibrated bonus: shorter prices win far more often."""
-        if odds < 3.0:  return 8   # 80% WR band — strongly prefer
-        if odds < 4.0:  return 4   # 42% WR band — moderately prefer
-        if odds < 5.0:  return 0   # 31% WR band — neutral
-        return -4                  # 21% WR and below — penalise
+        """Recalibrated 2026-05-28 from 14-day actuals:
+        <2.5: 50% WR  |  2.5-3.5: 31% WR  |  3.5-5.0: 6.7% WR (dead zone)  |  5.0+: 50% WR
+        3.5-5.0 is the worst band — placed-heavy, rarely wins. Penalise hard."""
+        if odds < 2.5:  return  8   # 50% WR — strongly prefer
+        if odds < 3.5:  return  3   # 31% WR — slight preference (was +4/+8)
+        if odds < 5.0:  return -6   # 6.7% WR — dead zone, penalise hard
+        if odds < 8.0:  return  2   # 50% WR but high variance — slight positive
+        return -2                   # longshots — penalise
 
     def _learning_odds_adjustment(odds):
         """Data-driven bonus/penalty from nightly learning cycle's odds ROI analysis.
         Reads _learning_odds_roi (captured from STAGE 0 DynamoDB read).
-        Falls back to 0 if no data or insufficient sample (n < 5)."""
+        Falls back to 0 if no data or insufficient sample (n < 5).
+        Threshold tightened: -5% ROI now triggers penalty (was -10%)."""
         if odds <= 3.0:    cat = 'favorite'
         elif odds <= 6.0:  cat = 'mid_price'
         elif odds <= 12.0: cat = 'outsider'
@@ -1083,8 +1087,8 @@ def analyze_and_save_all():
         if roi >=  80: return  6
         if roi >=  40: return  4
         if roi >=  10: return  2
-        if roi >= -10: return  0
-        if roi >= -30: return -3
+        if roi >=  -5: return  0
+        if roi >= -25: return -3
         return -6
 
     def _learning_course_bonus(venue):
@@ -1115,21 +1119,22 @@ def analyze_and_save_all():
                                      'going_suitability','cd_bonus','jockey_quality','price_steam')
                          if float(bd.get(k, 0) or 0) > 0)
 
-        # WINNER PROFILE BONUS — 30-day data: winners avg 2.8 signals, avg pre-cap score ~95.
-        # Clean 2-3 signal picks with market backing in the 78-125 pre-cap range win most.
+        # WINNER PROFILE BONUS — 14-day actuals: winners avg 2.53 signals, avg score 95.
+        # Tightened range: 78-110 pre-cap (placed horses avg 125, so 110+ = placed profile).
         _winner_profile = (
             _ml > 0
             and 2 <= _sig_count <= 3
-            and 78 <= pre_cap <= 125
+            and 78 <= pre_cap <= 110
         )
         _winner_bonus = 8 if _winner_profile else 0
 
-        # SIGNAL BLOAT PENALTY — losers avg 3.7 signals; 5+ signals = over-priced fav.
+        # SIGNAL BLOAT PENALTY — placed horses avg 3.33 signals (not 3.7).
+        # Lower threshold: 4+ signals now triggers penalty at high scores.
         _bloat_penalty = 0
-        if _sig_count >= 5 and pre_cap > 130:
-            _bloat_penalty = 10
-        elif _sig_count >= 4 and pre_cap > 145:
-            _bloat_penalty = 5
+        if _sig_count >= 5:
+            _bloat_penalty = 12
+        elif _sig_count >= 4 and pre_cap > 120:
+            _bloat_penalty = 8
 
         return (pre_cap
                 + _odds_preference_bonus(odds)
