@@ -66,6 +66,8 @@ def _load_results_from_dynamodb(table):
                         'selection_id' : item.get('selection_id', ''),
                         'runner_name'  : item.get('horse', item.get('dog', '')),
                         'venue'        : item.get('course', ''),
+                        'race_type'    : item.get('race_type', ''),
+                        'market_name'  : item.get('market_name', ''),
                         'odds'         : _f(item.get('odds')),
                         'bet_type'     : item.get('bet_type', 'WIN'),
                         'confidence'   : _f(item.get('comprehensive_score', item.get('confidence'))),
@@ -89,7 +91,7 @@ def _load_results_from_dynamodb(table):
     return results
 
 
-def _persist_insights(table, insights, analysis, date_str):
+def _persist_insights(table, insights, analysis, date_str, raw_results=None):
     """Save learning insights + structured signals to DynamoDB.
 
     Structured fields consumed by complete_daily_analysis.py STAGE 0:
@@ -112,17 +114,40 @@ def _persist_insights(table, insights, analysis, date_str):
         and int(stats.get('wins', 0)) / int(stats.get('total', 1)) >= 0.40
     ]
 
+    # Race type performance breakdown — saved alongside odds/course signals
+    race_type_perf = {}
+    for r in (raw_results or []):
+        rt = r.get('selection', {}).get('race_type', '') or 'Unknown'
+        is_w = r.get('result', {}).get('is_winner', False)
+        is_p = r.get('result', {}).get('is_placed', False)
+        if rt not in race_type_perf:
+            race_type_perf[rt] = {'wins': 0, 'placed': 0, 'losses': 0}
+        if is_w:
+            race_type_perf[rt]['wins'] += 1
+        elif is_p:
+            race_type_perf[rt]['placed'] += 1
+        else:
+            race_type_perf[rt]['losses'] += 1
+    for rt, s in race_type_perf.items():
+        n = s['wins'] + s['placed'] + s['losses']
+        s['total'] = n
+        s['win_rate'] = round(s['wins'] / n * 100, 1) if n else 0
+
+    _rt_summary = {k: str(v['wins']) + 'W/' + str(v['total']) + 'n=' + str(v['win_rate']) + '%'
+                   for k, v in race_type_perf.items()}
     print(f"[sf_learning] odds_roi signals: {odds_roi}")
     print(f"[sf_learning] best_courses: {best_courses}")
+    print(f"[sf_learning] race_type_perf: {_rt_summary}")
 
     table.put_item(Item={
-        'bet_date'    : 'LEARNING_INSIGHTS',
-        'bet_id'      : 'latest',
-        'date'        : date_str,
-        'insights'    : json.dumps(insights,      default=str),
-        'odds_roi'    : json.dumps(odds_roi,       default=str),
-        'best_courses': json.dumps(best_courses,   default=str),
-        'updated_at'  : datetime.datetime.utcnow().isoformat(),
+        'bet_date'        : 'LEARNING_INSIGHTS',
+        'bet_id'          : 'latest',
+        'date'            : date_str,
+        'insights'        : json.dumps(insights,        default=str),
+        'odds_roi'        : json.dumps(odds_roi,         default=str),
+        'best_courses'    : json.dumps(best_courses,     default=str),
+        'race_type_perf'  : json.dumps(race_type_perf,   default=str),
+        'updated_at'      : datetime.datetime.utcnow().isoformat(),
     })
 
 
@@ -177,7 +202,7 @@ def lambda_handler(event, context):
     print("[sf_learning] Generating insights ...")
     insights = generate_learning_insights(analysis)
 
-    _persist_insights(table, insights, analysis, date_str)
+    _persist_insights(table, insights, analysis, date_str, raw_results=results)
 
     patterns_found = sum(
         len(v) if isinstance(v, (list, dict)) else 1

@@ -203,6 +203,29 @@ def _kelly_fraction(win_prob_pct: int, decimal_odds: float, fraction: float = 0.
     return round(min(fraction * k, 0.12), 4)
 
 
+def _classify_race_type(market_name: str) -> str:
+    """Classify Betfair market_name into a standardised race type string."""
+    mn = str(market_name or '').upper()
+    if 'CHS' in mn or 'CHASE' in mn:
+        if 'NOV' in mn:   return 'Novice Chase'
+        if 'HCAP' in mn:  return 'Handicap Chase'
+        return 'Chase'
+    if 'HRD' in mn or 'HURDLE' in mn:
+        if 'NOV' in mn:   return 'Novice Hurdle'
+        if 'JUV' in mn:   return 'Juvenile Hurdle'
+        if 'HCAP' in mn or mn.endswith(' H'):  return 'Handicap Hurdle'
+        return 'Hurdle'
+    if 'NHF' in mn or 'BUMPER' in mn:  return 'NH Flat/Bumper'
+    if 'MDN' in mn or 'MAIDEN' in mn:  return 'Maiden'
+    if 'HCAP' in mn:                   return 'Flat Handicap'
+    if 'GRP' in mn or 'GROUP' in mn:   return 'Group Race'
+    if 'LIST' in mn or 'LISTED' in mn: return 'Listed Race'
+    if 'STKS' in mn or 'STAKES' in mn: return 'Conditions Stakes'
+    if 'CLMR' in mn or 'CLAIM' in mn:  return 'Claimer'
+    if 'SELL' in mn:                   return 'Seller'
+    return 'Flat'
+
+
 def analyze_and_save_all():
     """
     Two-pass algorithm:
@@ -648,6 +671,7 @@ def analyze_and_save_all():
                 'score_breakdown':     breakdown,
                 'selection_reasons':   reasons,
                 'sport':               'horses',
+                'race_type':           _classify_race_type(market_name),
                 'outcome':             'pending',
                 'market_id':           market_id,
                 'market_name':         market_name,
@@ -714,16 +738,18 @@ def analyze_and_save_all():
         analysed_count = len(race_runners)
         missing_runners = max(0, sl_count - analysed_count) if sl_count else 0
 
+        _mkt_name = race.get('market_name', '')
         all_races_data.append({
             'venue':             venue,
             'race_time':         race_time,
-            'market_name':       race.get('market_name', ''),
+            'market_name':       _mkt_name,
+            'race_type':         _classify_race_type(_mkt_name),
             'runners':           race_runners,
             'raw_runners':       runners,
             'best':              best,
             'n_runners':         len(runners),
-            'sl_declared_count': sl_count,           # from SL racecard (0 if unavailable)
-            'missing_runners':   missing_runners,    # runners in SL not in Betfair
+            'sl_declared_count': sl_count,
+            'missing_runners':   missing_runners,
         })
 
     # ── SELECT TOP 5 CROSS-RACE BESTS ────────────────────────────────────────
@@ -1029,6 +1055,18 @@ def analyze_and_save_all():
                   f"Score inflation indicator (stacked bonuses ≠ real edge).")
             return False
 
+        # S15 — Handicap gate (2026-05-28: 132-pick analysis)
+        # Flat Handicap 29.6% WR | Handicap Hurdle 18.8% WR | Handicap Chase 47% WR
+        # Non-handicap races dominate: Maiden 100%, Novice Hurdle 100%, Conditions 71%.
+        # Focus exclusively on non-handicap races where the model has clear edge.
+        _rt_s15 = r.get('race_type', _classify_race_type(r.get('market_name', '')))
+        _HANDICAP_TYPES = {'Flat Handicap', 'Handicap Hurdle', 'Handicap Chase'}
+        if _rt_s15 in _HANDICAP_TYPES:
+            print(f"  [GATE-S15 REJECTED] {r['best']['horse']} score={score:.0f}: "
+                  f"{_rt_s15} — model focuses on non-handicap races (Maiden/Novice/Conditions "
+                  f"= 100%/100%/71% WR vs 18.8%-47% for handicaps)")
+            return False
+
         return True
 
     def _race_min_confidence(r):
@@ -1136,11 +1174,19 @@ def analyze_and_save_all():
         elif _sig_count >= 4 and pre_cap > 120:
             _bloat_penalty = 8
 
+        # Race type ranking bonus — all handicaps now gated out (S15), so remaining
+        # eligible races are non-handicaps. Bonus differentiates within that set.
+        _rt = r.get('race_type', _classify_race_type(r.get('market_name', '')))
+        _rt_rank_bonus = 0
+        if _rt in ('Maiden', 'Novice Hurdle', 'Novice Chase'):  _rt_rank_bonus = 12
+        elif _rt == 'Conditions Stakes':                         _rt_rank_bonus = 8
+
         return (pre_cap
                 + _odds_preference_bonus(odds)
                 + _learning_odds_adjustment(odds)
                 + _learning_course_bonus(venue)
                 + _winner_bonus
+                + _rt_rank_bonus
                 - _bloat_penalty)
 
     eligible.sort(key=lambda r: _selection_score(r), reverse=True)

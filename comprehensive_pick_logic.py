@@ -935,6 +935,19 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
         'Luke Comer', 'L Comer',
         'Kieran Cotter', 'K Cotter',
         'Daniel Murphy', 'D Murphy',
+        # ADDED 2026-05-25: Key flat/2yo specialists missing from all tiers
+        # causing them to be penalised -8pts as "unknown trainer" despite being
+        # well-established at the top of the game.
+        'Simon Crisford', 'S Crisford',                   # Godolphin-connected, T2 flat
+        'James Tate', 'J Tate',                           # Strong UK flat, multiple stakes winners
+        'Richard Fahey', 'R Fahey',                       # High-volume 2yo/3yo, consistent strike rate
+        'Ed Walker', 'E Walker',                           # Quality flat trainer, Ascot specialist
+        'Saeed bin Suroor', 'S bin Suroor', 'Saeed Bin Suroor',  # Godolphin T2, flat
+        'Owen Burrows', 'O Burrows',                      # Shadwell stable, progressive horses
+        'George Boughey', 'G Boughey',                    # Rising flat trainer, 2yo specialist
+        'Ismail Mohammed', 'I Mohammed',                  # AW/flat specialist
+        'Adrian Keatley', 'A Keatley',                    # Irish flat, solid strike rate
+        'Joseph Patrick OBrien', "Joseph Patrick O'Brien",
     ]
     # Tier 3: Decent — know their horses, worth modest bonus
     elite_trainers_t3 = [
@@ -963,6 +976,17 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
         'John Flint', 'J Flint',
         'Peter Bowen', 'P Bowen',
         'Rebecca Curtis', 'R Curtis',
+        # ADDED 2026-05-25: 2yo/flat specialists missing from all tiers
+        'Mick Channon', 'M Channon',                     # 2yo specialist, regular winner
+        'Jamie Osborne', 'J Osborne',                    # solid flat/2yo
+        'Brian Meehan', 'B Meehan',                      # flat/AW consistent
+        'Roger Fell', 'R Fell',                          # Northern flat specialist
+        'David Loughnane', 'D Loughnane',                # 2yo sprint specialist
+        'Michael Bell', 'M Bell',                        # flat, solid Newmarket yard
+        'Stuart Williams', 'S Williams',                  # AW/flat, consistent
+        'Simon Dow', 'S Dow',                            # solid flat yard
+        'William Knight', 'W Knight',                    # progressive flat yard
+        'Jonathan Portman', 'J Portman',                 # southern flat specialist
     ]
     
     trainer_bonus = 0
@@ -994,6 +1018,65 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
             score += trainer_bonus
             breakdown['trainer_reputation'] = trainer_bonus
             reasons.append(f"{tier_label} trainer ({trainer}): +{trainer_bonus}pts")
+
+    # 8b. RACING API LIVE TRAINER FORM — replaces/augments static tier list
+    # trainer_14d_pct is from theracingapi.com Pro racecard: actual win% over last 14 days.
+    # This is dynamic and far more reliable than a static name-based tier list.
+    _ra = horse_data.get('ra_data', {})
+    if _ra:
+        _t14_pct  = int(_ra.get('trainer_14d_pct', 0) or 0)
+        _t14_runs = int(_ra.get('trainer_14d_runs', 0) or 0)
+        _ra_trainer_bonus = 0
+        if _t14_runs >= 5:  # need at least 5 runs for meaningful sample
+            if _t14_pct >= 35:
+                _ra_trainer_bonus = 14
+                reasons.append(f"Trainer on fire last 14 days ({_t14_pct}% from {_t14_runs} runs): +{_ra_trainer_bonus}pts")
+            elif _t14_pct >= 25:
+                _ra_trainer_bonus = 8
+                reasons.append(f"Trainer in strong 14-day form ({_t14_pct}% from {_t14_runs} runs): +{_ra_trainer_bonus}pts")
+            elif _t14_pct >= 18:
+                _ra_trainer_bonus = 4
+                reasons.append(f"Trainer in good 14-day form ({_t14_pct}% from {_t14_runs} runs): +{_ra_trainer_bonus}pts")
+            elif _t14_runs >= 10 and _t14_pct < 5:
+                _ra_trainer_bonus = -6
+                reasons.append(f"Trainer out of form last 14 days ({_t14_pct}% from {_t14_runs} runs): {_ra_trainer_bonus}pts")
+
+        if _ra_trainer_bonus:
+            # Prevent double-counting: if static tier already fired, only add the difference
+            _static_bonus = breakdown.get('trainer_reputation', 0)
+            if _static_bonus > 0 and _ra_trainer_bonus > 0:
+                # Static tier bonus already applied — add any extra from live form
+                _extra = max(0, _ra_trainer_bonus - _static_bonus)
+                if _extra > 0:
+                    score += _extra
+                    breakdown['trainer_live_form'] = _extra
+            else:
+                score += _ra_trainer_bonus
+                breakdown['trainer_live_form'] = _ra_trainer_bonus
+
+        # RPR (Racing Post Rating) — quality signal relative to career peak
+        # High RPR = proven high-class performer. Low RPR in a competitive field = outclassed.
+        _rpr = _ra.get('rpr')
+        if _rpr and isinstance(_rpr, int):
+            if _rpr >= 120:
+                _rpr_pts = 10
+                score += _rpr_pts
+                breakdown['rpr_class'] = _rpr_pts
+                reasons.append(f"High Racing Post Rating ({_rpr} RPR — class performer): +{_rpr_pts}pts")
+            elif _rpr >= 100:
+                _rpr_pts = 5
+                score += _rpr_pts
+                breakdown['rpr_class'] = _rpr_pts
+                reasons.append(f"Good Racing Post Rating ({_rpr} RPR): +{_rpr_pts}pts")
+            elif _rpr > 0 and _rpr < 60:
+                _rpr_pts = -5
+                score += _rpr_pts
+                breakdown['rpr_class'] = _rpr_pts
+                reasons.append(f"Low Racing Post Rating ({_rpr} RPR — may be outclassed): {_rpr_pts}pts")
+            else:
+                breakdown['rpr_class'] = 0
+        else:
+            breakdown['rpr_class'] = 0
 
     # 9. FAVORITE CORRECTION — capped, doesn't stack heavily on trainer
     # Only applies when trainer_tier=1 (truly elite) to avoid inflating mediocre picks
@@ -1600,8 +1683,94 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
             breakdown['deep_form'] = form_detail_pts
         else:
             breakdown['deep_form'] = 0
+
+        # ── CURRENT FORM QUALITY (from form_runs) ───────────────────────────
+        # These signal whether the horse is IN form RIGHT NOW, not just historically.
+        # Separate from deep_form so they appear distinctly in score_breakdown.
+
+        # Won in last 2 runs — horse is firing at peak form right now
+        if fs.get('won_last_2_runs') and not recent_win:
+            # Only add if `recent_win` from Betfair form string DIDN'T already fire
+            # (to avoid double-counting when both data sources agree).
+            _wl2_pts = 8
+            score += _wl2_pts
+            breakdown['won_last_2_runs'] = _wl2_pts
+            reasons.append(f"Won in last 2 runs (in-form now): +{_wl2_pts}pts")
+        else:
+            breakdown['won_last_2_runs'] = 0
+
+        # Runs since last win — long losing streak is a red flag
+        _rslw = fs.get('runs_since_last_win')
+        if _rslw is not None:
+            if _rslw >= 12:
+                _lstreak_pen = 12
+                score -= _lstreak_pen
+                breakdown['losing_streak_penalty'] = -_lstreak_pen
+                reasons.append(f"Extended losing run ({_rslw} runs without a win): -{_lstreak_pen}pts")
+            elif _rslw >= 8:
+                _lstreak_pen = 7
+                score -= _lstreak_pen
+                breakdown['losing_streak_penalty'] = -_lstreak_pen
+                reasons.append(f"Losing run ({_rslw} runs without a win): -{_lstreak_pen}pts")
+            else:
+                breakdown['losing_streak_penalty'] = 0
+        else:
+            breakdown['losing_streak_penalty'] = 0
+
+        # Form trend — improving horses win more; declining horses place/lose
+        if fs.get('form_trend_improving'):
+            _trend_pts = 6
+            score += _trend_pts
+            breakdown['form_trend'] = _trend_pts
+            reasons.append(f"Improving form trend (positions getting better): +{_trend_pts}pts")
+        elif fs.get('form_trend_declining'):
+            _trend_pen = 6
+            score -= _trend_pen
+            breakdown['form_trend'] = -_trend_pen
+            reasons.append(f"Declining form trend (positions getting worse): -{_trend_pen}pts")
+        else:
+            breakdown['form_trend'] = 0
+
     else:
         breakdown['deep_form'] = 0
+        breakdown['won_last_2_runs'] = 0
+        breakdown['losing_streak_penalty'] = 0
+        breakdown['form_trend'] = 0
+
+    # ── TIMEFORM STARS (from Sporting Life scrape) ──────────────────────────
+    # Timeform rates every horse 1-5 stars based on current class, fitness, and form.
+    # This is a pre-race assessment by professional analysts — a 5-star rating in a
+    # field of 3-star horses is the strongest single class indicator we can get.
+    # Stars are collected in form_enricher.py but were previously unused here.
+    # 30-day winner data shows winners avg score 93 with clean 2-3 signal profiles.
+    # Timeform stars give us a QUALITY signal independent of form-stacking.
+    _tf_stars = horse_data.get('timeform_stars')
+    if _tf_stars and isinstance(_tf_stars, (int, float)):
+        _tf_stars = int(_tf_stars)
+        if _tf_stars == 5:
+            _tf_pts = 14
+            score += _tf_pts
+            breakdown['timeform_stars'] = _tf_pts
+            reasons.append(f"Timeform 5-star rating (elite form/class): +{_tf_pts}pts")
+        elif _tf_stars == 4:
+            _tf_pts = 8
+            score += _tf_pts
+            breakdown['timeform_stars'] = _tf_pts
+            reasons.append(f"Timeform 4-star rating (strong form): +{_tf_pts}pts")
+        elif _tf_stars == 2:
+            _tf_pts = -5
+            score += _tf_pts
+            breakdown['timeform_stars'] = _tf_pts
+            reasons.append(f"Timeform 2-star rating (below par form): {_tf_pts}pts")
+        elif _tf_stars == 1:
+            _tf_pts = -10
+            score += _tf_pts
+            breakdown['timeform_stars'] = _tf_pts
+            reasons.append(f"Timeform 1-star rating (poor form): {_tf_pts}pts")
+        else:
+            breakdown['timeform_stars'] = 0  # 3 stars = average, no adjustment
+    else:
+        breakdown['timeform_stars'] = 0
 
     # 14. CHELTENHAM FESTIVAL BONUS (CRITICAL FOR SYSTEM SURVIVAL)
     # Apply Championship-specific scoring if at Cheltenham Festival (March 10-13, 2026)
@@ -1893,6 +2062,24 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
     else:
         breakdown['trainer_hot_form'] = 0
         breakdown['jockey_hot_form']  = 0
+
+    # ── RACE TYPE ADJUSTMENT (2026-05-28: non-handicap focus) ───────────────
+    # Handicaps are now gated out at pick-selection (Gate S15). Score bonuses
+    # only needed to differentiate within non-handicap races.
+    # Maiden 100% WR | Novice 100% WR | Conditions Stakes 71% WR
+    _mkt_rt = str(horse_data.get('market_name', '')).upper()
+    _rt_bonus = 0
+    if 'NOV' in _mkt_rt and ('HRD' in _mkt_rt or 'CHS' in _mkt_rt):
+        _rt_bonus = 12   # Novice hurdle/chase: 100% WR
+    elif 'MDN' in _mkt_rt or 'MAIDEN' in _mkt_rt:
+        _rt_bonus = 12   # Maiden: 100% WR
+    elif ('STKS' in _mkt_rt or 'STAKES' in _mkt_rt) and 'HCAP' not in _mkt_rt and 'GRP' not in _mkt_rt and 'LIST' not in _mkt_rt:
+        _rt_bonus = 8    # Conditions Stakes: 71% WR
+    if _rt_bonus != 0:
+        score += _rt_bonus
+        breakdown['race_type_adj'] = _rt_bonus
+    else:
+        breakdown['race_type_adj'] = 0
 
     # ── GENERAL SCORE CAP: 120pts ────────────────────────────────────────────
     # LESSON 2026-04-17: Marty McFly scored 145 (9th of 9), Solar Pass 142 (5th of 6).

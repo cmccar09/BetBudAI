@@ -1278,6 +1278,7 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
                       <div style={{ fontSize: isMobile ? '17px' : '20px', fontWeight:'800', color:'#111' }}>{pick.horse || 'Unknown'}</div>
                       <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', marginTop:'6px', alignItems:'center' }}>
                         {pick.course && <span style={{ background:'#1e3a5f', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'700' }}>{pick.course}</span>}
+                        {pick.race_type && <span style={{ background:'#7c3aed', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'11px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.4px' }}>{pick.race_type}</span>}
                         {ft.date && <span style={{ background:'#f3f4f6', color:'#374151', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'600' }}>{ft.date}</span>}
                         {ft.time && <span style={{ background:'#ecfdf5', color:'#065f46', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'700', border:'1px solid #a7f3d0' }}>{ft.time}</span>}
                       </div>
@@ -2593,6 +2594,7 @@ function Top5PicksView() {
                       </div>
                       <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', marginTop:'6px', alignItems:'center' }}>
                         {pick.course && <span style={{ background:'#1e3a5f', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'700' }}>{pick.course}</span>}
+                        {pick.race_type && <span style={{ background:'#7c3aed', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'11px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.4px' }}>{pick.race_type}</span>}
                         {ft.date && <span style={{ background:'#f3f4f6', color:'#374151', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'600' }}>{ft.date}</span>}
                         {ft.time && <span style={{ background:'#ecfdf5', color:'#065f46', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'700', border:'1px solid #a7f3d0' }}>{ft.time}</span>}
                       </div>
