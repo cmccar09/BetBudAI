@@ -711,23 +711,27 @@ def get_today_picks(headers):
             })
         }
 
-    # Use query with partition key for better performance
+    # Use paginated query — table has 400+ items/day which can exceed DynamoDB's 1MB page limit
     try:
-        response = table.query(
-            KeyConditionExpression='bet_date = :today',
-            ExpressionAttributeValues={':today': today}
-        )
+        raw_items = []
+        _qkw = {'KeyConditionExpression': Key('bet_date').eq(today)}
+        while True:
+            response = table.query(**_qkw)
+            raw_items.extend(response.get('Items', []))
+            lek = response.get('LastEvaluatedKey')
+            if not lek:
+                break
+            _qkw['ExclusiveStartKey'] = lek
     except Exception as e:
         print(f"Query failed, falling back to scan: {e}")
-        # Fallback to scan if query fails
         response = table.scan(
             FilterExpression='(#d = :today OR bet_date = :today)',
             ExpressionAttributeNames={'#d': 'date'},
             ExpressionAttributeValues={':today': today}
         )
-    
-    items = response.get('Items', [])
-    items = [decimal_to_float(item) for item in items]
+        raw_items = response.get('Items', [])
+
+    items = [decimal_to_float(item) for item in raw_items]
     
     # Filter out greyhounds - only show horses (accept both 'horses' and 'Horse Racing')
     horse_items = [item for item in items if item.get('sport', 'horses') in ['horses', 'Horse Racing', 'horse racing']]
@@ -1032,12 +1036,18 @@ def get_punchestown_tomorrow_picks(headers, event):
             if item.get('race_time') and item.get('horse')
         }
 
-        # Query DynamoDB for ALL picks on target date
-        # WARNING: This returns BOTH main system picks AND featured picks if they exist
-        # If a horse appears in both, you'll get duplicate records with potentially different outcomes
+        # Paginated query for ALL picks on target date (400+ items/day, may exceed 1MB)
+        # WARNING: Returns BOTH main system picks AND featured picks if they exist
         # Featured picks have: is_featured_meeting=True and bet_id starting with "YYYY-MM-DD_FEATURED_"
-        response = table.query(KeyConditionExpression=Key('bet_date').eq(target_date))
-        items = [decimal_to_float(item) for item in response.get('Items', [])]
+        _raw = []
+        _qkw2 = {'KeyConditionExpression': Key('bet_date').eq(target_date)}
+        while True:
+            _resp = table.query(**_qkw2)
+            _raw.extend(_resp.get('Items', []))
+            if not _resp.get('LastEvaluatedKey'):
+                break
+            _qkw2['ExclusiveStartKey'] = _resp['LastEvaluatedKey']
+        items = [decimal_to_float(item) for item in _raw]
 
         def _score(row):
             try:
@@ -1618,12 +1628,16 @@ def get_yesterday_picks(headers):
     
     print(f"[DEBUG] Querying for yesterday: {yesterday}")
     
-    # Use query with partition key for better performance (bet_date is the partition key)
-    response = table.query(
-        KeyConditionExpression=Key('bet_date').eq(yesterday)
-    )
-    
-    items = response.get('Items', [])
+    # Paginated query — 400+ items/day can exceed DynamoDB's 1MB page limit
+    _raw_yest = []
+    _ykw = {'KeyConditionExpression': Key('bet_date').eq(yesterday)}
+    while True:
+        _yr = table.query(**_ykw)
+        _raw_yest.extend(_yr.get('Items', []))
+        if not _yr.get('LastEvaluatedKey'):
+            break
+        _ykw['ExclusiveStartKey'] = _yr['LastEvaluatedKey']
+    items = _raw_yest
     print(f"[DEBUG] Raw items from query: {len(items)}")
     items = [decimal_to_float(item) for item in items]
     
@@ -3192,11 +3206,15 @@ def _mark_daily_email_sent(date_str, sent_to, picks_count):
 
 def _collect_today_ui_picks_for_email(date_str):
     try:
-        resp = table.query(
-            KeyConditionExpression=Key('bet_date').eq(date_str),
-            FilterExpression=Attr('show_in_ui').eq(True)
-        )
-        picks = [decimal_to_float(p) for p in resp.get('Items', [])]
+        _ekw = {'KeyConditionExpression': Key('bet_date').eq(date_str), 'FilterExpression': Attr('show_in_ui').eq(True)}
+        _eitems = []
+        while True:
+            resp = table.query(**_ekw)
+            _eitems.extend(resp.get('Items', []))
+            if not resp.get('LastEvaluatedKey'):
+                break
+            _ekw['ExclusiveStartKey'] = resp['LastEvaluatedKey']
+        picks = [decimal_to_float(p) for p in _eitems]
         picks = [p for p in picks if not p.get('is_learning_pick')]
         picks.sort(key=lambda p: str(p.get('race_time', '')))
         return picks
@@ -4945,9 +4963,16 @@ def apply_learning_lambda(headers, event):
         # Support date passed directly in payload (Step Functions) or in body (API Gateway)
         target_date = data.get('date') or event.get('date') or (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 
-        # Fetch all records for the date
-        resp = table.query(KeyConditionExpression=Key('bet_date').eq(target_date))
-        all_items = [decimal_to_float(i) for i in resp.get('Items', [])]
+        # Fetch all records for the date (paginated)
+        _lkw = {'KeyConditionExpression': Key('bet_date').eq(target_date)}
+        _litems = []
+        while True:
+            _lr = table.query(**_lkw)
+            _litems.extend(_lr.get('Items', []))
+            if not _lr.get('LastEvaluatedKey'):
+                break
+            _lkw['ExclusiveStartKey'] = _lr['LastEvaluatedKey']
+        all_items = [decimal_to_float(i) for i in _litems]
 
         picks = [p for p in all_items
              if _is_ranked_daily_pick(p)
@@ -5125,8 +5150,15 @@ def _fetch_sl_winner_map():
 
 def _analyse_date_lambda(target_date_str, tbl, winner_map=None):
     from boto3.dynamodb.conditions import Key as DKey
-    resp = tbl.query(KeyConditionExpression=DKey('bet_date').eq(target_date_str))
-    all_items = [_dec(it) for it in resp.get('Items', [])]
+    _akw = {'KeyConditionExpression': DKey('bet_date').eq(target_date_str)}
+    _aitems = []
+    while True:
+        _ar = tbl.query(**_akw)
+        _aitems.extend(_ar.get('Items', []))
+        if not _ar.get('LastEvaluatedKey'):
+            break
+        _akw['ExclusiveStartKey'] = _ar['LastEvaluatedKey']
+    all_items = [_dec(it) for it in _aitems]
     if not all_items:
         return []
 
@@ -6235,12 +6267,15 @@ def get_analysis_quality(headers, event):
         if not target_date:
             target_date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
 
-        # Get all picks for the date
-        response = table.query(
-            KeyConditionExpression=Key('bet_date').eq(target_date)
-        )
-
-        items = response.get('Items', [])
+        # Get all picks for the date (paginated)
+        _gkw = {'KeyConditionExpression': Key('bet_date').eq(target_date)}
+        items = []
+        while True:
+            _gr = table.query(**_gkw)
+            items.extend(_gr.get('Items', []))
+            if not _gr.get('LastEvaluatedKey'):
+                break
+            _gkw['ExclusiveStartKey'] = _gr['LastEvaluatedKey']
         ui_picks = [item for item in items if item.get('show_in_ui')]
 
         if not items:

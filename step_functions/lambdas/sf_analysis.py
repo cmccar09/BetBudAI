@@ -52,14 +52,22 @@ def lambda_handler(event, context):
     print(f"[sf_analysis] Scoring all horses and selecting top picks for {date_str} ...")
     analyze_and_save_all()
 
-    # ── Count saved UI picks ──────────────────────────────────────────────────
+    # ── Count saved UI picks (paginated — table has 400+ items/day, may exceed 1MB) ──
     db    = boto3.resource('dynamodb', region_name=REGION)
     table = db.Table('SureBetBets')
-    resp  = table.query(
+    ui_picks = []
+    kwargs = dict(
         KeyConditionExpression = Key('bet_date').eq(date_str),
         FilterExpression       = Attr('show_in_ui').eq(True),
     )
-    picks_count = len(resp.get('Items', []))
+    while True:
+        resp = table.query(**kwargs)
+        ui_picks.extend(resp.get('Items', []))
+        lek = resp.get('LastEvaluatedKey')
+        if not lek:
+            break
+        kwargs['ExclusiveStartKey'] = lek
+    picks_count = len(ui_picks)
     print(f"[sf_analysis] Done — {picks_count} UI pick(s) saved for {date_str}")
 
     return {
