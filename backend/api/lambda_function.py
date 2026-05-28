@@ -5245,14 +5245,16 @@ def _analyse_date_lambda(target_date_str, tbl, winner_map=None):
 
 
 def _build_daily_lay_snapshot(day, rows, generated_iso):
-    settled = [r for r in rows if _normalise_fav_outcome(r.get('outcome')) in ('win', 'loss')]
+    # Only count races that scored 4+ — these are the actionable candidates shown to users
+    candidates = [r for r in rows if float(r.get('lay_score') or 0) >= 4]
+    settled = [r for r in candidates if _normalise_fav_outcome(r.get('outcome')) in ('win', 'loss')]
     fav_lost = [r for r in settled if _normalise_fav_outcome(r.get('outcome')) == 'loss']
     summary = {
         'date': day,
-        'total': len(rows),
-        'caution': len([r for r in rows if float(r.get('lay_score') or 0) >= 4]),
-        'strong': len([r for r in rows if float(r.get('lay_score') or 0) >= 9]),
-        'red_flag': len([r for r in rows if float(r.get('lay_score') or 0) >= 13]),
+        'total': len(candidates),
+        'caution': len(candidates),
+        'strong': len([r for r in candidates if float(r.get('lay_score') or 0) >= 9]),
+        'red_flag': len([r for r in candidates if float(r.get('lay_score') or 0) >= 13]),
         'settled': len(settled),
         'fav_lost': len(fav_lost),
         'lay_win_pct': round((len(fav_lost) / len(settled)) * 100, 1) if settled else None,
