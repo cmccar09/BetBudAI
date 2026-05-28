@@ -35,7 +35,11 @@ def lambda_handler(event, context):
     if not picks:
         raise RuntimeError(f"[sf_validate] No show_in_ui picks for {date_str} — analysis may have failed")
 
-    errors = []
+    errors   = []
+    warnings = []
+    form_enriched_count   = 0
+    form_unenriched_count = 0
+
     for p in picks:
         horse   = p.get('horse', p.get('horse_name', 'unknown'))
         score   = float(p.get('comprehensive_score', p.get('analysis_score', 0)))
@@ -50,13 +54,36 @@ def lambda_handler(event, context):
         if odds <= 1:
             errors.append(f"{horse}: odds={odds} (must be > 1)")
 
+        # Form enrichment check — was this horse scored with actual form data?
+        if p.get('form_enriched') is True:
+            form_enriched_count += 1
+        elif p.get('form_enriched') is False:
+            form_unenriched_count += 1
+            warnings.append(f"{horse}: no form data — pick scored on market signals only")
+
+        # Coverage check — what was overall field coverage when this pick was made?
+        cov = float(p.get('race_coverage_pct', 100))
+        if cov < 25:
+            warnings.append(f"{horse}: race_coverage_pct={cov:.0f}% (below 25% gate at analysis time)")
+
     if errors:
         raise RuntimeError(f"[sf_validate] FAILED — {len(errors)} pick error(s): " + "; ".join(errors))
 
-    print(f"[sf_validate] PASSED — all {len(picks)} pick(s) valid for {date_str}")
+    if warnings:
+        print(f"[sf_validate] DATA WARNINGS ({len(warnings)}):")
+        for w in warnings:
+            print(f"  ⚠ {w}")
+    else:
+        print(f"[sf_validate] All picks have form data (form_enriched=True)")
+
+    print(f"[sf_validate] PASSED — all {len(picks)} pick(s) valid for {date_str} "
+          f"| form_enriched={form_enriched_count} unenriched={form_unenriched_count}")
     return {
-        'success'     : True,
-        'date'        : date_str,
-        'valid_picks' : len(picks),
-        'errors'      : [],
+        'success'              : True,
+        'date'                 : date_str,
+        'valid_picks'          : len(picks),
+        'errors'               : [],
+        'warnings'             : warnings,
+        'form_enriched_picks'  : form_enriched_count,
+        'form_unenriched_picks': form_unenriched_count,
     }

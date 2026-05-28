@@ -132,26 +132,53 @@ def lambda_handler(event, context):
     resp  = table.query(KeyConditionExpression=Key('bet_date').eq(date_str))
     picks = resp.get('Items', [])
 
-    recorded = 0
-    winners  = 0
+    # Build a secondary name-based index for fallback matching.
+    # If a pick's market_id is missing or stale, match by horse name against winner names.
+    # This catches the silent-fail where market_id was never saved correctly.
+    _winner_names_lower = {}  # horse_name_lower -> result dict
+    for mid, res in results_map.items():
+        _winner_names_lower[res['winner_name'].lower().strip()] = res
+
+    recorded   = 0
+    winners    = 0
+    unmatched  = []
 
     for pick in picks:
         market_id    = str(pick.get('market_id', ''))
         selection_id = int(pick.get('selection_id', 0))
+        horse_name   = str(pick.get('horse', pick.get('horse_name', ''))).lower().strip()
 
-        if market_id not in results_map:
-            continue   # race result not available yet
+        result = None
+        match_method = None
 
-        result       = results_map[market_id]
-        won          = (result['winner_selection_id'] == selection_id)
-        outcome      = 'WON' if won else 'LOST'
-        emoji        = '✅ WIN' if won else '❌ LOSS'
+        if market_id and market_id in results_map:
+            result = results_map[market_id]
+            match_method = 'market_id'
+        elif horse_name and horse_name in _winner_names_lower:
+            # Fallback: horse name matches a winner in today's settled markets
+            result = _winner_names_lower[horse_name]
+            match_method = 'name_fallback'
+            print(f"  [sf_results_fetch] Name-fallback match: {pick.get('horse')} "
+                  f"(market_id '{market_id}' not in results_map)")
+
+        if result is None:
+            unmatched.append(pick.get('horse', 'unknown'))
+            continue
+
+        if match_method == 'market_id':
+            won = (result['winner_selection_id'] == selection_id)
+        else:
+            # Name fallback: this horse IS the winner (we matched its name)
+            won = True
+
+        outcome = 'WON' if won else 'LOST'
+        emoji   = '✅ WIN' if won else '❌ LOSS'
 
         table.update_item(
             Key={'bet_date': date_str, 'bet_id': pick['bet_id']},
             UpdateExpression=(
                 'SET outcome=:o, result_won=:w, result_winner_name=:wn, '
-                'result_emoji=:e, result_recorded_at=:at'
+                'result_emoji=:e, result_recorded_at=:at, result_match_method=:mm'
             ),
             ExpressionAttributeValues={
                 ':o' : outcome,
@@ -159,12 +186,16 @@ def lambda_handler(event, context):
                 ':wn': result['winner_name'],
                 ':e' : emoji,
                 ':at': datetime.datetime.utcnow().isoformat(),
+                ':mm': match_method,
             },
         )
         recorded += 1
         if won:
             winners += 1
 
+    if unmatched:
+        print(f"  [sf_results_fetch] ⚠ {len(unmatched)} pick(s) unmatched (race not settled yet or market_id missing): "
+              + ", ".join(unmatched))
     print(f"[sf_results_fetch] {recorded} picks updated ({winners} winners) for {date_str}")
 
     return {

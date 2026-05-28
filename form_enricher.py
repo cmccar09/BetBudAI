@@ -506,13 +506,17 @@ def _parse_racing_api_runs(past_results: list, max_runs: int = 6) -> list[dict]:
 
 def fetch_racing_api_form(date_str: str, api_key: str) -> dict:
     """
-    Fetch runner form from theracingapi.com for all UK/Irish races on date_str.
-    Runs in parallel alongside SL scraping — fills in horses SL missed.
+    Fetch Pro racecard data from theracingapi.com for today's runners.
+    Pro plan (£99.99/mo) — racecards/pro returns structured per-runner data including:
+      past_results_flags : 'C'=course winner, 'D'=distance winner, 'CD'=both, 'BF'=beaten fav
+      last_run           : days since last run (authoritative)
+      rpr                : Racing Post Rating
+      ts                 : Topspeed rating
+      ofr                : Official Rating
+      trainer_14_days    : {"runs": N, "wins": N, "percent": N} — live 14-day trainer form
+      trainer_rtf        : trainer rank-to-form score
 
-    api_key format: "username:password" from theracingapi.com signup (free tier).
-    Set via RACING_API_KEY Lambda env var.
-
-    Returns { horse_name_lower: [run_dicts] }
+    Returns { horse_name_lower: ra_runner_dict } — injected onto runners as 'ra_data'.
     """
     if not api_key or ':' not in api_key:
         return {}
@@ -524,49 +528,70 @@ def fetch_racing_api_form(date_str: str, api_key: str) -> dict:
         'Accept': 'application/json',
     }
 
-    # Try pro endpoint first (has full past_results), fall back to standard
-    for endpoint in (
-        f'https://api.theracingapi.com/v1/racecards/pro?date={date_str}',
-        f'https://api.theracingapi.com/v1/racecards?date={date_str}',
-    ):
-        try:
-            resp = requests.get(endpoint, headers=headers_auth, timeout=25)
-            if resp.status_code == 401:
-                print(f'  [racing_api] Auth failed — check RACING_API_KEY')
-                return {}
-            if resp.status_code == 403:
-                print(f'  [racing_api] Plan does not include {endpoint.split("?")[0].split("/")[-1]} endpoint — trying next')
-                continue
-            if resp.status_code != 200:
-                print(f'  [racing_api] HTTP {resp.status_code} from {endpoint}')
-                continue
-            data = resp.json()
-            break
-        except Exception as exc:
-            print(f'  [racing_api] Request error: {exc}')
+    # Pro endpoint — no date param needed (defaults to today); &region filters aren't needed
+    try:
+        resp = requests.get('https://api.theracingapi.com/v1/racecards/pro',
+                            headers=headers_auth, timeout=30)
+        if resp.status_code == 401:
+            print(f'  [racing_api] ⛔ 401 — credentials rejected. Check RACING_API_KEY in Lambda env.')
             return {}
-    else:
+        if resp.status_code == 403:
+            print(f'  [racing_api] ⛔ 403 — plan does not include racecards/pro. Upgrade required.')
+            return {}
+        if resp.status_code != 200:
+            print(f'  [racing_api] HTTP {resp.status_code} from racecards/pro')
+            return {}
+        data = resp.json()
+    except Exception as exc:
+        print(f'  [racing_api] Request error: {exc}')
         return {}
 
     result: dict = {}
-    races = data.get('racecards') or data.get('races') or []
+    races = data.get('racecards') or []
     for race in races:
-        runners = race.get('runners') or []
-        for runner in runners:
-            name = str(runner.get('horse') or runner.get('horse_name') or '').strip()
+        race_course = str(race.get('course', '')).strip()
+        race_going  = str(race.get('going', '')).strip()
+        for runner in (race.get('runners') or []):
+            name = str(runner.get('horse') or '').strip()
             if not name:
                 continue
             name_key = re.sub(r'\s*\([A-Z]{2,3}\)\s*$', '', name).strip().lower()
-            # past_results / results / form_history — try all keys the API may use
-            past = (runner.get('past_results')
-                    or runner.get('results')
-                    or runner.get('form_history')
-                    or runner.get('form') or [])
-            if isinstance(past, list) and past:
-                runs = _parse_racing_api_runs(past)
-                if runs:
-                    result[name_key] = runs
 
+            # trainer_14_days is {"runs": "28", "wins": "10", "percent": "36"}
+            t14 = runner.get('trainer_14_days') or {}
+            try:
+                t14_pct = int(t14.get('percent', 0) or 0)
+            except (ValueError, TypeError):
+                t14_pct = 0
+            try:
+                t14_runs = int(t14.get('runs', 0) or 0)
+            except (ValueError, TypeError):
+                t14_runs = 0
+
+            def _int_or_none(v):
+                try:
+                    n = int(v)
+                    return n if n > 0 else None
+                except (TypeError, ValueError):
+                    return None
+
+            result[name_key] = {
+                'past_results_flags': str(runner.get('past_results_flags') or '').upper().strip(),
+                'last_run_days':      _int_or_none(runner.get('last_run')),
+                'rpr':                _int_or_none(runner.get('rpr')),
+                'ts':                 _int_or_none(runner.get('ts')),
+                'ofr':                _int_or_none(runner.get('ofr')),
+                'trainer_14d_pct':    t14_pct,
+                'trainer_14d_runs':   t14_runs,
+                'trainer_rtf':        _int_or_none(runner.get('trainer_rtf')),
+                'horse_id':           str(runner.get('horse_id') or ''),
+                'race_course':        race_course,
+                'race_going':         race_going,
+                'draw':               _int_or_none(runner.get('draw')),
+                'form_string':        str(runner.get('form') or ''),
+            }
+
+    print(f'  [racing_api] Pro racecard: {len(result)} runners across {len(races)} races')
     return result
 
 
@@ -699,7 +724,7 @@ def enrich_runners(races: list[dict], verbose: bool = True,
         sl_form, sl_tf, sl_ids = sl_future.result()
         ra_form = ra_future.result()
 
-    # ── Merge: SL first, Racing API fills gaps ────────────────────────────────
+    # ── Merge: SL form into cache ─────────────────────────────────────────────
     _today_form.update(sl_form)
     _today_tf_stars.update(sl_tf)
     for name, h_id in sl_ids.items():
@@ -708,22 +733,20 @@ def enrich_runners(races: list[dict], verbose: bool = True,
             _sl_ids_dirty = True
     _save_sl_ids()
 
-    ra_filled = 0
-    for name, runs in ra_form.items():
-        if name not in _today_form or not _today_form[name]:
-            _today_form[name] = runs
-            ra_filled += 1
+    # ra_form now contains {horse_name: ra_runner_dict} (structured racecard data,
+    # NOT individual run lists). It is NOT merged into _today_form (which holds run lists).
+    # Instead it is injected directly onto each runner as runner['ra_data'].
 
     if verbose:
-        print(f"  [form] SL: {len(sl_form)} horses | "
-              f"Racing API: {len(ra_form)} horses ({ra_filled} gap-fills) | "
-              f"Total pool: {len(_today_form)} horses")
+        print(f"  [form] SL form pool: {len(sl_form)} horses | "
+              f"Racing API Pro racecard: {len(ra_form)} runners | "
+              f"Total SL cache: {len(_today_form)} horses")
 
-    # ── Inject form_runs + timeform_stars into each runner ────────────────────
+    # ── Inject form_runs + ra_data + timeform_stars into each runner ──────────
     total_horses = sum(len(r.get('runners', [])) for r in races)
-    enriched = 0
-    tf_count = 0
-    ra_count = 0
+    enriched   = 0
+    tf_count   = 0
+    ra_injected = 0
     for race in races:
         for runner in race.get('runners', []):
             name = runner.get('name') or runner.get('horse') or ''
@@ -732,16 +755,19 @@ def enrich_runners(races: list[dict], verbose: bool = True,
             name_clean = re.sub(r'\s*\([A-Z]{2,3}\)\s*$', '', name).strip()
             name_key = name_clean.lower()
 
+            # SL form runs (individual race history)
             runs = fetch_form(name_clean)
             runner['form_runs'] = runs
             if runs:
                 enriched += 1
-                # Tag source so manifest can report it
-                if name_key in ra_form and name_key not in sl_form:
-                    runner['form_source'] = 'racing_api'
-                    ra_count += 1
-                else:
-                    runner['form_source'] = 'sl'
+                runner['form_source'] = 'sl'
+
+            # Racing API Pro racecard data — injected for ALL runners (C/D flags,
+            # live trainer form, RPR, last_run_days etc.)
+            ra_data = ra_form.get(name_key)
+            if ra_data:
+                runner['ra_data'] = ra_data
+                ra_injected += 1
 
             tf = _today_tf_stars.get(name_key)
             if tf:
@@ -750,8 +776,8 @@ def enrich_runners(races: list[dict], verbose: bool = True,
 
     if verbose:
         pct = round(100 * enriched / total_horses) if total_horses else 0
-        print(f"  [form] Enriched {enriched}/{total_horses} ({pct}%) — "
-              f"SL: {enriched - ra_count} | Racing API gaps filled: {ra_count} | "
+        print(f"  [form] SL form_runs: {enriched}/{total_horses} ({pct}%) | "
+              f"Racing API ra_data: {ra_injected}/{total_horses} | "
               f"Timeform stars: {tf_count}")
     return races
 
@@ -796,7 +822,35 @@ def get_form_signals(horse_data: dict, today_course: str, today_distance_f: floa
         'course_win_count': 0,
         'distance_win_count': 0,
         'class_drop': False,   # ran in higher class (2/3) recently, drops to lower (4/5+) today
+        # Current form quality signals
+        'won_last_2_runs': False,  # won in either of last 2 races — horse is IN form right now
+        'runs_since_last_win': None,  # count of runs without a win; None = no run history
+        'form_trend_improving': False,  # positions improving across last 3 runs (e.g. 6→3→1)
+        'form_trend_declining': False,  # positions declining across last 3 runs (e.g. 1→3→6)
+        'or_above_field': False,  # horse's current OR is highest or near-highest in recent fields
     }
+
+    # ── Racing API Pro data — augments or substitutes form_runs signals ───────
+    # Available for ALL runners (even those without SL form_runs).
+    # C/D flags from theracingapi.com are authoritative — pre-computed from full history.
+    ra = horse_data.get('ra_data', {})
+    if ra:
+        flags = ra.get('past_results_flags', '')
+
+        # last_run_days: RA is more reliable than computed from form_runs dates
+        if ra.get('last_run_days') is not None:
+            ld = int(ra['last_run_days'])
+            signals['days_since_last_run'] = ld
+            signals['fresh_days_optimal']  = 14 <= ld <= 35
+
+        # C/D flags — only set from RA if form_runs haven't already fired them
+        # (avoids double-counting on the ~86% of horses that have SL data too)
+        if 'C' in flags and not signals['exact_course_win']:
+            signals['exact_course_win']  = True
+            signals['course_win_count']  = max(signals['course_win_count'], 1)
+        if 'D' in flags and not signals['exact_distance_win']:
+            signals['exact_distance_win']  = True
+            signals['distance_win_count']  = max(signals['distance_win_count'], 1)
 
     if not runs:
         return signals
@@ -858,6 +912,36 @@ def get_form_signals(horse_data: dict, today_course: str, today_distance_f: floa
     valid_ors = [(r.get('official_rating') or 0) for r in runs[:3] if r.get('official_rating')]
     if len(valid_ors) >= 2:
         signals['or_trajectory_up'] = valid_ors[0] > valid_ors[-1]   # most recent > oldest
+
+    # Won in last 2 runs — horse is in winning form RIGHT NOW
+    for _ri in range(min(2, len(runs))):
+        if runs[_ri].get('position') == 1:
+            signals['won_last_2_runs'] = True
+            break
+
+    # Runs since last win — number of runs without winning (None if no history)
+    _runs_since_win = 0
+    _found_win = False
+    for _run in runs:
+        if _run.get('position') == 1:
+            _found_win = True
+            break
+        _runs_since_win += 1
+    signals['runs_since_last_win'] = _runs_since_win if _found_win else (len(runs) if runs else None)
+
+    # Form trend — improving or declining over last 3 runs
+    _last3_pos = [r.get('position') for r in runs[:3] if isinstance(r.get('position'), int)]
+    if len(_last3_pos) >= 3:
+        # Improving: positions numerically DECREASING (1 is better than 6)
+        # e.g. [2, 4, 7] means most recent (index 0) = 2nd, previous = 4th, oldest = 7th → improving
+        signals['form_trend_improving'] = (
+            _last3_pos[0] < _last3_pos[1] < _last3_pos[2]
+            and _last3_pos[0] <= 4  # must be placing well in most recent
+        )
+        signals['form_trend_declining'] = (
+            _last3_pos[0] > _last3_pos[1] > _last3_pos[2]
+            and _last3_pos[0] >= 4  # must be placing poorly in most recent
+        )
 
     # Class drop detection — if today's race class is lower than horse's recent runs
     # today_class is passed via horse_data; form runs carry race_class per run
