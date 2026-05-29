@@ -484,16 +484,27 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
     if places > 0:
         reasons.append(f"{places} places (2nd/3rd): {place_points}pts")
 
-    # Gate S17 — WINLESS WITH CHANCES PENALTY
-    # LESSON 2026-05-29: El Nay had 0 wins from 3 runs, all places, but still scored 102pts.
-    # A horse that has run 3+ times without winning has had enough chances — it lacks the
-    # finishing gear to convert. Penalise these to prevent place-form masquerading as win form.
-    _s17_runs = len(form.replace('-', '')) if form else 0
-    if wins == 0 and places >= 3 and _s17_runs >= 3:
-        _winless_penalty = -15
+    # Gate S18 — WIN REQUIREMENT GATE
+    # LESSON 2026-05-29: El Nay (3 runs, 0 wins, 3 places, score 102) was selected #2.
+    # Gate S17 (-15) was not enough — El Nay would still score 87, above the 78pt threshold.
+    # Root cause: place-form (CONSISTENCY) + unexposed bonus together outweigh the penalty.
+    # New rule: any horse with 3+ runs and 0 wins gets -25pts. The only exception is a
+    # 5-star Timeform horse that is steaming in the market — genuine class + money behind it.
+    # Debutants and horses with ≤2 runs are not affected (genuinely unexposed).
+    _s18_runs = len(form.replace('-', '')) if form else 0
+    if wins == 0 and _s18_runs >= 3:
+        _tf_raw = horse_data.get('timeform_stars')
+        _tf_val = int(_tf_raw) if _tf_raw and str(_tf_raw).isdigit() else 0
+        _pm     = horse_data.get('price_movement', 'stable')
+        if _tf_val == 5 and _pm == 'steaming':
+            # Elite class horse with market backing — soften but don't ignore
+            _winless_penalty = -10
+            reasons.append(f"⚠ No wins in {_s18_runs} runs — 5-star TF + steaming (exception): {_winless_penalty}pts")
+        else:
+            _winless_penalty = -25
+            reasons.append(f"⚠ No wins from {_s18_runs} runs ({places} place(s)) — win requirement not met: {_winless_penalty}pts")
         score += _winless_penalty
         breakdown['winless_penalty'] = _winless_penalty
-        reasons.append(f"⚠ Winless despite {_s17_runs} runs ({places} places, 0 wins): {_winless_penalty}pts")
     else:
         breakdown['winless_penalty'] = 0
     
@@ -1585,10 +1596,10 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
         _uex_age = int(horse_data.get('age', 0) or 0)
     except (TypeError, ValueError):
         pass
-    # Tightened 2026-05-29: require places < 3 — a horse placed in 3+ runs without winning
-    # is NOT unexposed, it's consistently losing. "Unexposed" means truly lightly-raced.
-    if (_uex_age and _uex_age <= 5 and _uex_runs <= 5
-            and wins == 0 and places >= 1 and places < 3 and 4.0 <= odds <= 10.0):
+    # Tightened 2026-05-29: "unexposed" means ≤2 outings — genuinely lightly raced.
+    # A horse with 3+ runs and no win has had enough chances and is covered by Gate S18.
+    if (_uex_age and _uex_age <= 5 and _uex_runs <= 2
+            and wins == 0 and places >= 1 and 4.0 <= odds <= 10.0):
         score += _uex_pts
         breakdown['unexposed_bonus'] = _uex_pts
         reasons.append(f"Unexposed {_uex_age}yo improver ({_uex_runs} runs, {places} place(s)): +{_uex_pts}pts")
