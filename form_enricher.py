@@ -589,6 +589,14 @@ def fetch_racing_api_form(date_str: str, api_key: str) -> dict:
                 'race_going':         race_going,
                 'draw':               _int_or_none(runner.get('draw')),
                 'form_string':        str(runner.get('form') or ''),
+                # Bloodstock fields — used by debutant_scorer for first-time-out maidens
+                'sire':               str(runner.get('sire') or '').strip(),
+                'sire_id':            str(runner.get('sire_id') or '').strip(),
+                'dam':                str(runner.get('dam') or '').strip(),
+                'damsire':            str(runner.get('damsire') or '').strip(),
+                'spotlight':          str(runner.get('spotlight') or '').strip(),
+                'stable_tour':        str(runner.get('stable_tour') or '').strip(),
+                'breeder':            str(runner.get('breeder') or '').strip(),
             }
 
     print(f'  [racing_api] Pro racecard: {len(result)} runners across {len(races)} races')

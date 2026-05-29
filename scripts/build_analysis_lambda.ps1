@@ -25,6 +25,7 @@ $FILES = [ordered]@{
     'sf_analysis.py'              = 'step_functions\lambdas\sf_analysis.py'
     'complete_daily_analysis.py'  = 'complete_daily_analysis.py'
     'comprehensive_pick_logic.py' = 'comprehensive_pick_logic.py'
+    'debutant_scorer.py'          = 'debutant_scorer.py'
     'form_enricher.py'            = 'form_enricher.py'
     'betfair_odds_fetcher.py'     = 'betfair_odds_fetcher.py'
     'notify_picks.py'             = 'notify_picks.py'

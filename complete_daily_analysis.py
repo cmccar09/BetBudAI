@@ -19,6 +19,7 @@ This ensures:
 
 import json
 import os
+import re
 import boto3
 from boto3.dynamodb.conditions import Attr
 from datetime import datetime, timezone, timedelta
@@ -532,14 +533,27 @@ def analyze_and_save_all(force_reanalyse: bool = False):
         # Collect weight_lbs for every runner in this race so scoring can do relative comparison
         field_weights = [int(r.get('weight_lbs', 0) or 0) for r in runners if int(r.get('weight_lbs', 0) or 0) > 0]
 
+        # Parse distance in furlongs from market_name for debutant scorer
+        # e.g. "5f Maiden", "1m2f Handicap", "7f Conditions Stakes"
+        _dist_f = 0.0
+        _dm = re.search(r'(\d+)m(\d+)f|(\d+)m|(\d+)f', str(market_name), re.IGNORECASE)
+        if _dm:
+            if _dm.group(1) and _dm.group(2):
+                _dist_f = int(_dm.group(1)) * 8 + int(_dm.group(2))
+            elif _dm.group(3):
+                _dist_f = int(_dm.group(3)) * 8
+            elif _dm.group(4):
+                _dist_f = int(_dm.group(4))
+
         race_runners = []
         for runner in runners:
             horse_name = runner.get('name', 'Unknown')
             odds       = float(runner.get('odds', 0))
 
-            # Inject race-level OurHub going into runner so scoring can access it
+            # Inject race-level context into runner for sub-scorers
             if race.get('ourhub_going'):
                 runner['_race_ourhub_going'] = race['ourhub_going']
+            runner['distance_f'] = _dist_f
 
             score, breakdown, reasons = analyze_horse_comprehensive(
                 runner,

@@ -349,7 +349,25 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
     score = 0
     breakdown = {}
     reasons = []
-    
+
+    # ── DEBUTANT BRANCH ───────────────────────────────────────────────────────
+    # A first-time-out runner has no form — standard signals don't apply.
+    # Use bloodstock signals instead: purchase price, sire tier, pedigree class,
+    # analyst distance hint, amplified market signal.
+    # The standard scoring continues below but most form-dependent signals will
+    # return 0 naturally for a debutant (no form = no wins/places/streaks etc).
+    _form_stripped = (form or '').replace('-', '').replace('/', '')
+    _is_debutant = len(_form_stripped) == 0
+    if _is_debutant:
+        try:
+            from debutant_scorer import score_debutant
+            _race_dist = float(horse_data.get('distance_f', 0) or 0)
+            _deb_delta, _deb_bd = score_debutant(horse_data, race_distance_f=_race_dist)
+            score += _deb_delta
+            breakdown.update(_deb_bd)
+        except Exception as _e:
+            print(f"  [debutant_scorer] import/call failed for {name}: {_e}")
+
     # 1. SWEET SPOT CHECK (Graduated - give points based on odds)
     # LESSON 2026-04-03: Historical data shows 3.0–4.9 decimal (2/1–4/1) is a LOSING RANGE
     # (-£11.95 P&L). The PROVEN winning range is 5.0–8.0 decimal (4/1–7/1, +£25.20 P&L).
