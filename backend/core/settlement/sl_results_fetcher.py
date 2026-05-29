@@ -23,7 +23,7 @@ import json
 import requests
 import boto3
 from html import unescape
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 from core.enrichment.betfair_fetcher import get_betfair_session, fetch_betfair_sp
 from decimal import Decimal
 from boto3.dynamodb.conditions import Key, Attr
@@ -587,6 +587,16 @@ def update_results(date_str):
             print(f"  [SKIP] {horse} – can't parse time from {race_time_raw}")
             continue
         race_date, race_hhmm = tm_m.group(1), tm_m.group(2)
+
+        # Guard: don't attempt settlement until race time has passed (+ 5 min buffer)
+        try:
+            _race_dt = datetime.fromisoformat(f"{race_date}T{race_hhmm}:00+00:00")
+            if _race_dt > datetime.now(timezone.utc) + timedelta(minutes=5):
+                print(f"  [SKIP] {horse} — race not yet run ({race_hhmm} UTC, now {datetime.now(timezone.utc).strftime('%H:%M')} UTC)")
+                continue
+        except Exception as _te:
+            print(f"  [WARN] {horse} — could not parse race time for guard check: {_te}")
+
         local_hhmm = _to_uk_local_hhmm(race_hhmm, race_date)
 
         winner, actual_off, all_runners = find_result(course, local_hhmm)  # fast-results: BST/local

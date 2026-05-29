@@ -23,7 +23,7 @@ import json
 import requests
 import boto3
 from html import unescape
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 from core.enrichment.betfair_fetcher import get_betfair_session, fetch_betfair_sp
 from decimal import Decimal
 from boto3.dynamodb.conditions import Key, Attr
@@ -344,7 +344,9 @@ def fetch_fast_results():
         # Avoid duplicate entries
         if not any(abs(existing_mins - mins) < 1 for existing_mins, _, _, _ in race_results[key]):
             race_results[key].append((mins, winner, off_time, all_runners))
-            print(f"    [fast] {off_time} {course} \u2192 {winner} ({len(all_runners)} placed horses listed)")
+            # Enhanced logging with race ID for audit trail
+            race_id = (fr.get('race_reference') or {}).get('id', 'unknown')
+            print(f"    [fast] {off_time} {course} \u2192 {winner} | Placed: {', '.join(all_runners[:4])} | Race ID: {race_id}")
 
             # Build per-horse draw and SP map for analysis
             draw_map = {_strip_country(h2.get('horse_name', '')): h2.get('draw_number') for h2 in sorted_horses}
@@ -478,12 +480,12 @@ def update_results(date_str):
             continue
         race_date, race_hhmm = tm_m.group(1), tm_m.group(2)
         course = pick.get('course', '').strip()
-        # The SL fast-results JSON 'time' field is UTC, matching DB storage.
-        # Try the raw UTC hhmm first; then try BST-converted for HTML-fallback pages.
+        # The SL fast-results JSON 'time' field is local BST/GMT, NOT UTC.
+        # Try the BST-converted time first (fast-results); then try UTC for HTML-fallback pages.
         local_hhmm = _to_uk_local_hhmm(race_hhmm, race_date)
-        w, _, _ = _find_in_results(course, race_hhmm)   # fast-results: UTC
+        w, _, _ = _find_in_results(course, local_hhmm)  # fast-results: BST/local
         if not w:
-            w, _, _ = _find_in_results(course, local_hhmm)  # HTML fallback: BST
+            w, _, _ = _find_in_results(course, race_hhmm)   # HTML fallback: UTC
         if not w:
             unresolved_courses_dates.add(race_date)
 
@@ -585,14 +587,42 @@ def update_results(date_str):
             print(f"  [SKIP] {horse} – can't parse time from {race_time_raw}")
             continue
         race_date, race_hhmm = tm_m.group(1), tm_m.group(2)
+
+        # Guard: don't attempt settlement until race time has passed (+ 5 min buffer)
+        try:
+            _race_dt = datetime.fromisoformat(f"{race_date}T{race_hhmm}:00+00:00")
+            if _race_dt > datetime.now(timezone.utc) + timedelta(minutes=5):
+                print(f"  [SKIP] {horse} — race not yet run ({race_hhmm} UTC, now {datetime.now(timezone.utc).strftime('%H:%M')} UTC)")
+                continue
+        except Exception as _te:
+            print(f"  [WARN] {horse} — could not parse race time for guard check: {_te}")
+
         local_hhmm = _to_uk_local_hhmm(race_hhmm, race_date)
 
-        winner, actual_off, all_runners = find_result(course, race_hhmm)   # fast-results: UTC
+        winner, actual_off, all_runners = find_result(course, local_hhmm)  # fast-results: BST/local
+        matched_source = 'fast-results-local'
         if not winner:
-            winner, actual_off, all_runners = find_result(course, local_hhmm)  # HTML fallback: BST
+            winner, actual_off, all_runners = find_result(course, race_hhmm)   # HTML fallback: UTC
+            matched_source = 'html-fallback-utc' if winner else None
 
         if not winner:
             print(f"  [SKIP] {horse} @ {course} {race_hhmm} (local:{local_hhmm}) - no result found")
+            continue
+
+        # Log the match for audit
+        print(f"  [MATCH] {horse} @ {course} {actual_off or race_hhmm} | Source: {matched_source} | Winner: {winner}")
+
+        # ═══════════════════════════════════════════════════════════════════════════
+        # VALIDATION 1: Winner must exist in original race lineup
+        # ═══════════════════════════════════════════════════════════════════════════
+        all_horses_in_race = pick.get('all_horses', [])
+        runner_names = [norm(h.get('horse', '')) for h in all_horses_in_race if isinstance(h, dict)]
+        winner_normalized = norm(winner)
+
+        if runner_names and winner_normalized not in runner_names:
+            print(f"  [ERROR] Winner '{winner}' NOT in original race lineup for {horse} @ {course} {race_hhmm}")
+            print(f"          Expected runners: {[h.get('horse', '') for h in all_horses_in_race[:5] if isinstance(h, dict)]}")
+            print(f"          Matched result may be from WRONG RACE - SKIPPING to prevent data corruption")
             continue
 
         # Find our horse's finishing position (1-based)
@@ -659,11 +689,31 @@ def update_results(date_str):
         # ── Betfair SP for our horse (prefer BSP over SL scraped SP) ──────────
         pick_sp_odds = None
         pick_market_id = pick.get('market_id', '')
+        betfair_winner = None
+
         if pick_market_id and _bf_session:
             if pick_market_id not in _bf_sp_cache:
                 _bf_sp_cache[pick_market_id] = fetch_betfair_sp(
                     _bf_app_key, _bf_session, pick_market_id)
             bf_sp_map = _bf_sp_cache[pick_market_id]
+
+            # ═══════════════════════════════════════════════════════════════════════════
+            # VALIDATION 2: Cross-check winner with Betfair market results
+            # ═══════════════════════════════════════════════════════════════════════════
+            # Betfair SP data includes winner (BSP exists = horse ran, BSP 0 or None = non-runner)
+            # The horse with lowest BSP typically won (but not always - check separately)
+            betfair_runners = [name for name, sp in bf_sp_map.items() if sp and sp > 0]
+
+            # Simple heuristic: if we have Betfair data, check winner exists there
+            if betfair_runners:
+                winner_in_betfair = any(norm(name) == winner_normalized for name in betfair_runners)
+                if not winner_in_betfair:
+                    print(f"  [WARN] Winner '{winner}' not found in Betfair market {pick_market_id}")
+                    print(f"         Betfair runners: {betfair_runners[:5]}")
+                    print(f"         This may indicate wrong race matched - proceeding with caution")
+                else:
+                    print(f"  [✓] Winner '{winner}' confirmed in Betfair market")
+
             # Match our horse name (case-insensitive)
             for sp_name, sp_val in bf_sp_map.items():
                 if sp_name.strip().lower() == horse.strip().lower():
@@ -810,7 +860,10 @@ def update_results(date_str):
 
     print(f"\nUpdated {updated}/{len(pending)} pending picks")
 
-    # Final summary
+    # ═══════════════════════════════════════════════════════════════════════════
+    # VALIDATION 3: Post-settlement integrity check
+    # ═══════════════════════════════════════════════════════════════════════════
+    # Detect races where all horses have the same finish position (indicates bad data)
     resp2 = t.query(KeyConditionExpression=Key('bet_date').eq(date_str))
     all_picks = resp2['Items']
     while resp2.get('LastEvaluatedKey'):
@@ -820,6 +873,44 @@ def update_results(date_str):
         )
         all_picks.extend(resp2.get('Items', []))
     all_picks = [p for p in all_picks if _is_racing_row(p)]
+
+    # Group by race (course + time) and check for anomalies
+    races_check = {}
+    for p in all_picks:
+        if p.get('finish_position') and p.get('outcome') != 'pending':
+            race_key = (p.get('course', ''), p.get('race_time', ''))
+            if race_key not in races_check:
+                races_check[race_key] = {'positions': [], 'winners': set(), 'horses': []}
+            races_check[race_key]['positions'].append(p.get('finish_position'))
+            races_check[race_key]['winners'].add(p.get('winner_name', ''))
+            races_check[race_key]['horses'].append(p.get('horse', ''))
+
+    anomalies_found = False
+    for race_key, data in races_check.items():
+        course, race_time = race_key
+        positions = data['positions']
+        winners = data['winners']
+        horses = data['horses']
+
+        # Check 1: All horses have same position (impossible)
+        if len(positions) > 1 and len(set(positions)) == 1:
+            print(f"\n[ALERT] Data corruption detected: {course} {race_time}")
+            print(f"        All {len(horses)} horses marked as position {positions[0]}")
+            print(f"        Winners recorded: {winners}")
+            print(f"        Horses affected: {horses[:5]}")
+            anomalies_found = True
+
+        # Check 2: Multiple different winners in same race (impossible)
+        if len(winners) > 1:
+            print(f"\n[ALERT] Inconsistent winner data: {course} {race_time}")
+            print(f"        Multiple winners: {winners}")
+            print(f"        Horses: {horses[:5]}")
+            anomalies_found = True
+
+    if anomalies_found:
+        print(f"\n[ERROR] Settlement completed with data integrity issues!")
+        print(f"        Review logs above and manually correct affected races")
+        print(f"        This may indicate wrong race matching or parsing failure")
     wins = sum(1 for p in all_picks if p.get('outcome') in ('win', 'WON'))
     places = sum(1 for p in all_picks if p.get('outcome') == 'placed')
     losses = sum(1 for p in all_picks if p.get('outcome') in ('loss', 'LOST', 'LOSS'))
