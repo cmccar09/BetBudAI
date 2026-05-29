@@ -2179,6 +2179,24 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
         breakdown['score_cap'] = -cap_reduction
         reasons.append(f"Score capped at {GENERAL_CAP}pts (was {score + cap_reduction:.0f}): -{cap_reduction:.0f}pts")
 
+    # ── Signal count audit ────────────────────────────────────────────────────
+    # Count positive scoring signals (exclude penalties and meta fields).
+    _PENALTY_KEYS = {
+        'score_cap', 'winless_penalty', 'maiden_fav_penalty', 'beaten_fav_penalty',
+        'heavy_going_penalty', 'losing_streak_penalty', 'weight_penalty',
+        'novice_penalty', 'aw_low_class_penalty', 'aw_evening_penalty',
+        'large_field_penalty', 'irish_handicap_penalty', 'claiming_jockey',
+        'unknown_trainer_penalty', 'signals_fired',
+    }
+    _signals_fired = sum(
+        1 for k, v in breakdown.items()
+        if k not in _PENALTY_KEYS and isinstance(v, (int, float)) and v > 0
+    )
+    breakdown['signals_fired'] = _signals_fired
+    if _signals_fired < 3:
+        print(f"  [LOW-SIGNAL] {name}: only {_signals_fired} positive signal(s) fired — "
+              f"pick may be odds-driven rather than evidence-driven")
+
     return score, breakdown, reasons
 
 

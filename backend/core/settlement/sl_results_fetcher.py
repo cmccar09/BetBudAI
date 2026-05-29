@@ -838,6 +838,23 @@ def update_results(date_str):
                 extra_expr += ', loss_model_hints = :lmh'
                 extra_vals[':lmh'] = _loss_hints[:8]
 
+        # ── Pre-write integrity check ──────────────────────────────────────────
+        _integrity_errors = []
+        if not winner or not winner.strip():
+            _integrity_errors.append("winner is empty")
+        if not finish_pos or finish_pos < 1:
+            _integrity_errors.append(f"finish_pos invalid ({finish_pos!r})")
+        if outcome_lc not in ('win', 'placed', 'loss'):
+            _integrity_errors.append(f"outcome_lc invalid ({outcome_lc!r})")
+        if outcome_lc == 'win' and norm(horse) != norm(winner):
+            _integrity_errors.append(f"outcome=win but our horse ({horse!r}) != winner ({winner!r})")
+        if _integrity_errors:
+            print(f"  [INTEGRITY FAIL] {horse} @ {course} {race_hhmm} — ABORTING settlement write:")
+            for _e in _integrity_errors:
+                print(f"    ✗ {_e}")
+            continue
+        print(f"  [INTEGRITY OK] {horse}: outcome={outcome_lc}, pos={finish_pos}, winner={winner!r}")
+
         t.update_item(
             Key={'bet_date': date_str, 'bet_id': bet_id},
             UpdateExpression=(
@@ -849,7 +866,7 @@ def update_results(date_str):
                 ':o':  outcome_lc,
                 ':re': result_emoji,
                 ':p':  Decimal(str(profit)),
-                ':r':  result_emoji,
+                ':r':  analysis,        # descriptive ("Won at 3/2 (8 runners)") not bare "WIN"/"LOSS"
                 ':w':  winner,
                 ':fp': finish_pos or 0,
                 ':ra': analysis,

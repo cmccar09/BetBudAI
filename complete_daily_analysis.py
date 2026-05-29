@@ -802,6 +802,15 @@ def analyze_and_save_all(force_reanalyse: bool = False):
         deep_form  = float(bd.get('deep_form', 0))   # SL form signals (course/distance/going wins)
         score_gap  = float(r['best']['item'].get('score_gap', 0))
         n_runners  = r.get('n_runners', 0)
+        signals_fired = float(bd.get('signals_fired', 99))  # 99 = old pick pre-signal-count
+
+        # GATE-SIG — Minimum signal count. At least 3 positive signals required.
+        # Prevents picks driven purely by odds position or single inflated signal.
+        # Bypass: score >= 88 (already above ELITE threshold — model is highly confident).
+        if signals_fired < 3 and score < 88:
+            print(f"  [GATE-SIG REJECTED] {r['best']['horse']} score={score:.0f}: "
+                  f"only {signals_fired:.0f} positive signals fired (need ≥3 below ELITE threshold)")
+            return False
 
         # Detect day of week from race_time
         is_saturday = False
@@ -1344,6 +1353,31 @@ def analyze_and_save_all(force_reanalyse: bool = False):
 
     print(f"\nSaved {total_saved} horses | {ui_promoted} UI picks | "
           f"{total_saved - ui_promoted} learning records\n")
+
+    # ── ZERO-PICKS ALERT ──────────────────────────────────────────────────────
+    if ui_promoted == 0 and total_saved > 0:
+        _zp_msg = (
+            f"BetBudAI ALERT [{today}]: Analysis scored {total_saved} horses "
+            f"but produced 0 UI picks. All races rejected by gates. "
+            f"Form coverage: {_form_pct:.0f}%. Check gate thresholds and logs."
+        )
+        print(f"\n{'='*60}")
+        print(f"[ZERO-PICKS ALERT] {_zp_msg}")
+        print(f"{'='*60}\n")
+        try:
+            import boto3 as _b3
+            _ses = _b3.client('ses', region_name='eu-west-1')
+            _ses.send_email(
+                Source='charles.mccarthy@gmail.com',
+                Destination={'ToAddresses': ['charles.mccarthy@gmail.com']},
+                Message={
+                    'Subject': {'Data': f'🚨 BetBudAI: ZERO picks produced for {today}'},
+                    'Body': {'Text': {'Data': _zp_msg}},
+                }
+            )
+            print("[ZERO-PICKS ALERT] SES alert sent")
+        except Exception as _zpe:
+            print(f"[ZERO-PICKS ALERT] SES send failed (non-fatal): {_zpe}")
 
     # ── COVERAGE HEALTH CHECK ─────────────────────────────────────────────────
     # Verify every UI pick has a complete all_horses list matching the actual
