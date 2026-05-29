@@ -43,11 +43,13 @@ def lambda_handler(event, context):
         from boto3.dynamodb.conditions import Key, Attr
         db = boto3.resource('dynamodb', region_name=os.environ.get('AWS_DEFAULT_REGION', 'eu-west-1'))
         t  = db.Table('SureBetBets')
-        resp = t.query(
-            KeyConditionExpression=Key('bet_date').eq(date_str),
-            FilterExpression=Attr('show_in_ui').eq(True)
-        )
-        picks = resp.get('Items', [])
+        picks, _kw = [], {'KeyConditionExpression': Key('bet_date').eq(date_str),
+                          'FilterExpression': Attr('show_in_ui').eq(True)}
+        while True:
+            resp = t.query(**_kw)
+            picks.extend(resp.get('Items', []))
+            if not resp.get('LastEvaluatedKey'): break
+            _kw['ExclusiveStartKey'] = resp['LastEvaluatedKey']
         settled  = [p for p in picks if p.get('outcome') and p['outcome'] not in ('pending', 'PENDING')]
         winners  = [p for p in settled if str(p.get('outcome', '')).lower() in ('win', 'won')]
 
