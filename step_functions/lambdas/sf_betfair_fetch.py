@@ -82,9 +82,18 @@ def _apply_price_movement(races, morning_prices):
 
 
 def lambda_handler(event, context):
-    date_str = event.get('date', datetime.datetime.utcnow().strftime('%Y-%m-%d'))
-    # run_type is injected by the step function: 'morning' or 'refresh'
     run_type = event.get('run_type', 'morning')
+    run_mode = event.get('run_mode', '')
+
+    # Night-prep run (23:00 UTC) targets TOMORROW's declared races.
+    # InjectDate passes execution_date (today); we add 1 day here.
+    if run_mode == 'night_prep' or event.get('date_offset'):
+        _offset = int(event.get('date_offset', 1))
+        _base   = event.get('execution_date') or event.get('date') or datetime.datetime.utcnow().strftime('%Y-%m-%d')
+        date_str = (datetime.datetime.strptime(_base, '%Y-%m-%d') + datetime.timedelta(days=_offset)).strftime('%Y-%m-%d')
+        print(f"[sf_betfair_fetch] night_prep — targeting tomorrow: {date_str} (base={_base} +{_offset}d)")
+    else:
+        date_str = event.get('date', datetime.datetime.utcnow().strftime('%Y-%m-%d'))
 
     # Work in /tmp so any local file writes land there (read-only /var/task)
     os.makedirs('/tmp', exist_ok=True)
@@ -92,7 +101,7 @@ def lambda_handler(event, context):
 
     from betfair_odds_fetcher import get_live_betfair_races
 
-    print(f"[sf_betfair_fetch] run_type={run_type} — Fetching races for {date_str}...")
+    print(f"[sf_betfair_fetch] run_type={run_type} run_mode={run_mode} — Fetching races for {date_str}...")
     races = get_live_betfair_races()
 
     if not races:

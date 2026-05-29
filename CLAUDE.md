@@ -34,7 +34,7 @@ When reviewing or generating picks, always think:
 - **Frontend**: React on Cloudflare Pages (`frontend/src/App.js`)
 - **DynamoDB tables**: `SureBetBets` (picks), `BetBudAI_Subscribers` (users), `BetBudAICache` (ROI)
 - **Email**: AWS SES from `charles.mccarthy@gmail.com` — **SES is in sandbox mode**, production access denied (Case 177585279500302). Re-apply via AWS Console with correct use case before emails reach subscribers.
-- **Schedule**: Morning 08:30 UTC | Refresh 12:00, 13:00, 13:30, 14:00, 15:00, 16:00, 17:00, 18:00 UTC | Email 12:20 UTC
+- **Schedule**: Night-prep 23:00 UTC (night before — targets TOMORROW's declared races, run_mode=night_prep, +1 day offset) | Refresh 12:00, 13:00, 13:30, 14:00, 15:00, 16:00, 17:00, 18:00 UTC | Email 12:20 UTC
 - **Region**: `eu-west-1` everywhere
 
 ## Updating the analysis Lambda

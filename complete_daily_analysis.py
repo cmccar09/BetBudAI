@@ -226,12 +226,13 @@ def _classify_race_type(market_name: str) -> str:
     return 'Flat'
 
 
-def analyze_and_save_all():
+def analyze_and_save_all(force_reanalyse: bool = False):
     """
     Two-pass algorithm:
       Pass 1 — Score every horse, collect per-race bests.
       Select top-5 cross-race bests.
       Pass 2 — Save everything with correct show_in_ui flag.
+    force_reanalyse: bypass the 12:00 UTC pick lock (use when scoring logic has changed).
     """
     races = load_races()
     if not races:
@@ -391,7 +392,7 @@ def analyze_and_save_all():
     # freeze them for the rest of the day — no additions, no removals.
     # This preserves the morning selection even if later refreshes would swap picks.
     _LOCK_HOUR_UTC = 12
-    if now_utc.hour >= _LOCK_HOUR_UTC and _existing_ui_count >= 1:
+    if now_utc.hour >= _LOCK_HOUR_UTC and _existing_ui_count >= 1 and not force_reanalyse:
         print(f"  PICKS LOCKED at {now_utc.strftime('%H:%M')} UTC — "
               f"{_existing_ui_count} picks set; skipping selection pass.")
         return {

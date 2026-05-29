@@ -49,8 +49,11 @@ def lambda_handler(event, context):
     # ── Run analysis ─────────────────────────────────────────────────────────
     # complete_daily_analysis reads 'response_horses.json' from cwd (/tmp)
     from complete_daily_analysis import analyze_and_save_all
+    force_reanalyse = bool(event.get('force_reanalyse', False))
+    if force_reanalyse:
+        print(f"[sf_analysis] FORCE REANALYSE — bypassing pick lock for {date_str}")
     print(f"[sf_analysis] Scoring all horses and selecting top picks for {date_str} ...")
-    analyze_and_save_all()
+    analyze_and_save_all(force_reanalyse=force_reanalyse)
 
     # ── Count saved UI picks (paginated — table has 400+ items/day, may exceed 1MB) ──
     db    = boto3.resource('dynamodb', region_name=REGION)
