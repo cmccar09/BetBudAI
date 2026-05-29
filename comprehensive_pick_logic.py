@@ -525,7 +525,47 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
         breakdown['winless_penalty'] = _winless_penalty
     else:
         breakdown['winless_penalty'] = 0
-    
+
+    # Gate S19 — EXPOSED MAIDEN FAVOURITE TRAP
+    # LESSON 2026-05-29: Food For Thought (1.9, 5★TF, Beckett) — hammered favourite in a
+    # 5-runner maiden, had 2 runs (6th, 2nd), 0 wins. Gate S18 doesn't fire (needs 3+ runs).
+    # But in a maiden race, a short-priced horse with multiple runs and no win is the most
+    # common lay scenario. Trainer/Timeform reputation lifts the score; the fact it's been
+    # beaten in a maiden already should counteract that. Penalty grows with runs: 2 runs = -10,
+    # and applies regardless of Timeform stars (unlike S18's exception — if it can't win a maiden
+    # with 5-star TF, the Timeform rating may simply be inflated by breeding, not racecourse form).
+    _s19_race_type = horse_data.get('_race_type', '')
+    _s19_is_maiden = 'maiden' in _s19_race_type.lower() or _s19_race_type == 'Maiden'
+    _s19_runs = _s18_runs  # reuse run count from above
+    if _s19_is_maiden and wins == 0 and _s19_runs >= 2:
+        _odds_val = float(odds) if odds else 99.0
+        if _odds_val < 3.5:
+            # Short-priced maiden horse with 2+ runs and no win — exposed favourite
+            _mfp = -15
+            score += _mfp
+            breakdown['maiden_fav_penalty'] = _mfp
+            reasons.append(f"⚠ Exposed maiden favourite: {_s19_runs} runs, 0 wins, {_odds_val:.1f} odds: {_mfp}pts")
+        else:
+            # Longer-priced but still penalise — not expected to win and hasn't yet
+            _mfp = -8
+            score += _mfp
+            breakdown['maiden_fav_penalty'] = _mfp
+            reasons.append(f"⚠ Exposed in maiden: {_s19_runs} runs, 0 wins: {_mfp}pts")
+    else:
+        breakdown['maiden_fav_penalty'] = 0
+
+    # Beaten Favourite penalty — in a maiden context specifically this is a red flag.
+    # A horse that was backed to win, failed, and is now back in a maiden again = structural lay.
+    # past_results_flags from Racing API: 'BF' = was beaten favourite.
+    _ra_flags = str((horse_data.get('ra_data') or {}).get('past_results_flags') or '').upper()
+    if 'BF' in _ra_flags:
+        _bf_penalty = -10 if _s19_is_maiden else -5
+        score += _bf_penalty
+        breakdown['beaten_fav_penalty'] = _bf_penalty
+        reasons.append(f"⚠ Beaten favourite in previous run: {_bf_penalty}pts")
+    else:
+        breakdown['beaten_fav_penalty'] = 0
+
     # 4. COURSE BONUS
     course_bonus_pts = int(weights['course_bonus'])
     if course_winners_today > 0:

@@ -554,6 +554,7 @@ def analyze_and_save_all(force_reanalyse: bool = False):
             if race.get('ourhub_going'):
                 runner['_race_ourhub_going'] = race['ourhub_going']
             runner['distance_f'] = _dist_f
+            runner['_race_type']  = _classify_race_type(market_name)
 
             score, breakdown, reasons = analyze_horse_comprehensive(
                 runner,
