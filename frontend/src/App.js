@@ -1028,6 +1028,7 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
   const [upgradeLoading, setUpgradeLoading] = useState(null);
   const [upgradeError, setUpgradeError]     = useState(null);
   const [expandedCards, setExpandedCards]   = useState(new Set());
+  const [showReadGuide, setShowReadGuide]   = useState(false);
 
   const doSubscribe = async (tier) => {
     if (!authUser?.email) return;
@@ -1280,6 +1281,62 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
           </div>
         </div>
       )}
+
+      {/* How to Read Your Pick guide */}
+      <div style={{ marginBottom:'12px' }}>
+        <button
+          onClick={() => setShowReadGuide(v => !v)}
+          style={{ background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', padding:'0', marginBottom: showReadGuide ? '10px' : '0' }}
+        >
+          <span style={{ fontSize:'12px', fontWeight:'700', color:'rgba(255,255,255,0.7)', letterSpacing:'0.4px', textTransform:'uppercase' }}>ⓘ HOW TO READ YOUR PICK</span>
+          <span style={{ color:'rgba(255,255,255,0.5)', fontSize:'11px' }}>{showReadGuide ? '▲ hide' : '▼ show'}</span>
+        </button>
+        {showReadGuide && (
+          <div style={{ background:'linear-gradient(135deg,#0f172a 0%,#1e293b 100%)', borderRadius:'14px', padding: isMobile ? '16px 14px' : '22px 24px', border:'1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ marginBottom:'14px' }}>
+              <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight:'800', color:'white', marginBottom:'4px' }}>HOW TO READ YOUR PICK ⓘ</div>
+              <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.6)', lineHeight:'1.5' }}>Our picks combine value, confidence and data coverage. When all 3 are strong, that's a high-conviction bet.</div>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gap:'12px', marginBottom:'14px' }}>
+              {/* EV */}
+              <div style={{ background:'rgba(16,185,129,0.1)', borderRadius:'10px', padding:'14px', border:'1px solid rgba(16,185,129,0.25)' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'8px' }}>
+                  <span style={{ fontSize:'20px' }}>📈</span>
+                  <span style={{ fontSize:'13px', fontWeight:'800', color:'#34d399' }}>EV (Expected Value)</span>
+                </div>
+                <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.72)', lineHeight:'1.5', marginBottom:'8px' }}>Shows whether the odds offer value. Positive EV means the price is bigger than our true win chance.</div>
+                <span style={{ background:'rgba(16,185,129,0.2)', color:'#34d399', border:'1px solid rgba(16,185,129,0.4)', borderRadius:'5px', padding:'2px 8px', fontSize:'11px', fontWeight:'700' }}>Green = value ✓</span>
+              </div>
+              {/* Kelly */}
+              <div style={{ background:'rgba(124,58,237,0.1)', borderRadius:'10px', padding:'14px', border:'1px solid rgba(124,58,237,0.25)' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'8px' }}>
+                  <span style={{ fontSize:'20px' }}>💡</span>
+                  <span style={{ fontSize:'13px', fontWeight:'800', color:'#a78bfa' }}>Kelly Criterion</span>
+                </div>
+                <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.72)', lineHeight:'1.5', marginBottom:'8px' }}>Tells you how strong the edge is and suggests an optimal stake % of your bankroll.</div>
+                <span style={{ background:'rgba(124,58,237,0.2)', color:'#a78bfa', border:'1px solid rgba(124,58,237,0.4)', borderRadius:'5px', padding:'2px 8px', fontSize:'11px', fontWeight:'700' }}>Higher % = stronger edge</span>
+              </div>
+              {/* Race Data Coverage */}
+              <div style={{ background:'rgba(59,130,246,0.1)', borderRadius:'10px', padding:'14px', border:'1px solid rgba(59,130,246,0.25)' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'8px' }}>
+                  <span style={{ fontSize:'20px' }}>📊</span>
+                  <span style={{ fontSize:'13px', fontWeight:'800', color:'#60a5fa' }}>Race Data Coverage</span>
+                </div>
+                <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.72)', lineHeight:'1.5', marginBottom:'8px' }}>% of runners with full form data before the pick was made. Higher % = more confidence.</div>
+                <span style={{ background:'rgba(59,130,246,0.2)', color:'#60a5fa', border:'1px solid rgba(59,130,246,0.4)', borderRadius:'5px', padding:'2px 8px', fontSize:'11px', fontWeight:'700' }}>Higher % = better</span>
+              </div>
+            </div>
+            {/* Strongest signals row */}
+            <div style={{ background:'rgba(255,255,255,0.05)', borderRadius:'8px', padding:'10px 14px', display:'flex', flexWrap:'wrap', alignItems:'center', gap:'10px' }}>
+              <span style={{ fontSize:'16px' }}>🎯</span>
+              <span style={{ fontSize:'12px', fontWeight:'700', color:'rgba(255,255,255,0.8)', marginRight:'4px' }}>Strongest signals:</span>
+              <span style={{ background:'rgba(16,185,129,0.15)', color:'#34d399', border:'1px solid rgba(16,185,129,0.3)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>✓ Positive EV</span>
+              <span style={{ background:'rgba(124,58,237,0.15)', color:'#a78bfa', border:'1px solid rgba(124,58,237,0.3)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>✓ Kelly 5%+</span>
+              <span style={{ background:'rgba(59,130,246,0.15)', color:'#60a5fa', border:'1px solid rgba(59,130,246,0.3)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>✓ 75%+ Race Data</span>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Picks */}
       {visiblePicks.length === 0 ? (
@@ -2281,6 +2338,7 @@ function Top5PicksView() {
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
   const [now, setNow]           = useState(new Date());
   const [expandedCards5, setExpandedCards5] = useState(new Set());
+  const [showReadGuide5, setShowReadGuide5] = useState(false);
 
   // Dublin-timezone-aware helpers — all time comparisons must use Dublin tz
   // to match displayed times (which use Europe/Dublin)
@@ -2575,6 +2633,58 @@ function Top5PicksView() {
           </span>
         </div>
       )}
+
+      {/* How to Read Your Pick guide */}
+      <div style={{ marginBottom:'12px' }}>
+        <button
+          onClick={() => setShowReadGuide5(v => !v)}
+          style={{ background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', padding:'0', marginBottom: showReadGuide5 ? '10px' : '0' }}
+        >
+          <span style={{ fontSize:'12px', fontWeight:'700', color:'rgba(255,255,255,0.7)', letterSpacing:'0.4px', textTransform:'uppercase' }}>ⓘ HOW TO READ YOUR PICK</span>
+          <span style={{ color:'rgba(255,255,255,0.5)', fontSize:'11px' }}>{showReadGuide5 ? '▲ hide' : '▼ show'}</span>
+        </button>
+        {showReadGuide5 && (
+          <div style={{ background:'linear-gradient(135deg,#0f172a 0%,#1e293b 100%)', borderRadius:'14px', padding: isMobile ? '16px 14px' : '22px 24px', border:'1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ marginBottom:'14px' }}>
+              <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight:'800', color:'white', marginBottom:'4px' }}>HOW TO READ YOUR PICK ⓘ</div>
+              <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.6)', lineHeight:'1.5' }}>Our picks combine value, confidence and data coverage. When all 3 are strong, that's a high-conviction bet.</div>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gap:'12px', marginBottom:'14px' }}>
+              <div style={{ background:'rgba(16,185,129,0.1)', borderRadius:'10px', padding:'14px', border:'1px solid rgba(16,185,129,0.25)' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'8px' }}>
+                  <span style={{ fontSize:'20px' }}>📈</span>
+                  <span style={{ fontSize:'13px', fontWeight:'800', color:'#34d399' }}>EV (Expected Value)</span>
+                </div>
+                <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.72)', lineHeight:'1.5', marginBottom:'8px' }}>Shows whether the odds offer value. Positive EV means the price is bigger than our true win chance.</div>
+                <span style={{ background:'rgba(16,185,129,0.2)', color:'#34d399', border:'1px solid rgba(16,185,129,0.4)', borderRadius:'5px', padding:'2px 8px', fontSize:'11px', fontWeight:'700' }}>Green = value ✓</span>
+              </div>
+              <div style={{ background:'rgba(124,58,237,0.1)', borderRadius:'10px', padding:'14px', border:'1px solid rgba(124,58,237,0.25)' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'8px' }}>
+                  <span style={{ fontSize:'20px' }}>💡</span>
+                  <span style={{ fontSize:'13px', fontWeight:'800', color:'#a78bfa' }}>Kelly Criterion</span>
+                </div>
+                <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.72)', lineHeight:'1.5', marginBottom:'8px' }}>Tells you how strong the edge is and suggests an optimal stake % of your bankroll.</div>
+                <span style={{ background:'rgba(124,58,237,0.2)', color:'#a78bfa', border:'1px solid rgba(124,58,237,0.4)', borderRadius:'5px', padding:'2px 8px', fontSize:'11px', fontWeight:'700' }}>Higher % = stronger edge</span>
+              </div>
+              <div style={{ background:'rgba(59,130,246,0.1)', borderRadius:'10px', padding:'14px', border:'1px solid rgba(59,130,246,0.25)' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'8px' }}>
+                  <span style={{ fontSize:'20px' }}>📊</span>
+                  <span style={{ fontSize:'13px', fontWeight:'800', color:'#60a5fa' }}>Race Data Coverage</span>
+                </div>
+                <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.72)', lineHeight:'1.5', marginBottom:'8px' }}>% of runners with full form data before the pick was made. Higher % = more confidence.</div>
+                <span style={{ background:'rgba(59,130,246,0.2)', color:'#60a5fa', border:'1px solid rgba(59,130,246,0.4)', borderRadius:'5px', padding:'2px 8px', fontSize:'11px', fontWeight:'700' }}>Higher % = better</span>
+              </div>
+            </div>
+            <div style={{ background:'rgba(255,255,255,0.05)', borderRadius:'8px', padding:'10px 14px', display:'flex', flexWrap:'wrap', alignItems:'center', gap:'10px' }}>
+              <span style={{ fontSize:'16px' }}>🎯</span>
+              <span style={{ fontSize:'12px', fontWeight:'700', color:'rgba(255,255,255,0.8)', marginRight:'4px' }}>Strongest signals:</span>
+              <span style={{ background:'rgba(16,185,129,0.15)', color:'#34d399', border:'1px solid rgba(16,185,129,0.3)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>✓ Positive EV</span>
+              <span style={{ background:'rgba(124,58,237,0.15)', color:'#a78bfa', border:'1px solid rgba(124,58,237,0.3)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>✓ Kelly 5%+</span>
+              <span style={{ background:'rgba(59,130,246,0.15)', color:'#60a5fa', border:'1px solid rgba(59,130,246,0.3)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>✓ 75%+ Race Data</span>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Official Picks */}
       {(() => {
