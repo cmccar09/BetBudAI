@@ -5945,6 +5945,31 @@ function LayTheFavView() {
               </div>
             </div>
 
+            {/* Lay bet risk/reward */}
+            {r.fav_odds > 0 && (() => {
+              const layWin = 100;
+              const layRisk = Math.round(layWin * (r.fav_odds - 1));
+              const isSettled = r.outcome && ['win','won','loss','lost'].includes(r.outcome.toLowerCase());
+              const favWon = isSettled && ['win','won'].includes(r.outcome.toLowerCase());
+              return (
+                <div style={{ borderTop:'1px solid rgba(255,255,255,0.07)', padding: isMobile ? '10px 14px' : '10px 18px', display:'flex', alignItems:'center', flexWrap:'wrap', gap:'8px' }}>
+                  <span style={{ fontSize:'11px', color:'rgba(255,255,255,0.35)', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.5px', marginRight:'4px' }}>Lay €100 stake →</span>
+                  <span style={{
+                    background: isSettled && !favWon ? 'rgba(52,211,153,0.2)' : 'rgba(52,211,153,0.1)',
+                    color: isSettled && !favWon ? '#34d399' : 'rgba(52,211,153,0.8)',
+                    border: `1px solid ${isSettled && !favWon ? 'rgba(52,211,153,0.6)' : 'rgba(52,211,153,0.25)'}`,
+                    borderRadius:'5px', padding:'3px 10px', fontSize:'12px', fontWeight:'800',
+                  }}>✓ Win €{layWin} if loses</span>
+                  <span style={{
+                    background: isSettled && favWon ? 'rgba(248,113,113,0.2)' : 'rgba(248,113,113,0.08)',
+                    color: isSettled && favWon ? '#f87171' : 'rgba(248,113,113,0.7)',
+                    border: `1px solid ${isSettled && favWon ? 'rgba(248,113,113,0.6)' : 'rgba(248,113,113,0.2)'}`,
+                    borderRadius:'5px', padding:'3px 10px', fontSize:'12px', fontWeight:'800',
+                  }}>✗ Lose €{layRisk} if wins</span>
+                </div>
+              );
+            })()}
+
           </div>
         );
       })}
