@@ -190,7 +190,7 @@ function classifyRaceType(marketName) {
   return null;
 }
 function pickRaceType(pick) {
-  return pick.race_type || classifyRaceType(pick.market_name) || null;
+  return pick.race_type || classifyRaceType(pick.market_name) || classifyRaceType(pick.bet_type) || null;
 }
 
 // Parse UTC race_time string and display in BST (Europe/Dublin)
