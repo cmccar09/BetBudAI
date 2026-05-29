@@ -474,13 +474,28 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
     if wins > 0:
         reasons.append(f"{wins} total wins: {win_points}pts")
     
-    # Consistency (places)
+    # Consistency (places) — capped at 3 places worth
+    # LESSON 2026-05-29: El Nay scored 36pts from 6 places but had 0 career wins.
+    # Placing is not winning. Cap at 3 places to prevent place-form dominating the score.
     place_pts_each = int(weights['consistency'])
-    place_points = places * place_pts_each
+    place_points = min(places * place_pts_each, place_pts_each * 3)
     score += place_points
     breakdown['consistency'] = place_points
     if places > 0:
         reasons.append(f"{places} places (2nd/3rd): {place_points}pts")
+
+    # Gate S17 — WINLESS WITH CHANCES PENALTY
+    # LESSON 2026-05-29: El Nay had 0 wins from 3 runs, all places, but still scored 102pts.
+    # A horse that has run 3+ times without winning has had enough chances — it lacks the
+    # finishing gear to convert. Penalise these to prevent place-form masquerading as win form.
+    _s17_runs = len(form.replace('-', '')) if form else 0
+    if wins == 0 and places >= 3 and _s17_runs >= 3:
+        _winless_penalty = -15
+        score += _winless_penalty
+        breakdown['winless_penalty'] = _winless_penalty
+        reasons.append(f"⚠ Winless despite {_s17_runs} runs ({places} places, 0 wins): {_winless_penalty}pts")
+    else:
+        breakdown['winless_penalty'] = 0
     
     # 4. COURSE BONUS
     course_bonus_pts = int(weights['course_bonus'])
@@ -1570,8 +1585,10 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
         _uex_age = int(horse_data.get('age', 0) or 0)
     except (TypeError, ValueError):
         pass
+    # Tightened 2026-05-29: require places < 3 — a horse placed in 3+ runs without winning
+    # is NOT unexposed, it's consistently losing. "Unexposed" means truly lightly-raced.
     if (_uex_age and _uex_age <= 5 and _uex_runs <= 5
-            and wins == 0 and places >= 1 and 4.0 <= odds <= 10.0):
+            and wins == 0 and places >= 1 and places < 3 and 4.0 <= odds <= 10.0):
         score += _uex_pts
         breakdown['unexposed_bonus'] = _uex_pts
         reasons.append(f"Unexposed {_uex_age}yo improver ({_uex_runs} runs, {places} place(s)): +{_uex_pts}pts")
