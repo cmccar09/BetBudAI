@@ -1765,19 +1765,17 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
             reasons.append(f"Drop in grade (was class 1-3, today class 4+): +{pts}pts")
 
         if form_detail_pts > 0:
-            # Cap: deep form cannot exceed 25% of the pre-deep-form base score.
-            # Prevents historical form history from dominating the entire pick when
-            # the base signals (market, trainer, recent form) are weak.
-            # 16pt minimum always allowed (one strong C&D or going-win signal).
-            # Lesson 2026-05-31: Little Lady Lucy deep_form=28pts on a base of 90
-            # vs Stellarmasterpiece (6/4 fav) score=30 — divergence alert, not a cap.
-            # Cap protects against more extreme inflation (e.g. base=30, deep_form=60).
+            # Cap: deep form cannot exceed 15% of the pre-deep-form base score.
+            # LOWERED 2026-06-02: Was 25%. At base=90, 25% cap = 22pts deep_form allowed.
+            # At 90pt base that was Rickety Bridge scoring 50pts deep_form (pre-fix).
+            # Winner profile (93pts avg) requires deep form to be proportionate, not dominant.
+            # 15% of 90 = 13pts; 12pt minimum always allowed (one solid C&D or going-win signal).
             _score_before_df = score
-            _deep_form_cap = max(16, int(_score_before_df * 0.25))
+            _deep_form_cap = max(12, int(_score_before_df * 0.15))
             if form_detail_pts > _deep_form_cap:
                 reasons.append(
                     f"Deep Form capped ({form_detail_pts}→{_deep_form_cap}pts: "
-                    f"exceeds 25% of {_score_before_df}pt base score)"
+                    f"exceeds 15% of {_score_before_df}pt base score)"
                 )
                 form_detail_pts = _deep_form_cap
             score += form_detail_pts
@@ -2182,12 +2180,14 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
     else:
         breakdown['race_type_adj'] = 0
 
-    # ── GENERAL SCORE CAP: 120pts ────────────────────────────────────────────
+    # ── GENERAL SCORE CAP: 108pts ────────────────────────────────────────────
     # LESSON 2026-04-17: Marty McFly scored 145 (9th of 9), Solar Pass 142 (5th of 6).
     # UPDATED 2026-04-18: Backtest shows score 110-120 has 60% WR vs 120+ at 28.6%.
-    # Raising cap 110→120 preserves the high-WR 110-120 signal while still capping
-    # runaway 130+ scores that give false confidence.
-    GENERAL_CAP = 120
+    # LOWERED 2026-06-02: Winner profile (30-day analysis) averages 93pts. Complete_daily_analysis
+    # adds market_leader (+16), db_history (+15), steam (+15) on top of this cap, pushing final
+    # scores to 131-136 where all picks cluster at ceiling with NO differentiation.
+    # Cap lowered 120→108 so post-function additions land in the 108-120 winner range.
+    GENERAL_CAP = 108
     if score > GENERAL_CAP:
         cap_reduction = score - GENERAL_CAP
         score = GENERAL_CAP

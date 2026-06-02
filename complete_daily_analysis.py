@@ -696,6 +696,20 @@ def analyze_and_save_all(force_reanalyse: bool = False):
             else:
                 breakdown['price_steam'] = 0
 
+            # ── FINAL SCORE CAP ──────────────────────────────────────────────────
+            # comprehensive_pick_logic.py caps the function score at 108, but market_leader
+            # (+16), db_history (+15), and price_steam (+15) are added here afterwards.
+            # Without this cap, final scores reach 131-136 where ALL picks cluster at the
+            # ceiling and the model can no longer differentiate between them.
+            # Winner profile avg is 93pts — final cap of 120 keeps scores spread in the
+            # realistic winner range (85-115) where the model has actual predictive power.
+            _FINAL_SCORE_CAP = 120
+            if score > _FINAL_SCORE_CAP:
+                _fsc_reduction = score - _FINAL_SCORE_CAP
+                score = _FINAL_SCORE_CAP
+                breakdown['final_score_cap'] = -_fsc_reduction
+                reasons.append(f"Final cap {_FINAL_SCORE_CAP}pts (post-enrichment was {score + _fsc_reduction:.0f}): -{_fsc_reduction:.0f}pts")
+
             # Track this race's market favourite so divergence check can run after selection
             if odds > 1.0 and odds == favourite_odds:
                 _race_fav_score = score
