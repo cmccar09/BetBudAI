@@ -1765,6 +1765,21 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
             reasons.append(f"Drop in grade (was class 1-3, today class 4+): +{pts}pts")
 
         if form_detail_pts > 0:
+            # Cap: deep form cannot exceed 25% of the pre-deep-form base score.
+            # Prevents historical form history from dominating the entire pick when
+            # the base signals (market, trainer, recent form) are weak.
+            # 16pt minimum always allowed (one strong C&D or going-win signal).
+            # Lesson 2026-05-31: Little Lady Lucy deep_form=28pts on a base of 90
+            # vs Stellarmasterpiece (6/4 fav) score=30 — divergence alert, not a cap.
+            # Cap protects against more extreme inflation (e.g. base=30, deep_form=60).
+            _score_before_df = score
+            _deep_form_cap = max(16, int(_score_before_df * 0.25))
+            if form_detail_pts > _deep_form_cap:
+                reasons.append(
+                    f"Deep Form capped ({form_detail_pts}→{_deep_form_cap}pts: "
+                    f"exceeds 25% of {_score_before_df}pt base score)"
+                )
+                form_detail_pts = _deep_form_cap
             score += form_detail_pts
             breakdown['deep_form'] = form_detail_pts
         else:

@@ -416,16 +416,21 @@ def lambda_handler(event, context):
         })
 
 def get_all_picks(headers):
-    """Get all picks from DynamoDB"""
-    response = table.scan()
-    items = response.get('Items', [])
-    
-    # Convert Decimals to floats
+    """Get picks from DynamoDB (last 7 days — avoids full table scan)"""
+    items = []
+    today = datetime.now(timezone.utc)
+    for days_back in range(7):
+        d = (today - timedelta(days=days_back)).strftime('%Y-%m-%d')
+        qkw = {'KeyConditionExpression': Key('bet_date').eq(d)}
+        while True:
+            resp = table.query(**qkw)
+            items.extend(resp.get('Items', []))
+            lek = resp.get('LastEvaluatedKey')
+            if not lek:
+                break
+            qkw['ExclusiveStartKey'] = lek
     items = [decimal_to_float(item) for item in items]
-    
-    # Sort by timestamp descending
     items.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
-    
     return {
         'statusCode': 200,
         'headers': headers,

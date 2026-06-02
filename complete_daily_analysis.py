@@ -62,29 +62,58 @@ MIN_CONFIDENCE_NORACE = 75   # Conditions / novice / maiden races: smaller field
 
 def load_horse_history():
     """
-    Scan DynamoDB for all previous results (analysis_type=comprehensive_7factor)
-    where result_won is set.  Returns a dict: horse_name -> {wins, runs, win_rate}.
-    Used to enrich scoring context with database knowledge of each horse.
+    Query analysis_type-bet_date-index GSI for settled picks in the last 180 days.
+    Returns dict: horse_name -> {wins: int, runs: int, win_rate: float}.
+    Falls back to full scan if the GSI is unavailable (e.g. still backfilling).
     """
-    print("Loading horse history from DynamoDB...")
-    history = {}  # horse -> {'wins': int, 'runs': int}
-    kwargs = {'FilterExpression': Attr('analysis_type').eq('comprehensive_7factor') & Attr('result_won').exists()}
-    while True:
-        resp = table.scan(**kwargs)
-        for item in resp.get('Items', []):
-            name = item.get('horse', item.get('horse_name', ''))
-            if not name:
-                continue
-            won = item.get('result_won') in (True, 'true', 'True', 1, '1')
-            rec = history.setdefault(name, {'wins': 0, 'runs': 0})
-            rec['runs'] += 1
-            if won:
-                rec['wins'] += 1
-        lk = resp.get('LastEvaluatedKey')
-        if not lk:
-            break
-        kwargs['ExclusiveStartKey'] = lk
-    # Compute win rate
+    from boto3.dynamodb.conditions import Key
+    print("Loading horse history from DynamoDB (GSI, 180-day window)...")
+    history = {}
+    today  = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=180)).strftime('%Y-%m-%d')
+    try:
+        kwargs = {
+            'IndexName': 'analysis_type-bet_date-index',
+            'KeyConditionExpression': (
+                Key('analysis_type').eq('comprehensive_7factor') &
+                Key('bet_date').between(cutoff, today)
+            ),
+            'FilterExpression': Attr('result_won').exists(),
+        }
+        while True:
+            resp = table.query(**kwargs)
+            for item in resp.get('Items', []):
+                name = item.get('horse', item.get('horse_name', ''))
+                if not name:
+                    continue
+                won = item.get('result_won') in (True, 'true', 'True', 1, '1')
+                rec = history.setdefault(name, {'wins': 0, 'runs': 0})
+                rec['runs'] += 1
+                if won:
+                    rec['wins'] += 1
+            lk = resp.get('LastEvaluatedKey')
+            if not lk:
+                break
+            kwargs['ExclusiveStartKey'] = lk
+    except Exception as _gsi_err:
+        print(f"  [WARN] GSI query failed ({_gsi_err}), falling back to full scan")
+        history = {}
+        scan_kwargs = {'FilterExpression': Attr('analysis_type').eq('comprehensive_7factor') & Attr('result_won').exists()}
+        while True:
+            resp = table.scan(**scan_kwargs)
+            for item in resp.get('Items', []):
+                name = item.get('horse', item.get('horse_name', ''))
+                if not name:
+                    continue
+                won = item.get('result_won') in (True, 'true', 'True', 1, '1')
+                rec = history.setdefault(name, {'wins': 0, 'runs': 0})
+                rec['runs'] += 1
+                if won:
+                    rec['wins'] += 1
+            lk = resp.get('LastEvaluatedKey')
+            if not lk:
+                break
+            scan_kwargs['ExclusiveStartKey'] = lk
     for name, rec in history.items():
         rec['win_rate'] = rec['wins'] / rec['runs'] if rec['runs'] > 0 else 0.0
     print(f"  Horse history loaded: {len(history)} horses tracked in DB")
@@ -546,6 +575,8 @@ def analyze_and_save_all(force_reanalyse: bool = False):
                 _dist_f = int(_dm.group(4))
 
         race_runners = []
+        _race_fav_score = 0   # favourite's score after all bonuses (set in runner loop)
+        _race_fav_horse = ''
         for runner in runners:
             horse_name = runner.get('name', 'Unknown')
             odds       = float(runner.get('odds', 0))
@@ -616,6 +647,22 @@ def analyze_and_save_all(force_reanalyse: bool = False):
                 reasons.append(f"Market second choice: +{market_leader_bonus}pts")
                 breakdown['market_leader'] = market_leader_bonus
 
+            # Market-leader floor: a short-priced favourite (≤1.80) that scores
+            # below 50 has NO form data in our model but the market still backs it.
+            # Floor to 50 so it surfaces in competitor analysis rather than being
+            # buried at the noise floor. Lesson 2026-05-31: Stellarmasterpiece 6/4,
+            # model score=30, won vs our 118-point pick Little Lady Lucy.
+            if odds > 1.0 and odds == favourite_odds and odds <= 1.80 and score < 50:
+                _floor_bump = 50 - score
+                score += _floor_bump
+                breakdown['market_leader_no_form'] = _floor_bump
+                reasons.append(
+                    f"Short-priced favourite ({odds:.2f}) — no model data, "
+                    f"score floored to 50: +{_floor_bump}pts"
+                )
+            else:
+                breakdown.setdefault('market_leader_no_form', 0)
+
             # ── Price steam / drift bonus (2026-03-30) ───────────────────────
             # Detected by betfair_odds_fetcher.py price_history comparison.
             # 'steaming' = price dropped ≥20% since last fetch (smart money in).
@@ -648,6 +695,11 @@ def analyze_and_save_all(force_reanalyse: bool = False):
                 breakdown['price_steam'] = -_drift_pts
             else:
                 breakdown['price_steam'] = 0
+
+            # Track this race's market favourite so divergence check can run after selection
+            if odds > 1.0 and odds == favourite_odds:
+                _race_fav_score = score
+                _race_fav_horse = horse_name
 
             confidence_level, confidence_grade, confidence_color = tier_from_score(score)
 
@@ -766,6 +818,9 @@ def analyze_and_save_all(force_reanalyse: bool = False):
             'n_runners':         len(runners),
             'sl_declared_count': sl_count,
             'missing_runners':   missing_runners,
+            'fav_horse':         _race_fav_horse,
+            'fav_score':         _race_fav_score,
+            'fav_odds':          favourite_odds,
         })
 
     # ── SELECT TOP 5 CROSS-RACE BESTS ────────────────────────────────────────
@@ -1217,6 +1272,27 @@ def analyze_and_save_all(force_reanalyse: bool = False):
     eligible.sort(key=lambda r: _selection_score(r), reverse=True)
 
     top_picks = eligible[:_effective_target]
+
+    # ── FAVOURITE MISMATCH CHECK ──────────────────────────────────────────────
+    # Warn when our pick races against a well-backed favourite (≤1.80) that our
+    # model couldn't score above 50 — we have no form data on the actual market
+    # leader. Lesson 2026-05-31: Stellarmasterpiece 6/4, score=30, won vs 118-pt pick.
+    for _tp in top_picks:
+        _fav_horse = _tp.get('fav_horse', '')
+        _fav_score = float(_tp.get('fav_score', 99))
+        _fav_odds  = float(_tp.get('fav_odds', 99))
+        _our_horse = _tp['best']['horse']
+        if _our_horse != _fav_horse and _fav_score < 50 and _fav_odds <= 1.80:
+            _mismatch_warn = (
+                f"FAVOURITE_MISMATCH: {_fav_horse} is the {_fav_odds:.2f} market leader "
+                f"but scored only {_fav_score:.0f} — our model has no form data on it. "
+                f"Pick ({_our_horse}) beats an unscorable favourite: confidence reduced."
+            )
+            _tp['best']['item'].setdefault('warnings', []).append(_mismatch_warn)
+            _tp['best']['item']['favourite_mismatch'] = True
+            print(f"  [⚠ FAVOURITE MISMATCH] {_tp['venue']} {_tp.get('race_time', '')[:16]}: "
+                  f"our pick={_our_horse}, market fav={_fav_horse} "
+                  f"({_fav_odds:.2f}) scored only {_fav_score:.0f}")
 
     # ── HOT PROSPECT BONUS SLOT ──────────────────────────────────────────────
     # Allow a 6th pick ONLY if a genuinely exceptional candidate exists beyond
