@@ -470,20 +470,51 @@ def analyze_and_save_all(force_reanalyse: bool = False):
     # PICK LOCK: once the daily target is filled (2 picks), freeze for the rest of the day.
     # Also lock if it's past 12:00 UTC and any picks exist (belt-and-braces for partial days).
     # force_reanalyse bypasses both locks (used when scoring logic has changed mid-day).
+    # Locked runs still do an odds-only refresh so subscribers see the current Betfair price.
     _target_filled = _existing_ui_count >= MAX_DAILY_UI_PICKS
     _time_lock     = now_utc.hour >= 12 and _existing_ui_count >= 1
     if (_target_filled or _time_lock) and not force_reanalyse:
         reason = "target filled" if _target_filled else "12:00 UTC time lock"
         print(f"  PICKS LOCKED ({reason}) at {now_utc.strftime('%H:%M')} UTC — "
-              f"{_existing_ui_count}/{MAX_DAILY_UI_PICKS} picks set; skipping selection pass.")
+              f"{_existing_ui_count}/{MAX_DAILY_UI_PICKS} picks set; refreshing odds only.")
+
+        # Build horse→current_odds lookup from the freshly-fetched Betfair data
+        _live_odds: dict[str, float] = {}
+        for _race in races:
+            for _runner in _race.get('runners', []):
+                _rname = (_runner.get('name') or '').strip().lower()
+                _rodds = float(_runner.get('odds', 0) or 0)
+                if _rname and _rodds > 0:
+                    _live_odds[_rname] = _rodds
+
+        _odds_updated = 0
+        for _pick in _existing_ui:
+            _horse_key = (_pick.get('horse') or '').strip().lower()
+            _new_odds  = _live_odds.get(_horse_key, 0)
+            _old_odds  = float(_pick.get('odds', 0) or 0)
+            if _new_odds > 0 and abs(_new_odds - _old_odds) >= 0.05:
+                try:
+                    table.update_item(
+                        Key={'bet_date': today, 'bet_id': _pick['bet_id']},
+                        UpdateExpression='SET odds = :o, decimal_odds = :o',
+                        ExpressionAttributeValues={':o': Decimal(str(round(_new_odds, 2)))}
+                    )
+                    print(f"  [ODDS REFRESH] {_pick.get('horse')} "
+                          f"{_old_odds:.2f} → {_new_odds:.2f}")
+                    _odds_updated += 1
+                except Exception as _oe:
+                    print(f"  [ODDS REFRESH ERROR] {_pick.get('horse')}: {_oe}")
+
+        print(f"  Odds refresh complete: {_odds_updated}/{_existing_ui_count} picks updated.")
         return {
             'statusCode': 200,
             'body': json.dumps({
                 'success': True,
                 'picks_locked': True,
                 'picks_count': _existing_ui_count,
+                'odds_refreshed': _odds_updated,
                 'date': today,
-                'message': f'Picks locked ({reason}). {_existing_ui_count} picks stand for today.'
+                'message': f'Picks locked ({reason}). Odds refreshed for {_odds_updated} picks.'
             })
         }
 
