@@ -131,7 +131,7 @@ def analyze_performance_patterns(results):
     
     return analysis
 
-def generate_learning_insights(analysis, min_sample_size=20):
+def generate_learning_insights(analysis, min_sample_size=8):
     """Generate actionable insights from performance analysis
     
     Args:

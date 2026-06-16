@@ -50,14 +50,9 @@ except ImportError:
 db    = boto3.resource('dynamodb', region_name='eu-west-1')
 table = db.Table('SureBetBets')
 
-TARGET_PICKS   = 5      # 2026-04-17: Max 5 picks per day total (free users see top 2, paid see all 5).
-                        # Intraday picks are added via /api/picks/intraday with pick_type='intraday'.
-MIN_CONFIDENCE        = 78    # Global floor (fallback only — race-type thresholds below take precedence)
-MIN_CONFIDENCE_HCAP   = 85   # 2026-04-06: Handicaps need higher conviction — handicapper designs
-                              # these races to be competitive and hard to predict. A score of 78-84
-                              # in a handicap provides insufficient model edge vs field variance.
-MIN_CONFIDENCE_NORACE = 75   # Conditions / novice / maiden races: smaller fields, less weight chaos,
-                              # form signals more reliable → lower threshold is appropriate.
+TARGET_PICKS   = 2      # 2026-06-16: data-driven reset. 75 settled picks show 66.7% WR only in
+                        # non-handicap 2.0-3.5 odds band. 2 high-quality picks beats 5 speculative ones.
+MIN_CONFIDENCE = 60     # Soft floor — race-type + odds window do the real filtering now.
 
 
 def load_horse_history():
@@ -129,6 +124,57 @@ def load_races():
     except FileNotFoundError:
         print("ERROR: Run 'python betfair_odds_fetcher.py' first")
         return []
+
+
+def _merge_racing_api_races(betfair_races: list[dict], api_key: str) -> list[dict]:
+    """
+    Option 3: Supplement Betfair races with any UK/Irish races from Racing API
+    that are not already in our Betfair pool (e.g. small meetings, AW cards not
+    yet showing in Betfair, or races where Betfair fetch had a gap).
+
+    Matching logic: normalise course name + HH:MM race time.  If a Racing API
+    race matches an existing Betfair race we skip it (Betfair has live odds and
+    takes priority).  Unmatched races are appended with source='racing_api' so
+    form enrichment and scoring still run on them; they are excluded from the
+    final UI picks if odds are 0 (no Betfair market confirmed yet).
+    """
+    try:
+        from form_enricher import fetch_racing_api_race_list
+    except ImportError:
+        return betfair_races
+
+    ra_races = fetch_racing_api_race_list(
+        datetime.now(timezone.utc).strftime('%Y-%m-%d'), api_key
+    )
+    if not ra_races:
+        return betfair_races
+
+    def _race_key(course: str, race_time: str) -> str:
+        course_slug = re.sub(r'[^a-z0-9]', '', (course or '').lower())
+        # Normalise time to HH:MM
+        t = re.search(r'(\d{2}):?(\d{2})', str(race_time or ''))
+        time_str = f"{t.group(1)}:{t.group(2)}" if t else ''
+        return f"{course_slug}_{time_str}"
+
+    existing_keys = {_race_key(r.get('course', ''), r.get('race_time', ''))
+                     for r in betfair_races}
+
+    added = 0
+    merged = list(betfair_races)
+    for ra_race in ra_races:
+        key = _race_key(ra_race.get('course', ''), ra_race.get('race_time', ''))
+        if key not in existing_keys:
+            merged.append(ra_race)
+            existing_keys.add(key)
+            added += 1
+
+    if added:
+        print(f"  [Option 3] Racing API added {added} races not in Betfair pool "
+              f"(total: {len(merged)} races)")
+    else:
+        print(f"  [Option 3] Racing API race pool check: all {len(ra_races)} RA races "
+              f"already covered by Betfair")
+    return merged
 
 
 def load_sl_declared_field_sizes():
@@ -269,13 +315,18 @@ def analyze_and_save_all(force_reanalyse: bool = False):
         print("No races found — run betfair_odds_fetcher.py first")
         return
 
+    # ── Option 3: Expand race pool with Racing API races not in Betfair ──────
+    _racing_api_key_early = os.environ.get('RACING_API_KEY', '')
+    if _racing_api_key_early:
+        races = _merge_racing_api_races(races, _racing_api_key_early)
+
     # Load SL declared field sizes for S8 completeness gate
     sl_declared = load_sl_declared_field_sizes()
 
     # ── STAGE 0: Load learning insights + structured signals ─────────────────
     # sf_learning writes insights AND structured odds_roi / best_courses to
     # DynamoDB nightly. We consume both here: text insights for logging, structured
-    # signals for live score adjustment in _selection_score() below.
+    # signals from the nightly learning cycle (used for logging).
     import json as _json
     _learning_odds_roi    = {}   # cat -> {roi, win_rate, n}  e.g. 'favorite': {roi:-19.6, n:18}
     _learning_best_courses = []  # venue names with ≥40% WR and ≥5 bets
@@ -401,10 +452,8 @@ def analyze_and_save_all(force_reanalyse: bool = False):
 
     # ── CHECK EXISTING UI PICKS (intraday accumulation guard) ─────────────────
     # Each refresh only fetches FUTURE races, so previous picks are never overwritten.
-    # Without this guard, 3 new picks are added per 2-hour refresh → 9+ picks/day.
-    # Weekends have more racing cards → allow 8 picks; weekdays capped at 5.
-    _dow = datetime.now(timezone.utc).weekday()  # 0=Mon … 6=Sun
-    MAX_DAILY_UI_PICKS = 2 if _dow == 6 else 5  # Sunday capped at 2 (lower-grade cards, 25% WR vs 38% Sat)
+    # Without this guard, new picks are added per 2-hour refresh → too many picks/day.
+    MAX_DAILY_UI_PICKS = 2  # data-driven reset: 2 high-quality picks beats 5 speculative
     from boto3.dynamodb.conditions import Key as _Key
     _existing_resp = table.query(KeyConditionExpression=_Key('bet_date').eq(today))
     _existing_items = _existing_resp.get('Items', [])
@@ -418,13 +467,15 @@ def analyze_and_save_all(force_reanalyse: bool = False):
     now_utc = datetime.now(timezone.utc)
     cutoff  = now_utc + timedelta(minutes=15)
 
-    # PICK LOCK: once it's past 12:00 UTC (1pm BST) and we already have picks,
-    # freeze them for the rest of the day — no additions, no removals.
-    # This preserves the morning selection even if later refreshes would swap picks.
-    _LOCK_HOUR_UTC = 12
-    if now_utc.hour >= _LOCK_HOUR_UTC and _existing_ui_count >= 1 and not force_reanalyse:
-        print(f"  PICKS LOCKED at {now_utc.strftime('%H:%M')} UTC — "
-              f"{_existing_ui_count} picks set; skipping selection pass.")
+    # PICK LOCK: once the daily target is filled (2 picks), freeze for the rest of the day.
+    # Also lock if it's past 12:00 UTC and any picks exist (belt-and-braces for partial days).
+    # force_reanalyse bypasses both locks (used when scoring logic has changed mid-day).
+    _target_filled = _existing_ui_count >= MAX_DAILY_UI_PICKS
+    _time_lock     = now_utc.hour >= 12 and _existing_ui_count >= 1
+    if (_target_filled or _time_lock) and not force_reanalyse:
+        reason = "target filled" if _target_filled else "12:00 UTC time lock"
+        print(f"  PICKS LOCKED ({reason}) at {now_utc.strftime('%H:%M')} UTC — "
+              f"{_existing_ui_count}/{MAX_DAILY_UI_PICKS} picks set; skipping selection pass.")
         return {
             'statusCode': 200,
             'body': json.dumps({
@@ -432,8 +483,7 @@ def analyze_and_save_all(force_reanalyse: bool = False):
                 'picks_locked': True,
                 'picks_count': _existing_ui_count,
                 'date': today,
-                'message': f'Picks locked since {_LOCK_HOUR_UTC:02d}:00 UTC. '
-                           f'{_existing_ui_count} picks stand for today.'
+                'message': f'Picks locked ({reason}). {_existing_ui_count} picks stand for today.'
             })
         }
 
@@ -837,465 +887,97 @@ def analyze_and_save_all(force_reanalyse: bool = False):
             'fav_odds':          favourite_odds,
         })
 
-    # ── SELECT TOP 5 CROSS-RACE BESTS ────────────────────────────────────────
-    import re as _re_s12  # for sprint distance detection in S12
+    # ── SELECT TOP 2 CROSS-RACE BESTS ────────────────────────────────────────
+    # DATA-DRIVEN RESET 2026-06-16: 75 settled picks analysed.
+    # Non-handicap + 2.0-3.5 odds = 66.7% WR / +96.5% ROI (12 picks).
+    # Everything else: handicaps -59% ROI, 3.5-5.0 -26.9%, 8+ just 5.9% WR.
+    # 3 rules replace 15 gates. Score ranks within the qualifying pool.
+
+    # Rule 1 — race type. Handicaps and bumpers are structurally unedgeable.
+    _NON_HCAP_TYPES = {
+        'Maiden', 'Conditions Stakes', 'Listed Race', 'Group Race',
+        'Novice Hurdle', 'Novice Chase', 'Hurdle', 'Chase', 'Flat',
+    }
+    # Rule 2 — odds window where we actually win (data: 66.7% WR in 2.0-3.5 band)
+    _ODDS_MIN = 2.0
+    _ODDS_MAX = 3.5
+    # Rule 3 — signal count: at least 2 meaningful signals must fire
+    _KEY_SIGNALS = ('market_leader', 'deep_form', 'going_suitability',
+                    'price_steam', 'trainer_reputation', 'cd_bonus', 'jockey_quality')
+    _MIN_SIGNALS = 2
+
     def _passes_quality_gates(r):
-        """Quality gate filters applied at pick-selection time.
-        S1: Non-market-backed picks need score >= 85 (or 80 if tr/cd anchor present; unexposed >= 50).
-        S2: Must have at least one contextual anchor: market_leader, trainer, cd_bonus, OR unexposed_bonus.
-            Override: score >= 88 AND gap >= 20 passes without anchor (clear model conviction).
-        S3: Age-propped picks (age_bonus >= 10, no market/trainer) need score >= 92 (unexposed >= 50).
-        S4: Score gap must be >= 8 (too-close races are coin-flips). Elite (>= 88) bypass.
-        S5: Saturday gate — data shows only 9.3pt winner/loser gap on Saturdays vs 21.5pt on Sundays.
-            Saturday races: score_gap must be >= 15, AND market_leader signal required for 16+ fields.
-        S6: Large field (16+ runners) without market backing: require score_gap >= 12.
-        S7: Novice/debut-heavy race — ≥60% runners with ≤1 career run in a named novice/conditions
-            stakes, or ≥80% debut runners in any race → skip (model has no rivals form to compare).
-            Override: our pick has ≥3 runs AND score >= 88 (we have form, others don't).
-        2026-03-27: Relaxed S1 threshold (90→85/80) and added S2 override + S4 elite bypass.
-        2026-03-29: Added S5 Saturday tightening + S6 large-field market requirement.
-        2026-03-30: Added S7 novice/debut-heavy race gate.
-        LESSON: Over-correcting on 2026-03-25 (85 threshold + halved ml bonus) → 0 picks for 2 days.
-        LESSON: Saturday analysis — losers averaged 94.2pts (hardly below winners at 103.5); Sunday
-                 losers averaged 74.7pts (clearly below winners at 96.2). Saturdays need harder gates.
-        LESSON: 2026-03-30 Kempton 14:10 — picked Barefoot Beach (85pts, CD win) but 4/5 runners
-                 had only 1 career run → Sizzling Seixas won at 9/1 → novice races are ungradeable.
+        """3-rule filter replacing 15 accumulated gates.
+        Rule 1: Non-handicap race type only.
+        Rule 2: Best horse odds 2.0–3.5 (data: 66.7% WR, +96.5% ROI in this band).
+        Rule 3: At least 2 meaningful signals firing.
+        Score >= 60 soft floor to exclude noise.
         """
-        score      = r['best']['score']
-        bd         = r['best']['item'].get('score_breakdown', {})
-        ml         = float(bd.get('market_leader', 0))
-        tr         = float(bd.get('trainer_reputation', 0))
-        cd         = float(bd.get('cd_bonus', 0))
-        age        = float(bd.get('age_bonus', 0))
-        unexposed  = float(bd.get('unexposed_bonus', 0))
-        deep_form  = float(bd.get('deep_form', 0))   # SL form signals (course/distance/going wins)
-        score_gap  = float(r['best']['item'].get('score_gap', 0))
-        n_runners  = r.get('n_runners', 0)
-        signals_fired = float(bd.get('signals_fired', 99))  # 99 = old pick pre-signal-count
+        horse = r['best']['horse']
+        score = r['best']['score']
+        bd    = r['best']['item'].get('score_breakdown', {})
 
-        # GATE-SIG — Minimum signal count. At least 3 positive signals required.
-        # Prevents picks driven purely by odds position or single inflated signal.
-        # Bypass: score >= 88 (already above ELITE threshold — model is highly confident).
-        if signals_fired < 3 and score < 88:
-            print(f"  [GATE-SIG REJECTED] {r['best']['horse']} score={score:.0f}: "
-                  f"only {signals_fired:.0f} positive signals fired (need ≥3 below ELITE threshold)")
+        # Rule 1 — race type must be non-handicap, non-bumper
+        rt = r.get('race_type', _classify_race_type(r.get('market_name', '')))
+        if rt not in _NON_HCAP_TYPES:
+            print(f"  [SKIP] {horse}: {rt} (not in qualifying race types)")
             return False
 
-        # Detect day of week from race_time
-        is_saturday = False
-        try:
-            _rt = r.get('race_time', '')
-            if _rt:
-                _d = datetime.fromisoformat(_rt[:19])
-                is_saturday = (_d.weekday() == 5)  # 5 = Saturday
-        except Exception:
-            pass
-
-        # S5 — Saturday-specific tightening
-        # Data: Saturday model discrimination gap is only 9.3pts (winner 103.5 vs loser 94.2).
-        # Require a larger gap between our pick and the next-best horse in the race.
-        if is_saturday:
-            sat_gap_req = 15
-            if score < 88 and score_gap < sat_gap_req:
-                print(f"  [GATE-S5 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                      f"SATURDAY gate — score_gap={score_gap:.1f} < {sat_gap_req} required "
-                      f"(Saturday model discrimination historically weak — 9.3pt winner/loser gap)")
-                return False
-            # For 16+ runner races on Saturday, must have market backing — too chaotic otherwise
-            if n_runners >= 16 and ml == 0:
-                print(f"  [GATE-S5 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                      f"SATURDAY large field ({n_runners} runners) — market leader signal required")
-                return False
-
-        # S6 — Large field without market backing
-        # 16+ runner fields have pace/draw/traffic variance the model cannot see.
-        # Without market agreement, our pick is essentially a coin-flip.
-        if n_runners >= 16 and ml == 0 and score < 92:
-            if score_gap < 12:
-                print(f"  [GATE-S6 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                      f"large field ({n_runners} runners), no market signal, gap={score_gap:.1f} < 12")
-                return False
-
-        # S2 — hard gate: at least one contextual anchor required
-        # Anchors: market_leader, trainer, cd_bonus, unexposed_bonus, OR strong deep_form (≥16pts)
-        # deep_form ≥ 16 = horse won on this going/course/distance → legitimate evidence
-        # Override: high-conviction picks (88+ score, 20+ point gap) bypass anchor check
-        if ml == 0 and tr == 0 and cd == 0 and unexposed == 0 and deep_form < 16:
-            if score >= 88 and score_gap >= 20:
-                print(f"  [GATE-S2 OVERRIDE] {r['best']['horse']} score={score:.0f} gap={score_gap:.0f}: "
-                      f"high-conviction override — no anchor but clear model advantage")
-            else:
-                print(f"  [GATE-S2 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                      f"no market_leader/trainer_rep/cd_bonus/unexposed signal")
-                return False
-
-        # S1 — non-market-backed picks need good score
-        # If horse has another anchor (trainer or cd), threshold is 85; otherwise 88
-        # RAISED 2026-04-01: was 80/85. Analysis of 47 races shows non-market picks with only
-        # trainer/cd anchors lose at ~55% rate. Higher bar filters out more marginal picks.
-        if ml == 0:
-            if unexposed >= 10:
-                min_s1 = 50
-            elif tr > 0 or cd > 0:
-                min_s1 = 85   # Was 80: raised after April 1 analysis — trainer/cd alone not enough
-            else:
-                min_s1 = 88   # Was 85: no market AND no strong anchor = very risky
-            if score < min_s1:
-                print(f"  [GATE-S1 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                      f"not market-backed, needs >= {min_s1}")
-                return False
-
-        # S3 — age-padded with no market or trainer support needs >= 92; unexposed ≤5yo >= 50
-        if age >= 10 and ml == 0 and tr == 0:
-            min_s3 = 50 if unexposed >= 10 else 92
-            if score < min_s3:
-                print(f"  [GATE-S3 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                      f"age_bonus={age:.0f} dominant, needs >= {min_s3}")
-                return False
-
-        # S4 — Score gap gate: require the race-best to outscore 2nd-best by at least 8 points.
-        # ELITE bypass: scores >= 88 already indicate strong model conviction.
-        if score < 88 and score_gap < 8:
-            print(f"  [GATE-S4 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                  f"score_gap={score_gap:.1f} < 8 (too tight, race is a coin-flip)")
+        # Rule 2 — odds window 2.0–3.5 (data: 66.7% WR, +96.5% ROI)
+        odds = float(r['best'].get('odds', 0) or 0)
+        if odds < _ODDS_MIN:
+            print(f"  [SKIP] {horse}: odds {odds:.2f} below {_ODDS_MIN} floor")
+            return False
+        if odds > _ODDS_MAX:
+            print(f"  [SKIP] {horse}: odds {odds:.2f} above {_ODDS_MAX} ceiling")
             return False
 
-        # S7 — Novice/debut-heavy race gate (2026-03-30)
-        # LESSON: 14:10 Kempton — 4/5 runners had 1 career run; won by a 9/1 shot.
-        #   Barefoot Beach scored 85 (CD win, co-fav) but form data was nearly non-existent
-        #   for most rivals → model has nothing to compare against → effectively a coin-flip.
-        # Rule: if ≥ 60% of runners are on debut or have a single career run, SKIP unless:
-        #   (a) our pick is the ONLY runner with real form (>= 3 runs), AND score >= 88, OR
-        #   (b) race_name explicitly isn't a novice/conditions stakes
-        _all_runners = r.get('raw_runners', [])
-        if _all_runners:
-            _debut_count = 0
-            for _ru in _all_runners:
-                _form = str(_ru.get('form', '') or '').strip()
-                # Betfair FORM field: '-' = no runs, single char = 1 run, '1-' = debut win, etc.
-                _run_chars = _form.replace('-', '').replace('/', '').replace('P', '') \
-                                  .replace('F', '').replace('U', '').replace('0', '')
-                _is_debut_or_one_run = len(_form) == 0 or _form == '-' or len(_run_chars) <= 1
-                if _is_debut_or_one_run:
-                    _debut_count += 1
-            _debut_ratio = _debut_count / len(_all_runners)
-            if _debut_ratio >= 0.60:
-                _our_form = str(r['best']['item'].get('form', '') or '').strip()
-                _our_runs = len(_our_form.replace('-', '').replace('/', ''))
-                _market_name = r.get('market_name', '').lower()
-                _is_novice_name = any(kw in _market_name for kw in
-                                      ['nov', 'novice', 'mdn', 'maiden', 'cond', 'nstks', 'nst'])
-                if _debut_ratio >= 0.80 and not (_our_runs >= 3 and score >= 88):
-                    print(f"  [GATE-S7 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                          f"debut-heavy field — {_debut_count}/{len(_all_runners)} runners "
-                          f"({_debut_ratio:.0%} ≤1 run) → model has no rivals form to compare")
-                    return False
-                if _is_novice_name and not (_our_runs >= 3 and score >= 88):
-                    print(f"  [GATE-S7 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                          f"novice stakes ('{r.get('market_name','')}') — "
-                          f"{_debut_count}/{len(_all_runners)} runners ≤1 run → skip")
-                    return False
-
-        # S8 — Incomplete field gate (2026-04-01)
-        # LESSON: Kingcormac (Wincanton 15:20, Class 5) — Betfair returned 5 runners but the
-        # SL racecard declared 6.  The winner (Starlucky) was never in our analysis.
-        # We picked the best of an incomplete field — a guaranteed blind spot.
-        # Rule: if the SL racecard declares N runners and we only scored M < N, we're missing
-        # at least N-M horses. This almost always means a late entry / non-runner substitute
-        # was omitted by Betfair — exactly the runner that can win at big odds and wreck the bet.
-        #
-        # Thresholds:
-        #   - Missing 2+ runners: BLOCK unconditionally (too many unknowns)
-        #   - Missing 1 runner:   BLOCK unless our pick is the market favourite (ml > 0)
-        #     Rationale: if we back the market leader in a small incomplete field, the
-        #     missing horse is unlikely to beat the public's top selection.
-        #   - Missing 0 or sl_count==0 (racecard unavailable): allow through
-        _missing = r.get('missing_runners', 0)
-        _sl_decl = r.get('sl_declared_count', 0)
-        if _missing >= 2:
-            print(f"  [GATE-S8 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                  f"incomplete field \u2014 only {r['n_runners']}/{_sl_decl} declared runners analysed "
-                  f"({_missing} missing). Cannot rank a field we haven\u2019t fully seen.")
-            return False
-        if _missing == 1 and ml == 0:
-            print(f"  [GATE-S8 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                  f"incomplete field \u2014 {r['n_runners']}/{_sl_decl} runners analysed, 1 missing "
-                  f"and pick is NOT market leader. Missing runner could be the winner.")
-            return False
-        if _missing == 1 and ml > 0:
-            print(f"  [GATE-S8 WARNING] {r['best']['horse']} score={score:.0f}: "
-                  f"1 undeclared runner missing but pick is market leader \u2014 allowing through.")
-
-        # S9 — Minimum odds gate (2026-04-06, refined 2026-04-07, relaxed 2026-04-17)
-        # RECALIBRATED 2026-05-25 from 30-day winner analysis (102 ranked picks):
-        #   2.0-2.5 odds band = 55% WR (best performing band) — floor of 2.2 was blocking our best zone.
-        #   1.0-2.0 band = 33% WR (small sample). Absolute floor kept at 1.5 to block genuinely odds-on picks.
-        #   Winners avg score 93 (not 110+) — the odds floor was right to exist but 2.2 was too high.
-        #   Minnie Hauk (1.95)/True Love (1.91) placed: same-trainer rival penalty explains this (3 O'Brien runners)
-        #   not the odds themselves. Causeway (1.95) won in a DIFFERENT race same day with clean profile.
-        # Rule: anything below 1.5 blocked; 1.5-2.5 requires score>=85 (empirically the best band, high threshold).
-        _min_odds = 2.5
-        _best_odds = float(r['best'].get('odds', 99))
-        # Absolute floor at 1.5 — genuinely odds-on in a competitive race is not value
-        if _best_odds < 1.5:
-            print(f"  [GATE-S9 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                  f"odds {_best_odds:.2f} below absolute floor (1.5) — odds-on in competitive field")
-            return False
-        # 1.5-2.5: allow if score >= 85 (tighter threshold — these must be high-conviction picks)
-        if _best_odds < _min_odds:
-            if score >= 85:
-                print(f"  [GATE-S9 SHORT-PRICE] {r['best']['horse']} score={score:.0f}: "
-                      f"odds {_best_odds:.2f} in 1.5-2.5 zone, high score — allowing "
-                      f"(30d data: 2.0-2.5 band = 55% WR)")
-            else:
-                print(f"  [GATE-S9 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                      f"odds {_best_odds:.2f} < {_min_odds:.2f} (needs score>=85 in 1.5-2.5 zone)")
-                return False
-
-        # S10 — Irish NHF bumper short-priced favourite gate (2026-04-06)
-        # LESSON: Boundfornowhere (Cork 16:45, score=104 ELITE, 7/4 fav) — lost to 80/1 shot.
-        # Pattern: Irish NH Flat bumpers are inherently unpredictable. Form is shallow (≤3 runs each),
-        # point-to-point form is unquantifiable, and heavy/soft ground randomises the result.
-        # When our pick is the SHORT-PRICED FAVOURITE in an Irish bumper, the market_leader bonus
-        # (+16pts) inflates the score without adding genuine predictive edge. The 68/1 range of
-        # outcomes (2nd-placed Kill Vanhowe at 13/2, winner at 80/1) shows the market itself
-        # has no reliable information — being the favourite is NOT an edge.
-        # Gate: Irish venue + bumper/NHF race type + market leader at ≤4.0 odds → require score ≥ 110,
-        # OR require 3+ recent bumper wins in form. Most horses won't pass — and that's the point.
-        _race_mkt = str(r.get('market_name', r.get('race_name', ''))).upper()
-        _is_nhf_bumper = 'NHF' in _race_mkt or 'BUMPER' in _race_mkt or 'N.H. FLAT' in _race_mkt
-        _IRISH_BUMPER_VENUES = {
-            'curragh', 'dundalk', 'navan', 'naas', 'leopardstown', 'cork',
-            'galway', 'tipperary', 'punchestown', 'killarney', 'gowran',
-            'bellewstown', 'roscommon', 'tramore', 'ballinrobe', 'sligo',
-            'fairyhouse', 'listowel', 'down royal', 'downroyal',
-        }
-        _is_irish_bumper_venue = r.get('course', '').lower().strip() in _IRISH_BUMPER_VENUES
-        if _is_nhf_bumper and _is_irish_bumper_venue and ml > 0 and _best_odds <= 4.0:
-            # Count recent bumper wins from form — form like 'P-1' or '11' suggests bumper ability
-            _bumper_form = str(r['best']['item'].get('form', '') or '')
-            _bumper_recent_wins = _bumper_form.replace('-', '').replace('/', '').count('1')
-            if _bumper_recent_wins < 2 and score < 110:
-                print(f"  [GATE-S10 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                      f"Irish NHF bumper short-priced favourite ({_best_odds}). "
-                      f"Market leader bonus inflates score but bumper form is shallow — "
-                      f"need score>=110 OR >=2 bumper wins. Lesson: Boundfornowhere 2026-04-06 (104→lost 80/1)")
-                return False
-
-        # S11 — Expected Value gate (2026-04-07, recalibrated 2026-05-25)
-        # Core principle from value betting theory: EV = p×d - 1.
-        # If EV < -0.15, the model says we're giving away more than 15 cents per £1 staked.
-        # RECALIBRATED 2026-05-25: 30-day data shows 2.0-2.5 odds band wins 55% — far above the
-        # 25% our model estimates for score-90 picks. Our _win_prob_pct() is conservative, making
-        # the EV gate too aggressive for genuine short-priced winners. Score >= 95 bypass restored
-        # regardless of odds (was temporarily restricted to odds >= 2.5 — too broad a restriction).
-        _wp = _win_prob_pct(score)
-        _ev = _expected_value(_wp, _best_odds)
-        _ev_bypass = score >= 95  # restored: score >= 95 is genuine model conviction at any odds
-        if _ev < -0.15 and not _ev_bypass:
-            print(f"  [GATE-S11 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                  f"EV={_ev:+.3f} (win_prob={_wp}%, odds={_best_odds:.2f}) — "
-                  f"negative expected value > 15% loss per unit staked")
-            return False
-        if _ev < 0:
-            print(f"  [GATE-S11 WARNING] {r['best']['horse']} score={score:.0f}: "
-                  f"EV={_ev:+.3f} (marginally negative) — allowing through (calibration margin)")
-
-        # S12 — Sprint handicap with 12+ runners (2026-04-07)
-        # PROFESSIONAL WORKFLOW LESSON: Pro skips "Redcar 2:25 Sprint Handicap, messy pace,
-        # 12 runners" immediately. Sprint handicaps (≤7f) with large fields have extremely
-        # unpredictable pace dynamics — draw, barrier, early speed all dominate form.
-        # This is the single race type where well-handicapped horses lose most unexpectedly.
-        # We already block 16+ with S6. Here we extend: sprint handicaps block at 12+.
-        _mkt_s12 = str(r.get('market_name', '')).lower()
-        _dist_s12 = _re_s12.search(r'(\d+)f', _mkt_s12)
-        _dist_f_s12 = int(_dist_s12.group(1)) if _dist_s12 else 99
-        _is_sprint_hcap = (
-            ('hcap' in _mkt_s12 or 'handicap' in _mkt_s12 or ' h ' in _mkt_s12)
-            and _dist_f_s12 <= 7
-        )
-        if _is_sprint_hcap and n_runners >= 12:
-            if score < 92 and ml == 0:
-                print(f"  [GATE-S12 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                      f"sprint handicap ({n_runners} runners) — messy pace dynamics, "
-                      f"no market backing. Pro workflow: skip this race type at 12+")
-                return False
-
-        # S13 — Odds ceiling gate (2026-04-18, backtest-driven)
-        # EVIDENCE: 144 horses Mar 22-Apr 17 backtest:
-        #   odds 2-3: 80% WR (+97.8% ROI)  |  odds 3-4: 42.1% (+40.2%)
-        #   odds 4-5: 30.8% (+34.9%)        |  odds 5-6: 20.8% (+9.3%)
-        #   odds 6-8: 0% WR (-100% ROI)     |  odds 10+: 0% WR
-        # Horses at 6+ odds have near-zero hit rate. Allow only if score >= 100
-        # AND market leader (captures rare legitimate longshot picks like Royal Velvet 9.2).
-        if _best_odds >= 6.0:
-            if score < 100 or ml == 0:
-                print(f"  [GATE-S13 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                      f"odds {_best_odds:.2f} >= 6.0 — backtest shows 0% WR in 6-8 band. "
-                      f"Needs score>=100 AND market leader to override.")
-                return False
-            else:
-                print(f"  [GATE-S13 WARNING] {r['best']['horse']} score={score:.0f}: "
-                      f"odds {_best_odds:.2f} >= 6.0 but elite score + ML — allowing")
-
-        # S14 — Excessive score gap gate (2026-04-18, backtest-driven)
-        # EVIDENCE: score_gap 50+ has only 11.1% WR (1W of 9 picks).
-        # When the model scores one horse 50+ pts above the field, it's stacking
-        # bonuses (form+trainer+jockey+distance) that each add noise — false dominance.
-        # Gap 0-10: 50% WR, gap 30-50: 50% WR, gap 50+: 11.1% — clear red flag.
-        if score_gap >= 50 and score < 100:
-            print(f"  [GATE-S14 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                  f"score_gap={score_gap:.0f} >= 50 — backtest shows 11% WR for huge gaps. "
-                  f"Score inflation indicator (stacked bonuses ≠ real edge).")
+        # Rule 3 — at least 2 meaningful signals firing
+        n_signals = sum(1 for s in _KEY_SIGNALS if float(bd.get(s, 0) or 0) > 0)
+        if n_signals < _MIN_SIGNALS:
+            print(f"  [SKIP] {horse}: only {n_signals} signals (need {_MIN_SIGNALS})")
             return False
 
-        # S15 — Handicap gate (2026-05-28: 132-pick analysis)
-        # Flat Handicap 29.6% WR | Handicap Hurdle 18.8% WR | Handicap Chase 47% WR
-        # Non-handicap races dominate: Maiden 100%, Novice Hurdle 100%, Conditions 71%.
-        # Focus exclusively on non-handicap races where the model has clear edge.
-        _rt_s15 = r.get('race_type', _classify_race_type(r.get('market_name', '')))
-        _HANDICAP_TYPES = {'Flat Handicap', 'Handicap Hurdle', 'Handicap Chase'}
-        if _rt_s15 in _HANDICAP_TYPES:
-            print(f"  [GATE-S15 REJECTED] {r['best']['horse']} score={score:.0f}: "
-                  f"{_rt_s15} — model focuses on non-handicap races (Maiden/Novice/Conditions "
-                  f"= 100%/100%/71% WR vs 18.8%-47% for handicaps)")
+        # Soft score floor — catches complete scoring failures
+        if score < MIN_CONFIDENCE:
+            print(f"  [SKIP] {horse}: score {score:.0f} below floor {MIN_CONFIDENCE}")
             return False
 
+        print(f"  [QUALIFY] {horse} @{odds:.2f} score={score:.0f} signals={n_signals} rt={rt}")
         return True
 
-    def _race_min_confidence(r):
-        """Return the minimum score required for this race type to qualify as a UI pick.
-        Handicaps are harder to predict (field deliberately levelled by weights) so require
-        a higher model conviction. Conditions/novice/maiden races have simpler fields.
-        2026-04-06: replaces the single MIN_CONFIDENCE=78 with race-type-specific thresholds.
-        """
-        market_name = r.get('market_name', '').lower()
-        is_handicap = (
-            'hcap' in market_name or
-            'handicap' in market_name or
-            market_name.endswith(' h') or
-            ' h ' in market_name
-        )
-        if is_handicap:
-            return MIN_CONFIDENCE_HCAP    # 85
-        return MIN_CONFIDENCE_NORACE      # 75
-
+    # Build eligible list: races passing 3-rule filter, today only, with live odds
     eligible = [r for r in all_races_data
-                if r['best']['score'] >= _race_min_confidence(r)
-                and _passes_quality_gates(r)
-                and r.get('race_time', '')[:10] == today]  # exclude tomorrow's races
-    eligible.sort(key=lambda r: r['best']['score'], reverse=True)
-
-    # ── PICK SELECTION (2026-04-18 backtest-driven) ────────────────────────────
-    # EVIDENCE from 104 UI picks Mar 22-Apr 17:
-    #   odds 2-3: 80% WR  |  3-4: 42%  |  4-5: 31%  |  5-6: 21%  |  6+: 0%
-    #   Simulation "top score + odds < 4.0" → 61.9% WR, +116.7% ROI
-    # Strategy: sort by COMPOSITE score = raw_score + odds_preference_bonus.
-    # This shifts selection toward shorter-priced horses when scores are close,
-    # without ignoring a genuinely high-scoring longer-odds pick.
-    def _odds_preference_bonus(odds):
-        """Recalibrated 2026-05-28 from 14-day actuals:
-        <2.5: 50% WR  |  2.5-3.5: 31% WR  |  3.5-5.0: 6.7% WR (dead zone)  |  5.0+: 50% WR
-        3.5-5.0 is the worst band — placed-heavy, rarely wins. Penalise hard."""
-        if odds < 2.5:  return  8   # 50% WR — strongly prefer
-        if odds < 3.5:  return  3   # 31% WR — slight preference (was +4/+8)
-        if odds < 5.0:  return -6   # 6.7% WR — dead zone, penalise hard
-        if odds < 8.0:  return  2   # 50% WR but high variance — slight positive
-        return -2                   # longshots — penalise
-
-    def _learning_odds_adjustment(odds):
-        """Data-driven bonus/penalty from nightly learning cycle's odds ROI analysis.
-        Reads _learning_odds_roi (captured from STAGE 0 DynamoDB read).
-        Falls back to 0 if no data or insufficient sample (n < 5).
-        Threshold tightened: -5% ROI now triggers penalty (was -10%)."""
-        if odds <= 3.0:    cat = 'favorite'
-        elif odds <= 6.0:  cat = 'mid_price'
-        elif odds <= 12.0: cat = 'outsider'
-        else:              cat = 'longshot'
-        d   = _learning_odds_roi.get(cat, {})
-        n   = int(d.get('n', 0))
-        if n < 5: return 0
-        roi = float(d.get('roi', 0))
-        if roi >=  80: return  6
-        if roi >=  40: return  4
-        if roi >=  10: return  2
-        if roi >=  -5: return  0
-        if roi >= -25: return -3
-        return -6
-
-    def _learning_course_bonus(venue):
-        """Bonus for venues flagged as high-performing by the learning cycle (≥40% WR, ≥5 bets)."""
-        if not _learning_best_courses: return 0
-        v = str(venue or '').lower().strip()
-        for c in _learning_best_courses:
-            cl = c.lower().strip()
-            if cl in v or v in cl:
-                return 4
-        return 0
-
-    def _selection_score(r):
-        odds  = float(r['best'].get('odds', 99))
-        bd    = r['best']['item'].get('score_breakdown', {})
-        venue = r.get('venue', '')
-
-        # Recover pre-cap raw score.  r['best']['score'] = GENERAL_CAP + ml_bonus (136
-        # for all capped picks).  score_cap is stored as negative e.g. -42.
-        # pre_cap = r['best']['score'] - ml_bonus - score_cap
-        #         = 136 - 16 - (-42) = 162  (differentiates picks that all hit the cap)
-        _ml   = float(bd.get('market_leader', 0) or 0)
-        _cap  = float(bd.get('score_cap', 0) or 0)
-        pre_cap = r['best']['score'] - _ml - _cap
-
-        # Count positive signals firing (on pre-cap score basis)
-        _sig_count = sum(1 for k in ('market_leader','deep_form','trainer_reputation',
-                                     'going_suitability','cd_bonus','jockey_quality','price_steam')
-                         if float(bd.get(k, 0) or 0) > 0)
-
-        # WINNER PROFILE BONUS — 14-day actuals: winners avg 2.53 signals, avg score 95.
-        # Tightened range: 78-110 pre-cap (placed horses avg 125, so 110+ = placed profile).
-        _winner_profile = (
-            _ml > 0
-            and 2 <= _sig_count <= 3
-            and 78 <= pre_cap <= 110
-        )
-        _winner_bonus = 8 if _winner_profile else 0
-
-        # SIGNAL BLOAT PENALTY — placed horses avg 3.33 signals (not 3.7).
-        # Lower threshold: 4+ signals now triggers penalty at high scores.
-        _bloat_penalty = 0
-        if _sig_count >= 5:
-            _bloat_penalty = 12
-        elif _sig_count >= 4 and pre_cap > 120:
-            _bloat_penalty = 8
-
-        # Race type ranking bonus — all handicaps now gated out (S15), so remaining
-        # eligible races are non-handicaps. Bonus differentiates within that set.
-        _rt = r.get('race_type', _classify_race_type(r.get('market_name', '')))
-        _rt_rank_bonus = 0
-        if _rt in ('Maiden', 'Novice Hurdle', 'Novice Chase'):  _rt_rank_bonus = 12
-        elif _rt == 'Conditions Stakes':                         _rt_rank_bonus = 8
-
-        return (pre_cap
-                + _odds_preference_bonus(odds)
-                + _learning_odds_adjustment(odds)
-                + _learning_course_bonus(venue)
-                + _winner_bonus
-                + _rt_rank_bonus
-                - _bloat_penalty)
-
-    eligible.sort(key=lambda r: _selection_score(r), reverse=True)
+                if _passes_quality_gates(r)
+                and r.get('race_time', '')[:10] == today
+                and float(r['best'].get('odds', 0) or 0) > 0]
+    # Rank by score; prefer shorter odds within the 2.0-3.5 window on ties
+    eligible.sort(key=lambda r: (r['best']['score'],
+                                  1 if float(r['best'].get('odds', 99)) < 2.5 else 0),
+                  reverse=True)
 
     top_picks = eligible[:_effective_target]
 
     # ── FAVOURITE MISMATCH CHECK ──────────────────────────────────────────────
-    # Warn when our pick races against a well-backed favourite (≤1.80) that our
-    # model couldn't score above 50 — we have no form data on the actual market
-    # leader. Lesson 2026-05-31: Stellarmasterpiece 6/4, score=30, won vs 118-pt pick.
+    # ── FAVOURITE MISMATCH + MARKET DISAGREEMENT CHECKS ─────────────────────
+    # Two distinct cases:
+    #   Case 1 (blind-spot): we're picking against an odds-on fav our model
+    #     couldn't score — no form data at all.
+    #   Case 2 (market disagreement): our pick is NOT the market favourite but
+    #     the market favourite scored well (≥70) and is at shorter odds. The
+    #     market knows something our model may not — remove pick from pool.
+    #   Lesson 2026-06-05: Legacy Link 4.40 vs Amelia Earhart 3.85 (score 102).
+    #     Old guard never fired (fav_score ≥ 50, fav_odds > 1.80). Need broader gate.
+    _market_disagree_picks = []
     for _tp in top_picks:
         _fav_horse = _tp.get('fav_horse', '')
-        _fav_score = float(_tp.get('fav_score', 99))
-        _fav_odds  = float(_tp.get('fav_odds', 99))
+        _fav_score = float(_tp.get('fav_score', 0) or 0)
+        _fav_odds  = float(_tp.get('fav_odds', 99) or 99)
+        _our_odds  = float(_tp['best'].get('odds', 99) or 99)
         _our_horse = _tp['best']['horse']
+        _our_score = float(_tp['best'].get('score', 0) or 0)
+
+        # Case 1: blind-spot (original guard)
         if _our_horse != _fav_horse and _fav_score < 50 and _fav_odds <= 1.80:
             _mismatch_warn = (
                 f"FAVOURITE_MISMATCH: {_fav_horse} is the {_fav_odds:.2f} market leader "
@@ -1304,9 +986,35 @@ def analyze_and_save_all(force_reanalyse: bool = False):
             )
             _tp['best']['item'].setdefault('warnings', []).append(_mismatch_warn)
             _tp['best']['item']['favourite_mismatch'] = True
-            print(f"  [⚠ FAVOURITE MISMATCH] {_tp['venue']} {_tp.get('race_time', '')[:16]}: "
-                  f"our pick={_our_horse}, market fav={_fav_horse} "
-                  f"({_fav_odds:.2f}) scored only {_fav_score:.0f}")
+            print(f"  [FAVOURITE_MISMATCH] {_tp['venue']} {_tp.get('race_time','')[:16]}: "
+                  f"pick={_our_horse}, mkt fav={_fav_horse} ({_fav_odds:.2f}) "
+                  f"scored only {_fav_score:.0f}")
+
+        # Case 2: market disagreement — fav scored well but market prefers someone else
+        # Only apply when our pick is at longer odds than the favourite AND the
+        # favourite scored ≥ 70 (the market has real conviction about a well-performing horse).
+        elif (_our_horse != _fav_horse
+              and _fav_horse
+              and _fav_score >= 70
+              and _fav_odds < _our_odds):
+            _score_lead = _our_score - _fav_score
+            _odds_gap   = _our_odds - _fav_odds
+            print(f"  [MARKET_DISAGREE] {_tp['venue']} {_tp.get('race_time','')[:16]}: "
+                  f"pick={_our_horse} @{_our_odds:.2f} (score {_our_score:.0f}), "
+                  f"mkt fav={_fav_horse} @{_fav_odds:.2f} (score {_fav_score:.0f}), "
+                  f"score lead={_score_lead:+.0f}, odds gap={_odds_gap:+.2f}")
+            # Only drop the pick if the score lead doesn't compensate the market disagreement.
+            # Threshold: need ≥25 score points of lead to override a shorter-priced fav.
+            if _score_lead < 25:
+                print(f"    → Score lead {_score_lead:.0f} < 25pts threshold — "
+                      f"dropping {_our_horse} (market disagreement, insufficient model edge)")
+                _market_disagree_picks.append(_tp)
+            else:
+                print(f"    → Score lead {_score_lead:.0f} ≥ 25pts — keeping {_our_horse} "
+                      f"(model edge outweighs market signal)")
+
+    for _drop in _market_disagree_picks:
+        top_picks.remove(_drop)
 
     # ── HOT PROSPECT BONUS SLOT ──────────────────────────────────────────────
     # Allow a 6th pick ONLY if a genuinely exceptional candidate exists beyond
@@ -1330,12 +1038,11 @@ def analyze_and_save_all(force_reanalyse: bool = False):
                   f"score={_hot_score:.0f} @{_hot_odds:.2f} "
                   f"— does not meet threshold (need score>=130, odds<5.0)")
 
-    # Sort final picks: rank 1 = highest composite selection score
-    top_picks.sort(key=lambda r: _selection_score(r), reverse=True)
+    # Sort final picks: rank 1 = highest score (already sorted, but re-sort after hot prospect)
+    top_picks.sort(key=lambda r: (r['best']['score'],
+                                   1 if float(r['best'].get('odds', 99)) < 2.5 else 0),
+                   reverse=True)
 
-    # Pre-compute selection_rank_score (pre-cap signal strength) for each UI pick.
-    # Stored for display — shows true model conviction without the cap squash.
-    # Sort uses _selection_score() (pre_cap + odds_pref + bonuses); display uses pre_cap only.
     def _pre_cap_score(r):
         bd   = r['best']['item'].get('score_breakdown', {})
         _ml  = float(bd.get('market_leader', 0) or 0)
@@ -1449,7 +1156,7 @@ def analyze_and_save_all(force_reanalyse: bool = False):
         _zp_msg = (
             f"BetBudAI ALERT [{today}]: Analysis scored {total_saved} horses "
             f"but produced 0 UI picks. All races rejected by gates. "
-            f"Form coverage: {_form_pct:.0f}%. Check gate thresholds and logs."
+            f"Form coverage: {_final_form_pct:.0f}%. Check gate thresholds and logs."
         )
         print(f"\n{'='*60}")
         print(f"[ZERO-PICKS ALERT] {_zp_msg}")
