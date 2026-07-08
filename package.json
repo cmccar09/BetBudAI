@@ -1,0 +1,12 @@
+{
+  "name": "betbudai-sports-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for BetBudAI sports data",
+  "type": "module",
+  "main": "mcp-sports-server.js",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1081.0",
+    "@aws-sdk/lib-dynamodb": "^3.1081.0",
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  }
+}

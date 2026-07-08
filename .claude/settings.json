@@ -1,0 +1,167 @@
+{
+  "hooks": {
+    "PostToolUse": [
+
+      {
+        "description": "Prettier — auto-format JS/JSX/CSS after every edit",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_FILE_PATHS\" | tr ' ' '\\n' | grep -E '\\.(jsx?|css)$' | xargs -r npx --prefix \"c:/Users/charl/OneDrive/futuregenAI/BetBudAI/frontend\" prettier --write 2>/dev/null || true"
+        }]
+      },
+
+      {
+        "description": "Black — auto-format Python files after every edit",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_FILE_PATHS\" | tr ' ' '\\n' | grep -E '\\.py$' | xargs -r python -m black --line-length 120 2>/dev/null || true"
+        }]
+      },
+
+      {
+        "description": "Flake8 — lint Python files after edit (non-blocking, shows warnings)",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_FILE_PATHS\" | tr ' ' '\\n' | grep -E '\\.py$' | xargs -r python -m flake8 --max-line-length=120 --ignore=E501,W503,E402 2>&1 | head -20 || true"
+        }]
+      },
+
+      {
+        "description": "ESLint — lint React/JS files after edit",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_FILE_PATHS\" | tr ' ' '\\n' | grep -E 'frontend/src/.*\\.jsx?$' | xargs -r npx --prefix \"c:/Users/charl/OneDrive/futuregenAI/BetBudAI/frontend\" eslint --fix --max-warnings=0 2>/dev/null || true"
+        }]
+      },
+
+      {
+        "description": "Analysis Lambda — warn when editing Lambda source files",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_FILE_PATHS\" | tr ' ' '\\n' | grep -qE '(complete_daily_analysis|form_enricher|comprehensive_pick_logic|weather_going_inference|betfair_odds_fetcher|notify_picks|sf_analysis)\\.py$' && echo '' && echo '⚠️  ANALYSIS LAMBDA SOURCE CHANGED' && echo '   → Deploy: .\\scripts\\build_analysis_lambda.ps1' && echo '' || true"
+        }]
+      },
+
+      {
+        "description": "API Lambda — warn when editing lambda_function.py (both Lambdas must be updated)",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_FILE_PATHS\" | grep -q 'lambda_function.py' && echo '' && echo '⚠️  API LAMBDA CHANGED — deploy to BOTH Lambdas' && echo '   → Deploy: .\\scripts\\deploy_api.ps1' && echo '' || true"
+        }]
+      },
+
+      {
+        "description": "Scraper Lambda — warn when editing sport scraper files",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_FILE_PATHS\" | tr ' ' '\\n' | grep -qE '(world_cup_scraper|wimbledon_scraper|tour_de_france_scraper|rugby_scraper|golf_scraper)\\.py$' && echo '' && echo '⚠️  SPORT SCRAPER CHANGED — redeploy Lambda + re-run to refresh DynamoDB' && echo '   → aws lambda update-function-code --function-name <scraper-name> --zip-file fileb://<file>.zip --region eu-west-1' && echo '' || true"
+        }]
+      },
+
+      {
+        "description": "Frontend — warn when editing frontend source, remind to build + deploy",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_FILE_PATHS\" | grep -q 'frontend/src/' && echo '' && echo '🔨 FRONTEND SOURCE CHANGED — build + deploy when ready' && echo '   → cd frontend && npm run build && cd .. && npx wrangler pages deploy frontend/build --project-name betbudai' && echo '' || true"
+        }]
+      },
+
+      {
+        "description": "CLAUDE.md guard — warn if editing CLAUDE.md directly instead of via update",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_FILE_PATHS\" | grep -q 'CLAUDE.md' && echo '' && echo '📋 CLAUDE.md UPDATED — verify the change is accurate and commit it' && echo '' || true"
+        }]
+      },
+
+      {
+        "description": "DynamoDB schema guard — warn when editing table definitions",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_FILE_PATHS\" | tr ' ' '\\n' | grep -qE '(dynamodb|table|schema)' && echo '' && echo '🗄️  DYNAMODB RELATED FILE CHANGED — verify table/GSI names match eu-west-1 resources' && echo '' || true"
+        }]
+      },
+
+      {
+        "description": "Ticker data guard — verify dates are current when editing Ticker.jsx",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_FILE_PATHS\" | grep -q 'Ticker.jsx' && echo '' && echo '🏟️  TICKER UPDATED — check: (1) no NS items with past dates, (2) FT results are real scores, (3) TIP is current' && echo '' || true"
+        }]
+      },
+
+      {
+        "description": "Skill files — remind to test after editing pick skills",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_FILE_PATHS\" | grep -q '.claude/skills/' && echo '' && echo '🎯 SKILL UPDATED — test with /betting-picks [sport] or /picks-today' && echo '' || true"
+        }]
+      }
+
+    ],
+
+    "PreToolUse": [
+
+      {
+        "description": "Destructive command guard — flag dangerous Bash operations",
+        "matcher": "Bash",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_TOOL_INPUT\" | grep -qiE '(rm -rf|DROP TABLE|TRUNCATE|DELETE FROM|git reset --hard|push --force|push -f|clean -fd|checkout -- \\.)' && echo '' && echo '⛔ DESTRUCTIVE COMMAND DETECTED — confirm this is intentional before proceeding' && echo '' || true"
+        }]
+      },
+
+      {
+        "description": "Main branch push guard — warn before pushing to main",
+        "matcher": "Bash",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git push.*(main|master)' && echo '' && echo '⚠️  PUSHING TO MAIN — ensure changes are reviewed and tested' && echo '' || true"
+        }]
+      },
+
+      {
+        "description": "Production Lambda guard — warn before deleting or overwriting Lambda functions",
+        "matcher": "Bash",
+        "hooks": [{
+          "type": "command",
+          "command": "echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'lambda.*(delete|remove)' && echo '' && echo '⛔ LAMBDA DELETE DETECTED — this removes a production function. Are you sure?' && echo '' || true"
+        }]
+      }
+
+    ],
+
+    "Stop": [
+
+      {
+        "description": "Git status — show uncommitted changes at end of session",
+        "hooks": [{
+          "type": "command",
+          "command": "cd \"c:/Users/charl/OneDrive/futuregenAI/BetBudAI\" && CHANGES=$(git status --short | wc -l | tr -d ' ') && [ \"$CHANGES\" -gt 0 ] && echo '' && echo \"📝 SESSION ENDED — $CHANGES uncommitted file(s). Run: git add -A && git commit -m 'your message'\" && git status --short | head -15 && echo '' || echo '✅ Session ended — no uncommitted changes'"
+        }]
+      },
+
+      {
+        "description": "Data freshness reminder — prompt to check sports data after a session",
+        "hooks": [{
+          "type": "command",
+          "command": "echo '' && echo '💡 REMINDER: verify DynamoDB data is fresh before next picks run' && echo '   /pick-racing or /betting-picks all will check freshness automatically via MCP' && echo ''"
+        }]
+      }
+
+    ]
+
+  }
+}

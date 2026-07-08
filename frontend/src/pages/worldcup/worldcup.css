@@ -1,0 +1,376 @@
+/* ─── BetBudWorldCup theme — scoped under .wc-page so it never leaks ──────── */
+.wc-page {
+  /* Brand palette — mirrors betbudai.com */
+  --purple:      #6366f1;   /* indigo — primary brand */
+  --purple-dk:   #4f46e5;   /* indigo dark */
+  --violet:      #8b5cf6;   /* violet — gradient end */
+  --orange:      #f97316;   /* orange — HOT / action */
+  --gold:        #f59e0b;   /* amber — odds highlight */
+  --green:       #10b981;   /* emerald — success */
+  --blue:        #3b82f6;   /* blue — info */
+  --red:         #ef4444;   /* red — error / NO */
+
+  /* Backgrounds — dark navy-purple like betbudai dark mode */
+  --dark:        #0a0f1e;
+  --dark2:       #0f172a;
+  --card:        #1e293b;
+  --card2:       #0f172a;
+
+  /* Borders */
+  --border:      #334155;
+  --border2:     #1e2a3b;
+
+  /* Text */
+  --text:        #f1f5f9;
+  --muted:       #94a3b8;
+
+  /* Aliases used by components */
+  --accent:      #6366f1;
+  --accent2:     #818cf8;
+
+  background: var(--dark);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+.wc-page * { box-sizing: border-box; }
+
+.wc-page button { cursor: pointer; font-family: inherit; }
+.wc-page input, .wc-page select { font-family: inherit; }
+
+/* Scrollbar */
+.wc-page ::-webkit-scrollbar { width: 6px; height: 6px; }
+.wc-page ::-webkit-scrollbar-track { background: var(--dark2); }
+.wc-page ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 3px; }
+.wc-page ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
+
+/* ─── Utilities ────────────────────────────────────────────────────────────── */
+.wc-page .gold       { color: var(--gold); }
+.wc-page .accent     { color: var(--accent); }
+.wc-page .muted      { color: var(--muted); }
+.wc-page .red        { color: var(--red); }
+.wc-page .font-bold  { font-weight: 700; }
+.wc-page .font-900   { font-weight: 900; }
+.wc-page .text-center { text-align: center; }
+.wc-page .flex { display: flex; }
+.wc-page .flex-col { flex-direction: column; }
+.wc-page .items-center { align-items: center; }
+.wc-page .justify-between { justify-content: space-between; }
+.wc-page .gap-4  { gap: 4px; }
+.wc-page .gap-8  { gap: 8px; }
+.wc-page .gap-12 { gap: 12px; }
+.wc-page .gap-16 { gap: 16px; }
+.wc-page .mt-4   { margin-top: 4px; }
+.wc-page .mt-8   { margin-top: 8px; }
+.wc-page .mt-12  { margin-top: 12px; }
+.wc-page .mt-16  { margin-top: 16px; }
+.wc-page .mb-12  { margin-bottom: 12px; }
+.wc-page .mb-16  { margin-bottom: 16px; }
+
+/* ─── Cards ────────────────────────────────────────────────────────────────── */
+.wc-page .card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.wc-page .card-sm {
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.wc-page .card-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── Grid ─────────────────────────────────────────────────────────────────── */
+.wc-page .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.wc-page .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.wc-page .grid-4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+
+/* ─── Badges ───────────────────────────────────────────────────────────────── */
+.wc-page .badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.wc-page .badge-q    { background: rgba(16,185,129,.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,.3); }
+.wc-page .badge-t    { background: rgba(249,115,22,.15);  color: #fb923c; border: 1px solid rgba(249,115,22,.3); }
+.wc-page .badge-pred { background: rgba(99,102,241,.15);  color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); }
+.wc-page .badge-hot  { background: rgba(249,115,22,.2);   color: #fb923c; border: 1px solid rgba(249,115,22,.4); }
+.wc-page .badge-val  { background: rgba(16,185,129,.15);  color: #34d399; border: 1px solid rgba(16,185,129,.3); }
+.wc-page .badge-tip  { background: rgba(59,130,246,.15);  color: #93c5fd; border: 1px solid rgba(59,130,246,.3); }
+.wc-page .badge-live { background: var(--red); color: #fff; animation: wc-pulse 1.5s infinite; }
+.wc-page .badge-yes  { background: rgba(16,185,129,.15);  color: #34d399; border: 1px solid rgba(16,185,129,.3); }
+.wc-page .badge-no   { background: rgba(239,68,68,.15);   color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
+.wc-page .badge-maybe { background: rgba(245,158,11,.15); color: #fcd34d; border: 1px solid rgba(245,158,11,.3); }
+
+/* ─── Animations ───────────────────────────────────────────────────────────── */
+@keyframes wc-pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+@keyframes wc-spin  { to { transform: rotate(360deg); } }
+
+/* ─── Buttons ──────────────────────────────────────────────────────────────── */
+.wc-page .btn {
+  border: none;
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all .2s;
+  letter-spacing: .3px;
+}
+
+.wc-page .btn-primary {
+  background: linear-gradient(135deg, var(--purple), var(--violet));
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(99,102,241,.4);
+}
+.wc-page .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+
+.wc-page .btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.wc-page .btn-ghost:hover { border-color: var(--purple); color: var(--accent2); }
+
+.wc-page .btn-gold {
+  background: linear-gradient(135deg, var(--orange), var(--gold));
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(249,115,22,.4);
+}
+.wc-page .btn-gold:hover { opacity: .9; transform: translateY(-1px); }
+
+/* ─── Form elements ────────────────────────────────────────────────────────── */
+.wc-page .input {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 50px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .2s;
+}
+.wc-page .input:focus { border-color: var(--purple); }
+
+.wc-page .select {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 50px;
+  font-size: 13px;
+  outline: none;
+}
+
+/* ─── Tables ───────────────────────────────────────────────────────────────── */
+.wc-page .table { width: 100%; border-collapse: collapse; }
+.wc-page .table th {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  padding: 10px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+.wc-page .table td { padding: 11px 8px; border-bottom: 1px solid var(--border2); }
+.wc-page .table tr:last-child td { border-bottom: none; }
+.wc-page .table tr:hover td { background: rgba(99,102,241,.04); }
+
+/* ─── Section ──────────────────────────────────────────────────────────────── */
+.wc-page .section { margin-bottom: 28px; }
+
+.wc-page .section-title {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+}
+.wc-page .section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* ─── Confidence bar ───────────────────────────────────────────────────────── */
+.wc-page .conf-bar {
+  height: 6px;
+  background: var(--border2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.wc-page .conf-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--purple), var(--violet));
+  transition: width .5s;
+}
+
+/* ─── Form dots (W/D/L) ────────────────────────────────────────────────────── */
+.wc-page .form-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.wc-page .form-W { background: var(--green); }
+.wc-page .form-D { background: var(--gold); }
+.wc-page .form-L { background: var(--red); }
+
+/* ─── Spinner ──────────────────────────────────────────────────────────────── */
+.wc-page .spinner {
+  border: 3px solid var(--border);
+  border-top-color: var(--purple);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: wc-spin .8s linear infinite;
+  margin: 24px auto;
+}
+
+/* ─── Odds pill ────────────────────────────────────────────────────────────── */
+.wc-page .odds-pill {
+  font-weight: 700;
+  color: var(--gold);
+  font-size: 14px;
+}
+
+/* ─── Rating pill ──────────────────────────────────────────────────────────── */
+.wc-page .rating-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(99,102,241,.12);
+  border: 1px solid rgba(99,102,241,.3);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent2);
+}
+
+/* ─── Page layout ──────────────────────────────────────────────────────────── */
+.wc-page .page-content {
+  padding: 24px 20px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ─── Ticker ───────────────────────────────────────────────────────────────── */
+.wc-page .ticker {
+  background: var(--dark2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+.wc-page .ticker-track {
+  display: flex;
+  animation: wc-ticker-scroll 60s linear infinite;
+  white-space: nowrap;
+}
+.wc-page .ticker-track:hover { animation-play-state: paused; }
+@keyframes wc-ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.wc-page .ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 48px;
+  font-size: 13px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+/* ─── Responsive ───────────────────────────────────────────────────────────── */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .wc-page .grid-2 { grid-template-columns: 1fr; }
+  .wc-page .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .wc-page .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .wc-page .page-content { padding: 12px 10px; }
+  .wc-page .section-title { font-size: 15px; }
+  .wc-page .table th { font-size: 10px; padding: 8px 5px; }
+  .wc-page .table td { font-size: 12px; padding: 9px 5px; }
+  .wc-page .card { padding: 12px; }
+}
+
+/* Phone */
+@media (max-width: 480px) {
+  .wc-page .grid-3 { grid-template-columns: 1fr; }
+  .wc-page .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .wc-page .page-content { padding: 10px 8px; }
+  .wc-page .section-title { font-size: 13px; gap: 8px; }
+  .wc-page .btn { padding: 7px 14px; font-size: 12px; }
+  .wc-page .card { padding: 10px; border-radius: 10px; }
+  .wc-page .card-sm { padding: 8px; }
+  .wc-page .table th { font-size: 10px; padding: 6px 3px; }
+  .wc-page .table td { font-size: 11px; padding: 7px 3px; }
+  .wc-page .header-subtitle { display: none; }
+  .wc-page .header-controls-desktop { display: none !important; }
+  .wc-page .header-controls-mobile { display: flex !important; }
+}
+
+/* Horizontal scroll wrapper for wide tables */
+.wc-page .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ─── Extra mobile fixes ────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Ticker — ensure items don't overflow on small screens */
+  .wc-page .ticker-item { font-size: 11px; padding: 0 14px; gap: 6px; }
+
+  /* R32 prediction grid — single column on phone */
+  .wc-page .r32-grid { grid-template-columns: 1fr !important; }
+
+  /* Group filter select — full width */
+  .wc-page .select { width: 100%; font-size: 13px; }
+
+  /* Champion banner stat boxes — each takes 50% in row mode */
+  .wc-page .stat-mini-box { flex: 1; min-width: 0; }
+
+  /* Player cards in scorers — reduce padding */
+  .wc-page .grid-3 .card,
+  .wc-page .grid-4 .card { padding: 10px; }
+
+  /* Section titles smaller */
+  .wc-page .section-title { font-size: 13px; }
+
+  /* Fixture card text */
+  .wc-page .fixture-home,
+  .wc-page .fixture-away { font-size: 12px; }
+
+  /* Nav tabs — allow scroll, hide text overflow */
+  .wc-page nav button { font-size: 11px; padding: 8px 8px; min-width: 0; }
+
+  /* Groups table — compact */
+  .wc-page .table { font-size: 10px; }
+  .wc-page .table th,
+  .wc-page .table td { padding: 5px 3px; }
+
+  /* Odds pill — smaller */
+  .wc-page .odds-pill { font-size: 10px; padding: 2px 6px; }
+}

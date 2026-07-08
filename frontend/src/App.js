@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { loadStripe } from '@stripe/stripe-js';
 import { trackEvent, trackPageView } from './analytics';
+import WorldCupPage from './pages/worldcup/WorldCupPage';
+import WimbledonPage from './pages/wimbledon/WimbledonPage';
+import TourDeFrancePage from './pages/tourdefrance/TourDeFrancePage';
+import RugbyPage from './pages/rugby/RugbyPage';
+import GolfPage from './pages/golf/GolfPage';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL ||
   'https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com';
@@ -216,8 +221,10 @@ function bettingWindow(pick, now) {
     } catch {}
   }
 
+  // Race is well in the past — no betting window applies
+  if (mins !== null && mins < -30) return null;
   // Already past or within 15 mins — urgent
-  if (mins !== null && mins <= 15 && mins >= -10) {
+  if (mins !== null && mins <= 15 && mins >= -30) {
     return { label:'⏰ Bet Now', desc:'Race imminent', color:'#dc2626', bg:'#fef2f2', border:'#fca5a5' };
   }
   // Within 90 mins + short price — get in before it goes
@@ -446,9 +453,79 @@ function buildPositiveBannerData(latestWinner, yesterdaySummary, yesterdayPicks,
 }
 
 // ---- App ----
+// ── Subscribe for Free gate ────────────────────────────────────────────────
+// Shown to authenticated users whose 3-day trial has expired.
+// One click, no card, permanently unlocks the free tier.
+function SubscribeFreeGate({ email, onSuccess, pageName }) {
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubscribeFree = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/subscribe-free`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDone(true);
+        setTimeout(() => { if (onSuccess) onSuccess(); }, 1200);
+      } else {
+        setError(data.error || 'Something went wrong — please try again.');
+      }
+    } catch (e) {
+      setError('Network error — please try again.');
+    }
+    setLoading(false);
+  };
+
+  if (done) {
+    return (
+      <div style={{ textAlign: 'center', padding: '60px 32px', maxWidth: 560, margin: '40px auto' }}>
+        <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
+        <h2 style={{ color: '#34d399', fontSize: 24, fontWeight: 900, marginBottom: 8 }}>You're in!</h2>
+        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16 }}>Free access confirmed — loading your content…</p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 16, padding: '48px 32px', textAlign: 'center', maxWidth: 560, margin: '40px auto', border: '2px solid rgba(52,211,153,0.4)' }}>
+      <div style={{ fontSize: 52, marginBottom: 16 }}>🔓</div>
+      <h2 style={{ color: 'white', fontSize: 26, fontWeight: 900, margin: '0 0 12px' }}>Subscribe for Free</h2>
+      <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 15, lineHeight: 1.7, marginBottom: 8 }}>
+        Your 3-day trial has ended. Subscribe to keep your free access — <strong style={{ color: '#34d399' }}>no credit card, no charge, ever.</strong>
+      </p>
+      <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, marginBottom: 28 }}>
+        One click confirms your free account and unlocks everything again.
+      </p>
+      <button
+        onClick={handleSubscribeFree}
+        disabled={loading}
+        style={{
+          background: 'linear-gradient(135deg,#059669,#047857)',
+          border: '2px solid #10b981', borderRadius: 10, padding: '16px 48px',
+          color: 'white', fontSize: 18, fontWeight: 900, cursor: loading ? 'not-allowed' : 'pointer',
+          opacity: loading ? 0.7 : 1, transition: 'all 0.2s', display: 'block', width: '100%', maxWidth: 320, margin: '0 auto',
+        }}
+      >
+        {loading ? 'Confirming…' : '✅ Subscribe for Free — No Card'}
+      </button>
+      {error && <p style={{ color: '#f87171', fontSize: 13, marginTop: 12 }}>{error}</p>}
+      <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, marginTop: 20 }}>
+        Want lay alerts? <a href="#" onClick={e => { e.preventDefault(); }} style={{ color: '#fbbf24' }}>Favourite Watch — €9.99/mo</a>
+      </p>
+    </div>
+  );
+}
+
 function App() {
   const [page, setPage] = useState('home');
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
   const [accountSettingsRequest, setAccountSettingsRequest] = useState(null);
   const [featuredMeetingMeta, setFeaturedMeetingMeta] = useState(null);
 
@@ -520,8 +597,8 @@ function App() {
         })
           .then(r => r.json())
           .then(data => {
-            if (data.subscription_tier) {
-              const updatedUser = { ...authUser, role: data.subscription_tier, subscription_tier: data.subscription_tier, subscription_status: data.subscription_status };
+            if (data.subscription_status) {
+              const updatedUser = { ...authUser, role: data.subscription_tier || authUser?.role, subscription_tier: data.subscription_tier || authUser?.subscription_tier, subscription_status: data.subscription_status };
               try { localStorage.setItem('betbudai_user', JSON.stringify(updatedUser)); } catch {}
               setAuthUser(updatedUser);
             }
@@ -544,7 +621,8 @@ function App() {
       picks: 'Daily Picks',
       picks5: 'Top 5 Picks',
       majors: featuredMeetingTitle || 'Featured Meet',
-      laythe: 'VIP Rollers',
+      worldcup: 'World Cup',
+      laythe: 'Favourite Watch',
       account: 'My Account',
       admin: 'Admin',
     };
@@ -562,6 +640,32 @@ function App() {
       });
     }
   }, [page, isAuthenticated, featuredMeetingTitle]);
+
+  // Refresh subscription status from server on every page load for authenticated users.
+  // This picks up server-side changes (grandfathering, plan upgrades) without requiring
+  // the user to sign out and back in.
+  useEffect(() => {
+    if (!authUser?.email) return;
+    fetch(`${API_BASE_URL}/api/subscription-status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: authUser.email }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.subscription_status) {
+          const updatedUser = {
+            ...authUser,
+            subscription_status: data.subscription_status,
+            subscription_tier: data.subscription_tier || authUser.subscription_tier,
+            role: data.subscription_tier || authUser.role,
+          };
+          try { localStorage.setItem('betbudai_user', JSON.stringify(updatedUser)); } catch {}
+          setAuthUser(updatedUser);
+        }
+      })
+      .catch(() => {});
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAuthSuccess = (userData) => {
     const userRole = (userData?.role || '').toLowerCase();
@@ -598,7 +702,7 @@ function App() {
   };
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -662,7 +766,7 @@ function App() {
 
   const isAdmin = authUser?.role === 'admin';
   const hasExplicitFreeRole = (authUser?.role || '').toLowerCase() === 'free';
-  const hasActivePaidStatus = ['trialing', 'active', 'canceling'].includes(authUser?.subscription_status);
+  const hasActivePaidStatus = ['trialing', 'active', 'canceling', 'free_subscriber'].includes(authUser?.subscription_status);
   const hasTrialAccess = isAuthenticated && authUser?.subscription_status === 'trialing';
   const hasPaidEntitlement = isAuthenticated && (
     hasTrialAccess ||
@@ -701,7 +805,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>BetBudAI.com</h1>
-        <p style={{ fontSize: '14px', opacity: 0.8, margin: '4px 0 0' }}>AI-powered racing analysis · UK &amp; Ireland</p>
+        <p style={{ fontSize: '14px', opacity: 0.8, margin: '4px 0 0' }}>AI Betting Intelligence Platform · UK &amp; Ireland</p>
         {isAuthenticated && (
           <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '12px', color: '#34d399', fontWeight: '600' }}>
@@ -735,10 +839,15 @@ function App() {
       <div style={{ display:'flex', justifyContent: isMobile ? 'flex-start' : 'center', gap: isMobile ? '8px' : '12px', marginBottom: isMobile ? '20px' : '32px', flexWrap: isMobile ? 'nowrap' : 'wrap', overflowX: isMobile ? 'auto' : 'visible', WebkitOverflowScrolling: 'touch', padding: isMobile ? '0 8px 8px' : '0', msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
         {[
           { key:'home',      label:'Home',             emoji:'🏠', sub:'About & sign in',     gated: false, tierRequired: null },
-          { key:'picks5',    label:'Daily Picks',      emoji:'🏆', sub:'4+ tips daily',       gated: true, tierRequired: 'premium' },
+          { key:'picks5',    label:'Daily Picks',      emoji:'🏆', sub:'4+ tips daily — free',       gated: true, tierRequired: 'free' },
           { key:'punchestown', label: featuredMeetingMeta?.tabLabel || 'Featured Meet', emoji:'🐎', sub: featuredMeetingMeta?.subLabel || '2 watchlist selections', gated: false, tierRequired: null },
-          { key:'laythe',    label:'VIP Rollers',      emoji:'👑', sub:'Lay the Favourite',   gated: true, tierRequired: 'vip' },
-          { key:'majors',    label:'Major Races',      emoji:'🏆', sub:'Ante-post + previews', gated: true, tierRequired: 'premium' },
+          { key:'laythe',    label:'Favourite Watch',      emoji:'🚫', sub:'Vulnerable Favorites', gated: true, tierRequired: 'vip' },
+          { key:'majors',    label:'Major Races',      emoji:'🏆', sub:'Ante-post + previews — free', gated: true, tierRequired: 'free' },
+          { key:'worldcup',  label:'World Cup',        emoji:'⚽', sub:'2026 predictions — free',    gated: true, tierRequired: 'free' },
+          { key:'wimbledon', label:'Pro Tennis',       emoji:'🎾', sub:'Live predictions — free',    gated: true, tierRequired: 'free' },
+          { key:'tourdefrance', label:'Pro Cycling',   emoji:'🚴', sub:'Stage predictions — free',  gated: true, tierRequired: 'free' },
+          { key:'rugby',     label:'Rugby',            emoji:'🏉', sub:'Nations Championship — free', gated: true, tierRequired: 'free' },
+          { key:'golf',      label:'Pro Golf',          emoji:'⛳', sub:'Majors — free',                gated: true, tierRequired: 'free' },
           ...(isAuthenticated ? [{ key:'account', label:'My Account', emoji:'👤', sub:'Profile & billing', gated: true, tierRequired: 'premium' }] : []),
           ...(isAdmin ? [{ key:'admin', label:'Admin', emoji:'⚙️', sub:'System controls', gated: true, admin: true, tierRequired: 'admin' }] : []),
         ]
@@ -788,11 +897,11 @@ function App() {
         })}
       </div>
 
-      <main style={{ maxWidth:'960px', margin:'0 auto', padding:'0 12px' }}>
+      <main style={page === 'worldcup' ? {} : { maxWidth:'960px', margin:'0 auto', padding:'0 12px' }}>
         {paymentSuccess && (
           <div style={{ background:'linear-gradient(135deg,rgba(52,211,153,0.2),rgba(16,185,129,0.15))', border:'1.5px solid rgba(52,211,153,0.5)', borderRadius:'12px', padding:'16px 20px', textAlign:'center', marginBottom:'16px' }}>
             <div style={{ fontSize:'20px', marginBottom:'4px' }}>🎉</div>
-            <div style={{ fontSize:'16px', fontWeight:'800', color:'#34d399' }}>Welcome to {paymentSuccess === 'vip' ? 'VIP Rollers' : 'Premium'}!</div>
+            <div style={{ fontSize:'16px', fontWeight:'800', color:'#34d399' }}>Welcome to {paymentSuccess === 'vip' ? 'Favourite Watch' : 'Premium'}!</div>
             <div style={{ fontSize:'13px', color:'rgba(255,255,255,0.7)', marginTop:'4px' }}>Your subscription is now active. Enjoy full access to all picks!</div>
           </div>
         )}
@@ -800,10 +909,15 @@ function App() {
           const pageConfig = [
             { key:'home',      tierRequired: null, component: () => <HomePageView onAuthSuccess={handleAuthSuccess} isAuthenticated={isAuthenticated} authUser={authUser} accountSettingsRequest={accountSettingsRequest} /> },
             { key:'punchestown', tierRequired: null, component: () => <PunchestownTomorrowView /> },
-            { key:'picks',    tierRequired: 'premium', component: () => <Top5PicksView /> },
-            { key:'picks5',   tierRequired: 'premium', component: () => <Top5PicksView /> },
+            { key:'picks',    tierRequired: 'free', component: () => <Top5PicksView /> },
+            { key:'picks5',   tierRequired: 'free', component: () => <Top5PicksView /> },
             { key:'laythe',   tierRequired: 'vip', component: () => <LayTheFavView /> },
-            { key:'majors',   tierRequired: 'premium', component: () => <MajorRacesView /> },
+            { key:'majors',   tierRequired: 'free', component: () => <MajorRacesView /> },
+            { key:'worldcup', tierRequired: 'free', component: () => <WorldCupPage /> },
+            { key:'wimbledon', tierRequired: 'free', component: () => <WimbledonPage /> },
+            { key:'tourdefrance', tierRequired: 'free', component: () => <TourDeFrancePage /> },
+            { key:'rugby', tierRequired: 'free', component: () => <RugbyPage /> },
+            { key:'golf', tierRequired: 'free', component: () => <GolfPage /> },
             { key:'account',  tierRequired: 'premium', component: () => <MyAccountView authUser={authUser} onLogout={handleLogout} accountSettingsRequest={accountSettingsRequest} /> },
             { key:'admin',    tierRequired: 'admin', component: () => isAdmin ? <AdminView authUser={authUser} /> : null },
           ];
@@ -822,35 +936,61 @@ function App() {
             hasAccess = hasVipEntitlement;
           } else if (requiredTier === 'premium') {
             hasAccess = hasPaidEntitlement;
+          } else if (requiredTier === 'free') {
+            // Free tier: requires active account. trial_expired users must "Subscribe for Free" first.
+            hasAccess = isAuthenticated && hasActivePaidStatus;
           }
           
           // If no access, show gating message
           if (!hasAccess) {
             const vipMessage = requiredTier === 'vip';
+            const freeMessage = requiredTier === 'free';
+            const trialExpired = isAuthenticated && authUser?.subscription_status === 'trial_expired';
+            const worldCupMessage = cfg.key === 'worldcup';
+
+            // Trial-expired authenticated users get "Subscribe for Free" (no Stripe)
+            if (trialExpired && freeMessage) {
+              return (
+                <SubscribeFreeGate
+                  email={authUser?.email}
+                  onSuccess={handleAuthSuccess}
+                  pageName={cfg.key}
+                />
+              );
+            }
+
             return (
               <div style={{ background:'rgba(255,255,255,0.08)', borderRadius:'16px', padding:'60px 32px', textAlign:'center', maxWidth:'640px', margin:'40px auto' }}>
                 <div style={{ fontSize:'60px', marginBottom:'24px' }}>🔒</div>
                 <h2 style={{ fontSize:'28px', fontWeight:'900', color:'white', marginBottom:'12px' }}>
-                  {isAuthenticated
-                    ? (vipMessage ? 'VIP Rollers Exclusive' : 'Premium Access Required')
-                    : 'Unlock This Content'}
+                  {freeMessage
+                    ? (worldCupMessage ? '⚽ World Cup Predictions — Free Account Required' : 'Create a Free Account')
+                    : isAuthenticated
+                      ? (vipMessage ? 'Favourite Watch Exclusive' : 'Premium Access Required')
+                      : 'Unlock This Content'}
                 </h2>
                 <p style={{ fontSize:'16px', color:'rgba(255,255,255,0.7)', marginBottom:'28px', lineHeight:'1.6' }}>
-                  {isAuthenticated ? (
-                    vipMessage ?
-                      'This content is exclusive to VIP Rollers members. Upgrade now to unlock premium features and VIP-only strategies.' :
-                      'This page requires a Premium or VIP subscription. Subscribe today to unlock all picks and analysis.'
+                  {freeMessage ? (
+                    <>
+                      {worldCupMessage
+                        ? "Get all the World Cup action — group predictions, knockout bracket, scorers, England XI and BetBud's best bets for the 2026 tournament."
+                        : 'Sign up free to see daily picks, analysis and results.'}
+                      <br/>
+                      <strong style={{ color:'#34d399' }}>100% free — no card. Ever.</strong>
+                    </>
+                  ) : isAuthenticated ? (
+                    'This content is exclusive to Favourite Watch members. Upgrade now to unlock premium features and VIP-only strategies.'
                   ) : (
                     <>
-                      Get instant access to all premium picks, daily analysis, and our AI-powered value model.
+                      Get instant access to all picks, daily analysis, and our AI-powered value model.
                       <br/>
-                      <strong style={{ color:'#34d399' }}>Start your 7-day free trial — no payment required!</strong>
+                      <strong style={{ color:'#34d399' }}>3-day free trial — no credit card required.</strong>
                     </>
                   )}
                 </p>
                 <div style={{ display:'flex', flexDirection:'column', gap:'12px', alignItems:'center' }}>
                   <button onClick={() => {
-                    trackEvent('signup_click', { location: 'gated_page_' + cfg.key, tier: isAuthenticated ? (vipMessage ? 'vip' : 'premium') : 'premium_trial', user_status: isAuthenticated ? 'authenticated' : 'guest' });
+                    trackEvent('signup_click', { location: 'gated_page_' + cfg.key, tier: freeMessage ? 'free' : (vipMessage ? 'vip' : 'premium'), user_status: isAuthenticated ? 'authenticated' : 'guest' });
                     setPage('home');
                     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
                   }} style={{
@@ -861,9 +1001,11 @@ function App() {
                     boxShadow:'0 4px 12px rgba(5,150,105,0.3)',
                     minWidth:'240px'
                   }}>
-                    {isAuthenticated
-                      ? (vipMessage ? 'Upgrade to VIP' : 'View Plans')
-                      : '🎁 Start Free 7-Day Trial'}
+                    {freeMessage
+                      ? '🎁 Create Free Account'
+                      : isAuthenticated
+                        ? (vipMessage ? 'Upgrade to VIP' : 'View Plans')
+                        : '🎁 Start Free Trial — No Card'}
                   </button>
                   {!isAuthenticated && (
                     <button onClick={() => {
@@ -882,9 +1024,19 @@ function App() {
                 </div>
                 <div style={{ marginTop:'24px', padding:'16px', background:'rgba(52,211,153,0.08)', border:'1px solid rgba(52,211,153,0.25)', borderRadius:'10px' }}>
                   <div style={{ fontSize:'13px', color:'rgba(255,255,255,0.6)', lineHeight:'1.6' }}>
-                    ✓ No credit card required for trial<br/>
-                    ✓ Full Premium access for 7 days<br/>
-                    ✓ Cancel anytime, no questions asked
+                    {freeMessage ? (
+                      <>
+                        ✓ No credit card. Ever.<br/>
+                        ✓ 3-day trial then subscribe free — one click, still free<br/>
+                        ✓ Just need an account to sign in
+                      </>
+                    ) : (
+                      <>
+                        ✓ No credit card. Ever.<br/>
+                        ✓ Full access for 3 days — then subscribe free<br/>
+                        ✓ Cancel anytime, no questions asked
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1023,7 +1175,7 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState(null);
   const [cumulRoi, setCumulRoi] = useState(null);
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
   const [now, setNow]           = useState(new Date());
   const [upgradeLoading, setUpgradeLoading] = useState(null);
   const [upgradeError, setUpgradeError]     = useState(null);
@@ -1057,7 +1209,7 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
   };
 
   useEffect(() => { const t = setInterval(() => setNow(new Date()), 60000); return () => clearInterval(t); }, []);
-  useEffect(() => { const h = () => setIsMobile(window.innerWidth < 768); window.addEventListener('resize', h); return () => window.removeEventListener('resize', h); }, []);
+  useEffect(() => { const h = () => setIsMobile(window.innerWidth < 1024); window.addEventListener('resize', h); return () => window.removeEventListener('resize', h); }, []);
   useEffect(() => { loadPicks(); const iv = setInterval(() => { const h = new Date().getHours(); if (h >= 12 && h <= 18) loadPicks(); }, 30*60*1000); return () => clearInterval(iv); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadPicks = async () => {
@@ -1525,8 +1677,8 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
                   {/* VIP ROLLERS */}
                   <div style={{ flex:'1 1 160px', maxWidth:'260px', background:'linear-gradient(135deg,rgba(245,158,11,0.12),rgba(251,191,36,0.06))', border:'2px solid rgba(245,158,11,0.45)', borderRadius:'14px', padding:'18px 16px', position:'relative' }}>
                     <div style={{ position:'absolute', top:'-10px', left:'50%', transform:'translateX(-50%)', background:'linear-gradient(135deg,#f59e0b,#d97706)', borderRadius:'12px', padding:'2px 12px', fontSize:'9px', fontWeight:'800', color:'white', textTransform:'uppercase', letterSpacing:'0.5px', whiteSpace:'nowrap' }}>Best Value</div>
-                    <div style={{ fontSize:'12px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'1px', color:'#fbbf24', marginBottom:'4px', textAlign:'center' }}>👑 VIP Rollers</div>
-                    <div style={{ textAlign:'center', marginBottom:'10px' }}><span style={{ fontSize:'26px', fontWeight:'900', color:'white' }}>€49.99</span><span style={{ fontSize:'12px', color:'rgba(255,255,255,0.4)' }}>/mo</span></div>
+                    <div style={{ fontSize:'12px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'1px', color:'#fbbf24', marginBottom:'4px', textAlign:'center' }}>👑 Favourite Watch</div>
+                    <div style={{ textAlign:'center', marginBottom:'10px' }}><span style={{ fontSize:'26px', fontWeight:'900', color:'white' }}>€9.99</span><span style={{ fontSize:'12px', color:'rgba(255,255,255,0.4)' }}>/mo</span></div>
                     <ul style={{ listStyle:'none', padding:0, margin:'0 0 14px', fontSize:'12px', color:'rgba(255,255,255,0.7)', lineHeight:'1.9' }}>
                       <li>✓ 4+ tips daily + 2 watchlist picks</li>
                       <li>✓ Early ante-post selections</li>
@@ -1537,7 +1689,7 @@ function DailyPicksView({ isFreeUser, onUpgrade, authUser }) {
                     </ul>
                     <button onClick={() => doSubscribe('vip')} disabled={!!upgradeLoading}
                       style={{ width:'100%', background:'linear-gradient(135deg,#f59e0b,#d97706)', border:'none', borderRadius:'8px', padding:'10px', color:'white', fontSize:'13px', fontWeight:'800', cursor:upgradeLoading?'wait':'pointer', opacity:upgradeLoading==='premium'?0.5:1 }}>
-                      {upgradeLoading==='vip' ? 'Redirecting...' : 'Get VIP Rollers'}
+                      {upgradeLoading==='vip' ? 'Redirecting...' : 'Get Favourite Watch'}
                     </button>
                   </div>
                 </div>
@@ -1608,54 +1760,39 @@ function UpgradeCards({ authUser }) {
       {error && (
         <div style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)', borderRadius: '8px', padding: '10px', textAlign: 'center', marginBottom: '12px', color: '#f87171', fontSize: '13px' }}>{error}</div>
       )}
-      <div style={{ display: 'flex', gap: '12px', maxWidth: '700px', margin: '0 auto', flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: '16px', maxWidth: '520px', margin: '0 auto', flexWrap: 'wrap', justifyContent: 'center' }}>
         {/* Free */}
-        <div style={{ flex: '1 1 200px', maxWidth: '220px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
-          <div style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: '#60a5fa', marginBottom: '4px' }}>7-Day Free Trial</div>
-          <div style={{ fontSize: '24px', fontWeight: '900', color: 'white', marginBottom: '8px' }}>€0<span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>/mo</span></div>
-          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', lineHeight: '1.7', marginBottom: '10px' }}>No card details required · cancel anytime</div>
-          {currentTier === 'free' ? (
-            <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '8px', padding: '8px', fontSize: '12px', fontWeight: '700', color: 'rgba(255,255,255,0.4)' }}>Current Plan</div>
+        <div style={{ flex: '1 1 220px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '18px', textAlign: 'center' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: '#34d399', marginBottom: '4px' }}>Free Access</div>
+          <div style={{ fontSize: '28px', fontWeight: '900', color: 'white', marginBottom: '6px' }}>€0<span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>/mo</span></div>
+          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', lineHeight: '1.7', marginBottom: '12px' }}>
+            ✓ Horse racing picks<br/>
+            ✓ Pro Tennis · Pro Cycling<br/>
+            ✓ Rugby · Pro Golf · World Cup<br/>
+            ✓ No credit card. Ever.
+          </div>
+          {(currentTier === 'free' || currentTier === 'free_subscriber') || (!isActive && currentTier !== 'vip') ? (
+            <div style={{ background: 'rgba(52,211,153,0.1)', borderRadius: '8px', padding: '8px', fontSize: '12px', fontWeight: '700', color: '#34d399' }}>✓ Your Plan</div>
           ) : <div style={{ height: '32px' }} />}
         </div>
-        {/* Premium */}
-        <div style={{ flex: '1 1 200px', maxWidth: '220px', background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1))', border: '2px solid rgba(99,102,241,0.5)', borderRadius: '12px', padding: '16px', textAlign: 'center', position: 'relative', boxShadow: '0 0 25px rgba(99,102,241,0.15)' }}>
-          <div style={{ position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #6366f1, #7c3aed)', borderRadius: '12px', padding: '2px 12px', fontSize: '9px', fontWeight: '800', color: 'white', textTransform: 'uppercase', letterSpacing: '0.5px' }}>⭐ Popular</div>
-          <div style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: '#818cf8', marginBottom: '4px' }}>Premium</div>
-          <div style={{ fontSize: '24px', fontWeight: '900', color: 'white', marginBottom: '8px' }}>€9.99<span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>/mo</span></div>
-          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)', lineHeight: '1.65', marginBottom: '10px', textAlign: 'left' }}>
-            ✓ 4+ Tips Daily<br/>
-            ✓ 2 Watchlist Selections Daily<br/>
-            ✓ Daily Featured Meeting<br/>
-            ✓ All Results + Live ROI Tracking
+        {/* Favourite Watch — only paid tier */}
+        <div style={{ flex: '1 1 220px', background: 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(251,191,36,0.06))', border: '2px solid rgba(245,158,11,0.45)', borderRadius: '12px', padding: '18px', textAlign: 'center', position: 'relative', boxShadow: '0 0 25px rgba(245,158,11,0.1)' }}>
+          <div style={{ position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #f59e0b, #d97706)', borderRadius: '12px', padding: '2px 12px', fontSize: '9px', fontWeight: '800', color: 'white', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🚫 For Exchange Players</div>
+          <div style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: '#fbbf24', marginBottom: '4px' }}>Favourite Watch</div>
+          <div style={{ fontSize: '28px', fontWeight: '900', color: 'white', marginBottom: '6px' }}>€9.99<span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>/mo</span></div>
+          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)', lineHeight: '1.7', marginBottom: '4px', textAlign: 'left' }}>
+            ✓ Everything in Free<br/>
+            ✓ Vulnerable favourite alerts<br/>
+            ✓ Exchange lay signals daily<br/>
+            ✓ Betfair account recommended
           </div>
-          {currentTier === 'premium' && isActive ? (
-            <div style={{ background: 'rgba(52,211,153,0.15)', borderRadius: '8px', padding: '8px', fontSize: '12px', fontWeight: '700', color: '#34d399' }}>✓ Current Plan</div>
-          ) : (
-            <button onClick={() => handleSubscribe('premium')} disabled={!!loading}
-              style={{ width: '100%', background: 'linear-gradient(135deg, #6366f1, #7c3aed)', border: 'none', borderRadius: '8px', padding: '9px', color: 'white', fontSize: '13px', fontWeight: '800', cursor: loading ? 'wait' : 'pointer', opacity: loading === 'vip' ? 0.5 : 1 }}>
-              {loading === 'premium' ? 'Redirecting...' : (showTrialCta ? 'Start 7-Day Free Trial' : 'Subscribe — €9.99/mo')}
-            </button>
-          )}
-        </div>
-        {/* VIP Rollers */}
-        <div style={{ flex: '1 1 200px', maxWidth: '220px', background: 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(251,191,36,0.06))', border: '2px solid rgba(245,158,11,0.45)', borderRadius: '12px', padding: '16px', textAlign: 'center', position: 'relative', boxShadow: '0 0 25px rgba(245,158,11,0.1)' }}>
-          <div style={{ position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #f59e0b, #d97706)', borderRadius: '12px', padding: '2px 12px', fontSize: '9px', fontWeight: '800', color: 'white', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🔥 Best Value</div>
-          <div style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: '#fbbf24', marginBottom: '4px' }}>👑 VIP Rollers</div>
-          <div style={{ fontSize: '24px', fontWeight: '900', color: 'white', marginBottom: '8px' }}>€49.99<span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>/mo</span></div>
-          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)', lineHeight: '1.65', marginBottom: '4px', textAlign: 'left' }}>
-            ✓ Everything in Premium<br/>
-            ✓ Early Ante-Post Major Race Selections<br/>
-            ✓ Lay the Vulnerable Favourite<br/>
-            ✓ Major Race Previews
-          </div>
-          <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', marginBottom: '10px' }}>⚡ Exchange account required for max benefit</div>
+          <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.35)', marginBottom: '12px' }}>The only paid feature on BetBudAI</div>
           {currentTier === 'vip' && isActive ? (
             <div style={{ background: 'rgba(52,211,153,0.15)', borderRadius: '8px', padding: '8px', fontSize: '12px', fontWeight: '700', color: '#34d399' }}>✓ Current Plan</div>
           ) : (
             <button onClick={() => handleSubscribe('vip')} disabled={!!loading}
               style={{ width: '100%', background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', borderRadius: '8px', padding: '9px', color: 'white', fontSize: '13px', fontWeight: '800', cursor: loading ? 'wait' : 'pointer', opacity: loading === 'premium' ? 0.5 : 1 }}>
-              {loading === 'vip' ? 'Redirecting...' : (showTrialCta ? 'Start 7-Day Free Trial' : 'Subscribe — €49.99/mo')}
+              {loading === 'vip' ? 'Redirecting...' : (showTrialCta ? 'Start 3-Day Free Trial' : 'Subscribe — €9.99/mo')}
             </button>
           )}
         </div>
@@ -1748,7 +1885,7 @@ function RevolutPayOption({ authUser, compact }) {
           </div>
         </div>
         <div style={{ marginTop: '10px', fontSize: '11px', color: 'rgba(255,255,255,0.4)', lineHeight: '1.6' }}>
-          ⚡ Revolut-to-Revolut transfers are instant · Include your <strong style={{ color: 'rgba(255,255,255,0.6)' }}>username as reference</strong> so we can activate your account · €9.99/mo Premium · €49.99/mo VIP
+          ⚡ Revolut-to-Revolut transfers are instant · Include your <strong style={{ color: 'rgba(255,255,255,0.6)' }}>username as reference</strong> so we can activate your account · €9.99/mo Favourite Watch
         </div>
       </div>
       <LegalDisclaimerCard />
@@ -1849,7 +1986,7 @@ function PricingView({ authUser, onSuccess }) {
       {isActive && currentTier !== 'free' && (
         <div style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)', borderRadius: '10px', padding: '14px 18px', textAlign: 'center', marginBottom: '24px' }}>
           <span style={{ color: '#34d399', fontWeight: '700', fontSize: '14px' }}>
-            ✓ You're on the {currentTier === 'vip' ? 'VIP Rollers' : 'Premium'} plan
+            ✓ You're on the {currentTier === 'vip' ? 'Favourite Watch' : 'Premium'} plan
           </span>
           {subStatus?.subscription_status === 'canceling' && (
             <span style={{ color: '#fbbf24', fontSize: '13px', marginLeft: '12px' }}>(cancels at period end)</span>
@@ -1883,75 +2020,41 @@ function PricingView({ authUser, onSuccess }) {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', maxWidth: '700px', margin: '0 auto', padding: '0 8px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', maxWidth: '560px', margin: '0 auto', padding: '0 8px' }}>
 
-        {/* FREE TRIAL / FREE TIER */}
+        {/* FREE ACCESS */}
         <div style={{ background: 'linear-gradient(135deg, rgba(52,211,153,0.1), rgba(16,185,129,0.05))', border: '1px solid rgba(52,211,153,0.25)', borderRadius: '16px', padding: '28px 24px', position: 'relative' }}>
-          <div style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#34d399', fontWeight: '700', marginBottom: '8px' }}>7-Day Free Trial</div>
+          <div style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#34d399', fontWeight: '700', marginBottom: '8px' }}>Free Access</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '16px' }}>
             <span style={{ fontSize: '36px', fontWeight: '900', color: 'white' }}>€0</span>
-            <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>for 7 days</span>
+            <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>/mo — always</span>
           </div>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px', fontSize: '14px', color: 'rgba(255,255,255,0.7)', lineHeight: '2' }}>
-            <li>✓ Full Premium access</li>
-            <li>✓ 4+ tips daily + 2 watchlist picks</li>
-            <li>✓ Daily featured meeting, results &amp; live ROI</li>
-            <li>✓ No card details required</li>
-            <li style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px' }}>Then €9.99/mo after trial</li>
+            <li>✓ Horse racing AI picks</li>
+            <li>✓ Pro Tennis · Pro Cycling · Rugby</li>
+            <li>✓ Pro Golf · World Cup predictions</li>
+            <li>✓ Live ROI tracker</li>
+            <li>✓ No credit card. Ever.</li>
           </ul>
-          <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '10px', padding: '10px', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontWeight: '700', fontSize: '14px' }}>
-            {currentTier === 'free' ? 'Current Plan' : '—'}
+          <div style={{ background: 'rgba(52,211,153,0.1)', borderRadius: '10px', padding: '10px', textAlign: 'center', color: '#34d399', fontWeight: '700', fontSize: '14px' }}>
+            {(currentTier === 'vip' && isActive) ? 'Included in your plan' : '✓ Your Plan'}
           </div>
         </div>
 
-        {/* PREMIUM TIER */}
-        <div style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.08))', border: '2px solid rgba(99,102,241,0.4)', borderRadius: '16px', padding: '28px 24px', position: 'relative' }}>
-          <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #6366f1, #7c3aed)', borderRadius: '20px', padding: '4px 16px', fontSize: '11px', fontWeight: '800', color: 'white', textTransform: 'uppercase', letterSpacing: '1px' }}>Most Popular</div>
-          <div style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#818cf8', fontWeight: '700', marginBottom: '8px' }}>Premium</div>
+        {/* FAVOURITE WATCH — only paid tier */}
+        <div style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(251,191,36,0.06))', border: '2px solid rgba(245,158,11,0.35)', borderRadius: '16px', padding: '28px 24px', position: 'relative' }}>
+          <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #f59e0b, #d97706)', borderRadius: '20px', padding: '4px 16px', fontSize: '11px', fontWeight: '800', color: 'white', textTransform: 'uppercase', letterSpacing: '1px' }}>🚫 For Exchange Players</div>
+          <div style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#fbbf24', fontWeight: '700', marginBottom: '8px' }}>Favourite Watch</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '16px' }}>
             <span style={{ fontSize: '36px', fontWeight: '900', color: 'white' }}>€9.99</span>
             <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>/month</span>
           </div>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px', fontSize: '14px', color: 'rgba(255,255,255,0.7)', lineHeight: '2' }}>
-            <li>✓ 4+ Tips Daily</li>
-            <li>✓ 2 Watchlist Selections Daily</li>
-            <li>✓ Daily Featured Meeting</li>
-            <li>✓ All Results</li>
-            <li>✓ Live ROI Tracking</li>
-            <li>✓ Priority Support</li>
-            <li>✓ Cancel Anytime</li>
-          </ul>
-          {currentTier === 'premium' && isActive ? (
-            <div style={{ background: 'rgba(52,211,153,0.15)', borderRadius: '10px', padding: '10px', textAlign: 'center', color: '#34d399', fontWeight: '700', fontSize: '14px' }}>
-              ✓ Current Plan
-            </div>
-          ) : (
-            <button onClick={() => handleSubscribe('premium')} disabled={!!loading}
-              style={{ width: '100%', background: 'linear-gradient(135deg, #6366f1, #7c3aed)', border: 'none', borderRadius: '10px', padding: '12px', color: 'white', fontSize: '15px', fontWeight: '800', cursor: loading ? 'wait' : 'pointer', opacity: loading === 'vip' ? 0.5 : 1 }}>
-              {loading === 'premium' ? 'Redirecting to checkout...' : 'Subscribe to Premium'}
-            </button>
-          )}
-        </div>
-
-        {/* VIP TIER */}
-        <div style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(251,191,36,0.06))', border: '2px solid rgba(245,158,11,0.35)', borderRadius: '16px', padding: '28px 24px', position: 'relative' }}>
-          <div style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#fbbf24', fontWeight: '700', marginBottom: '8px' }}>VIP Rollers</div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '16px' }}>
-            <span style={{ fontSize: '36px', fontWeight: '900', color: 'white' }}>€49.99</span>
-            <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>/month</span>
-          </div>
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px', fontSize: '14px', color: 'rgba(255,255,255,0.7)', lineHeight: '2' }}>
-            <li>✓ 4+ Tips Daily</li>
-            <li>✓ 2 Watchlist Selections Daily</li>
-            <li>✓ Daily Featured Meeting</li>
-            <li>✓ All Results</li>
-            <li>✓ Early Ante-Post Major Race Selections</li>
-            <li>✓ Lay the Vulnerable Favourite</li>
-            <li>✓ Live ROI Tracking</li>
-            <li>✓ Major Race Previews</li>
-            <li>✓ Priority support</li>
-            <li>✓ Cancel anytime</li>
-            <li style={{ color: 'rgba(255,255,255,0.45)' }}>⚡ Exchange account required for max benefit</li>
+            <li>✓ Everything in Free</li>
+            <li>✓ Vulnerable favourite alerts daily</li>
+            <li>✓ Exchange lay signals</li>
+            <li>✓ Betfair account recommended</li>
+            <li style={{ color: 'rgba(255,255,255,0.45)', fontSize: '13px' }}>The only paid feature on BetBudAI</li>
           </ul>
           {currentTier === 'vip' && isActive ? (
             <div style={{ background: 'rgba(52,211,153,0.15)', borderRadius: '10px', padding: '10px', textAlign: 'center', color: '#34d399', fontWeight: '700', fontSize: '14px' }}>
@@ -1960,7 +2063,7 @@ function PricingView({ authUser, onSuccess }) {
           ) : (
             <button onClick={() => handleSubscribe('vip')} disabled={!!loading}
               style={{ width: '100%', background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', borderRadius: '10px', padding: '12px', color: 'white', fontSize: '15px', fontWeight: '800', cursor: loading ? 'wait' : 'pointer', opacity: loading === 'premium' ? 0.5 : 1 }}>
-              {loading === 'vip' ? 'Redirecting to checkout...' : 'Subscribe to VIP Rollers'}
+              {loading === 'vip' ? 'Redirecting to checkout...' : 'Subscribe — €9.99/mo'}
             </button>
           )}
         </div>
@@ -2065,7 +2168,7 @@ function MyAccountView({ authUser, onLogout, accountSettingsRequest }) {
     setCloseLoading(false);
   };
 
-  const tierLabel = (t) => t === 'vip' ? 'VIP Rollers' : t === 'premium' ? 'Premium' : 'Free Trial';
+  const tierLabel = (t) => t === 'vip' ? 'Favourite Watch' : t === 'premium' ? 'Premium' : 'Free Trial';
   const tierColor = (t) => t === 'vip' ? '#fbbf24' : t === 'premium' ? '#818cf8' : '#34d399';
   const periodEnd = subStatus?.subscription_current_period_end
     ? new Date(subStatus.subscription_current_period_end * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -2081,7 +2184,7 @@ function MyAccountView({ authUser, onLogout, accountSettingsRequest }) {
   const status = subStatus?.subscription_status || '';
   const isActive = status === 'active' || status === 'trialing';
   const isCanceling = status === 'canceling';
-  const monthlyPrice = tier === 'vip' ? '€49.99' : '€9.99';
+  const monthlyPrice = tier === 'vip' ? '€9.99' : '€9.99';
   const checkoutPending = subStatus?.checkout_pending;
   const emailOptedOut = !!subStatus?.daily_picks_email_opt_out;
   const canCloseAccount = !subStatus?.has_subscription && !isActive && !isCanceling;
@@ -2122,7 +2225,7 @@ function MyAccountView({ authUser, onLogout, accountSettingsRequest }) {
           <div style={{ fontSize: '48px', marginBottom: '8px' }}>⚠️</div>
           <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#fbbf24', marginBottom: '8px' }}>Complete Your Account Setup</h2>
           <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', maxWidth: '400px', margin: '0 auto 24px' }}>
-            Your account was created but you haven't completed the payment setup yet. A valid credit card is required to activate your 7-day free trial.
+            Your account was created but you haven't completed the payment setup yet. A valid credit card is required to activate your 3-day free trial.
           </p>
         </div>
         {error && (
@@ -2132,14 +2235,14 @@ function MyAccountView({ authUser, onLogout, accountSettingsRequest }) {
         )}
         <div style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', padding: '24px', textAlign: 'center' }}>
           <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '16px', lineHeight: '1.6' }}>
-            💳 Enter your card via Stripe to start your <strong style={{ color: '#34d399' }}>7-day free trial</strong>.<br/>
+            💳 Enter your card via Stripe to start your <strong style={{ color: '#34d399' }}>3-day free trial</strong>.<br/>
             You won't be charged during the trial. Cancel anytime.
           </div>
           <button onClick={handleCompleteSetup} disabled={cancelLoading}
             style={{ background: 'linear-gradient(135deg, #059669, #047857)', border: 'none', borderRadius: '10px', padding: '14px 40px', color: 'white', fontSize: '16px', fontWeight: '800', cursor: cancelLoading ? 'wait' : 'pointer' }}>
             {cancelLoading ? 'Redirecting...' : '🔒 Complete Setup - Start Free Trial'}
           </button>
-          <div style={{ marginTop: '16px', fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>Secure checkout powered by Stripe - €0 for 7 days, then €9.99/mo</div>
+          <div style={{ marginTop: '16px', fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>Secure checkout powered by Stripe - €0 for 3 days, then €9.99/mo</div>
         </div>
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
           <button onClick={onLogout} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}>Sign out</button>
@@ -2335,7 +2438,7 @@ function Top5PicksView() {
   const [yesterdaySummary5, setYesterdaySummary5] = useState(null);
   const [yesterdayPicks5, setYesterdayPicks5] = useState([]);
   const [yesterdayDate5, setYesterdayDate5] = useState('');
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
   const [now, setNow]           = useState(new Date());
   const [expandedCards5, setExpandedCards5] = useState(new Set());
   const [showReadGuide5, setShowReadGuide5] = useState(false);
@@ -2355,7 +2458,7 @@ function Top5PicksView() {
   };
 
   useEffect(() => { const t = setInterval(() => setNow(new Date()), 60000); return () => clearInterval(t); }, []);
-  useEffect(() => { const h = () => setIsMobile(window.innerWidth < 768); window.addEventListener('resize', h); return () => window.removeEventListener('resize', h); }, []);
+  useEffect(() => { const h = () => setIsMobile(window.innerWidth < 1024); window.addEventListener('resize', h); return () => window.removeEventListener('resize', h); }, []);
   useEffect(() => { loadPicks(); const iv = setInterval(() => { const h = new Date().getHours(); if (h >= 12 && h <= 18) loadPicks(); }, 30*60*1000); return () => clearInterval(iv); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -2974,7 +3077,7 @@ function Top5PicksView() {
 function AnalysisQualityReport({ date }) {
   const [quality, setQuality] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
 
   useEffect(() => {
     if (!date) return;
@@ -3096,12 +3199,12 @@ function YesterdayResultsView({ isFreeUser }) {
   const [results, setResults]         = useState(null);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
-  const [isMobile, setIsMobile]       = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+  const [isMobile, setIsMobile]       = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
   const [cumulRoi, setCumulRoi]         = useState(null);
   const [layData,  setLayData]          = useState(null);
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -4399,7 +4502,7 @@ function PunchestownTomorrowView() {
   const [summaryPayload, setSummaryPayload] = useState({ races: [], race_count: 0, settled_count: 0, date: null, last_analysed_at: null });
   const [lastUpdated, setLastUpdated] = useState(null);
   const [strategyMode, setStrategyMode] = useState('balanced');
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
 
   const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Dublin' });
   const lockedFeaturedCourse = '';
@@ -4414,7 +4517,7 @@ function PunchestownTomorrowView() {
   });
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -5162,7 +5265,7 @@ function PunchestownTomorrowView() {
                                   <div style={{ marginTop: '4px', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                                     {runnerOdds && (
                                       <span style={{ background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.28)', borderRadius: '999px', padding: '1px 6px', fontSize: '10px', color: '#bfdbfe', fontWeight: '700' }}>
-                                        Odds: {runnerOdds}
+                                        {toFractional(parseOddsToDecimal(runnerOdds)) || runnerOdds}
                                       </span>
                                     )}
                                     {runnerOfficialRating && (
@@ -5193,6 +5296,7 @@ function PunchestownTomorrowView() {
                     <div style={{ display: 'grid', gap: '8px', maxWidth: isMobile ? '100%' : '520px', width: isMobile ? '100%' : 'auto' }}>
                       <span style={{ background: 'linear-gradient(135deg,#16a34a 0%,#65a30d 100%)', border: '2px solid rgba(190,242,100,0.9)', borderRadius: '10px', padding: isMobile ? '7px 10px' : '8px 14px', fontSize: isMobile ? '13px' : '16px', color: '#f7fee7', fontWeight: '900', letterSpacing: '0.3px', textTransform: 'uppercase', boxShadow: '0 6px 18px rgba(132,204,22,0.35)', justifySelf: 'start' }}>
                         Model Pick: {linkedPick.horse || 'n/a'}
+                        {linkedPick.odds && <span style={{ marginLeft: '8px', background: 'rgba(0,0,0,0.25)', borderRadius: '6px', padding: '2px 8px', fontSize: isMobile ? '12px' : '14px' }}>{formatFeaturedOdds(linkedPick.odds)}</span>}
                       </span>
 
                       <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.22)', borderRadius: '8px', padding: '8px 10px' }}>
@@ -5238,7 +5342,7 @@ function PunchestownTomorrowView() {
                           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
                             {linkedEachWay.odds && (
                               <span style={{ background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.28)', borderRadius: '999px', padding: '1px 7px', fontSize: '10px', color: '#bfdbfe', fontWeight: '700' }}>
-                                Odds: {linkedEachWay.odds}
+                                {formatFeaturedOdds(linkedEachWay.odds)}
                               </span>
                             )}
                             {linkedEachWay.score !== null && linkedEachWay.score !== undefined && (
@@ -5297,10 +5401,10 @@ function MajorRacesView() {
   const [featuredMeetingData, setFeaturedMeetingData] = useState(null);
   const [analysisLoading, setAnalysisLoading] = useState(true);
   const [expandedRace, setExpandedRace] = useState(null);
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -5615,21 +5719,24 @@ function LayTheFavView() {
   const [loading, setLoading] = useState(true);
   const [error, setError]   = useState(null);
   const [filter, setFilter] = useState('all'); // all | caution | strong
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  useEffect(() => {
+  const loadData = () => {
     setLoading(true);
+    setError(null);
     fetch(`${API_BASE_URL}/api/favs-run`)
       .then(r => r.json())
       .then(d => { setData(d); setLoading(false); })
       .catch(e => { setError(e.message); setLoading(false); });
-  }, []);
+  };
+
+  useEffect(() => { loadData(); }, []);
 
   const VERDICT_COLOURS = {
     RED:    { fg:'#f87171', bg:'rgba(248,113,113,0.12)', border:'rgba(248,113,113,0.35)' },
@@ -5652,7 +5759,8 @@ function LayTheFavView() {
     </div>
   );
 
-  const { summary, races, generated, history_days, history_summary } = data;
+  const { summary, races, vip_elite: vipEliteRaw, generated, history_days, history_summary } = data;
+  const vipElite = Array.isArray(vipEliteRaw) ? vipEliteRaw : [];
   const genTime = generated ? new Date(generated).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : '';
   const dailyHistory = Array.isArray(history_days) ? history_days : [];
   const historyAgg = history_summary || {};
@@ -5722,18 +5830,123 @@ function LayTheFavView() {
 
       {/* Header */}
       <div style={{ background:'linear-gradient(135deg,rgba(217,119,6,0.25) 0%,rgba(180,83,9,0.18) 100%)', border:'1px solid rgba(245,158,11,0.3)', borderRadius:'14px', padding: isMobile ? '16px 14px' : '24px 28px', marginBottom:'24px' }}>
-        <div style={{ fontSize:'11px', letterSpacing:'2px', textTransform:'uppercase', color:'rgba(255,255,255,0.4)', marginBottom:'6px' }}>VIP Rollers · Lay Vulnerable Favorites</div>
-        <div style={{ fontSize:'22px', fontWeight:'800', color:'white', marginBottom:'4px' }}>👑 VIP Rollers — Lay Vulnerable Favorites</div>
+        <div style={{ fontSize:'11px', letterSpacing:'2px', textTransform:'uppercase', color:'rgba(255,255,255,0.4)', marginBottom:'6px' }}>Favourite Watch · Lay Vulnerable Favorites</div>
+        <div style={{ fontSize:'22px', fontWeight:'800', color:'white', marginBottom:'4px' }}>👑 Favourite Watch — Lay Vulnerable Favorites</div>
         <div style={{ fontSize:'13px', color:'rgba(255,255,255,0.55)', marginBottom:'12px' }}>Highlights vulnerable favorites to avoid backing and potential lay opportunities on exchange markets.</div>
+
+        <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'12px' }}>
+          {genTime && <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.4)' }}>Updated {genTime}</div>}
+          <button
+            onClick={loadData}
+            style={{ background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:'6px', color:'rgba(255,255,255,0.7)', fontSize:'11px', fontWeight:'700', padding:'4px 10px', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px' }}
+          >
+            🔄 Refresh
+          </button>
+        </div>
 
         {/* Exchange account notice */}
         <div style={{ display:'flex', alignItems:'flex-start', gap:'10px', background:'rgba(251,191,36,0.08)', border:'1px solid rgba(251,191,36,0.25)', borderRadius:'10px', padding:'12px 16px', marginBottom:'18px' }}>
           <span style={{ fontSize:'18px', flexShrink:0 }}>🔄</span>
           <div>
             <div style={{ fontSize:'13px', fontWeight:'700', color:'#fbbf24', marginBottom:'2px' }}>Bet Exchange Account Required</div>
-            <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.55)', lineHeight:'1.5' }}>VIP Rollers is built around <strong style={{ color:'rgba(255,255,255,0.8)' }}>laying horses on the exchange</strong>, using a specialist strategy designed to profit when selections lose. You'll need an account with Betfair Exchange or similar to place lay bets.</div>
+            <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.55)', lineHeight:'1.5' }}>Favourite Watch is built around <strong style={{ color:'rgba(255,255,255,0.8)' }}>laying horses on the exchange</strong>, using a specialist strategy designed to profit when selections lose. You'll need a betting exchange account to place lay bets.</div>
           </div>
         </div>
+
+        {/* LIVE LAY ROI TRACKER */}
+        {historyAgg && historyAgg.settled > 0 && (
+          <div style={{ background:'linear-gradient(135deg,rgba(52,211,153,0.14),rgba(16,185,129,0.07))', border:'1.5px solid rgba(52,211,153,0.35)', borderRadius:'14px', padding: isMobile ? '16px' : '20px 24px', marginBottom:'18px' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'14px' }}>
+              <span style={{ width:'8px', height:'8px', borderRadius:'50%', background:'#34d399', boxShadow:'0 0 6px #34d399', display:'inline-block' }}></span>
+              <span style={{ fontSize:'11px', fontWeight:'700', letterSpacing:'1.5px', textTransform:'uppercase', color:'#34d399' }}>Live Lay ROI · Last {historyAgg.days} {historyAgg.days === 1 ? 'Day' : 'Days'}</span>
+            </div>
+            <div style={{ display:'flex', flexWrap:'wrap', gap: isMobile ? '14px' : '28px' }}>
+              <div>
+                <div style={{ fontSize: isMobile ? '30px' : '38px', fontWeight:'900', color: (historyAgg.roi_pct ?? 0) >= 0 ? '#34d399' : '#f87171', lineHeight:1 }}>
+                  {historyAgg.roi_pct !== null ? `${historyAgg.roi_pct >= 0 ? '+' : ''}${historyAgg.roi_pct}%` : '—'}
+                </div>
+                <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>ROI · 1pt flat lay stake, 5% commission</div>
+              </div>
+              <div>
+                <div style={{ fontSize: isMobile ? '20px' : '24px', fontWeight:'800', color:'#fbbf24', lineHeight:1 }}>
+                  {historyAgg.lay_win_pct !== null ? `${historyAgg.lay_win_pct}%` : '—'}
+                </div>
+                <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Favourite lost (lay won)</div>
+              </div>
+              <div>
+                <div style={{ fontSize: isMobile ? '20px' : '24px', fontWeight:'800', color:'white', lineHeight:1 }}>
+                  {historyAgg.profit_pts !== undefined ? `${historyAgg.profit_pts >= 0 ? '+' : ''}${historyAgg.profit_pts}pts` : '—'}
+                </div>
+                <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Profit on {historyAgg.staked_pts}pts staked</div>
+              </div>
+              <div>
+                <div style={{ fontSize: isMobile ? '20px' : '24px', fontWeight:'800', color:'rgba(255,255,255,0.85)', lineHeight:1 }}>
+                  {historyAgg.settled}
+                </div>
+                <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Races settled, score 4+</div>
+              </div>
+            </div>
+            <div style={{ fontSize:'10px', color:'rgba(255,255,255,0.35)', marginTop:'14px', lineHeight:1.5 }}>
+              Every qualifying favourite (lay score ≥4) logged pre-race, no cherry-picking. ROI assumes a flat 1-point lay stake at the favourite's odds and standard 5% exchange commission on winning lays.
+            </div>
+          </div>
+        )}
+
+        {/* VIP ROLLERS ELITE LAY FILTER */}
+        {vipElite.length > 0 && (
+          <div style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.18),rgba(168,85,247,0.08))', border:'2px solid rgba(167,139,250,0.5)', borderRadius:'14px', padding: isMobile ? '14px' : '18px 22px', marginBottom:'22px' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'14px', flexWrap:'wrap' }}>
+              <div style={{ background:'linear-gradient(135deg,#7c3aed,#a855f7)', borderRadius:'8px', padding:'4px 12px', fontSize:'11px', fontWeight:'800', color:'white', letterSpacing:'1px', textTransform:'uppercase' }}>Favourite Watch</div>
+              <div style={{ fontSize:'15px', fontWeight:'800', color:'#c4b5fd' }}>Elite Lay Filter</div>
+              <div style={{ fontSize:'12px', color:'rgba(196,181,253,0.6)', marginLeft:'auto' }}>{vipElite.length} qualifying {vipElite.length === 1 ? 'race' : 'races'} today</div>
+            </div>
+            <div style={{ display:'flex', gap:'8px', flexWrap:'wrap', marginBottom:'14px' }}>
+              {[{t:'✅ Handicap', c:'#a78bfa'},{t:'✅ Score 13+', c:'#a78bfa'},{t:'✅ 8+ Runners', c:'#a78bfa'},{t:'✅ Below 2/1', c:'#a78bfa'}].map(b => (
+                <span key={b.t} style={{ background:'rgba(124,58,237,0.2)', border:'1px solid rgba(167,139,250,0.3)', borderRadius:'6px', padding:'3px 10px', fontSize:'11px', fontWeight:'700', color:b.c }}>{b.t}</span>
+              ))}
+            </div>
+            {vipElite.map((r, idx) => {
+              const timeStr = r.race_time ? new Date(r.race_time).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/London'}) : '';
+              const alt = r.alternative_winner;
+              const outcomeIcon = r.outcome === 'loss' || r.outcome === 'lost' ? '✅' : r.outcome === 'win' || r.outcome === 'won' ? '❌' : null;
+              return (
+                <div key={idx} style={{ background:'rgba(0,0,0,0.3)', border:'1px solid rgba(167,139,250,0.25)', borderRadius:'10px', padding:'14px 16px', marginBottom: idx < vipElite.length-1 ? '10px' : 0 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:'10px', flexWrap:'wrap', marginBottom:'8px' }}>
+                    <span style={{ fontWeight:'800', color:'#a78bfa', fontSize:'15px' }}>{timeStr}</span>
+                    <span style={{ fontWeight:'700', color:'white', fontSize:'14px' }}>{r.course}</span>
+                    <span style={{ fontSize:'11px', color:'rgba(255,255,255,0.4)', flex:1 }}>{r.race_name}</span>
+                    <span style={{ background:'rgba(248,81,73,0.2)', border:'1px solid rgba(248,81,73,0.4)', borderRadius:'5px', padding:'2px 8px', fontSize:'11px', fontWeight:'800', color:'#f87171' }}>LAY SCORE {r.lay_score}</span>
+                    {outcomeIcon && <span style={{ fontSize:'18px' }}>{outcomeIcon}</span>}
+                  </div>
+                  <div style={{ display:'flex', gap:'16px', flexWrap:'wrap', alignItems:'flex-start' }}>
+                    <div style={{ flex:1, minWidth:'160px' }}>
+                      <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.4)', marginBottom:'3px', textTransform:'uppercase', letterSpacing:'.5px' }}>Lay</div>
+                      <div style={{ fontWeight:'800', color:'#f87171', fontSize:'17px' }}>{r.favourite}</div>
+                      <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.5)', marginTop:'2px' }}>@ {r.fav_odds?.toFixed(2)} · {r.runners} runners · {r.trainer}</div>
+                    </div>
+                    {alt && (
+                      <div style={{ flex:1, minWidth:'160px', background:'rgba(52,211,153,0.08)', border:'1px solid rgba(52,211,153,0.2)', borderRadius:'8px', padding:'8px 12px' }}>
+                        <div style={{ fontSize:'11px', color:'#34d399', marginBottom:'3px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'.5px' }}>Alternative Winner</div>
+                        <div style={{ fontWeight:'800', color:'#6ee7b7', fontSize:'15px' }}>{alt.horse}</div>
+                        <div style={{ fontSize:'12px', color:'rgba(52,211,153,0.6)', marginTop:'2px' }}>Score {alt.score?.toFixed(0)} · @ {alt.odds?.toFixed(2)}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {vipElite.length === 0 && (
+          <div style={{ background:'rgba(124,58,237,0.08)', border:'1px dashed rgba(167,139,250,0.3)', borderRadius:'12px', padding:'16px 20px', marginBottom:'20px', display:'flex', alignItems:'center', gap:'12px' }}>
+            <div style={{ fontSize:'22px' }}>👑</div>
+            <div>
+              <div style={{ fontSize:'13px', fontWeight:'700', color:'#c4b5fd', marginBottom:'2px' }}>Favourite Watch Elite Lay Filter</div>
+              <div style={{ fontSize:'12px', color:'rgba(196,181,253,0.5)' }}>No races qualify today (Handicap + Score 13+ + 8 runners + below 2/1). Check back after the morning pipeline runs.</div>
+            </div>
+          </div>
+        )}
 
         {/* Score legend */}
         <div style={{ display:'flex', gap:'10px', flexWrap:'wrap', marginBottom:'18px' }}>
@@ -5747,7 +5960,7 @@ function LayTheFavView() {
 
         {/* Stats */}
         <div style={{ display:'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(auto-fill,minmax(120px,1fr))', gap:'10px', flexWrap:'wrap' }}>
-          {[{v:displaySummary.total, lbl:'Analysed (4+)', c:'#94a3b8'}, {v:displaySummary.caution, lbl:'Possible Lay (4+)', c:'#fbbf24'}, {v:displaySummary.strong, lbl:'Strong Lay (7+)', c:'#f97316'}, {v:displaySummary.red_flag, lbl:'Premium Lay (10+)', c:'#f87171'},
+          {[{v:displaySummary.total, lbl:'Reviewed (4+)', c:'#94a3b8'}, {v:displaySummary.caution, lbl:'Selected (4+)', c:'#fbbf24'}, {v:displaySummary.red_flag, lbl:'Favs Beaten (10+)', c:'#f87171'}, {v:displaySummary.strong, lbl:'Strong Lay (7+)', c:'#f97316'},
             {v: displaySummary.lay_win_pct != null ? `${displaySummary.lay_win_pct}%` : '—', lbl:`Lay Win % (${displaySummary.fav_lost}/${displaySummary.settled})`, c:'#22d3ee'}].map(s => (
             <div key={s.lbl} style={{ background:'rgba(255,255,255,0.07)', borderRadius:'10px', padding:'10px 18px', textAlign:'center' }}>
               <div style={{ fontSize:'24px', fontWeight:'800', color:s.c }}>{s.v}</div>
@@ -5764,14 +5977,14 @@ function LayTheFavView() {
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:'10px', flexWrap:'wrap', marginBottom:'10px' }}>
             <div style={{ fontSize:'12px', fontWeight:'800', letterSpacing:'0.8px', textTransform:'uppercase', color:'#67e8f9' }}>Rolling Lay History</div>
             <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.6)' }}>
-              {historyAgg.days || dailyHistory.length} days · {historyAgg.settled || 0} settled · {historyAgg.fav_lost || 0} fav lost · {historyAgg.lay_win_pct != null ? `${historyAgg.lay_win_pct}%` : '—'} lay win
+              {historyAgg.days || dailyHistory.length} days · {historyAgg.settled || 0} settled · {historyAgg.fav_lost || 0} favs beaten · {historyAgg.lay_win_pct != null ? `${historyAgg.lay_win_pct}%` : '—'} lay win
             </div>
           </div>
           <div style={{ overflowX:'auto' }}>
             <table style={{ width:'100%', borderCollapse:'collapse' }}>
               <thead>
                 <tr style={{ borderBottom:'1px solid rgba(255,255,255,0.15)' }}>
-                  {['Date', 'Total', 'Settled', 'Fav Lost', 'Lay Win %'].map(h => (
+                  {['Date', 'Reviewed', 'Selected', 'Favs Beaten', 'Lay Win %'].map(h => (
                     <th key={h} style={{ textAlign:'left', padding:'6px 8px', fontSize:'11px', color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'0.7px' }}>{h}</th>
                   ))}
                 </tr>
@@ -6067,7 +6280,7 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
   const [authMode, setAuthMode] = useState('login'); // 'register' | 'login' | 'forgot' | 'reset'
   const [selectedTrialTier, setSelectedTrialTier] = useState('premium');
   const [featuredSnapshot, setFeaturedSnapshot] = useState(null);
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
 
   const [form, setForm] = useState({
     fullName: '', email: '', age: '',
@@ -6167,7 +6380,7 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
       fetch(`${API_BASE_URL}/api/picks/featured-meeting?date=${yesterdayDateStr}`).then(r => r.json()).catch(() => null),
     ])
       .then(([roiData, latestData, todayData, yesterdayData, featuredData]) => {
-        if (roiData?.success) { setRoi(roiData.roi); setSettled(roiData.settled); }
+        if (roiData?.success || roiData?.roi != null) { setRoi(roiData.roi); setSettled(roiData.settled); }
         if (latestData?.success && latestData.fractional_odds) setLatestWinner(latestData);
         if (todayData?.success) {
           const official = Array.isArray(todayData.picks) ? todayData.picks.filter(p => p.show_in_ui !== false).length : 0;
@@ -6230,7 +6443,7 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
   }, []);
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -6240,8 +6453,8 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
     setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
-  const selectedTrialLabel = selectedTrialTier === 'vip' ? 'VIP Rollers' : 'Premium';
-  const selectedTrialPrice = selectedTrialTier === 'vip' ? '€49.99' : '€9.99';
+  const selectedTrialLabel = selectedTrialTier === 'vip' ? 'Favourite Watch' : 'Premium';
+  const selectedTrialPrice = selectedTrialTier === 'vip' ? '€9.99' : '€9.99';
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -6394,7 +6607,7 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
         <div style={{ fontSize: '64px', marginBottom: '16px' }}>🔒</div>
         <h2 style={{ color: '#34d399', fontSize: '28px', margin: '0 0 12px' }}>Account Created!</h2>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '16px', maxWidth: '480px', margin: '0 auto 32px' }}>
-          Redirecting you to Stripe to start your <strong>7-day free trial</strong>...
+          Redirecting you to Stripe to start your <strong>3-day free trial</strong>...
         </p>
         <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px' }}>You won't be charged during the trial. Cancel anytime.</div>
       </div>
@@ -6448,28 +6661,41 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
                 🏆 Featured Snapshot
               </span>
             </div>
-            <div style={{ fontSize: isMobile ? '48px' : '64px', textAlign: 'center', marginBottom: '12px' }}>🏇</div>
+            <div style={{ fontSize: isMobile ? '48px' : '56px', textAlign: 'center', marginBottom: '8px' }}>🏇</div>
+            {/* Yesterday's 4 winners — Jun 28 */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', marginBottom: '14px' }}>
+              {[
+                { horse: 'Flying Ace',      odds: '4/6',  course: 'Uttoxeter' },
+                { horse: 'Newtown Rambler', odds: '6/4',  course: 'Uttoxeter' },
+                { horse: 'Purview',         odds: '5/6',  course: 'Curragh'   },
+                { horse: 'King Of Earth',   odds: '4/1',  course: 'Curragh'   },
+              ].map(w => (
+                <div key={w.horse} style={{
+                  background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)',
+                  borderRadius: '8px', padding: '6px 12px', textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '11px', color: '#6ee7b7', fontWeight: 700 }}>✅ WON</div>
+                  <div style={{ fontSize: '14px', fontWeight: 900, color: '#fbbf24' }}>{w.horse}</div>
+                  <div style={{ fontSize: '12px', color: '#34d399', fontWeight: 700 }}>{w.odds}</div>
+                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)' }}>{w.course}</div>
+                </div>
+              ))}
+            </div>
             <div style={{
               color: 'rgba(255,255,255,0.95)',
               fontSize: isMobile ? '16px' : '18px',
-              fontWeight: '600',
-              lineHeight: '1.6',
+              fontWeight: '700',
               textAlign: 'center',
-              maxWidth: '800px',
-              margin: '0 auto'
             }}>
-              Best news: <span style={{ color: '#fbbf24', fontWeight: '900' }}>{featuredSnapshot.horse}</span> landed
-              {featuredSnapshot.odds && <> at <span style={{ color: '#34d399', fontWeight: '900', fontSize: '16px' }}>{featuredSnapshot.odds}</span></>}
-              {' '}on yesterday&apos;s featured card.
-              <span style={{ marginLeft: '6px' }}>
-                Yesterday (Wed 20 May):{' '}
-                <span style={{ color: '#fbbf24', fontWeight: '900' }}>{featuredSnapshot.winners} winner{featuredSnapshot.winners === 1 ? '' : 's'}</span>
-                {' & '}
-                <span style={{ color: '#60a5fa', fontWeight: '900' }}>{featuredSnapshot.placed} placed</span>
-                {` out of ${featuredSnapshot.total}.`}
-              </span>
+              <span style={{ color: '#fbbf24', fontWeight: '900', fontSize: '22px' }}>4 from 4</span>
+              {' · '}
+              <span style={{ color: '#34d399' }}>100% strike rate</span>
+              {' · Sun 28 Jun'}
             </div>
-            <div style={{ fontSize: isMobile ? '14px' : '16px', textAlign: 'center', marginTop: '16px' }}>🔥</div>
+            <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginTop: '6px' }}>
+              4-fold accumulator returned <span style={{ color: '#fbbf24', fontWeight: 700 }}>44× stake</span>
+            </div>
+            <div style={{ fontSize: isMobile ? '14px' : '16px', textAlign: 'center', marginTop: '12px' }}>🔥🔥🔥</div>
           </div>
         )}
 
@@ -6478,9 +6704,9 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
           <span style={{ color: '#34d399', fontSize: '12px', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase' }}>Live System · UK &amp; Ireland Racing</span>
         </div>
         <h2 style={{ fontSize: isMobile ? '26px' : '42px', fontWeight: '900', margin: '0 0 16px', lineHeight: 1.15, color: 'white' }}>
-          Stop guessing. Start winning.<br/>
+          Back Winners. Avoid Poor Favorites.<br/>
           <span style={{ background: 'linear-gradient(135deg,#34d399,#059669)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Built for winners. Powered by AI.
+            Find the Edge. Track the Results.
           </span>
         </h2>
         {/* ── VS comparison banner ── */}
@@ -6509,7 +6735,7 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
         <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? '16px' : '28px', flexWrap: 'wrap', marginBottom: isMobile ? '20px' : '28px' }}>
           {[
             { icon: '🤖', label: '20+ signals per horse' },
-            { icon: '🎯', label: 'Top 4 official picks + up to 2 watchlist' },
+            { icon: '🎯', label: 'Daily picks + Favourite Watch lays' },
             { icon: '📊', label: 'Every pick logged pre-race' },
             { icon: '📅', label: 'Live since 22 Mar 2026' },
           ].map((p, i) => (
@@ -6520,6 +6746,7 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
           ))}
         </div>
       </div>
+
 
       {!isAuthenticated && accountSettingsRequest && (
         <div style={{ maxWidth: '620px', margin: '0 auto 20px', padding: '14px 18px', background: 'rgba(96,165,250,0.12)', border: '1px solid rgba(96,165,250,0.32)', borderRadius: '12px' }}>
@@ -6535,75 +6762,50 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
         </div>
       )}
 
-      {/* ── COMPACT PRICING STRIP ─────────────────────────────────────── */}
+      {/* ── CLEAN 2-OPTION CTA ────────────────────────────────────────── */}
       {!isAuthenticated && (
-      <div style={{ marginBottom: '24px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '10px', fontSize: '12px', color: 'rgba(255,255,255,0.55)' }}>
-          Typical daily card: <strong style={{ color: 'white' }}>{preSignPickCount}</strong> total picks (4 official + up to 2 watchlist). The 1:20pm email includes winners out of total picks. Research/education only, not a betting site, always bet responsibly.
-        </div>
-        <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-          <span style={{ fontSize: '16px', fontWeight: '800', color: 'white' }}>⚡ Unlock Your Edge</span>
-          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', marginLeft: '8px' }}>Start your 7-day free trial</span>
-        </div>
-        <div style={{ display: 'flex', gap: '10px', maxWidth: '700px', margin: '0 auto', flexWrap: 'wrap', justifyContent: 'center', padding: '0 8px' }}>
-          {/* Free Trial */}
-          <div style={{ flex: '1 1 180px', maxWidth: isMobile ? '100%' : '220px', background: 'linear-gradient(135deg, rgba(52,211,153,0.12), rgba(16,185,129,0.06))', border: '2px solid rgba(52,211,153,0.4)', borderRadius: '10px', padding: '14px 16px', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: '-9px', right: '10px', background: 'linear-gradient(135deg, #059669, #047857)', borderRadius: '10px', padding: '2px 8px', fontSize: '8px', fontWeight: '800', color: 'white', textTransform: 'uppercase', letterSpacing: '0.5px' }}>7 Days Free</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: '#34d399' }}>Free Trial</span>
-              <span style={{ fontSize: '20px', fontWeight: '900', color: 'white' }}>€0<span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}> for 7 days</span></span>
-            </div>
-            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)', lineHeight: '1.8', marginBottom: '10px' }}>
-              ✓ Full Premium access<br/>
-              ✓ 4+ tips daily + 2 watchlist picks<br/>
-              ✓ Daily featured meeting, results &amp; live ROI<br/>
-              ✓ Cancel anytime<br/>
-              <span style={{ color: 'rgba(255,255,255,0.4)' }}>No card details required</span><br/>
-              <span style={{ color: 'rgba(255,255,255,0.35)' }}>Then €9.99/mo after trial</span>
-            </div>
-            <button onClick={() => { trackEvent('signup_click', { location: 'home_pricing_strip_free_trial', tier: 'premium_trial', user_status: 'guest' }); setSelectedTrialTier('premium'); setAuthMode('register'); setFormError(''); }} style={{ width: '100%', background: 'linear-gradient(135deg, #059669, #047857)', border: 'none', borderRadius: '6px', padding: '8px', color: 'white', fontSize: '12px', fontWeight: '800', cursor: 'pointer' }}>Start Free Trial</button>
+      <div style={{ maxWidth: '560px', margin: '0 auto 28px', padding: '0 16px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <div style={{ fontSize: isMobile ? '17px' : '20px', fontWeight: '900', color: 'white', marginBottom: '6px' }}>
+            Everything is <span style={{ color: '#34d399' }}>free</span> — just create an account.
           </div>
-          {/* Premium */}
-          <div style={{ flex: '1 1 180px', maxWidth: isMobile ? '100%' : '220px', background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1))', border: '2px solid rgba(99,102,241,0.5)', borderRadius: '10px', padding: '14px 16px', position: 'relative', boxShadow: '0 0 20px rgba(99,102,241,0.15)' }}>
-            <div style={{ position: 'absolute', top: '-9px', right: '10px', background: 'linear-gradient(135deg, #6366f1, #7c3aed)', borderRadius: '10px', padding: '2px 8px', fontSize: '8px', fontWeight: '800', color: 'white', textTransform: 'uppercase', letterSpacing: '0.5px' }}>⭐ Popular</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: '#818cf8' }}>Premium</span>
-              <span style={{ fontSize: '20px', fontWeight: '900', color: 'white' }}>€9.99<span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>/mo</span></span>
-            </div>
-            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)', lineHeight: '1.8', marginBottom: '10px' }}>
-              ✓ 4+ Tips Daily<br/>
-              ✓ 2 Watchlist Selections Daily<br/>
-              ✓ Daily Featured Meeting<br/>
-              ✓ All Results<br/>
-              ✓ Live ROI Tracking<br/>
-              ✓ Priority Support<br/>
-              ✓ Cancel Anytime
-            </div>
-            <button onClick={() => { trackEvent('signup_click', { location: 'home_pricing_strip_premium', tier: 'premium_trial', user_status: 'guest' }); setSelectedTrialTier('premium'); setAuthMode('register'); setFormError(''); }} style={{ width: '100%', background: 'linear-gradient(135deg, #6366f1, #7c3aed)', border: 'none', borderRadius: '6px', padding: '8px', color: 'white', fontSize: '12px', fontWeight: '800', cursor: 'pointer' }}>Start Free Trial</button>
-          </div>
-          {/* VIP Rollers */}
-          <div style={{ flex: '1 1 180px', maxWidth: isMobile ? '100%' : '220px', background: 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(251,191,36,0.06))', border: '2px solid rgba(245,158,11,0.45)', borderRadius: '10px', padding: '14px 16px', position: 'relative', boxShadow: '0 0 20px rgba(245,158,11,0.1)' }}>
-            <div style={{ position: 'absolute', top: '-9px', right: '10px', background: 'linear-gradient(135deg, #f59e0b, #d97706)', borderRadius: '10px', padding: '2px 8px', fontSize: '8px', fontWeight: '800', color: 'white', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🔥 Best Value</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: '#fbbf24' }}>👑 VIP Rollers</span>
-              <span style={{ fontSize: '20px', fontWeight: '900', color: 'white' }}>€49.99<span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>/mo</span></span>
-            </div>
-            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)', lineHeight: '1.8', marginBottom: '10px' }}>
-              ✓ 4+ Tips Daily<br/>
-              ✓ 2 Watchlist Selections Daily<br/>
-              ✓ Daily Featured Meeting<br/>
-              ✓ All Results<br/>
-              ✓ Early Ante-Post Major Race Selections<br/>
-              ✓ Lay the Vulnerable Favourite<br/>
-              ✓ Live ROI Tracking<br/>
-              ✓ Major Race Previews<br/>
-              ✓ Priority support<br/>
-              <span style={{ color: 'rgba(255,255,255,0.4)' }}>⚡ Exchange account required for max benefit</span>
-            </div>
-            <button onClick={() => { trackEvent('signup_click', { location: 'home_pricing_strip_vip', tier: 'vip_trial', user_status: 'guest' }); setSelectedTrialTier('vip'); setAuthMode('register'); setFormError(''); }} style={{ width: '100%', background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', borderRadius: '6px', padding: '8px', color: 'white', fontSize: '12px', fontWeight: '800', cursor: 'pointer' }}>Start Free Trial</button>
+          <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
+            Daily horse racing picks, Pro Tennis, Pro Cycling, Rugby, Pro Golf, World Cup — all free.<br/>
+            One premium add-on for serious Betfair users.
           </div>
         </div>
-        <div style={{ textAlign: 'center', fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '8px' }}>🔒 Powered by Stripe · Cancel anytime · EUR</div>
+        <div style={{ display: 'flex', gap: '12px', flexDirection: isMobile ? 'column' : 'row' }}>
+          {/* Free */}
+          <div style={{ flex: 1, background: 'linear-gradient(135deg,rgba(52,211,153,0.12),rgba(16,185,129,0.06))', border: '2px solid rgba(52,211,153,0.4)', borderRadius: '12px', padding: '18px 16px', textAlign: 'center' }}>
+            <div style={{ fontSize: '22px', fontWeight: '900', color: '#34d399', marginBottom: '4px' }}>Free</div>
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginBottom: '14px', lineHeight: 1.6 }}>
+              ✓ Horse racing AI picks<br/>
+              ✓ Pro Tennis · Pro Cycling<br/>
+              ✓ Rugby · Pro Golf · World Cup<br/>
+              ✓ Live ROI tracker<br/>
+              ✓ No card required, ever
+            </div>
+            <button onClick={() => { trackEvent('signup_click', { location: 'home_cta_free', tier: 'free', user_status: 'guest' }); setSelectedTrialTier('premium'); setAuthMode('register'); setFormError(''); }} style={{ width: '100%', background: 'linear-gradient(135deg,#059669,#047857)', border: 'none', borderRadius: '8px', padding: '10px', color: 'white', fontSize: '13px', fontWeight: '800', cursor: 'pointer' }}>
+              Create Free Account
+            </button>
+          </div>
+          {/* Favourite Watch */}
+          <div style={{ flex: 1, background: 'linear-gradient(135deg,rgba(245,158,11,0.12),rgba(251,191,36,0.06))', border: '2px solid rgba(245,158,11,0.45)', borderRadius: '12px', padding: '18px 16px', textAlign: 'center', position: 'relative' }}>
+            <div style={{ position: 'absolute', top: '-9px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,#f59e0b,#d97706)', borderRadius: '10px', padding: '2px 10px', fontSize: '9px', fontWeight: '800', color: 'white', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>🚫 For Exchange Players</div>
+            <div style={{ fontSize: '22px', fontWeight: '900', color: '#fbbf24', marginBottom: '2px' }}>€9.99<span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>/mo</span></div>
+            <div style={{ fontSize: '12px', fontWeight: '700', color: '#fbbf24', marginBottom: '12px' }}>Favourite Watch</div>
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginBottom: '14px', lineHeight: 1.6 }}>
+              ✓ Everything in Free<br/>
+              ✓ Vulnerable favorites flagged<br/>
+              ✓ Exchange lay alerts daily<br/>
+              ✓ Betfair account recommended
+            </div>
+            <button onClick={() => { trackEvent('signup_click', { location: 'home_cta_vip', tier: 'vip_trial', user_status: 'guest' }); setSelectedTrialTier('vip'); setAuthMode('register'); setFormError(''); }} style={{ width: '100%', background: 'linear-gradient(135deg,#f59e0b,#d97706)', border: 'none', borderRadius: '8px', padding: '10px', color: 'white', fontSize: '13px', fontWeight: '800', cursor: 'pointer' }}>
+              Start Free Trial
+            </button>
+          </div>
+        </div>
+        <div style={{ textAlign: 'center', fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '10px' }}>🔒 Powered by Stripe · Cancel anytime</div>
       </div>
       )}
 
@@ -6778,7 +6980,7 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
           /* ── REGISTER FORM ──────────────────────────────────────────── */
           <>
         <h3 style={{ color: 'white', fontSize: '22px', fontWeight: '800', margin: '0 0 6px', textAlign: 'center' }}>Start Your 7-Day {selectedTrialLabel} Trial</h3>
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', textAlign: 'center', margin: '0 0 8px' }}>Immediate {selectedTrialLabel} access for 7 days — no card details required.</p>
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', textAlign: 'center', margin: '0 0 8px' }}>Immediate {selectedTrialLabel} access for 3 days — no card details required.</p>
         <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', textAlign: 'center', margin: '0 0 28px' }}>Cancel anytime. If you want to continue after the trial, the plan is {selectedTrialPrice}/mo.</p>
 
         <form onSubmit={handleSubmit} noValidate autoComplete="off">
