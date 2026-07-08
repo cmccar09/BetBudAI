@@ -30,6 +30,8 @@ $FILES = [ordered]@{
     'betfair_odds_fetcher.py'     = 'betfair_odds_fetcher.py'
     'notify_picks.py'             = 'notify_picks.py'
     'weather_going_inference.py'  = 'backend\utils\weather_going_inference.py'
+    'bloodstock.py'               = 'bloodstock.py'
+    'watchlist.py'                = 'watchlist.py'
 }
 
 Write-Host ""
