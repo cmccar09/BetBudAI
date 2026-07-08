@@ -2,7 +2,14 @@
 AWS Lambda function to serve betting picks from DynamoDB
 Provides REST API for frontend hosted on Amplify
 
-DEBUGGING NOTES:
+DEPLOYMENT NOTE (critical — 2026-07-01):
+- TWO Lambda functions serve this code and BOTH must be updated on every deploy:
+    1. BettingPicksAPI        — used for direct invocation / admin testing
+    2. betbudai-picks-api     — the ACTUAL public API, sits behind API Gateway at
+                                https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com
+  Always run: aws lambda update-function-code --function-name betbudai-picks-api ...
+  Failing to update betbudai-picks-api means the browser gets STALE code even though
+  direct Lambda tests pass. This was the cause of "no data" on all sport pages.
 - This Lambda serves multiple API endpoints including /api/picks/featured-meeting
 - Featured meeting endpoint: get_punchestown_tomorrow_picks() function (line ~963)
 - Outcome mapping: _norm_outcome() reads 'outcome' or 'result' fields from DynamoDB
@@ -40,11 +47,20 @@ if stripe:
     stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', '')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
 STRIPE_PRICE_PREMIUM = os.environ.get('STRIPE_PRICE_PREMIUM', '')   # price_xxx for €9.99/mo
-STRIPE_PRICE_VIP     = os.environ.get('STRIPE_PRICE_VIP', '')       # price_xxx for €49.99/mo
+# VIP (Favourite Watch) now uses the same €9.99 Stripe product — unified pricing model 2026-07-01.
+STRIPE_PRICE_VIP     = STRIPE_PRICE_PREMIUM or os.environ.get('STRIPE_PRICE_VIP', '')
 
+
+_FREE_MODEL_DATE = '2026-07-01'  # Date the 3-day trial + free subscription model was introduced.
+                                   # Users who joined BEFORE this date are grandfathered — their
+                                   # expired trial auto-converts to free_subscriber, not trial_expired.
 
 def _normalize_local_trial_status(email: str, item: dict | None) -> dict:
-    """Expire local no-card trials once their stored end timestamp has passed."""
+    """Expire local no-card trials once their stored end timestamp has passed.
+    Existing users (joined before the free model date) are grandfathered:
+    their trial expiry maps to 'free_subscriber' not 'trial_expired', so they
+    never see the 'Subscribe for Free' gate — they already have full access.
+    """
     if not item:
         return item or {}
 
@@ -54,14 +70,20 @@ def _normalize_local_trial_status(email: str, item: dict | None) -> dict:
     now_ts = int(datetime.now(timezone.utc).timestamp())
 
     if status == 'trialing' and trial_end_ts and trial_end_ts <= now_ts and not has_stripe_sub:
+        joined_at = str(item.get('joined_at') or '')[:10]
+        is_grandfathered = bool(joined_at) and joined_at < _FREE_MODEL_DATE
+        new_status = 'free_subscriber' if is_grandfathered else 'trial_expired'
+
         subscribers_table.update_item(
             Key={'email': email},
             UpdateExpression='SET subscription_status = :status REMOVE subscription_current_period_end',
-            ExpressionAttributeValues={':status': 'trial_expired'},
+            ExpressionAttributeValues={':status': new_status},
         )
         item = dict(item)
-        item['subscription_status'] = 'trial_expired'
+        item['subscription_status'] = new_status
         item.pop('subscription_current_period_end', None)
+        if is_grandfathered:
+            print(f'[normalize] {email} grandfathered → free_subscriber (joined {joined_at})')
 
     return item
 
@@ -334,6 +356,8 @@ def lambda_handler(event, context):
             response = create_checkout_session(headers, event)
         elif 'stripe-webhook' in path and method == 'POST':
             response = handle_stripe_webhook(headers, event)
+        elif 'subscribe-free' in path and method == 'POST':
+            response = subscribe_free(headers, event)
         elif 'subscription-status' in path and method == 'POST':
             response = get_subscription_status(headers, event)
         elif 'customer-portal' in path and method == 'POST':
@@ -360,6 +384,22 @@ def lambda_handler(event, context):
             response = get_punchestown_tomorrow_picks(headers, event)
         elif 'picks/punchestown-tomorrow' in path and method == 'GET':
             response = get_punchestown_tomorrow_picks(headers, event)
+        elif 'picks/extended' in path and method == 'GET':
+            response = get_extended_picks(headers, event)
+        elif 'sports/worldcup' in path and method == 'GET':
+            response = get_sport_data(headers, 'worldcup')
+        elif 'sports/wimbledon' in path and method == 'GET':
+            response = get_sport_data(headers, 'wimbledon')
+        elif 'sports/tourdefrance' in path and method == 'GET':
+            response = get_sport_data(headers, 'tourdefrance')
+        elif 'sports/rugby' in path and method == 'GET':
+            response = get_sport_data(headers, 'rugby')
+        elif 'sports/golf' in path and method == 'GET':
+            response = get_sport_data(headers, 'golf')
+        elif 'sports/basketball' in path and method == 'GET':
+            response = get_sport_data(headers, 'basketball')
+        elif 'sports/nfl' in path and method == 'GET':
+            response = get_sport_data(headers, 'nfl')
         elif 'picks/yesterday' in path:
             response = get_yesterday_picks(headers)
         elif 'picks/analysis-quality' in path:
@@ -416,10 +456,10 @@ def lambda_handler(event, context):
         })
 
 def get_all_picks(headers):
-    """Get picks from DynamoDB (last 7 days — avoids full table scan)"""
+    """Get picks from DynamoDB (today + yesterday only — active and most recent settled)"""
     items = []
     today = datetime.now(timezone.utc)
-    for days_back in range(7):
+    for days_back in range(2):
         d = (today - timedelta(days=days_back)).strftime('%Y-%m-%d')
         qkw = {'KeyConditionExpression': Key('bet_date').eq(d)}
         while True:
@@ -689,32 +729,6 @@ def get_today_picks(headers):
             return False
 
         return True
-
-    # ── 1PM BST GATE ─────────────────────────────────────────────────────────
-    # Hold picks until 12:00 UTC (1:00pm BST) each day.
-    # The morning analysis runs at ~10:00 UTC but may re-score horses as going /
-    # flags update before racing.  Showing picks only after 1pm ensures the last
-    # lunchtime re-check has settled and we're committed to the best version.
-    _now_utc = datetime.now(_tz.utc)
-    if _now_utc.hour < 12:
-        _mins = (12 - _now_utc.hour) * 60 - _now_utc.minute
-        return {
-            'statusCode': 200,
-            'headers': headers,
-            'body': json.dumps({
-                'success':          True,
-                'picks':            [],
-                'count':            0,
-                'watchlist':        [],
-                'watchlist_count':  0,
-                'top_calls':        {'sure_thing': None, 'nap': None, 'must_win': None},
-                'payload_status':   _build_payload_status([], {'sure_thing': None, 'nap': None, 'must_win': None}, analysis_pending=True),
-                'date':             today,
-                'analysis_pending': True,
-                'pending_reason':   f'Picks confirmed at 1:00pm — rechecking going & flags ({_mins} min)',
-                'message':          'Picks locked until 1pm BST to allow full morning analysis to complete',
-            })
-        }
 
     # Use paginated query — table has 400+ items/day which can exceed DynamoDB's 1MB page limit
     try:
@@ -1005,6 +1019,7 @@ def get_punchestown_tomorrow_picks(headers, event):
             {'date': '2026-06-18', 'meeting': 'Royal Ascot'},
             {'date': '2026-06-19', 'meeting': 'Royal Ascot'},
             {'date': '2026-06-20', 'meeting': 'Royal Ascot'},
+            {'date': '2026-06-26', 'meeting': 'Doncaster'},
             {'date': '2026-07-09', 'meeting': 'Sandown'},
             {'date': '2026-07-25', 'meeting': 'Ascot'},
             {'date': '2026-07-29', 'meeting': 'Goodwood'},
@@ -1625,6 +1640,162 @@ def get_punchestown_tomorrow_picks(headers, event):
             'body': json.dumps({'success': False, 'error': str(e)})
         }
 
+def get_extended_picks(headers, event):
+    """GET /api/picks/extended — today's extended daily picks (any odds, top by score).
+    These are the broader winner candidates selected automatically after morning analysis.
+    pick_type='extended', score >= 80, 2+ signals, any course/odds/race type.
+    """
+    try:
+        from boto3.dynamodb.conditions import Key as _Key
+        from zoneinfo import ZoneInfo
+        params = event.get('queryStringParameters') or {}
+        target_date = str(params.get('date') or '').strip()[:10] or \
+                      datetime.now(ZoneInfo('Europe/Dublin')).date().isoformat()
+
+        resp = table.query(KeyConditionExpression=_Key('bet_date').eq(target_date))
+        items = [decimal_to_float(i) for i in resp.get('Items', [])]
+        while resp.get('LastEvaluatedKey'):
+            resp = table.query(
+                KeyConditionExpression=_Key('bet_date').eq(target_date),
+                ExclusiveStartKey=resp['LastEvaluatedKey'])
+            items.extend([decimal_to_float(i) for i in resp.get('Items', [])])
+
+        extended = [i for i in items if str(i.get('pick_type', '')) == 'extended'
+                    and i.get('horse') and i.get('course')]
+        extended.sort(key=lambda x: -float(x.get('comprehensive_score') or 0))
+
+        picks_out = []
+        for i in extended:
+            bd = i.get('score_breakdown') or {}
+            KEY_SIGS = ('market_leader','deep_form','going_suitability','distance_suitability',
+                        'price_steam','trainer_reputation','cd_bonus','jockey_quality',
+                        'won_last_2_runs','form_trend','total_wins','timeform_stars','DEBUTANT_STEAM')
+            sigs = [k for k, v in bd.items() if k in KEY_SIGS and float(v or 0) > 0]
+            picks_out.append({
+                'horse':    i.get('horse'),
+                'course':   i.get('course'),
+                'race_time': i.get('race_time', ''),
+                'odds':     float(i.get('odds') or 0),
+                'score':    float(i.get('comprehensive_score') or 0),
+                'grade':    i.get('confidence_grade', ''),
+                'trainer':  i.get('trainer', ''),
+                'jockey':   i.get('jockey', ''),
+                'race_type': i.get('race_type', ''),
+                'outcome':  str(i.get('outcome') or i.get('result') or 'pending'),
+                'signals':  sigs,
+                'n_signals': len(sigs),
+            })
+
+        return {
+            'statusCode': 200, 'headers': headers,
+            'body': json.dumps({
+                'success': True, 'date': target_date,
+                'count': len(picks_out), 'picks': picks_out,
+                'methodology': 'Top 5 by score · any odds · any race type · score≥80 · 2+ signals',
+            }, default=str)
+        }
+    except Exception as e:
+        print(f'get_extended_picks error: {e}')
+        return {'statusCode': 500, 'headers': headers,
+                'body': json.dumps({'success': False, 'error': str(e)})}
+
+
+def get_sport_data(headers, sport):
+    """GET /api/sports/{sport} — serve scraped multi-sport data (Wimbledon, Tour de France, Rugby, Golf).
+    Reads from BetBudAI_Sports table, all data_key rows for the given sport.
+    Shape differs per sport (matches vs stages), so this returns each data_key's
+    payload generically — frontend pages know which keys to read for their sport.
+    """
+    try:
+        sports_tbl = dynamodb.Table('BetBudAI_Sports')
+        from boto3.dynamodb.conditions import Key as _Key
+        resp = sports_tbl.query(KeyConditionExpression=_Key('sport').eq(sport))
+        items = {i['data_key']: decimal_to_float(i) for i in resp.get('Items', [])}
+
+        body = {'success': True, 'sport': sport, 'meta': items.get('META', {})}
+
+        if sport == 'worldcup':
+            body['results'] = (items.get('RESULTS', {}) or {}).get('results', [])
+            body['bracket'] = items.get('BRACKET', {}) or {}
+            body['golden_boot'] = (items.get('GOLDEN_BOOT', {}) or {}).get('leaderboard', [])
+        elif sport == 'wimbledon':
+            body['matches'] = (items.get('MATCHES', {}) or {}).get('matches', [])
+            body['outright_men'] = (items.get('OUTRIGHT_MEN', {}) or {}).get('contenders', [])
+            body['outright_women'] = (items.get('OUTRIGHT_WOMEN', {}) or {}).get('contenders', [])
+            body['previous_champions_men'] = (items.get('HISTORY', {}) or {}).get('previous_champions_men', [])
+            body['previous_champions_women'] = (items.get('HISTORY', {}) or {}).get('previous_champions_women', [])
+            body['tips_in_form'] = (items.get('TIPS', {}) or {}).get('in_form', [])
+            body['tips_predictions'] = (items.get('TIPS', {}) or {}).get('predictions', [])
+            body['yesterday_performance'] = (items.get('TIPS', {}) or {}).get('yesterday_performance', {})
+        elif sport == 'tourdefrance':
+            body['schedule'] = (items.get('SCHEDULE', {}) or {}).get('stages', [])
+            body['results'] = (items.get('RESULTS', {}) or {}).get('results', [])
+            body['outright'] = (items.get('OUTRIGHT', {}) or {}).get('contenders', [])
+            body['previous_winners'] = (items.get('HISTORY', {}) or {}).get('previous_winners', [])
+            body['giro_2026'] = (items.get('HISTORY', {}) or {}).get('giro_2026', {})
+            body['all_time_record'] = (items.get('HISTORY', {}) or {}).get('all_time_record', {})
+            body['teams'] = (items.get('TEAMS', {}) or {}).get('teams', {})
+            body['sprinters'] = (items.get('SPECIALISTS', {}) or {}).get('sprinters', [])
+            body['tt_specialists'] = (items.get('SPECIALISTS', {}) or {}).get('tt_specialists', [])
+            body['tips_storyline'] = (items.get('TIPS', {}) or {}).get('storyline', '')
+            body['tips_gc_watch'] = (items.get('TIPS', {}) or {}).get('gc_watch', '')
+            body['stage_predictions'] = (items.get('TIPS', {}) or {}).get('stage_predictions', [])
+            body['yesterday_performance'] = (items.get('TIPS', {}) or {}).get('yesterday_performance', {})
+        elif sport == 'rugby':
+            body['fixtures'] = (items.get('FIXTURES', {}) or {}).get('fixtures', [])
+            body['results'] = (items.get('RESULTS', {}) or {}).get('results', [])
+            body['outright'] = (items.get('OUTRIGHT', {}) or {}).get('contenders', [])
+            body['six_nations_2026'] = (items.get('HISTORY', {}) or {}).get('six_nations_2026', {})
+            body['rugby_championship_2025'] = (items.get('HISTORY', {}) or {}).get('rugby_championship_2025', {})
+            body['tips_predictions'] = (items.get('TIPS', {}) or {}).get('predictions', [])
+            _rwc = items.get('RWC_2027', {}) or {}
+            body['rwc_2027'] = {
+                'pools': _rwc.get('pools', {}),
+                'dates': _rwc.get('dates', {}),
+                'pool_predictions': _rwc.get('pool_predictions', {}),
+                'outright': _rwc.get('outright', []),
+                'outright_is_live': _rwc.get('outright_is_live', False),
+                'history': _rwc.get('history', []),
+                'title_counts': _rwc.get('title_counts', []),
+            }
+        elif sport == 'golf':
+            body['majors'] = (items.get('MAJORS', {}) or {}).get('majors', [])
+            body['outright'] = (items.get('OUTRIGHT', {}) or {}).get('contenders', [])
+            body['outright_tournament'] = (items.get('OUTRIGHT', {}) or {}).get('tournament', '')
+            body['previous_open_champions'] = (items.get('HISTORY', {}) or {}).get('previous_open_champions', [])
+            body['tips_in_form'] = (items.get('TIPS', {}) or {}).get('in_form', [])
+            body['course_form'] = (items.get('TIPS', {}) or {}).get('course_form', {})
+            body['round_predictions'] = (items.get('TIPS', {}) or {}).get('round_predictions', [])
+            body['yesterday_performance'] = (items.get('TIPS', {}) or {}).get('yesterday_performance', {})
+            _rc = items.get('RYDER_CUP', {}) or {}
+            body['ryder_cup_last'] = _rc.get('last_edition', {})
+            body['ryder_cup_next'] = _rc.get('next_edition', {})
+        elif sport == 'basketball':
+            body['outright'] = (items.get('OUTRIGHT', {}) or {}).get('contenders', [])
+            body['standings'] = (items.get('STANDINGS', {}) or {}).get('standings', [])
+            body['summer_league_games'] = (items.get('SUMMER_LEAGUE', {}) or {}).get('games', [])
+            body['previous_champions'] = (items.get('HISTORY', {}) or {}).get('previous_champions', [])
+            body['tip'] = {k: v for k, v in (items.get('TIPS', {}) or {}).items() if k != 'updated_at'}
+        elif sport == 'nfl':
+            body['superbowl_futures'] = (items.get('SUPERBOWL_FUTURES', {}) or {}).get('contenders', [])
+            body['standings'] = (items.get('STANDINGS', {}) or {}).get('standings', [])
+            body['games_today'] = (items.get('SCOREBOARD', {}) or {}).get('games', [])
+            body['superbowl_history'] = (items.get('HISTORY', {}) or {}).get('superbowl_history', [])
+            body['tip'] = {k: v for k, v in (items.get('TIPS', {}) or {}).items() if k != 'updated_at'}
+        else:
+            # Generic fallback for future sports — return all data_key payloads as-is
+            body['data'] = {k: v for k, v in items.items() if k != 'META'}
+
+        return {
+            'statusCode': 200,
+            'headers': headers,
+            'body': json.dumps(body, default=str)
+        }
+    except Exception as e:
+        print(f'get_sport_data error ({sport}): {e}')
+        return {'statusCode': 500, 'headers': headers, 'body': json.dumps({'success': False, 'error': str(e)})}
+
+
 def get_yesterday_picks(headers):
     """Get yesterday's picks with results (System A only - actual bets)"""
     from datetime import timedelta
@@ -1785,6 +1956,7 @@ def get_cumulative_roi(headers):
             cached_data = cache_response['Item'].get('data', {})
             # Convert Decimal back to float for JSON serialization
             cached_data = decimal_to_float(cached_data)
+            cached_data['success'] = True   # required by frontend roiData?.success check
             print(f"[INFO] Returning cached ROI from {cached_data.get('cached_at', 'unknown')}")
             return {
                 'statusCode': 200,
@@ -2243,46 +2415,6 @@ def check_today_results(headers):
     from datetime import timezone as _tz
     today = datetime.now().strftime('%Y-%m-%d')
 
-    # Release safety gate: after 1pm BST (12:00 UTC), only publish picks if
-    # today's analysis manifest exists and is marked fully complete.
-    # No run_time freshness check — morning run at 08:30 UTC is the final run;
-    # picks are locked at 12:00 UTC so no later rescore will happen.
-    now_utc = datetime.now(_tz.utc)
-    if 12 <= now_utc.hour < 13:
-        try:
-            _m = table.get_item(Key={'bet_date': 'STATUS', 'bet_id': 'SYSTEM_ANALYSIS_MANIFEST'}).get('Item', {})
-            _manifest_today = str(_m.get('today', '')) == today
-            _manifest_complete = bool(_m.get('analysis_fully_complete', False))
-            _run_time = str(_m.get('run_time', '') or '')
-            if not (_manifest_today and _manifest_complete):
-                return {
-                    'statusCode': 200,
-                    'headers': headers,
-                    'body': json.dumps({
-                        'success': True,
-                        'date': today,
-                        'analysis_pending': True,
-                        'pending_reason': 'Final pre-release analysis still running; picks publish when final checks complete.',
-                        'summary': {'total_picks': 0, 'wins': 0, 'losses': 0, 'pending': 0},
-                        'horses': {'summary': None, 'picks': []},
-                        'greyhounds': {'summary': None, 'picks': []},
-                        'picks': [],
-                        'top_calls': {'sure_thing': None, 'nap': None, 'must_win': None},
-                        'payload_status': _build_payload_status([], {'sure_thing': None, 'nap': None, 'must_win': None}, analysis_pending=True),
-                        'watchlist': [],
-                        'watchlist_count': 0,
-                        'dropped': [],
-                        'dropped_count': 0,
-                        'manifest': {
-                            'today': _m.get('today'),
-                            'analysis_fully_complete': _m.get('analysis_fully_complete'),
-                            'run_time': _run_time,
-                        }
-                    })
-                }
-        except Exception as _gate_err:
-            print(f"Release safety gate warning: {_gate_err}")
-    
     # Get ALL today's picks using partition key query - WITH PAGINATION
     all_picks = []
     response = table.query(KeyConditionExpression=Key('bet_date').eq(today))
@@ -2942,7 +3074,7 @@ def register_subscriber(headers, event):
         )
 
         # Activate a no-card local trial immediately so the offer matches the live signup flow.
-        trial_end_ts = int((datetime.now(timezone.utc) + timedelta(days=7)).timestamp())
+        trial_end_ts = int((datetime.now(timezone.utc) + timedelta(days=3)).timestamp())
         subscribers_table.update_item(
             Key={'email': email},
             UpdateExpression=(
@@ -2958,10 +3090,9 @@ def register_subscriber(headers, event):
             },
         )
         try:
-            token = secrets.token_urlsafe(32)
-            _send_verification_email(email, full_name, token)
+            _send_welcome_email(email, full_name)
         except Exception as mail_err:
-            print(f'Welcome email failed (non-fatal): {mail_err}')
+            print(f'Welcome email failed (non-fatal, likely SES sandbox): {mail_err}')
 
         return {'statusCode': 200, 'headers': headers, 'body': json.dumps({
             'success': True,
@@ -3015,6 +3146,43 @@ def _send_verification_email(email: str, full_name: str, token: str):
             'Body': {
                 'Html': {'Data': html, 'Charset': 'UTF-8'},
                 'Text': {'Data': f'Hi {first_name},\n\nVerify your BetBudAI account by visiting:\n{verify_url}\n\nThis link expires in 24 hours.', 'Charset': 'UTF-8'},
+            },
+        },
+    )
+
+
+def _send_welcome_email(email: str, full_name: str):
+    """Welcome email on first signup — explains 3-day trial and free subscription model."""
+    first_name = full_name.split()[0] if full_name else 'there'
+    html = f"""<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;background:#0f172a;color:white;padding:40px;">
+<div style="max-width:560px;margin:0 auto;background:#1e293b;border-radius:16px;padding:40px;">
+  <h1 style="color:#34d399;margin:0 0 8px;">BetBudAI 🏇</h1>
+  <p style="color:rgba(255,255,255,0.5);margin:0 0 24px;font-size:13px;">AI Betting Intelligence Platform</p>
+  <h2 style="color:white;font-size:22px;margin:0 0 12px;">Welcome, {first_name}!</h2>
+  <p style="color:rgba(255,255,255,0.7);line-height:1.7;margin:0 0 20px;">Your <strong style="color:#34d399">3-day free trial</strong> has started. You now have full access to everything:</p>
+  <div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:10px;padding:16px 20px;margin-bottom:24px;">
+    <p style="margin:4px 0;color:rgba(255,255,255,0.8)">🏇 Daily horse racing AI picks (UK &amp; Ireland)</p>
+    <p style="margin:4px 0;color:rgba(255,255,255,0.8)">🎾 Pro Tennis · 🚴 Pro Cycling · 🏉 Rugby</p>
+    <p style="margin:4px 0;color:rgba(255,255,255,0.8)">⛳ Pro Golf · ⚽ World Cup predictions</p>
+    <p style="margin:4px 0;color:rgba(255,255,255,0.8)">📊 Live ROI tracker · 🏆 Major Races</p>
+  </div>
+  <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:16px 20px;margin-bottom:24px;">
+    <p style="margin:0;color:#fbbf24;font-weight:700;font-size:14px;">⏰ After 3 days — subscribe for free to keep access</p>
+    <p style="margin:8px 0 0;color:rgba(255,255,255,0.6);font-size:13px;">One click. No credit card. No charge. Everything stays free.</p>
+  </div>
+  <a href="{SITE_URL}" style="display:inline-block;margin:0 0 24px;padding:14px 32px;background:linear-gradient(135deg,#059669,#047857);color:white;text-decoration:none;border-radius:10px;font-weight:700;font-size:16px;">Go to BetBudAI →</a>
+  <p style="color:rgba(255,255,255,0.4);font-size:12px;line-height:1.6;">Daily picks are emailed at 12:20pm UTC before racing. Want the exchange lay edge? <a href="{SITE_URL}" style="color:#fbbf24">Favourite Watch — €9.99/mo</a></p>
+  <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:20px 0;"/>
+  <p style="color:rgba(255,255,255,0.3);font-size:11px;">BetBudAI · Research/education only · Bet responsibly · <a href="{SITE_URL}" style="color:#34d399;">{SITE_URL}</a></p>
+</div></body></html>"""
+    ses_client.send_email(
+        Source=f'BetBudAI <{SENDER_EMAIL}>',
+        Destination={'ToAddresses': [email]},
+        Message={
+            'Subject': {'Data': '🏇 Welcome to BetBudAI — your 3-day trial has started!', 'Charset': 'UTF-8'},
+            'Body': {
+                'Html': {'Data': html, 'Charset': 'UTF-8'},
+                'Text': {'Data': f'Hi {first_name},\n\nWelcome to BetBudAI! Your 3-day free trial has started.\n\nAfter 3 days, subscribe for free (no credit card, one click) to keep access.\n\nVisit: {SITE_URL}\n\nBetBudAI', 'Charset': 'UTF-8'},
             },
         },
     )
@@ -3241,7 +3409,7 @@ def _daily_email_recipients():
                 continue
             if email.startswith('u#') or email.startswith('vt#') or email.startswith('__session__'):
                 continue
-            if row.get('subscription_status') not in ('active', 'trialing'):
+            if row.get('subscription_status') not in ('active', 'trialing', 'free_subscriber'):
                 continue
             if bool(row.get('daily_picks_email_opt_out')):
                 continue
@@ -3495,7 +3663,7 @@ def create_checkout_session(headers, event):
         trial_kwargs = {}
         if not has_subscription and not local_trial_used:
             trial_kwargs['subscription_data'] = {
-                'trial_period_days': 7,
+                'trial_period_days': 3,
                 'metadata': {'betbudai_email': email, 'tier': tier},
             }
         else:
@@ -3710,6 +3878,66 @@ def _handle_payment_failed(invoice):
         print(f'Payment failed: {email} → past_due')
 
 
+def subscribe_free(headers, event):
+    """POST /api/subscribe-free { "email": "..." }
+    Called after the 3-day trial expires. Marks the account as 'free_subscriber'
+    — permanent free access, no card, no Stripe. Sends a confirmation email.
+    """
+    try:
+        body = json.loads(event.get('body') or '{}')
+        email = (body.get('email') or '').strip().lower()
+        if not email:
+            return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'email required'})}
+
+        item = subscribers_table.get_item(Key={'email': email}).get('Item')
+        if not item:
+            return {'statusCode': 404, 'headers': headers, 'body': json.dumps({'error': 'Account not found'})}
+
+        current_status = item.get('subscription_status', '')
+        if current_status in ('active', 'trialing', 'canceling', 'free_subscriber'):
+            return {'statusCode': 200, 'headers': headers, 'body': json.dumps({'success': True, 'already_active': True})}
+
+        subscribers_table.update_item(
+            Key={'email': email},
+            UpdateExpression='SET subscription_status = :s, free_subscribed_at = :t',
+            ExpressionAttributeValues={':s': 'free_subscriber', ':t': datetime.now(timezone.utc).isoformat()},
+        )
+
+        # Send "you're all set" welcome-back email
+        try:
+            name = (item.get('full_name') or item.get('username') or email.split('@')[0]).strip()
+            ses_client = boto3.client('ses', region_name='eu-west-1')
+            ses_client.send_email(
+                Source=SENDER_EMAIL,
+                Destination={'ToAddresses': [email]},
+                Message={
+                    'Subject': {'Data': '✅ You\'re all set — BetBudAI access confirmed!'},
+                    'Body': {'Html': {'Data': f'''
+                        <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;background:#0f172a;color:white;padding:32px;border-radius:12px">
+                          <h2 style="color:#34d399;margin-top:0">Welcome back, {name}! 🎉</h2>
+                          <p>Your free BetBudAI account is confirmed — you have full access to:</p>
+                          <ul style="color:rgba(255,255,255,0.8);line-height:2">
+                            <li>🏇 Daily horse racing AI picks</li>
+                            <li>🎾 Pro Tennis · 🚴 Pro Cycling · 🏉 Rugby</li>
+                            <li>⛳ Pro Golf · ⚽ World Cup predictions</li>
+                            <li>📊 Live ROI tracker · 🏆 Major Races</li>
+                          </ul>
+                          <p style="color:rgba(255,255,255,0.6)">All free. No credit card. Ever.</p>
+                          <a href="https://www.betbudai.com" style="display:inline-block;background:linear-gradient(135deg,#059669,#047857);color:white;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:800;margin-top:8px">Go to BetBudAI →</a>
+                          <p style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:24px">Want the Betfair lay edge? <a href="https://www.betbudai.com" style="color:#fbbf24">Upgrade to Favourite Watch — €9.99/mo</a></p>
+                        </div>
+                    '''}}
+                }
+            )
+        except Exception as email_err:
+            print(f'subscribe_free: welcome email failed (SES sandbox?): {email_err}')
+
+        return {'statusCode': 200, 'headers': headers, 'body': json.dumps({'success': True, 'status': 'free_subscriber'})}
+    except Exception as e:
+        print(f'subscribe_free error: {e}')
+        return {'statusCode': 500, 'headers': headers, 'body': json.dumps({'success': False, 'error': str(e)})}
+
+
 def get_subscription_status(headers, event):
     """Get current subscription status for a user.
     POST /api/subscription-status  { "email": "..." }
@@ -3735,7 +3963,7 @@ def get_subscription_status(headers, event):
 
         # Fallback reconciliation: if checkout looks pending but Stripe already has
         # a live subscription, repair local fields immediately.
-        if _has_cust and not _has_sub and _status not in ('active', 'trialing', 'canceling') and stripe and 'NOT_CONFIGURED' not in (os.environ.get('STRIPE_SECRET_KEY') or ''):
+        if _has_cust and not _has_sub and _status not in ('active', 'trialing', 'canceling', 'free_subscriber') and stripe and 'NOT_CONFIGURED' not in (os.environ.get('STRIPE_SECRET_KEY') or ''):
             try:
                 subs = stripe.Subscription.list(customer=sub.get('stripe_customer_id'), status='all', limit=10)
                 subs_data = subs.data if hasattr(subs, 'data') else []
@@ -3895,7 +4123,7 @@ def login_subscriber(headers, event):
         role = item.get('role', 'free')
         subscription_tier = item.get('subscription_tier', 'free')
         _has_sub = bool(item.get('stripe_subscription_id'))
-        _has_active = item.get('subscription_status') in ('active', 'trialing', 'canceling')
+        _has_active = item.get('subscription_status') in ('active', 'trialing', 'canceling', 'free_subscriber')
         _has_cust = bool(item.get('stripe_customer_id'))
         _had_previous_sub = _customer_has_previous_subscription(item['stripe_customer_id']) if _has_cust else False
         _had_local_trial = bool(item.get('trial_end_timestamp'))
@@ -3937,7 +4165,7 @@ def login_subscriber(headers, event):
 
             body = {
                 'success': False,
-                'error': 'Your 7-day trial has already been used. Subscribe to continue, then sign in again.',
+                'error': 'Your 3-day trial has ended. Subscribe for free (no card needed) to continue, then sign in again.',
                 'requires_subscription': True,
                 'trial_used': True,
             }
@@ -3994,7 +4222,7 @@ def login_subscriber(headers, event):
         checkout_url = None
         checkout_error = None
         _has_sub = bool(item.get('stripe_subscription_id'))
-        _has_active = item.get('subscription_status') in ('active', 'trialing', 'canceling')
+        _has_active = item.get('subscription_status') in ('active', 'trialing', 'canceling', 'free_subscriber')
         _has_cust = bool(item.get('stripe_customer_id'))
         _had_previous_sub = _customer_has_previous_subscription(item['stripe_customer_id']) if _has_cust else False
         _had_local_trial = bool(item.get('trial_end_timestamp'))
@@ -4006,7 +4234,7 @@ def login_subscriber(headers, event):
                     sub_data = {'metadata': {'betbudai_email': identifier, 'tier': checkout_tier}}
                     success_url = f'{SITE_URL}?payment=success&tier={checkout_tier}'
                     if not _had_previous_sub and not _had_local_trial:
-                        sub_data['trial_period_days'] = 7
+                        sub_data['trial_period_days'] = 3
                         success_url += '&trial=1'
                     session = stripe.checkout.Session.create(
                         customer=item['stripe_customer_id'],
@@ -4038,7 +4266,7 @@ def login_subscriber(headers, event):
                     sub_data = {'metadata': {'betbudai_email': identifier, 'tier': 'premium'}}
                     success_url = f'{SITE_URL}?payment=success&tier=premium'
                     if not had_previous_sub:
-                        sub_data['trial_period_days'] = 7
+                        sub_data['trial_period_days'] = 3
                         success_url += '&trial=1'
                     session = stripe.checkout.Session.create(
                         customer=customer.id,
@@ -5186,7 +5414,7 @@ def _analyse_date_lambda(target_date_str, tbl, winner_map=None):
         fav = runners_sorted[0]
         fav_odds_dec = sort_odds(fav)
 
-        if fav_odds_dec > 2.5:
+        if fav_odds_dec > 3.0:   # below 2/1 (VIP threshold) — wider net than old 2.5
             continue
 
         all_horses_raw = fav.get('all_horses') or []
@@ -5202,6 +5430,18 @@ def _analyse_date_lambda(target_date_str, tbl, winner_map=None):
         verd = _verdict(lay_score)
         race_name = fav.get('race_name') or f'{course} {rt[11:16]}'
         fav_name = fav.get('horse', '') or ''
+
+        # Alternative winner — highest-scored non-favourite for VIP handicap suggestion
+        _alt = None
+        _by_score = sorted(all_horses_sorted, key=lambda h: float(h.get('score', 0)), reverse=True)
+        for _h in _by_score:
+            if str(_h.get('horse', '')).strip().lower() != fav_name.strip().lower():
+                _alt = {
+                    'horse': str(_h.get('horse', '')),
+                    'score': float(_h.get('score', 0)),
+                    'odds':  float(_h.get('odds', 0)),
+                }
+                break
 
         # Guardrail: never mark outcomes for races that have not started yet.
         race_started = True
@@ -5257,28 +5497,50 @@ def _analyse_date_lambda(target_date_str, tbl, winner_map=None):
                 )
             # else: leave fav_outcome as None — race hasn't been settled yet
 
+        _race_type = str(fav.get('race_type') or fav.get('bet_type') or race_name or '')
         results.append({
-            'date':          target_date_str,
-            'race_time':     rt,
-            'course':        course,
-            'race_name':     race_name,
-            'favourite':     fav_name or '?',
-            'fav_odds':      fav_odds_dec,
-            'fav_sys_score': float(fav.get('comprehensive_score') or fav.get('score', 0)),
-            'score_gap':     float(fav.get('score_gap') or 0),
-            'runners':       len(runners),
-            'lay_score':     lay_score,
-            'flags':         list(flags.keys()),
-            'details':       details,
-            'verdict':       verd,
-            'verdict_colour': _verdict_colour(lay_score),
-            'form':          fav.get('form', ''),
-            'trainer':       fav.get('trainer', ''),
-            'jockey':        fav.get('jockey', ''),
-            'our_pick':      fav.get('show_in_ui', False),
-            'outcome':       fav_outcome,
+            'date':               target_date_str,
+            'race_time':          rt,
+            'course':             course,
+            'race_name':          race_name,
+            'race_type':          _race_type,
+            'favourite':          fav_name or '?',
+            'fav_odds':           fav_odds_dec,
+            'fav_sys_score':      float(fav.get('comprehensive_score') or fav.get('score', 0)),
+            'score_gap':          float(fav.get('score_gap') or 0),
+            'runners':            len(runners),
+            'lay_score':          lay_score,
+            'flags':              list(flags.keys()),
+            'details':            details,
+            'verdict':            verd,
+            'verdict_colour':     _verdict_colour(lay_score),
+            'form':               fav.get('form', ''),
+            'trainer':            fav.get('trainer', ''),
+            'jockey':             fav.get('jockey', ''),
+            'our_pick':           fav.get('show_in_ui', False),
+            'outcome':            fav_outcome,
+            'alternative_winner': _alt,
         })
     return results
+
+
+_LAY_COMMISSION = 0.05   # Betfair exchange standard commission on net winnings
+_LAY_STAKE_PTS  = 1.0    # flat 1-point lay stake per qualifying race, for ROI tracking
+
+def _lay_profit_pts(fav_odds, outcome, stake=_LAY_STAKE_PTS, commission=_LAY_COMMISSION):
+    """
+    P&L in points for laying the favourite at fav_odds with a flat stake.
+    outcome: 'loss' (favourite lost = lay WON) or 'win' (favourite won = lay LOST).
+    Lay win:  profit = stake * (1 - commission)
+    Lay loss: liability = stake * (fav_odds - 1)  →  loss = -liability
+    """
+    if not fav_odds or fav_odds <= 1.0:
+        return 0.0
+    if outcome == 'loss':       # favourite lost → lay bet wins
+        return round(stake * (1 - commission), 3)
+    elif outcome == 'win':      # favourite won → lay bet loses
+        return round(-(stake * (fav_odds - 1)), 3)
+    return 0.0
 
 
 def _build_daily_lay_snapshot(day, rows, generated_iso):
@@ -5286,6 +5548,25 @@ def _build_daily_lay_snapshot(day, rows, generated_iso):
     candidates = [r for r in rows if float(r.get('lay_score') or 0) >= 4]
     settled = [r for r in candidates if _normalise_fav_outcome(r.get('outcome')) in ('win', 'loss')]
     fav_lost = [r for r in settled if _normalise_fav_outcome(r.get('outcome')) == 'loss']
+
+    races_settled = []
+    day_profit_pts = 0.0
+    for r in settled:
+        _outcome = _normalise_fav_outcome(r.get('outcome'))
+        _odds = float(r.get('fav_odds') or 0)
+        _profit = _lay_profit_pts(_odds, _outcome)
+        day_profit_pts += _profit
+        races_settled.append({
+            'race_time':  r.get('race_time'),
+            'course':     r.get('course'),
+            'favourite':  r.get('favourite'),
+            'fav_odds':   _odds,
+            'outcome':    _outcome,
+            'lay_score':  float(r.get('lay_score') or 0),
+            'verdict':    r.get('verdict'),
+            'profit_pts': _profit,
+        })
+
     summary = {
         'date': day,
         'total': len(candidates),
@@ -5295,17 +5576,9 @@ def _build_daily_lay_snapshot(day, rows, generated_iso):
         'settled': len(settled),
         'fav_lost': len(fav_lost),
         'lay_win_pct': round((len(fav_lost) / len(settled)) * 100, 1) if settled else None,
+        'profit_pts': round(day_profit_pts, 2),
+        'staked_pts': round(len(settled) * _LAY_STAKE_PTS, 2),
     }
-    races_settled = []
-    for r in settled:
-        races_settled.append({
-            'race_time': r.get('race_time'),
-            'course': r.get('course'),
-            'favourite': r.get('favourite'),
-            'outcome': _normalise_fav_outcome(r.get('outcome')),
-            'lay_score': float(r.get('lay_score') or 0),
-            'verdict': r.get('verdict'),
-        })
     return {
         'bet_date': 'FAVS_HISTORY',
         'bet_id': f'day#{day}',
@@ -5773,9 +6046,28 @@ def get_favs_run_lambda(headers, event):
             snapshot = _build_daily_lay_snapshot(d, day_rows, generated_iso)
             _save_daily_lay_snapshot(tbl, snapshot)
 
+        # Exclude horses that are "OUR PICK" (show_in_ui=True) from lay candidates.
+        # A horse cannot be both a back pick and a lay candidate — it's a contradiction
+        # that would confuse subscribers and undermine trust in both signals.
+        all_results = [r for r in all_results if not r.get('our_pick')]
+
         caution   = [r for r in all_results if r['lay_score'] >= 4]
         strong    = [r for r in all_results if r['lay_score'] >= 7]
         red_flag  = [r for r in all_results if r['lay_score'] >= 10]
+
+        # ── VIP ROLLERS ELITE LAY FILTER ─────────────────────────────────────
+        # Qualifies when ALL four conditions are met:
+        #   1. Handicap race
+        #   2. Lay score 13+
+        #   3. 8+ runners
+        #   4. Favourite priced below 2/1 (decimal < 3.0)
+        vip_elite = [
+            r for r in all_results
+            if r.get('lay_score', 0) >= 13
+            and 'handicap' in str(r.get('race_type', '')).lower()
+            and r.get('runners', 0) >= 8
+            and 0 < r.get('fav_odds', 99) < 3.0
+        ]
 
         # Lay win % — how often the favourite lost (settled races only)
         settled   = [r for r in all_results if r.get('outcome') and r['outcome'].lower() in ('win','won','loss','lost')]
@@ -5828,11 +6120,16 @@ def get_favs_run_lambda(headers, event):
         history_days = _load_lay_history(tbl, days_back=30)
         hist_settled = sum(int((d.get('summary') or {}).get('settled') or 0) for d in history_days)
         hist_fav_lost = sum(int((d.get('summary') or {}).get('fav_lost') or 0) for d in history_days)
+        hist_profit = sum(float((d.get('summary') or {}).get('profit_pts') or 0) for d in history_days)
+        hist_staked = sum(float((d.get('summary') or {}).get('staked_pts') or 0) for d in history_days)
         history_summary = {
             'days': len(history_days),
             'settled': hist_settled,
             'fav_lost': hist_fav_lost,
             'lay_win_pct': round((hist_fav_lost / hist_settled) * 100, 1) if hist_settled else None,
+            'profit_pts': round(hist_profit, 2),
+            'staked_pts': round(hist_staked, 2),
+            'roi_pct': round((hist_profit / hist_staked) * 100, 1) if hist_staked else None,
         }
 
         return {
@@ -5842,9 +6139,11 @@ def get_favs_run_lambda(headers, event):
                 'success':   True,
                 'generated': datetime.now().isoformat(),
                 'summary':   {'total': len(all_results), 'caution': len(caution), 'strong': len(strong), 'red_flag': len(red_flag),
-                              'settled': len(settled), 'fav_lost': len(fav_lost), 'lay_win_pct': lay_win_pct},
+                              'settled': len(settled), 'fav_lost': len(fav_lost), 'lay_win_pct': lay_win_pct,
+                              'vip_elite_count': len(vip_elite)},
                 'csv_url':   f'/api/favs-run?date={target_date}&days={days}&format=csv',
                 'races':     all_results,
+                'vip_elite': vip_elite,
                 'history_days': history_days,
                 'history_summary': history_summary,
             }, default=str)
@@ -5868,7 +6167,6 @@ ADMIN_DEFAULT_CONFIG = {
     'min_confidence_hcap':   85,
     'min_confidence_norace': 75,
     'target_picks':           3,
-    'picks_gate_hour_utc':   12,   # 1pm BST = 12 UTC
     'elite_threshold':       95,
     'strong_threshold':      90,
     'good_threshold':        80,

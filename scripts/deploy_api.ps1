@@ -28,9 +28,9 @@ if (-not (Test-Path $SRC)) {
 # Zip the source
 Add-Type -Assembly System.IO.Compression.FileSystem
 if (Test-Path $ZIP) { Remove-Item $ZIP -Force }
-$zip = [System.IO.Compression.ZipFile]::Open($ZIP, 'Create')
-[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $SRC, 'lambda_function.py') | Out-Null
-$zip.Dispose()
+$zipArchive = [System.IO.Compression.ZipFile]::Open($ZIP, 'Create')
+[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zipArchive, $SRC, 'lambda_function.py') | Out-Null
+$zipArchive.Dispose()
 $size = (Get-Item $ZIP).Length
 Write-Host ""
 Write-Host "  Zip built: $size bytes"

@@ -7,6 +7,8 @@ import WimbledonPage from './pages/wimbledon/WimbledonPage';
 import TourDeFrancePage from './pages/tourdefrance/TourDeFrancePage';
 import RugbyPage from './pages/rugby/RugbyPage';
 import GolfPage from './pages/golf/GolfPage';
+import BasketballPage from './pages/basketball/BasketballPage';
+import NFLPage from './pages/nfl/NFLPage';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL ||
   'https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com';
@@ -848,6 +850,8 @@ function App() {
           { key:'tourdefrance', label:'Pro Cycling',   emoji:'🚴', sub:'Stage predictions — free',  gated: true, tierRequired: 'free' },
           { key:'rugby',     label:'Rugby',            emoji:'🏉', sub:'Nations Championship — free', gated: true, tierRequired: 'free' },
           { key:'golf',      label:'Pro Golf',          emoji:'⛳', sub:'Majors — free',                gated: true, tierRequired: 'free' },
+          { key:'basketball',label:'Basketball',        emoji:'🏀', sub:'NBA futures — free',            gated: true, tierRequired: 'free' },
+          { key:'nfl',       label:'NFL',               emoji:'🏈', sub:'Super Bowl futures — free',     gated: true, tierRequired: 'free' },
           ...(isAuthenticated ? [{ key:'account', label:'My Account', emoji:'👤', sub:'Profile & billing', gated: true, tierRequired: 'premium' }] : []),
           ...(isAdmin ? [{ key:'admin', label:'Admin', emoji:'⚙️', sub:'System controls', gated: true, admin: true, tierRequired: 'admin' }] : []),
         ]
@@ -918,6 +922,8 @@ function App() {
             { key:'tourdefrance', tierRequired: 'free', component: () => <TourDeFrancePage /> },
             { key:'rugby', tierRequired: 'free', component: () => <RugbyPage /> },
             { key:'golf', tierRequired: 'free', component: () => <GolfPage /> },
+            { key:'basketball', tierRequired: 'free', component: () => <BasketballPage /> },
+            { key:'nfl', tierRequired: 'free', component: () => <NFLPage /> },
             { key:'account',  tierRequired: 'premium', component: () => <MyAccountView authUser={authUser} onLogout={handleLogout} accountSettingsRequest={accountSettingsRequest} /> },
             { key:'admin',    tierRequired: 'admin', component: () => isAdmin ? <AdminView authUser={authUser} /> : null },
           ];
