@@ -123,3 +123,72 @@ DATA HEALTH
 - Always note if form_enriched = false.
 - If DynamoDB is empty at time of query (before 12:00 UTC), say "Pipeline not yet run — check after 12:00 UTC".
 - Check `watchlist.py` for any watchlist horses running today and flag them with their boost.
+
+---
+
+## Signal Priority Matrix
+
+Use this table to decide whether a pick is genuinely high-value or a trap.
+
+| Signal combination | Assessment | Action |
+|---|---|---|
+| C&D + going match on a win + market steam | **TOP TIER** — three independent evidence streams agree | Max stake, Best Bet |
+| C&D + elite trainer/jockey + form_enriched ≥ 40% | **HIGH** — class + proven form at venue | Best Bet |
+| Going match win + steam + close 2nd last time | **HIGH** — improving horse the market has spotted | Best Bet |
+| Score ≥ 90 driven by trainer/jockey tier alone | **TRAP** — name recognition, not horse evidence | Skip or half stake at most |
+| Score ≥ 90 but odds-only signals dominate (sweet_spot + optimal_odds > 50% of score) | **TRAP** — scoring model rewarding price, not performance | No bet |
+| Form wins all on AW, today's race is soft turf | **TRAP** — surface mismatch; AW speed ≠ soft turf stamina | Skip |
+| Large field (16+ runners) with score ≥ 90 | **TRAP** — model cannot see draw/pace; structural variance is too high | EW at best, no Best Bet |
+| Watchlist horse + going match + steam | **SLEEPER** — previous near-miss now with conditions in its favour | Best Bet even at 70–89 score |
+| Unexposed young horse (≤5 runs) + steam ≥ 20% | **IMPROVER** — market knows something form strings don't show | Consider at 70–89 with steam |
+
+**Key principle:** the number of *independent* positive signals matters more than the raw score. Three signals from different data sources (form, market, going) beat five signals derived from the same source (e.g. five odds-range bonuses).
+
+---
+
+## When to Skip
+
+Do not produce a Best Bet from these race types, regardless of score:
+
+| Situation | Why | What to do |
+|---|---|---|
+| Maiden over 2m with field of 8+ | Stamina unproven for most runners; winning form is usually a single run | Flag "high-variance maiden — skip" |
+| Field of 16+ runners, no clear market leader | Draw and pace dominate; our model cannot see these | Skip or label EW-only |
+| Going declared Heavy and horse has 0 wins on going | Heavy is structurally different from Soft; unpredictable across field | Skip unless C&D winner in Heavy |
+| form_enriched = false AND score < 85 | Pick is built on Betfair odds alone, not form data | Always skip |
+| AW Class 5/6 in the evening (post 17:30 BST) | Two independent penalties combine: low-class + evening AW variance | Always skip |
+| Irish handicap (Curragh/Dundalk/Navan) at Class 3–6 | Very tight weights, large fields, market harder to read | Skip; pick at Irish tracks only in Graded races |
+| Horse is beaten favourite in same race type (BF flag in prev results) | The market already gave it a chance; it failed | Require a going or distance change before backing again |
+| Three consecutive Best Bet losses | Model needs review before next pick; do not issue today | Pause and review scoring engine |
+| Going is weather-inferred (not officially declared) | All going signals are halved; uncertainty too high | Require other two signals (C&D + steam) to compensate |
+
+---
+
+## Confidence Calibration
+
+Map score + signal count to bet sizing. **Never size purely on score alone.**
+
+| Score | Signals fired | Stake | Bet type | Notes |
+|---|---|---|---|---|
+| ≥ 90 | ≥ 4 independent | **Max stake** (e.g. 4 units) | Best Bet | All criteria green; highest conviction |
+| ≥ 90 | 3 independent | **Full stake** (3 units) | Best Bet | Standard Best Bet threshold |
+| ≥ 90 | 2 or fewer | **Half stake** (1.5 units) | Each-Way | Signal count too thin; odds-driven risk |
+| 70–89 | ≥ 3 independent | **Half stake** (1.5 units) | Each-Way | Solid evidence but confidence gate not met |
+| 70–89 | 2 | **Quarter stake** (1 unit) | Each-Way | Speculative; note the gap in evidence |
+| < 70 | Any | **No bet** | — | Below minimum confidence gate |
+| Any | Score > 50% from odds signals | **No bet** | — | Price trap; not horse evidence |
+| Any | form_enriched = false | Reduce one tier | — | Data incomplete; scale back regardless of score |
+
+**Watchlist override:** a watchlist horse with steam (≥ 20% odds shortening) may be backed at one tier above its score band — the AI watchlist already accounts for the near-miss history.
+
+---
+
+## Result Review Checklist
+
+After every losing Best Bet, ask these three questions before the next pick:
+
+1. **Was the correct signal present?** — Look at the `analysis_breakdown` in DynamoDB. Which of C&D, going match, and steam was missing or scored zero? If none of the three top signals fired, the pick should not have reached Best Bet level — tighten the gate.
+
+2. **What did the winner have that our pick did not?** — Pull the winner's race card (Sporting Life or Racing Post). Did the winner have a going match win, C&D form, or a significant market move that we missed? If yes, identify which data gap caused us to miss it (form enrichment not covering that horse, going declared late, etc.).
+
+3. **Was the going or field size a known risk flag?** — Check whether the race triggered any "when to skip" conditions (heavy going, large field, Irish handicap, AW Class 5/6 evening). If it did and we still backed, that is a process failure, not a model failure — add a hard skip rule.
