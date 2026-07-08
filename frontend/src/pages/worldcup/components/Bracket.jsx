@@ -116,9 +116,8 @@ export default function Bracket() {
       </div>
 
       <div style={{ overflowX: 'auto', paddingBottom: 16 }}>
-        <div style={{ display: 'flex', gap: 0, minWidth: 1100, alignItems: 'flex-start' }}>
-          <Round title="Round of 32" matches={BRACKET.r32} />
-          <Round title="Round of 16" matches={BRACKET.r16} />
+        <div style={{ display: 'flex', gap: 0, minWidth: 900, alignItems: 'flex-start' }}>
+          <Round title="Last 16" matches={BRACKET.r16} />
           <Round title="Quarter-Finals" matches={BRACKET.qf} />
           <Round title="Semi-Finals" matches={BRACKET.sf} />
           <Round title="🏆 Final" matches={BRACKET.final} highlight />

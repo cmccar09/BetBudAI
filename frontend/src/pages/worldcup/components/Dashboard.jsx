@@ -184,17 +184,17 @@ export default function Dashboard() {
               <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>= Pickford · Pred: 5</div>
             </div>
             <div style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.22)', borderRadius: 10, padding: '10px 12px' }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: '#c4b5fd', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>🏅 R32 Starts</div>
-              <div style={{ fontSize: 13, fontWeight: 800, color: 'white', lineHeight: 1.3 }}>Jun 28 · 15:30</div>
-              <div style={{ fontSize: 11, color: '#c4b5fd', marginTop: 3 }}>🇿🇦 vs 🇨🇦</div>
-              <div style={{ fontSize: 10, color: '#64748b', marginTop: 3 }}>16 matches · Jul 3</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: '#c4b5fd', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>🏅 Last 16</div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: 'white', lineHeight: 1.3 }}>Jul 4–7 · Complete</div>
+              <div style={{ fontSize: 11, color: '#c4b5fd', marginTop: 3 }}>8 matches played</div>
+              <div style={{ fontSize: 10, color: '#64748b', marginTop: 3 }}>QF now underway</div>
             </div>
           </div>
 
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 10, fontSize: 10, color: '#374151' }}>
-          Model: Form · Squad depth · Bracket draw · R32 matchups · Updated daily
+          Model: Form · Squad depth · Bracket draw · Last 16 results · Updated daily
         </div>
       </div>
 
