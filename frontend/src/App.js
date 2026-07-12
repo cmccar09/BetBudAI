@@ -2433,6 +2433,7 @@ function MyAccountView({ authUser, onLogout, accountSettingsRequest }) {
 // ---- Top 4 Picks and Intraday (paid) — standalone card view showing ALL today's picks ----
 function Top5PicksView() {
   const [allPicks, setAllPicks] = useState([]);
+  const [extendedPicks, setExtendedPicks] = useState([]);
   const [watchlistPicks, setWatchlistPicks] = useState([]);
   const [droppedPicks, setDroppedPicks] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -2486,8 +2487,17 @@ function Top5PicksView() {
   const loadPicks = async () => {
     setLoading(true); setError(null); setReleasePending(null);
     try {
-      const res = await fetch(API_BASE_URL + '/api/results/today');
+      const [res, extRes] = await Promise.all([
+        fetch(API_BASE_URL + '/api/results/today'),
+        fetch(API_BASE_URL + '/api/picks/extended').catch(() => null),
+      ]);
       const data = await res.json();
+      // Load extended picks for Top 4 section (covers all courses, not just featured meeting)
+      if (extRes?.ok) {
+        extRes.json().then(extData => {
+          if (extData?.success) setExtendedPicks(extData.picks || []);
+        }).catch(() => null);
+      }
       // Load ROI in background — don't block picks display
       fetch(API_BASE_URL + '/api/results/cumulative-roi')
         .then(r => r.json()).then(d => { if (d?.success) setCumulRoi(d); }).catch(() => null);
@@ -2727,6 +2737,88 @@ function Top5PicksView() {
           <div style={{ color:'rgba(255,255,255,0.7)', fontSize:'12px', marginTop:'4px' }}>{releasePending}</div>
         </div>
       )}
+
+      {/* ── TOP 4 EXPERT SELECTIONS ── */}
+      {(allPicks.length > 0 || extendedPicks.length > 0) && (() => {
+        // Merge morning picks + extended picks, deduplicate by course+time, sort by score
+        const pool = {};
+        [...allPicks, ...extendedPicks].forEach(p => {
+          const key = (p.course || '') + '|' + (p.race_time || '').substring(0, 16);
+          const sc = parseFloat(p.comprehensive_score || p.score || 0);
+          if (!pool[key] || sc > parseFloat(pool[key].comprehensive_score || pool[key].score || 0)) pool[key] = p;
+        });
+        const top4 = Object.values(pool)
+          .sort((a, b) => parseFloat(b.comprehensive_score || b.score || 0) - parseFloat(a.comprehensive_score || a.score || 0))
+          .slice(0, 4);
+        const toFrac = dec => { const d = parseFloat(dec); if (!d || d <= 1) return null; const n = d - 1; const denom = 10; const num = Math.round(n * denom); const g = (a, b) => b ? g(b, a % b) : a; const gc = g(Math.round(num), denom); return `${Math.round(num) / gc}/${denom / gc}`; };
+        const outcomeChip = o => {
+          const oc = (o || '').toLowerCase();
+          if (oc === 'win' || oc === 'won')    return { label: 'WON ✓',   bg: '#059669', color: '#fff' };
+          if (oc === 'placed')                  return { label: 'PLACED',  bg: '#2563eb', color: '#fff' };
+          if (oc === 'loss' || oc === 'lost')   return { label: 'LOSS ✗',  bg: '#dc2626', color: '#fff' };
+          return { label: 'LIVE ⏳', bg: '#7c3aed', color: '#fff' };
+        };
+        return (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: 1.2 }}>⭐ Today's Top 4 Expert Selections</span>
+              <div style={{ flex: 1, height: 1, background: 'rgba(251,191,36,0.25)' }} />
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 600 }}>AI · {top4.length} picks</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
+              {top4.map((p, i) => {
+                const rt = formatRaceTime(p.race_time);
+                const sc = parseFloat(p.comprehensive_score || p.score || 0);
+                const tierBg = sc >= 110 ? '#d97706' : sc >= 95 ? '#7c3aed' : sc >= 85 ? '#059669' : '#2563eb';
+                const chip = outcomeChip(p.outcome);
+                const frac = toFrac(p.odds);
+                const isLive = chip.label === 'LIVE ⏳';
+                return (
+                  <div key={i} style={{
+                    background: isLive
+                      ? 'linear-gradient(135deg, rgba(124,58,237,0.18) 0%, rgba(16,185,129,0.08) 100%)'
+                      : 'rgba(255,255,255,0.04)',
+                    border: `1.5px solid ${isLive ? 'rgba(124,58,237,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                    borderRadius: 12, padding: '12px 14px',
+                    display: 'flex', flexDirection: 'column', gap: 6, position: 'relative',
+                  }}>
+                    {/* Rank badge */}
+                    <div style={{ position: 'absolute', top: 10, right: 10, width: 22, height: 22, borderRadius: '50%', background: tierBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, color: '#fff' }}>
+                      {i + 1}
+                    </div>
+                    {/* Score + outcome */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ background: tierBg, color: '#fff', fontSize: 10, fontWeight: 800, padding: '2px 7px', borderRadius: 5 }}>SCORE {Math.round(sc)}</span>
+                      <span style={{ background: chip.bg, color: chip.color, fontSize: 10, fontWeight: 800, padding: '2px 7px', borderRadius: 5 }}>{chip.label}</span>
+                      {isLive && <span style={{ fontSize: 9, color: '#a78bfa', fontWeight: 700, animation: 'none' }}>BET NOW</span>}
+                    </div>
+                    {/* Horse name */}
+                    <div style={{ fontSize: isMobile ? 15 : 17, fontWeight: 900, color: '#fff', lineHeight: 1.2, paddingRight: 24 }}>
+                      🏇 {p.horse}
+                    </div>
+                    {/* Course + time + race */}
+                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <span>📍 {p.course}</span>
+                      {rt.time && <span>⏰ {rt.time}</span>}
+                      {p.market_name && <span style={{ color: 'rgba(255,255,255,0.35)' }}>{p.market_name}</span>}
+                    </div>
+                    {/* Odds + signals */}
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                      {frac && <span style={{ background: 'rgba(251,191,36,0.15)', border: '1px solid rgba(251,191,36,0.4)', color: '#fbbf24', fontSize: 13, fontWeight: 800, padding: '3px 10px', borderRadius: 6 }}>{frac}</span>}
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>📡 {p.signals || '?'} signals</span>
+                    </div>
+                    {/* Trainer / jockey */}
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      {p.trainer && <span>T: <span style={{ color: 'rgba(255,255,255,0.75)' }}>{p.trainer}</span></span>}
+                      {p.jockey && <span>J: <span style={{ color: 'rgba(255,255,255,0.75)' }}>{p.jockey}</span></span>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Form coverage quality bar */}
       {formCoveragePct != null && !releasePending && (
@@ -3226,17 +3318,25 @@ function YesterdayResultsView({ isFreeUser }) {
   const loadResults = async () => {
     setLoading(true); setError(null);
     try {
-      const [todayRes, yestRes, cumulRes] = await Promise.all([
+      const twoDaysAgo = new Date(); twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      const twoDaysAgoStr = twoDaysAgo.toISOString().slice(0, 10);
+      const twoDaysAgoLabel = twoDaysAgo.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Europe/Dublin' });
+      const [todayRes, yestRes, cumulRes, twoDaysRes] = await Promise.all([
         fetch(API_BASE_URL + '/api/results/today'),
         fetch(API_BASE_URL + '/api/results/yesterday'),
         fetch(API_BASE_URL + '/api/results/cumulative-roi'),
+        fetch(`${API_BASE_URL}/api/picks/extended?date=${twoDaysAgoStr}`),
       ]);
-      const [todayData, yestData, cumulData] = await Promise.all([todayRes.json(), yestRes.json(), cumulRes.json()]);
+      const [todayData, yestData, cumulData, twoDaysData] = await Promise.all([todayRes.json(), yestRes.json(), cumulRes.json(), twoDaysRes.json()]);
       if (cumulData.success) setCumulRoi(cumulData);
 
       const todayPicks = (todayData.success ? todayData.picks || [] : [])
         .map(p => ({ ...p, _dayLabel: 'Today' }));
       const yestPicks  = (yestData.success  ? yestData.picks  || [] : []).map(p => ({ ...p, _dayLabel: 'Yesterday' }));
+      // picks from 2 days ago via extended endpoint (covers all courses, not just featured meeting)
+      const twoDaysPicks = (twoDaysData.success ? (twoDaysData.picks || []) : [])
+        .filter(p => !p.is_dropped)
+        .map(p => ({ ...p, _dayLabel: twoDaysAgoLabel }));
       const todayDropped = (todayData.success ? todayData.dropped || [] : [])
         .map(p => ({ ...p, _dayLabel: 'Today', is_dropped: true }));
       const yestDropped = (yestData.success ? yestData.dropped || [] : [])
@@ -3246,7 +3346,7 @@ function YesterdayResultsView({ isFreeUser }) {
       // Deduplicate: same course + race_time[:16] => keep highest-scored version
       // Use course+time (not horse name) to handle name variants like apostrophes
       const deduped = {};
-      [...todayPicks, ...yestPicks].forEach(p => {
+      [...todayPicks, ...yestPicks, ...twoDaysPicks].forEach(p => {
         const rt = (p.race_time || '').substring(0, 16);
         const key = (p.course || p.race_course || '') + '|' + rt;
         const sc  = parseFloat(p.comprehensive_score || p.analysis_score || 0);
@@ -3264,14 +3364,15 @@ function YesterdayResultsView({ isFreeUser }) {
 
       const ts = todayData.success ? (todayData.summary || {}) : {};
       const ys = yestData.success  ? (yestData.summary  || {}) : {};
+      const ds = twoDaysData.success ? (twoDaysData.summary || {}) : {};
       const combinedSummary = {
-        total_picks:  (ts.total_picks  || 0) + (ys.total_picks  || 0),
-        wins:         (ts.wins         || 0) + (ys.wins         || 0),
-        places:       (ts.places       || 0) + (ys.places       || 0),
-        losses:       (ts.losses       || 0) + (ys.losses       || 0),
-        pending:      (ts.pending      || 0) + (ys.pending      || 0),
-        profit:       (ts.profit       || 0) + (ys.profit       || 0),
-        total_stake:  (ts.total_stake  || 0) + (ys.total_stake  || 0),
+        total_picks:  (ts.total_picks  || 0) + (ys.total_picks  || 0) + (ds.total_picks  || 0),
+        wins:         (ts.wins         || 0) + (ys.wins         || 0) + (ds.wins         || 0),
+        places:       (ts.places       || 0) + (ys.places       || 0) + (ds.places       || 0),
+        losses:       (ts.losses       || 0) + (ys.losses       || 0) + (ds.losses       || 0),
+        pending:      (ts.pending      || 0) + (ys.pending      || 0) + (ds.pending      || 0),
+        profit:       (ts.profit       || 0) + (ys.profit       || 0) + (ds.profit       || 0),
+        total_stake:  (ts.total_stake  || 0) + (ys.total_stake  || 0) + (ds.total_stake  || 0),
       };
       // ROI = profit / total_stake * 100  (standard financial ROI)
       combinedSummary.roi = combinedSummary.total_stake > 0
@@ -3291,7 +3392,7 @@ function YesterdayResultsView({ isFreeUser }) {
         total_stake: combinedSummary.total_stake,
         roi: combinedSummary.roi,
       };
-      if (allPicks.length === 0 && !todayData.success && !yestData.success) {
+      if (allPicks.length === 0 && !todayData.success && !yestData.success && !twoDaysData.success) {
         setError('Failed to load results');
       } else {
         setResults({ picks: allPicks, summary: recomputed });
@@ -3979,8 +4080,8 @@ function YesterdayResultsView({ isFreeUser }) {
                   </span>
 
                   {/* Day */}
-                  <span style={{ background: pick._dayLabel === 'Today' ? '#7c3aed' : '#374151', color:'white', padding:'3px 7px', borderRadius:'5px', fontSize:'10px', fontWeight:'800', textTransform:'uppercase', textAlign:'center', width:'fit-content' }}>
-                    {pick._dayLabel === 'Today' ? 'Today' : 'Yest'}
+                  <span style={{ background: pick._dayLabel === 'Today' ? '#7c3aed' : pick._dayLabel === 'Yesterday' ? '#374151' : '#1e3a5f', color:'white', padding:'3px 7px', borderRadius:'5px', fontSize:'10px', fontWeight:'800', textTransform:'uppercase', textAlign:'center', width:'fit-content' }}>
+                    {pick._dayLabel === 'Today' ? 'Today' : pick._dayLabel === 'Yesterday' ? 'Yest' : pick._dayLabel}
                   </span>
 
                   {/* Time + Course */}

@@ -1,5 +1,14 @@
 # BetBudAI — Project Instructions for Claude
 
+## Project Overview
+
+BetBudAI is a multi-sport AI betting analysis platform serving daily picks across horse racing, World Cup football, Pro Tennis, Pro Cycling, Rugby, and Pro Golf.
+
+- **Stack**: JavaScript/React (primary frontend), Python (Lambda/scrapers), CSS/HTML, Markdown docs
+- **Infrastructure**: AWS (Lambda, Step Functions, DynamoDB, SES) + Cloudflare Pages
+- **Always verify sports data accuracy** (match results, squad data, standings) against a real source before deploying — stale data destroys subscriber trust faster than any bug
+- **Critical two-Lambda pattern**: API Gateway routes to `betbudai-picks-api`, NOT `BettingPicksAPI` — deploy to BOTH via `scripts/deploy_api.ps1` on every API change
+
 ## Who you are when working on this project
 
 You are an expert AI equine analyst and selection engine. Your entire purpose is to **find winners**. Every line of code you write, every pipeline you debug, every pick you review — all of it exists to produce the best possible horse racing selections for BetBudAI's premium subscribers.
@@ -34,7 +43,18 @@ When reviewing or generating picks, always think:
 - **Frontend**: React on Cloudflare Pages (`frontend/src/App.js`)
 - **DynamoDB tables**: `SureBetBets` (picks), `BetBudAI_Subscribers` (users), `BetBudAICache` (ROI)
 - **Email**: AWS SES from `charles.mccarthy@gmail.com` — **SES is in sandbox mode**, production access denied (Case 177585279500302). Re-apply via AWS Console with correct use case before emails reach subscribers.
-- **Schedule**: Morning run 11:00 UTC (same day — targets TODAY's declared races, run_mode=morning, no day offset) | Refresh 12:00, 13:00, 13:30, 14:00, 15:00, 16:00, 17:00, 18:00 UTC | Email 12:20 UTC
+- **Schedule & daily timeline** (all times UTC / BST in brackets):
+
+| Time UTC | BST | Event |
+|---|---|---|
+| 07:00 | 08:00 | `SureBet-Major-Analysis` — deep weekly model run (Mon only) |
+| 11:00 | 12:00 | **Morning pipeline fires** — Betfair fetch → scoring → form enrichment → validate → featured meeting seeded → notify |
+| ~11:15 | ~12:15 | **Initial picks in DynamoDB** — first set of winners visible on site |
+| 12:00 | 13:00 | First refresh — odds updated, picks re-scored |
+| 12:20 | 13:20 | **Subscriber email sent** — picks must be ready before this |
+| 13:00 | 14:00 | Second refresh |
+| 13:30 | 14:30 | **Featured meeting LOCKED** — finalised by 13:30 refresh, does not change after |
+| 14:00–18:00 | 15:00–19:00 | Hourly refreshes — live odds + steam signals update scores |
 - **Region**: `eu-west-1` everywhere
 
 ## Updating the analysis Lambda
@@ -97,6 +117,88 @@ A selection is only trustworthy when ALL of these are green:
 - ✅ At least 3 signals fired (not just odds-based)
 
 If any are red, the pick is flagged as low-confidence — still shown but with a warning.
+
+## Business model (updated 2026-07-01)
+
+**Free for all — one paid add-on:**
+- All content (horse racing picks, Pro Tennis, Pro Cycling, Rugby, Pro Golf, World Cup, Major Races) is **free** with a registered account (no card required)
+- **Favourite Watch** (VIP tier) = **€9.99/mo** — the only paid feature: vulnerable favourite alerts + Betfair lay signals
+- Stripe: use `STRIPE_PRICE_PREMIUM` (€9.99 product) for ALL paid signups. `STRIPE_PRICE_VIP` is now aliased to the same price — do not use a separate VIP price ID.
+- Goal: maximize free signups (build user base / data asset), monetise the exchange-betting niche with the lay product
+
+## Multi-sport pages (added 2026-06-30 to 2026-07-01)
+
+### Frontend pages
+| Page | Key | Source file | Tab label |
+|---|---|---|---|
+| Horse Racing | `picks5` | `App.js` (inline views) | 🏆 Daily Picks |
+| Wimbledon / Pro Tennis | `wimbledon` | `frontend/src/pages/wimbledon/WimbledonPage.jsx` | 🎾 Pro Tennis |
+| Tour de France / Pro Cycling | `tourdefrance` | `frontend/src/pages/tourdefrance/TourDeFrancePage.jsx` | 🚴 Pro Cycling |
+| Rugby (Nations Championship) | `rugby` | `frontend/src/pages/rugby/RugbyPage.jsx` | 🏉 Rugby |
+| Golf Majors / Pro Golf | `golf` | `frontend/src/pages/golf/GolfPage.jsx` | ⛳ Pro Golf |
+| World Cup 2026 | `worldcup` | `frontend/src/pages/worldcup/WorldCupPage.jsx` | ⚽ World Cup |
+
+All sport tabs are **free tier** (only require account login, no payment). Only `Favourite Watch` requires VIP payment.
+
+### Sport data scrapers (all at repo root)
+| File | Lambda name | What it scrapes |
+|---|---|---|
+| `wimbledon_scraper.py` | `wimbledon-scraper` | ESPN tennis API — match results, round, sets, form tips; Betfair outright odds |
+| `tour_de_france_scraper.py` | `tour-de-france-scraper` | Stage schedule (static), procyclingstats.com stage results, Betfair outright |
+| `rugby_scraper.py` | `rugby-scraper` | BBC Sport `__INITIAL_DATA__` — Nations Championship results, try scorers, venue; Betfair outright |
+| `golf_scraper.py` | `golf-scraper` | ESPN golf API — major leaderboards with round-by-round scores; Betfair outright |
+
+### DynamoDB: BetBudAI_Sports
+New table added for all sport pages. PK = `sport`, SK = `data_key`.
+```
+PK 'wimbledon'     → MATCHES, OUTRIGHT_MEN, OUTRIGHT_WOMEN, HISTORY, TIPS
+PK 'tourdefrance'  → SCHEDULE, RESULTS, OUTRIGHT, HISTORY, TEAMS, SPECIALISTS, TIPS
+PK 'rugby'         → FIXTURES, RESULTS, OUTRIGHT, HISTORY, TIPS, RWC_2027
+PK 'golf'          → MAJORS, OUTRIGHT, HISTORY, TIPS, RYDER_CUP
+```
+
+### Step Functions: Sports fan-out
+`SureBet-Sports-DailyRefresh` — runs all 5 scrapers **in parallel** at 06:00 UTC daily:
+- `wimbledon-scraper`
+- `tour-de-france-scraper`
+- `rugby-scraper`
+- `golf-scraper`
+- `betbud-wc-daily-review` (World Cup)
+
+EventBridge rule: `SureBet-Sports-DailyRefresh-Schedule` (cron 0 6 * * ? *)
+IAM role used: `wimbledon-eventbridge-role` (starts the state machine)
+Step Functions role: `betbudwc-stepfunctions-role` (invokes all 5 Lambdas)
+
+### Additional supporting files
+| File | Purpose |
+|---|---|
+| `bloodstock.py` | Sire going-preference database (~80 sires mapped), `sire_going_signal()` function |
+| `watchlist.py` | AI improver watchlist — picks placed on watchlist post-race, flagged +15pts next time out |
+
+### API endpoints added
+All served by `BettingPicksAPI` (`backend/api/lambda_function.py`):
+- `GET /api/sports/wimbledon` — Pro Tennis data
+- `GET /api/sports/tourdefrance` — Pro Cycling data
+- `GET /api/sports/rugby` — Rugby data (Nations Championship + RWC 2027)
+- `GET /api/sports/golf` — Pro Golf data (majors, Ryder Cup)
+- `GET /api/picks/extended` — Extended daily picks (top 5 by score, any odds, beyond main UI picks)
+
+## UI / Styling
+
+- All UI changes must be **mobile-friendly and responsive** — test styling across mobile (< 640px), tablet (640–1024px), and desktop (> 1024px) breakpoints before considering a change complete
+- Use `isMobile = window.innerWidth < 640` pattern (already in components) for conditional layout logic
+- Dark theme is canonical — background `#0f172a`, accent green `#34d399`, gold `#fbbf24`, muted `rgba(255,255,255,0.5)`
+- Never add inline styles that break the existing dark theme or override CSS variables without checking `App.css` and `worldcup.css` first
+
+## Deployment
+
+- After making any code change, **build and deploy before finishing** — a change that isn't live isn't done
+- Frontend: `cd frontend && npm run build && cd .. && npx wrangler pages deploy frontend/build --project-name betbudai --branch main`
+  - **`--branch main` is mandatory** — without it wrangler creates a preview URL, NOT www.betbudai.com
+- API Lambda: always use `scripts/deploy_api.ps1` — deploys to BOTH `BettingPicksAPI` AND `betbudai-picks-api`
+- Analysis Lambda: always use `scripts/build_analysis_lambda.ps1` — never patch the zip manually
+- **Verify the deployment succeeded** — check the Cloudflare deployment URL or invoke the Lambda directly after deploy
+- Commit after every successful deployment: changes not in git are one broken session away from being lost
 
 ## Always remember
 
