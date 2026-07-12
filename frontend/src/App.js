@@ -2738,7 +2738,7 @@ function Top5PicksView() {
         </div>
       )}
 
-      {/* ── TOP 4 EXPERT SELECTIONS ── */}
+      {/* ── LIVE OPPORTUNITIES (Top 4 by score — all courses) ── */}
       {(allPicks.length > 0 || extendedPicks.length > 0) && (() => {
         // Merge morning picks + extended picks, deduplicate by course+time, sort by score
         const pool = {};
@@ -2761,8 +2761,8 @@ function Top5PicksView() {
         return (
           <div style={{ marginBottom: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: 1.2 }}>⭐ Today's Top 4 Expert Selections</span>
-              <div style={{ flex: 1, height: 1, background: 'rgba(251,191,36,0.25)' }} />
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: 1.2 }}>🕐 Live Opportunities — updated throughout the day</span>
+              <div style={{ flex: 1, height: 1, background: 'rgba(56,189,248,0.2)' }} />
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 600 }}>AI · {top4.length} picks</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
@@ -2886,6 +2886,18 @@ function Top5PicksView() {
           </div>
         )}
       </div>
+
+      {/* ── MORNING PICK header ── */}
+      {allPicks.filter(p => !p.is_dropped).length > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, marginTop: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(217,119,6,0.12)', border: '1px solid rgba(217,119,6,0.35)', borderRadius: 8, padding: '5px 12px' }}>
+            <span style={{ fontSize: 13 }}>🔒</span>
+            <span style={{ fontSize: 11, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: 1.1 }}>Morning Pick</span>
+            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>— locked 1pm · back this one</span>
+          </div>
+          <div style={{ flex: 1, height: 1, background: 'rgba(217,119,6,0.2)' }} />
+        </div>
+      )}
 
       {/* Official Picks */}
       {(() => {
