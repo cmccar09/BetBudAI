@@ -183,6 +183,26 @@ All served by `BettingPicksAPI` (`backend/api/lambda_function.py`):
 - `GET /api/sports/golf` — Pro Golf data (majors, Ryder Cup)
 - `GET /api/picks/extended` — Extended daily picks (top 5 by score, any odds, beyond main UI picks)
 
+## Environment
+
+- **Cross-platform**: both Bash (Git Bash / WSL) and PowerShell are used in this project — always provide commands that work in the target shell, or note both variants
+- When running AWS CLI commands, prefer Bash to avoid PowerShell JSON-escaping issues with `--expression-attribute-values`
+- Wrangler deploy must be run from Bash, not PowerShell (PowerShell triggers a non-interactive auth error)
+
+## Domain conventions — sports data
+
+- **Always use real match results** for tickers and sport pages — never hardcode placeholder scores; stale or invented data breaks subscriber trust
+- **Measurable goals per sport** (enforce when generating picks or reviewing scraper output):
+
+| Sport | Goal |
+|---|---|
+| Horse Racing | ≥ 75% win rate · ≥ 60% ROI · score ≥ 90 gate |
+| World Cup | ≥ 65% match accuracy · ≥ 20% first-team-scorer |
+| Pro Tennis | ≥ 70% match accuracy · 1 EW pick per slam |
+| Pro Cycling | ≥ 35% stage winners · 1 EW per Tour |
+| Rugby | ≥ 70% winners · ≥ 18% FTS · 0 wrong-squad picks |
+| Pro Golf | ≥ 40% top-10 · 1 × 20/1+ EW per major |
+
 ## UI / Styling
 
 - All UI changes must be **mobile-friendly and responsive** — test styling across mobile (< 640px), tablet (640–1024px), and desktop (> 1024px) breakpoints before considering a change complete
