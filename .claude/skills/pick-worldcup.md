@@ -273,11 +273,26 @@ TOURNAMENT TRACKER
 
 ## Known tournament context (always apply)
 
-- France: **TOURNAMENT FAVOURITES +175** — 14-2 goals, 1 conceded in 5 games, Mbappe 7 goals, QF vs Morocco (easiest draw). Momentum: +1 (1-0 vs Paraguay, controlled).
-- Argentina: **HOLD +390** — Messi 8 goals (Golden Boot), QF vs Switzerland (easiest opposing QF draw), 2022 champions. Momentum: 0 (3-2 vs Egypt, late drama, not dominant). Watch for fatigue.
-- Spain: +370 — beat Portugal (0-1), Belgium in QF; strong but must navigate tougher half. Momentum: +2.
-- Norway: shock Brazil killers (2-1, Jul 5) — Haaland 7 goals, dangerous counter-attacking side, QF vs England. Momentum: +1. **Dark horse flag ACTIVE.**
-- England: face Norway QF (Jul 11) — beat Mexico 3-2 but inconsistent. Momentum: +1 (barely — late winner). Treat with caution vs Norway.
-- Brazil: ELIMINATED (Norway, 2-1, Jul 5) — remove from all future predictions.
-- R16 record: 5/8 = 62.5% — France England Spain Belgium Argentina (Norway Swiss Morocco not predicted)
-- **QF calibration active: tighten thresholds, watch for underdog value, never pick pens-winner as HIGH vs dominant form team**
+**STAGE: SEMI-FINALS**
+
+### SF 1 — France vs Spain (Jul 14)
+- France: **TOURNAMENT FAVOURITES** — beat Morocco 2-0 in QF. Momentum: +2. Mbappe 7+ goals. Dominant defensive record throughout.
+- Spain: beat Belgium 2-1 in QF. Momentum: +2. Strong tournament run, toughest bracket half.
+- **Our outright hold: France** — if France reach the Final, consider taking profit or hedging.
+
+### SF 2 — England vs Argentina (Jul 15)
+- England: beat Norway 2-1 in QF. Momentum: +1 (won by 1 goal — not dominant).
+- Argentina: **HOLD +390** — beat Switzerland 3-1 in QF. Momentum: +2. Messi 8+ goals (Golden Boot leader). 2022 champions. More convincing form than England.
+- **Our outright hold: Argentina** — if Argentina reach the Final, odds will tighten sharply; last value point.
+
+### Eliminated teams (never predict again)
+- Brazil: out (Norway 2-1, Jul 5)
+- Morocco: out (France 2-0, QF)
+- Belgium: out (Spain 2-1, QF)
+- Norway: out (England 2-1, QF) — dark horse run ended
+- Switzerland: out (Argentina 3-1, QF)
+
+### Calibration record
+- R16: 5/8 = 62.5%
+- QF: update after results confirmed
+- **SF gate: 5 factors required for HIGH confidence (no fatigue flag). Apply Step 3 SF multipliers.**

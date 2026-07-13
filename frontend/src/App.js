@@ -2738,87 +2738,6 @@ function Top5PicksView() {
         </div>
       )}
 
-      {/* ── LIVE OPPORTUNITIES (Top 4 by score — all courses) ── */}
-      {(allPicks.length > 0 || extendedPicks.length > 0) && (() => {
-        // Merge morning picks + extended picks, deduplicate by course+time, sort by score
-        const pool = {};
-        [...allPicks, ...extendedPicks].forEach(p => {
-          const key = (p.course || '') + '|' + (p.race_time || '').substring(0, 16);
-          const sc = parseFloat(p.comprehensive_score || p.score || 0);
-          if (!pool[key] || sc > parseFloat(pool[key].comprehensive_score || pool[key].score || 0)) pool[key] = p;
-        });
-        const top4 = Object.values(pool)
-          .sort((a, b) => parseFloat(b.comprehensive_score || b.score || 0) - parseFloat(a.comprehensive_score || a.score || 0))
-          .slice(0, 4);
-        const toFrac = dec => { const d = parseFloat(dec); if (!d || d <= 1) return null; const n = d - 1; const denom = 10; const num = Math.round(n * denom); const g = (a, b) => b ? g(b, a % b) : a; const gc = g(Math.round(num), denom); return `${Math.round(num) / gc}/${denom / gc}`; };
-        const outcomeChip = o => {
-          const oc = (o || '').toLowerCase();
-          if (oc === 'win' || oc === 'won')    return { label: 'WON ✓',   bg: '#059669', color: '#fff' };
-          if (oc === 'placed')                  return { label: 'PLACED',  bg: '#2563eb', color: '#fff' };
-          if (oc === 'loss' || oc === 'lost')   return { label: 'LOSS ✗',  bg: '#dc2626', color: '#fff' };
-          return { label: 'LIVE ⏳', bg: '#7c3aed', color: '#fff' };
-        };
-        return (
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: 1.2 }}>🕐 Live Opportunities — updated throughout the day</span>
-              <div style={{ flex: 1, height: 1, background: 'rgba(56,189,248,0.2)' }} />
-              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 600 }}>AI · {top4.length} picks</span>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
-              {top4.map((p, i) => {
-                const rt = formatRaceTime(p.race_time);
-                const sc = parseFloat(p.comprehensive_score || p.score || 0);
-                const tierBg = sc >= 110 ? '#d97706' : sc >= 95 ? '#7c3aed' : sc >= 85 ? '#059669' : '#2563eb';
-                const chip = outcomeChip(p.outcome);
-                const frac = toFrac(p.odds);
-                const isLive = chip.label === 'LIVE ⏳';
-                return (
-                  <div key={i} style={{
-                    background: isLive
-                      ? 'linear-gradient(135deg, rgba(124,58,237,0.18) 0%, rgba(16,185,129,0.08) 100%)'
-                      : 'rgba(255,255,255,0.04)',
-                    border: `1.5px solid ${isLive ? 'rgba(124,58,237,0.5)' : 'rgba(255,255,255,0.1)'}`,
-                    borderRadius: 12, padding: '12px 14px',
-                    display: 'flex', flexDirection: 'column', gap: 6, position: 'relative',
-                  }}>
-                    {/* Rank badge */}
-                    <div style={{ position: 'absolute', top: 10, right: 10, width: 22, height: 22, borderRadius: '50%', background: tierBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, color: '#fff' }}>
-                      {i + 1}
-                    </div>
-                    {/* Score + outcome */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ background: tierBg, color: '#fff', fontSize: 10, fontWeight: 800, padding: '2px 7px', borderRadius: 5 }}>SCORE {Math.round(sc)}</span>
-                      <span style={{ background: chip.bg, color: chip.color, fontSize: 10, fontWeight: 800, padding: '2px 7px', borderRadius: 5 }}>{chip.label}</span>
-                      {isLive && <span style={{ fontSize: 9, color: '#a78bfa', fontWeight: 700, animation: 'none' }}>BET NOW</span>}
-                    </div>
-                    {/* Horse name */}
-                    <div style={{ fontSize: isMobile ? 15 : 17, fontWeight: 900, color: '#fff', lineHeight: 1.2, paddingRight: 24 }}>
-                      🏇 {p.horse}
-                    </div>
-                    {/* Course + time + race */}
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                      <span>📍 {p.course}</span>
-                      {rt.time && <span>⏰ {rt.time}</span>}
-                      {p.market_name && <span style={{ color: 'rgba(255,255,255,0.35)' }}>{p.market_name}</span>}
-                    </div>
-                    {/* Odds + signals */}
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                      {frac && <span style={{ background: 'rgba(251,191,36,0.15)', border: '1px solid rgba(251,191,36,0.4)', color: '#fbbf24', fontSize: 13, fontWeight: 800, padding: '3px 10px', borderRadius: 6 }}>{frac}</span>}
-                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>📡 {p.signals || '?'} signals</span>
-                    </div>
-                    {/* Trainer / jockey */}
-                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                      {p.trainer && <span>T: <span style={{ color: 'rgba(255,255,255,0.75)' }}>{p.trainer}</span></span>}
-                      {p.jockey && <span>J: <span style={{ color: 'rgba(255,255,255,0.75)' }}>{p.jockey}</span></span>}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })()}
 
       {/* Form coverage quality bar */}
       {formCoveragePct != null && !releasePending && (
@@ -3167,6 +3086,84 @@ function Top5PicksView() {
         );
       })()}
 
+      {/* ── LIVE OPPORTUNITIES (Mon-Fri: 2 picks · Sat-Sun: 4 picks) ── */}
+      {(allPicks.length > 0 || extendedPicks.length > 0) && (() => {
+        const isWeekend = [0, 6].includes(new Date().getDay());
+        const maxPicks = isWeekend ? 4 : 2;
+        // Merge morning picks + extended picks, deduplicate by course+time, sort by score
+        const pool = {};
+        [...allPicks, ...extendedPicks].forEach(p => {
+          const key = (p.course || '') + '|' + (p.race_time || '').substring(0, 16);
+          const sc = parseFloat(p.comprehensive_score || p.score || 0);
+          if (!pool[key] || sc > parseFloat(pool[key].comprehensive_score || pool[key].score || 0)) pool[key] = p;
+        });
+        const topPicks = Object.values(pool)
+          .sort((a, b) => parseFloat(b.comprehensive_score || b.score || 0) - parseFloat(a.comprehensive_score || a.score || 0))
+          .slice(0, maxPicks);
+        const toFrac = dec => { const d = parseFloat(dec); if (!d || d <= 1) return null; const n = d - 1; const denom = 10; const num = Math.round(n * denom); const g = (a, b) => b ? g(b, a % b) : a; const gc = g(Math.round(num), denom); return `${Math.round(num) / gc}/${denom / gc}`; };
+        const outcomeChip = o => {
+          const oc = (o || '').toLowerCase();
+          if (oc === 'win' || oc === 'won')    return { label: 'WON ✓',   bg: '#059669', color: '#fff' };
+          if (oc === 'placed')                  return { label: 'PLACED',  bg: '#2563eb', color: '#fff' };
+          if (oc === 'loss' || oc === 'lost')   return { label: 'LOSS ✗',  bg: '#dc2626', color: '#fff' };
+          return { label: 'LIVE ⏳', bg: '#7c3aed', color: '#fff' };
+        };
+        return (
+          <div style={{ marginBottom: 20, marginTop: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: 1.2 }}>🕐 Live Opportunities — updated throughout the day</span>
+              <div style={{ flex: 1, height: 1, background: 'rgba(56,189,248,0.2)' }} />
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 600 }}>AI · {topPicks.length} picks</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
+              {topPicks.map((p, i) => {
+                const rt = formatRaceTime(p.race_time);
+                const sc = parseFloat(p.comprehensive_score || p.score || 0);
+                const tierBg = sc >= 110 ? '#d97706' : sc >= 95 ? '#7c3aed' : sc >= 85 ? '#059669' : '#2563eb';
+                const chip = outcomeChip(p.outcome);
+                const frac = toFrac(p.odds);
+                const isLive = chip.label === 'LIVE ⏳';
+                return (
+                  <div key={i} style={{
+                    background: isLive
+                      ? 'linear-gradient(135deg, rgba(124,58,237,0.18) 0%, rgba(16,185,129,0.08) 100%)'
+                      : 'rgba(255,255,255,0.04)',
+                    border: `1.5px solid ${isLive ? 'rgba(124,58,237,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                    borderRadius: 12, padding: '12px 14px',
+                    display: 'flex', flexDirection: 'column', gap: 6, position: 'relative',
+                  }}>
+                    <div style={{ position: 'absolute', top: 10, right: 10, width: 22, height: 22, borderRadius: '50%', background: tierBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, color: '#fff' }}>
+                      {i + 1}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ background: tierBg, color: '#fff', fontSize: 10, fontWeight: 800, padding: '2px 7px', borderRadius: 5 }}>SCORE {Math.round(sc)}</span>
+                      <span style={{ background: chip.bg, color: chip.color, fontSize: 10, fontWeight: 800, padding: '2px 7px', borderRadius: 5 }}>{chip.label}</span>
+                      {isLive && <span style={{ fontSize: 9, color: '#a78bfa', fontWeight: 700, animation: 'none' }}>BET NOW</span>}
+                    </div>
+                    <div style={{ fontSize: isMobile ? 15 : 17, fontWeight: 900, color: '#fff', lineHeight: 1.2, paddingRight: 24 }}>
+                      🏇 {p.horse}
+                    </div>
+                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <span>📍 {p.course}</span>
+                      {rt.time && <span>⏰ {rt.time}</span>}
+                      {p.market_name && <span style={{ color: 'rgba(255,255,255,0.35)' }}>{p.market_name}</span>}
+                    </div>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                      {frac && <span style={{ background: 'rgba(251,191,36,0.15)', border: '1px solid rgba(251,191,36,0.4)', color: '#fbbf24', fontSize: 13, fontWeight: 800, padding: '3px 10px', borderRadius: 6 }}>{frac}</span>}
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>📡 {p.signals || '?'} signals</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      {p.trainer && <span>T: <span style={{ color: 'rgba(255,255,255,0.75)' }}>{p.trainer}</span></span>}
+                      {p.jockey && <span>J: <span style={{ color: 'rgba(255,255,255,0.75)' }}>{p.jockey}</span></span>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Analysis Quality Report */}
       <AnalysisQualityReport date={new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Dublin' })} />
 
@@ -3175,10 +3172,6 @@ function Top5PicksView() {
         <YesterdayResultsView isFreeUser={false} />
       </div>
 
-      <div style={{ marginTop:'28px', padding:'16px 20px', background:'rgba(255,255,255,0.07)', borderRadius:'10px', color:'rgba(255,255,255,0.6)', fontSize:'12px', textAlign:'center', lineHeight:'1.6' }}>
-        All daily picks · Results update automatically after each race · Research and education tool only (not a betting site) · Always bet responsibly.
-      </div>
-      <LegalDisclaimerCard />
     </div>
   );
 }

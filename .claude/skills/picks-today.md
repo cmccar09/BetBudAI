@@ -10,12 +10,14 @@ Run: `python -c "from datetime import date; print(date.today())"`
 Run ALL of these in parallel (they are independent):
 
 **Horse Racing**
-```powershell
-aws dynamodb query --table-name SureBetBets --index-name date-index `
-  --key-condition-expression "#d = :d" `
-  --expression-attribute-names '{"#d":"date"}' `
-  --expression-attribute-values "{\":d\":{\"S\":\"$(Get-Date -Format yyyy-MM-dd)\"}}" `
-  --region eu-west-1 | ConvertFrom-Json | Select-Object -ExpandProperty Items | ConvertTo-Json -Depth 10
+```bash
+# SureBetBets uses bet_date as PK — query directly, no GSI
+TODAY=$(date +%Y-%m-%d)
+aws dynamodb query --table-name SureBetBets \
+  --key-condition-expression "bet_date = :d" \
+  --filter-expression "show_in_ui = :t OR pick_type = :e" \
+  --expression-attribute-values "{\":d\":{\"S\":\"$TODAY\"},\":t\":{\"BOOL\":true},\":e\":{\"S\":\"extended\"}}" \
+  --region eu-west-1
 ```
 
 **World Cup**
@@ -85,10 +87,13 @@ aws dynamodb get-item --table-name BetBudAI_Sports `
 ═══════════════════════════════════════════
 
 🏇 HORSE RACING
-  Best Bet: [Horse] @ [odds] — [meeting] [time]
-  Signal count: [n] | Score: [n] | Going: [going]
-  Key signals: [list]
-  Each-Way: [Horse] @ [odds]
+  🔒 MORNING PICK (locked 13:00 UTC): [Horse] @ [odds] — [meeting] [time]
+  Score: [n] | Signals: [n] | Going: [going] | Key: [top signals]
+
+  🕐 LIVE OPPORTUNITIES (top extended picks by score):
+  1. [Horse] @ [odds] — [course] [time] | score=[n]
+  2. [Horse] @ [odds] — [course] [time] | score=[n]
+  [up to 4]
 
 ⚽ WORLD CUP
   [Match] [time GMT]

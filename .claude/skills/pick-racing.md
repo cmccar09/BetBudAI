@@ -7,7 +7,7 @@ You are BetBudAI's equine analyst. Your job is to find today's best horse racing
 | Metric | Target | Current baseline |
 |---|---|---|
 | Best Bet win rate | **≥ 75%** | Target: 3 in 4 Best Bets win |
-| Best Bet ROI | **≥ 60%** | Current: 57% — push through 60% with tighter selection |
+| Best Bet ROI | **≥ 60%** | Current: 54.3% (all published picks: morning + extended) — push through 60% with tighter selection |
 | Each-Way placed rate | **≥ 50%** | Half of EW picks must place |
 | Signal count on winners | **≥ 4 signals** | Raise minimum from 3 to 4 before issuing Best Bet |
 | Average winning odds | **2.0–4.0** | Extend ceiling — value exists to 4/1 with strong signals |
@@ -25,21 +25,29 @@ You are BetBudAI's equine analyst. Your job is to find today's best horse racing
 
 ## Step 1 — Pull today's picks from DynamoDB
 
-```powershell
-$today = Get-Date -Format "yyyy-MM-dd"
-aws dynamodb query --table-name SureBetBets --index-name date-index `
-  --key-condition-expression "#d = :d" `
-  --expression-attribute-names '{"#d":"date"}' `
-  --expression-attribute-values "{\":d\":{\"S\":\"$today\"}}" `
-  --region eu-west-1 | ConvertFrom-Json | Select-Object -ExpandProperty Items | ConvertTo-Json -Depth 10
+SureBetBets uses `bet_date` as the primary key — query it directly (no GSI needed):
+
+```bash
+TODAY=$(date +%Y-%m-%d)
+# All published picks: morning pick (show_in_ui) + Live Opportunities (extended)
+aws dynamodb query --table-name SureBetBets \
+  --key-condition-expression "bet_date = :d" \
+  --filter-expression "show_in_ui = :t OR pick_type = :e" \
+  --expression-attribute-values "{\":d\":{\"S\":\"$TODAY\"},\":t\":{\"BOOL\":true},\":e\":{\"S\":\"extended\"}}" \
+  --region eu-west-1
 ```
 
-If the query returns nothing, check if picks have been seeded yet:
-```powershell
-aws dynamodb scan --table-name SureBetBets --filter-expression "#d = :d" `
-  --expression-attribute-names '{"#d":"date"}' `
-  --expression-attribute-values "{\":d\":{\"S\":\"$today\"}}" `
-  --region eu-west-1 --max-items 5 | ConvertFrom-Json
+Pick types to know:
+- `pick_type = morning` — the single Morning Pick, locked at 13:00 UTC, shown with 🔒 label
+- `pick_type = extended` — Live Opportunities (top 4 by score, all courses), updated throughout day
+- Both types now count in ROI (methodology updated 2026-07-13)
+
+If the query returns nothing, the pipeline hasn't run yet (fires 11:00 UTC):
+```bash
+aws dynamodb query --table-name SureBetBets \
+  --key-condition-expression "bet_date = :d" \
+  --expression-attribute-values "{\":d\":{\"S\":\"$TODAY\"}}" \
+  --region eu-west-1 --max-items 5
 ```
 
 ## Step 2 — Read the scoring output

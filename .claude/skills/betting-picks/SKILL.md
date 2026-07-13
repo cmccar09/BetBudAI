@@ -39,14 +39,14 @@ Map the input to the correct skill and data source:
 
 For each sport being picked, run the relevant data fetch and check `updated_at`:
 
-```powershell
-# Racing — check pipeline ran today
-$today = Get-Date -Format "yyyy-MM-dd"
-aws dynamodb query --table-name SureBetBets --index-name date-index `
-  --key-condition-expression "#d = :d" `
-  --expression-attribute-names '{"#d":"date"}' `
-  --expression-attribute-values "{\":d\":{\"S\":\"$today\"}}" `
-  --region eu-west-1 --max-items 3 | ConvertFrom-Json
+```bash
+# Racing — check pipeline ran today (bet_date is PK, no GSI needed)
+TODAY=$(date +%Y-%m-%d)
+aws dynamodb query --table-name SureBetBets \
+  --key-condition-expression "bet_date = :d" \
+  --filter-expression "show_in_ui = :t OR pick_type = :e" \
+  --expression-attribute-values "{\":d\":{\"S\":\"$TODAY\"},\":t\":{\"BOOL\":true},\":e\":{\"S\":\"extended\"}}" \
+  --region eu-west-1 --max-items 10
 
 # All other sports — check updated_at field
 aws dynamodb get-item --table-name BetBudAI_Sports `
@@ -90,7 +90,10 @@ aws dynamodb get-item --table-name BetBudAI_Sports `
 - MEDIUM: 2–3 factors → issue with caveat
 - SPECULATIVE: balanced → note the value price only
 
-**Always check:** Brazil ELIMINATED (Norway, Jul 5). Argentina 4/1 still live.
+**Always check:** Brazil ELIMINATED (Norway, Jul 5). Tournament now at SF stage.
+- SF 1 (Jul 14): France vs Spain
+- SF 2 (Jul 15): England vs Argentina
+- France and Argentina are the primary outright holds.
 
 ---
 

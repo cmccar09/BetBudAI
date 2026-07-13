@@ -9,8 +9,9 @@ List all available pick skills and what they do. Output this when invoked:
 
 /picks-today      — Full daily briefing across ALL sports
 
-/pick-racing      — Horse racing best bet + each-way
-                    🎯 Goal: ≥ 75% win rate · ≥ 60% ROI · 1 pick/day max
+/pick-racing      — Horse racing morning pick + live opportunities
+                    🎯 Goal: ≥ 75% win rate · ≥ 60% ROI · 1 morning pick + up to 4 extended
+                    ROI: 54.3% (morning + extended, from 2026-03-22)
                     Gate: score ≥ 90, ≥ 4 signals, going confirmed, no drift
 
 /pick-worldcup    — World Cup match predictions + first scorer
