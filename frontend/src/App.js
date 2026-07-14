@@ -2643,30 +2643,6 @@ function Top5PicksView() {
 
   return (
     <div>
-      {/* Latest Winner Banner */}
-      {(bannerData5.horse || bannerData5.odds || bannerData5.summaryText) && (
-        <div style={{
-          maxWidth: '100%', margin: '0 0 16px', padding: isMobile ? '10px 12px' : '12px 20px',
-          background: 'linear-gradient(135deg, rgba(52,211,153,0.12), rgba(16,185,129,0.06))',
-          border: '1px solid rgba(52,211,153,0.3)', borderRadius: '12px',
-          display: 'flex', alignItems: 'center', justifyContent: isMobile ? 'flex-start' : 'center', gap: isMobile ? '7px' : '10px',
-          flexWrap: 'wrap',
-        }}>
-          <span style={{ fontSize: '10px', fontWeight: '800', color: '#34d399', background: 'rgba(5,150,105,0.18)', border: '1px solid rgba(52,211,153,0.35)', padding: '2px 8px', borderRadius: '999px', letterSpacing: '0.6px' }}>LIVE SNAPSHOT</span>
-          <span style={{ fontSize: isMobile ? '18px' : '22px' }}>🏆</span>
-          <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: isMobile ? '12px' : '14px', fontWeight: '600', lineHeight: isMobile ? '1.45' : '1.35', textAlign: isMobile ? 'left' : 'center' }}>
-            Top example: {bannerData5.horse ? <><span style={{ color: '#fbbf24', fontWeight: '900' }}>{bannerData5.horse}</span> won{bannerData5.odds ? ' at ' : ' '}</> : 'our AI value model keeps surfacing strong opportunities'}
-            {bannerData5.odds && <span style={{ color: '#34d399', fontWeight: '900', fontSize: '16px' }}>{bannerData5.odds}</span>} {bannerData5.horse ? bannerData5.label : ''}.
-            <span style={{ marginLeft: '6px' }}>
-              {bannerData5.summaryMode === 'yesterday'
-                ? <>{`Yesterday (${bannerData5.yesterdayLabel}): `}<span style={{ color: '#fbbf24', fontWeight: '900' }}>{Number(yesterdaySummary5?.wins || 0)} winner{Number(yesterdaySummary5?.wins || 0) === 1 ? '' : 's'}</span>{' & '}<span style={{ color: '#60a5fa', fontWeight: '900' }}>{Number(yesterdaySummary5?.places || 0)} placed</span>{` out of ${Number(yesterdaySummary5?.total_picks || 0)}.`}</>
-                : bannerData5.summaryText}
-            </span>
-          </span>
-          <span style={{ fontSize: isMobile ? '12px' : '14px' }}>🔥</span>
-        </div>
-      )}
-
       {/* Today's Winners Banner */}
       {(() => {
         const winners = winnersToday;
@@ -2777,12 +2753,15 @@ function Top5PicksView() {
         )}
       </div>
 
-      {/* ── MORNING PICK header ── */}
-      {allPicks.filter(p => !p.is_dropped).length > 0 && (() => {
+      {/* ── COMBINED PICKS CARD (Morning Pick + Live Opportunities) ── */}
+      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 16, padding: isMobile ? '14px 12px' : '20px 20px', marginBottom: 20 }}>
+
+      {/* Morning Pick header */}
+      {(() => {
         const dublinHour = parseInt(new Date().toLocaleString('en-GB', { timeZone: 'Europe/Dublin', hour: 'numeric', hour12: false }), 10);
         const isLocked = dublinHour >= 13;
         return (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, marginTop: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: isLocked ? 'rgba(217,119,6,0.12)' : 'rgba(16,185,129,0.08)', border: `1px solid ${isLocked ? 'rgba(217,119,6,0.35)' : 'rgba(16,185,129,0.3)'}`, borderRadius: 8, padding: '5px 12px' }}>
               <span style={{ fontSize: 13 }}>{isLocked ? '🔒' : '🌅'}</span>
               <span style={{ fontSize: 11, fontWeight: 800, color: isLocked ? '#fbbf24' : '#34d399', textTransform: 'uppercase', letterSpacing: 1.1 }}>Morning Pick</span>
@@ -3139,6 +3118,8 @@ function Top5PicksView() {
         );
       })()}
 
+      </div>{/* end combined picks card */}
+
       {/* Analysis Quality Report */}
       <AnalysisQualityReport date={new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Dublin' })} />
 
@@ -3470,13 +3451,13 @@ function YesterdayResultsView({ isFreeUser }) {
   return (
     <div>
       {/* Header */}
-      <div style={{ background:'linear-gradient(135deg,#1e3a5f 0%,#1e40af 50%,#1e3a5f 100%)', border:'2px solid #3b82f6', borderRadius:'12px', padding: isMobile ? '16px 14px' : '24px 28px', marginBottom:'24px', color:'white', display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:'12px' }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'12px' }}>
         <div>
-          <div style={{ fontSize:'13px', textTransform:'uppercase', letterSpacing:'1px', color:'#93c5fd', opacity:0.9 }}>Post-Race Analysis</div>
-          <div style={{ fontSize:'22px', fontWeight:'800', marginTop:'4px' }}>Latest Results</div>
-          <div style={{ fontSize:'13px', opacity:0.75, marginTop:'4px' }}>{dateRangeLabel()}</div>
+          <span style={{ fontSize:'10px', textTransform:'uppercase', letterSpacing:'1px', color:'#93c5fd', fontWeight:'700' }}>Post-Race Analysis · </span>
+          <span style={{ fontSize:'10px', color:'rgba(255,255,255,0.45)' }}>{dateRangeLabel()}</span>
+          <div style={{ fontSize:'16px', fontWeight:'800', color:'white', marginTop:'2px' }}>Latest Results</div>
         </div>
-        <button onClick={loadResults} style={{ background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.4)', borderRadius:'8px', color:'white', padding:'8px 18px', cursor:'pointer', fontSize:'13px', fontWeight:'600' }}>
+        <button onClick={loadResults} style={{ background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.25)', borderRadius:'7px', color:'white', padding:'5px 14px', cursor:'pointer', fontSize:'12px', fontWeight:'600' }}>
           Refresh
         </button>
       </div>
@@ -3496,95 +3477,63 @@ function YesterdayResultsView({ isFreeUser }) {
         return (
           <div style={{ marginBottom:'24px' }}>
             {/* Top row: 4 count stats */}
-            <div style={{ display:'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(5,1fr)', gap: isMobile ? '6px' : '10px', marginBottom:'10px' }}>
+            <div style={{ display:'flex', gap:'6px', marginBottom:'10px', flexWrap:'wrap' }}>
               {statsLeft.map((stat, i) => (
-                <div key={i} style={{ background:stat.bg, border:`1.5px solid ${stat.border}`, borderRadius:'10px', padding: isMobile ? '10px 4px 8px' : '16px 10px 12px', textAlign:'center' }}>
-                  <div style={{ fontSize: isMobile ? '14px' : '12px', marginBottom:'2px' }}>{stat.icon}</div>
-                  <div style={{ fontSize: isMobile ? '20px' : '28px', fontWeight:'900', color:stat.color, lineHeight:1 }}>{stat.value}</div>
-                  <div style={{ fontSize: isMobile ? '9px' : '11px', color:'rgba(255,255,255,0.55)', marginTop: isMobile ? '3px' : '5px', textTransform:'uppercase', letterSpacing: isMobile ? '0.5px' : '1px', fontWeight:'600' }}>{stat.label}</div>
+                <div key={i} style={{ background:stat.bg, border:`1px solid ${stat.border}`, borderRadius:'8px', padding:'6px 12px', display:'flex', alignItems:'center', gap:'6px', flex:'1', minWidth:'60px', justifyContent:'center' }}>
+                  <span style={{ fontSize:'13px' }}>{stat.icon}</span>
+                  <span style={{ fontSize:'18px', fontWeight:'900', color:stat.color, lineHeight:1 }}>{stat.value}</span>
+                  <span style={{ fontSize:'10px', color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'0.5px', fontWeight:'600' }}>{stat.label}</span>
                 </div>
               ))}
             </div>
             {/* Bottom row: ROI spanning full width */}
             <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:'10px' }}>
               <div style={{
-                background: cumulRoiVal === null
-                  ? 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(99,102,241,0.05))'
-                  : cumulRoiVal >= 0
-                    ? 'linear-gradient(135deg, rgba(5,150,105,0.25) 0%, rgba(16,185,129,0.12) 50%, rgba(4,120,87,0.2) 100%)'
-                    : 'linear-gradient(135deg, rgba(239,68,68,0.2), rgba(185,28,28,0.1))',
-                border: `2px solid ${cumulRoiVal === null ? 'rgba(99,102,241,0.3)' : cumulRoiVal >= 0 ? 'rgba(52,211,153,0.5)' : 'rgba(239,68,68,0.4)'}`,
-                borderRadius:'16px',
-                padding: isMobile ? '20px 16px' : '28px 32px',
-                boxShadow: cumulRoiVal >= 0
-                  ? '0 0 40px rgba(52,211,153,0.15), 0 0 80px rgba(52,211,153,0.05), inset 0 1px 0 rgba(255,255,255,0.05)'
-                  : '0 4px 20px rgba(0,0,0,0.2)',
-                position: 'relative',
-                overflow: 'hidden',
+                background: cumulRoiVal === null ? 'rgba(99,102,241,0.1)' : cumulRoiVal >= 0 ? 'rgba(5,150,105,0.15)' : 'rgba(239,68,68,0.12)',
+                border: `1.5px solid ${cumulRoiVal === null ? 'rgba(99,102,241,0.3)' : cumulRoiVal >= 0 ? 'rgba(52,211,153,0.4)' : 'rgba(239,68,68,0.35)'}`,
+                borderRadius:'12px',
+                padding: isMobile ? '12px 14px' : '14px 20px',
               }}>
-                {/* Subtle shine overlay */}
-                <div style={{ position:'absolute', top:0, left:0, right:0, height:'1px', background:'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)' }} />
-                <div style={{ display:'flex', flexDirection: isMobile ? 'column' : 'row', alignItems:'center', gap: isMobile ? '20px' : '0' }}>
-                  {/* Left: emoji + ROI */}
-                  <div style={{ flex:1, display:'flex', alignItems: isMobile ? 'center' : 'flex-start', gap: isMobile ? '16px' : '20px', flexDirection: isMobile ? 'column' : 'row', textAlign: isMobile ? 'center' : 'left' }}>
-                    <div style={{ fontSize: isMobile ? '36px' : '48px', lineHeight:1, filter:'drop-shadow(0 2px 8px rgba(0,0,0,0.3))' }}>💰</div>
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'12px' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+                    <span style={{ fontSize:'24px' }}>💰</span>
                     <div>
-                      <div style={{ fontSize:'10px', color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'1.5px', fontWeight:'700', marginBottom:'6px' }}>Return on Investment</div>
-                      <div style={{
-                        fontSize: isMobile ? '38px' : '56px',
-                        fontWeight:'900',
-                        color: cumulRoiVal === null ? '#818cf8' : cumulRoiVal >= 0 ? '#34d399' : '#f87171',
-                        lineHeight:1,
-                        textShadow: cumulRoiVal >= 0 ? '0 0 30px rgba(52,211,153,0.4), 0 0 60px rgba(52,211,153,0.15)' : 'none',
-                        letterSpacing:'-1px',
-                      }}>
+                      <div style={{ fontSize:'9px', color:'rgba(255,255,255,0.45)', textTransform:'uppercase', letterSpacing:'1.2px', fontWeight:'700' }}>Return on Investment</div>
+                      <div style={{ fontSize:'28px', fontWeight:'900', color: cumulRoiVal === null ? '#818cf8' : cumulRoiVal >= 0 ? '#34d399' : '#f87171', lineHeight:1, letterSpacing:'-0.5px' }}>
                         {cumulRoiVal === null ? '—' : `${cumulRoiVal >= 0 ? '+' : ''}${cumulRoiVal.toFixed(1)}%`}
                       </div>
-                      <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.45)', marginTop:'8px', fontWeight:'500' }}>
+                      <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.4)', marginTop:'3px' }}>
                         {cumulRoiVal === null ? 'Loading…' : `Since 22 Mar · ${cumulSettled} settled`}
                       </div>
                     </div>
                   </div>
-                  {/* Right: impact stat + download */}
-                  <div style={{ display:'flex', flexDirection:'column', alignItems: isMobile ? 'center' : 'flex-end', gap:'14px' }}>
-                    {cumulRoiVal !== null && (
-                      <div style={{
-                        background: 'rgba(255,255,255,0.06)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '12px',
-                        padding: isMobile ? '12px 20px' : '14px 24px',
-                        textAlign: 'center',
-                        maxWidth: '260px',
-                      }}>
-                        <div style={{ fontSize:'13px', color:'rgba(255,255,255,0.7)', lineHeight:'1.5' }}>
-                          Across all bets, every <span style={{ color:'white', fontWeight:'800' }}>€1</span> staked returned
-                          <span style={{ color: cumulRoiVal >= 0 ? '#34d399' : '#f87171', fontWeight:'800', fontSize:'15px' }}> €{(1 + cumulRoiVal / 100).toFixed(2)}</span> on average
-                          — a {cumulRoiVal >= 0 ? 'profit' : 'loss'} of <span style={{ color: cumulRoiVal >= 0 ? '#34d399' : '#f87171', fontWeight:'800' }}>€{Math.abs(cumulRoiVal / 100).toFixed(2)}</span> per bet
-                        </div>
-                      </div>
-                    )}
-                    <button
-                      onClick={() => {
-                        const btn = document.getElementById('csv-download-btn');
-                        if (btn) btn.textContent = '⏳ Downloading...';
-                        fetch(API_BASE_URL + '/api/results/export-csv')
-                          .then(r => r.text())
-                          .then(csv => {
-                            const blob = new Blob([csv], { type: 'text/csv' });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url; a.download = 'BetBudAI_ROI_Data.csv'; a.click();
-                            URL.revokeObjectURL(url);
-                            if (btn) btn.textContent = '✅ Downloaded!';
-                            setTimeout(() => { if (btn) btn.textContent = '📥 Download CSV'; }, 3000);
-                          })
-                          .catch(() => { if (btn) btn.textContent = '❌ Failed'; setTimeout(() => { if (btn) btn.textContent = '📥 Download CSV'; }, 3000); });
-                      }}
-                      id="csv-download-btn"
-                      style={{ padding:'10px 20px', background:'linear-gradient(135deg,#3b82f6,#2563eb)', color:'white', border:'none', borderRadius:'8px', fontSize:'13px', fontWeight:'700', cursor:'pointer', boxShadow:'0 3px 10px rgba(37,99,235,0.3)', transition:'all 0.2s', letterSpacing:'0.3px', whiteSpace:'nowrap' }}
-                    >📥 Download CSV</button>
-                    <div style={{ fontSize:'10px', color:'rgba(255,255,255,0.35)', textAlign:'center', maxWidth:'160px', lineHeight:'1.3' }}>Every pick logged pre-race · fully transparent</div>
-                  </div>
+                  {cumulRoiVal !== null && (
+                    <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.6)', lineHeight:'1.5', textAlign:'right' }}>
+                      Every <span style={{ color:'white', fontWeight:'700' }}>€1</span> staked returned
+                      <span style={{ color: cumulRoiVal >= 0 ? '#34d399' : '#f87171', fontWeight:'800' }}> €{(1 + cumulRoiVal / 100).toFixed(2)}</span>
+                      {' '}— profit of <span style={{ color: cumulRoiVal >= 0 ? '#34d399' : '#f87171', fontWeight:'800' }}>€{Math.abs(cumulRoiVal / 100).toFixed(2)}</span>/bet
+                    </div>
+                  )}
+                  <button
+                    onClick={() => {
+                      const btn = document.getElementById('csv-download-btn');
+                      if (btn) btn.textContent = '⏳ Downloading...';
+                      fetch(API_BASE_URL + '/api/results/export-csv')
+                        .then(r => r.text())
+                        .then(csv => {
+                          const blob = new Blob([csv], { type: 'text/csv' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url; a.download = 'BetBudAI_ROI_Data.csv'; a.click();
+                          URL.revokeObjectURL(url);
+                          if (btn) btn.textContent = '✅ Downloaded!';
+                          setTimeout(() => { if (btn) btn.textContent = '📥 Download CSV'; }, 3000);
+                        })
+                        .catch(() => { if (btn) btn.textContent = '❌ Failed'; setTimeout(() => { if (btn) btn.textContent = '📥 Download CSV'; }, 3000); });
+                    }}
+                    id="csv-download-btn"
+                    style={{ padding:'7px 16px', background:'linear-gradient(135deg,#3b82f6,#2563eb)', color:'white', border:'none', borderRadius:'7px', fontSize:'12px', fontWeight:'700', cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}
+                  >📥 Download CSV</button>
                 </div>
               </div>
             </div>
