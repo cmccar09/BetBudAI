@@ -2548,7 +2548,16 @@ function Top5PicksView() {
   const totalPublishedPicks = allPicks.length + watchlistPicks.length;
   const displayPickCount = totalPublishedPicks || 4;
   const combinedPublishedPicks = [...allPicks, ...watchlistPicks];
-  const winnersToday = combinedPublishedPicks.filter(p => {
+  // All picks shown to subscribers today — morning + extended + watchlist, deduped by horse+race_time
+  const allPublishedToday = (() => {
+    const pool = new Map();
+    [...allPicks, ...watchlistPicks, ...extendedPicks].forEach(p => {
+      const key = (p.horse || '') + '|' + (p.race_time || '').substring(0, 16);
+      if (!pool.has(key)) pool.set(key, p);
+    });
+    return [...pool.values()];
+  })();
+  const winnersToday = allPublishedToday.filter(p => {
     const oc = (p.outcome || '').toLowerCase();
     return oc === 'win' || oc === 'won';
   });
@@ -2677,7 +2686,7 @@ function Top5PicksView() {
           <div style={{ background:'linear-gradient(135deg, rgba(5,150,105,0.25) 0%, rgba(16,185,129,0.15) 100%)', border:'2px solid rgba(52,211,153,0.6)', borderRadius:'12px', padding:'14px 18px', marginBottom:'16px' }}>
             <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'10px' }}>
               <span style={{ fontSize:'22px' }}>🔥</span>
-              <span style={{ color:'#34d399', fontWeight:'900', fontSize:'16px', letterSpacing:'0.5px' }}>{winners.length} Winner{winners.length > 1 ? 's' : ''} Today! ({winners.length}/{Math.max(1, totalPublishedPicks)} picks)</span>
+              <span style={{ color:'#34d399', fontWeight:'900', fontSize:'16px', letterSpacing:'0.5px' }}>{winners.length} Winner{winners.length > 1 ? 's' : ''} Today! ({winners.length}/{Math.max(1, allPublishedToday.length)} picks)</span>
               <span style={{ marginLeft:'auto', fontSize:'11px', color:'rgba(255,255,255,0.45)', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.8px' }}>Live Results</span>
             </div>
             <div style={{ display:'flex', flexWrap:'wrap', gap:'8px' }}>
