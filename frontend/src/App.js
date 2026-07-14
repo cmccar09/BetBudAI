@@ -3061,10 +3061,10 @@ function Top5PicksView() {
         );
       })()}
 
-      {/* ── LIVE OPPORTUNITIES (Mon-Fri: 2 picks · Sat-Sun: 4 picks) ── */}
+      {/* ── LIVE OPPORTUNITIES (Mon-Fri: 3 picks · Sat-Sun: 4 picks) ── */}
       {(allPicks.length > 0 || extendedPicks.length > 0) && (() => {
         const isWeekend = [0, 6].includes(new Date().getDay());
-        const maxPicks = isWeekend ? 4 : 2;
+        const maxPicks = isWeekend ? 4 : 3;
         // Merge morning picks + extended picks, deduplicate by course+time, sort by score
         const pool = {};
         [...allPicks, ...extendedPicks].forEach(p => {
