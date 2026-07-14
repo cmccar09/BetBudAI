@@ -2702,34 +2702,6 @@ function Top5PicksView() {
         );
       })()}
 
-      {/* ROI */}
-      {cumulRoi?.success && (() => {
-        const rv = cumulRoi.roi ?? 0; const rs = cumulRoi.settled || 0;
-        return (
-          <div style={{ background: rv >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.13)', border: `1.5px solid ${rv >= 0 ? 'rgba(16,185,129,0.45)' : 'rgba(239,68,68,0.4)'}`, borderRadius:'14px', padding: isMobile ? '14px 16px' : '18px 24px', marginBottom:'20px', display:'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', justifyContent:'space-between', gap:'12px' }}>
-            <div style={{ display:'flex', alignItems:'center', gap: isMobile ? '14px' : '20px' }}>
-              <div style={{ fontSize: isMobile ? '28px' : '38px' }}>💰</div>
-              <div>
-                <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.55)', textTransform:'uppercase', letterSpacing:'1.2px', fontWeight:'700', marginBottom:'4px' }}>Return on Investment</div>
-                <div style={{ fontSize: isMobile ? '26px' : '40px', fontWeight:'900', color: rv >= 0 ? '#34d399' : '#f87171', lineHeight:1 }}>{rv >= 0 ? '+' : ''}{rv.toFixed(1)}%</div>
-                <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Since 22 Mar · {rs} settled</div>
-              </div>
-            </div>
-            <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
-              <div style={{ fontSize:'13px', color:'rgba(255,255,255,0.55)', lineHeight:'1.6' }}>
-                Every €1 staked returned <span style={{ color: rv >= 0 ? '#34d399' : '#f87171', fontWeight:'700' }}>€{(1 + rv / 100).toFixed(2)}</span> on average
-              </div>
-              <div style={{ marginTop:'8px' }}>
-                <span onClick={() => { fetch(API_BASE_URL + '/api/results/export-csv').then(r => r.text()).then(csv => { const blob = new Blob([csv], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'BetBudAI_ROI_Data.csv'; a.click(); URL.revokeObjectURL(url); }).catch(() => {}); }}
-                  style={{ cursor:'pointer', fontSize:'12px', fontWeight:'700', color:'white', background:'linear-gradient(135deg,#059669,#047857)', border:'none', borderRadius:'8px', padding:'8px 18px', display:'inline-flex', alignItems:'center', gap:'6px' }}>
-                  📥 Download Full History CSV
-                </span>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
-
       {releasePending && (
         <div style={{ background:'rgba(245,158,11,0.14)', border:'1px solid rgba(245,158,11,0.4)', borderRadius:'10px', padding:'12px 14px', marginBottom:'14px' }}>
           <div style={{ color:'#f59e0b', fontSize:'13px', fontWeight:'700' }}>⏳ Final checks in progress</div>
