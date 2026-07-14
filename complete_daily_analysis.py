@@ -358,6 +358,70 @@ def analyze_and_save_all(force_reanalyse: bool = False):
     except Exception as _li_e:
         print(f"\n[STAGE 0] Could not load learning insights (non-fatal): {_li_e}")
 
+    today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+
+    # ── PICK LOCK CHECK (fast path — before expensive form enrichment) ────────
+    MAX_DAILY_UI_PICKS = 2  # 2026-06-25 reset: value slot removed, 0% WR across 13 picks at 3.5+
+    from boto3.dynamodb.conditions import Key as _Key
+    _lock_resp  = table.query(KeyConditionExpression=_Key('bet_date').eq(today))
+    _lock_items = _lock_resp.get('Items', [])
+    while _lock_resp.get('LastEvaluatedKey'):
+        _lock_resp = table.query(
+            KeyConditionExpression=_Key('bet_date').eq(today),
+            ExclusiveStartKey=_lock_resp['LastEvaluatedKey'])
+        _lock_items.extend(_lock_resp.get('Items', []))
+    _existing_ui       = [i for i in _lock_items if i.get('show_in_ui') is True]
+    _existing_ui_count = len(_existing_ui)
+    now_utc = datetime.now(timezone.utc)
+    cutoff  = now_utc + timedelta(minutes=15)
+
+    _target_filled = _existing_ui_count >= MAX_DAILY_UI_PICKS
+    _time_lock     = now_utc.hour >= 12 and _existing_ui_count >= 1
+    if (_target_filled or _time_lock) and not force_reanalyse:
+        reason = "target filled" if _target_filled else "12:00 UTC time lock"
+        print(f"\n  PICKS LOCKED ({reason}) at {now_utc.strftime('%H:%M')} UTC — "
+              f"{_existing_ui_count}/{MAX_DAILY_UI_PICKS} picks set; refreshing odds only.")
+
+        # Build horse→current_odds lookup from the freshly-fetched Betfair data
+        _live_odds: dict[str, float] = {}
+        for _race in races:
+            for _runner in _race.get('runners', []):
+                _rname = (_runner.get('name') or '').strip().lower()
+                _rodds = float(_runner.get('odds', 0) or 0)
+                if _rname and _rodds > 0:
+                    _live_odds[_rname] = _rodds
+
+        _odds_updated = 0
+        for _pick in _existing_ui:
+            _horse_key = (_pick.get('horse') or '').strip().lower()
+            _new_odds  = _live_odds.get(_horse_key, 0)
+            _old_odds  = float(_pick.get('odds', 0) or 0)
+            if _new_odds > 0 and abs(_new_odds - _old_odds) >= 0.05:
+                try:
+                    table.update_item(
+                        Key={'bet_date': today, 'bet_id': _pick['bet_id']},
+                        UpdateExpression='SET odds = :o, decimal_odds = :o',
+                        ExpressionAttributeValues={':o': Decimal(str(round(_new_odds, 2)))}
+                    )
+                    print(f"  [ODDS REFRESH] {_pick.get('horse')} "
+                          f"{_old_odds:.2f} -> {_new_odds:.2f}")
+                    _odds_updated += 1
+                except Exception as _oe:
+                    print(f"  [ODDS REFRESH ERROR] {_pick.get('horse')}: {_oe}")
+
+        print(f"  Odds refresh complete: {_odds_updated}/{_existing_ui_count} picks updated.")
+        return {
+            'statusCode': 200,
+            'body': json.dumps({
+                'success': True,
+                'picks_locked': True,
+                'picks_count': _existing_ui_count,
+                'odds_refreshed': _odds_updated,
+                'date': today,
+                'message': f'Picks locked ({reason}). Odds refreshed for {_odds_updated} picks.'
+            })
+        }
+
     # ── STAGE 1: Deep form enrichment ────────────────────────────────────────
     # Fetches last-6-race run history from Racing Post / Sporting Life for every
     # runner and injects it as 'form_runs'. The scoring engine reads this to fire
@@ -447,76 +511,7 @@ def analyze_and_save_all(force_reanalyse: bool = False):
     print(f"  Strategy : Best horse per race -> top {TARGET_PICKS} cross-race bests (min score {MIN_CONFIDENCE})")
     print("=" * 100 + "\n")
 
-    today        = datetime.now(timezone.utc).strftime('%Y-%m-%d')
     avg_winner_odds = 3.80  # RECALIBRATED 2026-04-17: shifted from 4.65 to centre of best-performing 2-5 range
-
-    # ── CHECK EXISTING UI PICKS (intraday accumulation guard) ─────────────────
-    # Each refresh only fetches FUTURE races, so previous picks are never overwritten.
-    # Without this guard, new picks are added per 2-hour refresh → too many picks/day.
-    MAX_DAILY_UI_PICKS = 2  # data-driven reset: 2 high-quality picks beats 5 speculative
-    from boto3.dynamodb.conditions import Key as _Key
-    _existing_resp = table.query(KeyConditionExpression=_Key('bet_date').eq(today))
-    _existing_items = _existing_resp.get('Items', [])
-    while _existing_resp.get('LastEvaluatedKey'):
-        _existing_resp = table.query(
-            KeyConditionExpression=_Key('bet_date').eq(today),
-            ExclusiveStartKey=_existing_resp['LastEvaluatedKey'])
-        _existing_items.extend(_existing_resp.get('Items', []))
-    _existing_ui = [i for i in _existing_items if i.get('show_in_ui') is True]
-    _existing_ui_count = len(_existing_ui)
-    now_utc = datetime.now(timezone.utc)
-    cutoff  = now_utc + timedelta(minutes=15)
-
-    # PICK LOCK: once the daily target is filled (2 picks), freeze for the rest of the day.
-    # Also lock if it's past 12:00 UTC and any picks exist (belt-and-braces for partial days).
-    # force_reanalyse bypasses both locks (used when scoring logic has changed mid-day).
-    # Locked runs still do an odds-only refresh so subscribers see the current Betfair price.
-    _target_filled = _existing_ui_count >= MAX_DAILY_UI_PICKS
-    _time_lock     = now_utc.hour >= 12 and _existing_ui_count >= 1
-    if (_target_filled or _time_lock) and not force_reanalyse:
-        reason = "target filled" if _target_filled else "12:00 UTC time lock"
-        print(f"  PICKS LOCKED ({reason}) at {now_utc.strftime('%H:%M')} UTC — "
-              f"{_existing_ui_count}/{MAX_DAILY_UI_PICKS} picks set; refreshing odds only.")
-
-        # Build horse→current_odds lookup from the freshly-fetched Betfair data
-        _live_odds: dict[str, float] = {}
-        for _race in races:
-            for _runner in _race.get('runners', []):
-                _rname = (_runner.get('name') or '').strip().lower()
-                _rodds = float(_runner.get('odds', 0) or 0)
-                if _rname and _rodds > 0:
-                    _live_odds[_rname] = _rodds
-
-        _odds_updated = 0
-        for _pick in _existing_ui:
-            _horse_key = (_pick.get('horse') or '').strip().lower()
-            _new_odds  = _live_odds.get(_horse_key, 0)
-            _old_odds  = float(_pick.get('odds', 0) or 0)
-            if _new_odds > 0 and abs(_new_odds - _old_odds) >= 0.05:
-                try:
-                    table.update_item(
-                        Key={'bet_date': today, 'bet_id': _pick['bet_id']},
-                        UpdateExpression='SET odds = :o, decimal_odds = :o',
-                        ExpressionAttributeValues={':o': Decimal(str(round(_new_odds, 2)))}
-                    )
-                    print(f"  [ODDS REFRESH] {_pick.get('horse')} "
-                          f"{_old_odds:.2f} → {_new_odds:.2f}")
-                    _odds_updated += 1
-                except Exception as _oe:
-                    print(f"  [ODDS REFRESH ERROR] {_pick.get('horse')}: {_oe}")
-
-        print(f"  Odds refresh complete: {_odds_updated}/{_existing_ui_count} picks updated.")
-        return {
-            'statusCode': 200,
-            'body': json.dumps({
-                'success': True,
-                'picks_locked': True,
-                'picks_count': _existing_ui_count,
-                'odds_refreshed': _odds_updated,
-                'date': today,
-                'message': f'Picks locked ({reason}). Odds refreshed for {_odds_updated} picks.'
-            })
-        }
 
     # Count UI picks whose races are PAST or within the 15-min cutoff as "locked".
     # These races won't appear in this analysis run, so their show_in_ui=True
@@ -777,6 +772,20 @@ def analyze_and_save_all(force_reanalyse: bool = False):
             else:
                 breakdown['price_steam'] = 0
 
+            # ── NO-FORM CAP ──────────────────────────────────────────────────────
+            # Lesson 2026-06-16: Hapiness scored 99 ELITE with zero SL form data —
+            # trainer_reputation + market_leader alone drove it to the top pick.
+            # It came 3rd. Without form runs we cannot confirm going/distance/C&D
+            # suitability, so cap at 80 (GOOD) to prevent empty-form horses from
+            # qualifying as core picks ahead of well-enriched runners.
+            if not runner.get('form_runs'):
+                _NO_FORM_CAP = 80
+                if score > _NO_FORM_CAP:
+                    _nfc_reduction = score - _NO_FORM_CAP
+                    score = _NO_FORM_CAP
+                    breakdown['no_form_cap'] = -_nfc_reduction
+                    reasons.append(f"No-form cap {_NO_FORM_CAP}pts (no SL form data): -{_nfc_reduction:.0f}pts")
+
             # ── FINAL SCORE CAP ──────────────────────────────────────────────────
             # comprehensive_pick_logic.py caps the function score at 108, but market_leader
             # (+16), db_history (+15), and price_steam (+15) are added here afterwards.
@@ -931,7 +940,7 @@ def analyze_and_save_all(force_reanalyse: bool = False):
     }
     # Rule 2 — odds window where we actually win (data: 66.7% WR in 2.0-3.5 band)
     _ODDS_MIN = 2.0
-    _ODDS_MAX = 3.5
+    _ODDS_MAX = 2.8  # 2026-06-25: tightened from 3.5 — 2.5-3.5 band showed 18% WR vs 36% at 2.0-2.5
     # Rule 3 — signal count: at least 2 meaningful signals must fire
     _KEY_SIGNALS = ('market_leader', 'deep_form', 'going_suitability',
                     'price_steam', 'trainer_reputation', 'cd_bonus', 'jockey_quality')
@@ -1104,6 +1113,51 @@ def analyze_and_save_all(force_reanalyse: bool = False):
         print("  WARNING: No races met the minimum confidence threshold — no UI picks today")
     print("=" * 100 + "\n")
 
+    # ── EXTENDED PICKS — top 5 by score across ALL courses/odds ──────────────
+    # Runs every day after main picks. Any race type, any odds, score ≥ 80,
+    # 2+ signals, future races only. Saved as pick_type='extended' for daily
+    # analysis. These are the broader winner candidates surfaced automatically.
+    _KEY_SIGNALS_EXT = ('market_leader', 'deep_form', 'going_suitability',
+                        'distance_suitability', 'price_steam', 'trainer_reputation',
+                        'cd_bonus', 'jockey_quality', 'won_last_2_runs', 'form_trend',
+                        'total_wins', 'timeform_stars', 'DEBUTANT_STEAM')
+    _MIN_SCORE_EXT = 80
+    _MIN_SIGS_EXT  = 2
+    # Match UI display limit: 4 on weekends (Sat=5, Sun=6), 2 on weekdays
+    _MAX_EXT_PICKS = 4 if now_utc.weekday() >= 5 else 2
+
+    _extended_candidates = []
+    _top_pick_races = {id(r) for r in top_picks}  # exclude already-selected races
+
+    for r in all_races_data:
+        if id(r) in _top_pick_races:
+            continue
+        if r.get('race_time', '')[:10] != today:
+            continue
+        odds = float(r['best'].get('odds', 0) or 0)
+        score = r['best']['score']
+        if odds < 1.3 or score < _MIN_SCORE_EXT:
+            continue
+        bd = r['best']['item'].get('score_breakdown', {})
+        n_sigs = sum(1 for s in _KEY_SIGNALS_EXT if float(bd.get(s, 0) or 0) > 0)
+        if n_sigs < _MIN_SIGS_EXT:
+            continue
+        if not r['best'].get('form_runs') and score < 85:
+            continue  # no-form cap for extended too (lower threshold)
+        _extended_candidates.append((score, n_sigs, odds, r))
+
+    _extended_candidates.sort(key=lambda x: (-x[0], -x[1], x[2]))
+    _extended_picks = [r for _, _, _, r in _extended_candidates[:_MAX_EXT_PICKS]]
+
+    _extended_bet_ids = {r['best']['item']['bet_id'] for r in _extended_picks}
+    if _extended_picks:
+        print("── EXTENDED DAILY PICKS (all odds, all courses) ──────────────────────")
+        for i, r in enumerate(_extended_picks, 1):
+            b = r['best']
+            print(f"  EXT#{i}  {b['horse']:28}  @{b['odds']:5.2f}  Score:{b['score']:3.0f}  "
+                  f"[{r['venue']}  {r['race_time'][11:16]}]")
+        print()
+
     # ── PASS 2 — SAVE ALL ITEMS ───────────────────────────────────────────────
     total_saved = 0
     ui_promoted = 0
@@ -1140,7 +1194,13 @@ def analyze_and_save_all(force_reanalyse: bool = False):
             item['pick_rank']           = rank
             item['is_hot_prospect']     = (bid == _hot_prospect_id) if _hot_prospect_id else False
             item['is_dropped']          = _is_dropped
-            item['pick_type']           = 'dropped' if _is_dropped else ('morning' if is_ui else 'learning')
+            _is_extended = bid in _extended_bet_ids
+            _existing_pt = item.get('pick_type', '')
+            item['pick_type'] = ('dropped'  if _is_dropped
+                                 else 'value'    if is_ui and _existing_pt == 'value'
+                                 else 'morning'  if is_ui
+                                 else 'extended' if _is_extended
+                                 else 'learning')
             item['race_analyzed_count'] = race_total
             if is_ui:
                 # Kelly Criterion stake sizing (half-Kelly, 100-unit bankroll):
