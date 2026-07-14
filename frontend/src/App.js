@@ -3267,13 +3267,14 @@ function YesterdayResultsView({ isFreeUser }) {
       const twoDaysAgo = new Date(); twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
       const twoDaysAgoStr = twoDaysAgo.toISOString().slice(0, 10);
       const twoDaysAgoLabel = twoDaysAgo.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Europe/Dublin' });
-      const [todayRes, yestRes, cumulRes, twoDaysRes] = await Promise.all([
+      const [todayRes, yestRes, cumulRes, twoDaysRes, extTodayRes] = await Promise.all([
         fetch(API_BASE_URL + '/api/results/today'),
         fetch(API_BASE_URL + '/api/results/yesterday'),
         fetch(API_BASE_URL + '/api/results/cumulative-roi'),
         fetch(`${API_BASE_URL}/api/picks/extended?date=${twoDaysAgoStr}`),
+        fetch(API_BASE_URL + '/api/picks/extended'),
       ]);
-      const [todayData, yestData, cumulData, twoDaysData] = await Promise.all([todayRes.json(), yestRes.json(), cumulRes.json(), twoDaysRes.json()]);
+      const [todayData, yestData, cumulData, twoDaysData, extTodayData] = await Promise.all([todayRes.json(), yestRes.json(), cumulRes.json(), twoDaysRes.json(), extTodayRes.json()]);
       if (cumulData.success) setCumulRoi(cumulData);
 
       const todayPicks = (todayData.success ? todayData.picks || [] : [])
@@ -3291,8 +3292,11 @@ function YesterdayResultsView({ isFreeUser }) {
       void todayDropped; void yestDropped;
       // Deduplicate: same course + race_time[:16] => keep highest-scored version
       // Use course+time (not horse name) to handle name variants like apostrophes
+      const extendedToday = (extTodayData?.success ? extTodayData.picks || [] : [])
+        .filter(p => !p.is_dropped)
+        .map(p => ({ ...p, _dayLabel: 'Today' }));
       const deduped = {};
-      [...todayPicks, ...yestPicks].forEach(p => {
+      [...todayPicks, ...extendedToday, ...yestPicks].forEach(p => {
         const rt = (p.race_time || '').substring(0, 16);
         const key = (p.course || p.race_course || '') + '|' + rt;
         const sc  = parseFloat(p.comprehensive_score || p.analysis_score || 0);
