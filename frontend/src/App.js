@@ -2807,16 +2807,20 @@ function Top5PicksView() {
       </div>
 
       {/* ── MORNING PICK header ── */}
-      {allPicks.filter(p => !p.is_dropped).length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, marginTop: 4 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(217,119,6,0.12)', border: '1px solid rgba(217,119,6,0.35)', borderRadius: 8, padding: '5px 12px' }}>
-            <span style={{ fontSize: 13 }}>🔒</span>
-            <span style={{ fontSize: 11, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: 1.1 }}>Morning Pick</span>
-            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>— locked 1pm · back this one</span>
+      {allPicks.filter(p => !p.is_dropped).length > 0 && (() => {
+        const dublinHour = parseInt(new Date().toLocaleString('en-GB', { timeZone: 'Europe/Dublin', hour: 'numeric', hour12: false }), 10);
+        const isLocked = dublinHour >= 13;
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, marginTop: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: isLocked ? 'rgba(217,119,6,0.12)' : 'rgba(16,185,129,0.08)', border: `1px solid ${isLocked ? 'rgba(217,119,6,0.35)' : 'rgba(16,185,129,0.3)'}`, borderRadius: 8, padding: '5px 12px' }}>
+              <span style={{ fontSize: 13 }}>{isLocked ? '🔒' : '🌅'}</span>
+              <span style={{ fontSize: 11, fontWeight: 800, color: isLocked ? '#fbbf24' : '#34d399', textTransform: 'uppercase', letterSpacing: 1.1 }}>Morning Pick</span>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>{isLocked ? '— locked · back this one' : '— locks at 1pm · may update'}</span>
+            </div>
+            <div style={{ flex: 1, height: 1, background: isLocked ? 'rgba(217,119,6,0.2)' : 'rgba(16,185,129,0.15)' }} />
           </div>
-          <div style={{ flex: 1, height: 1, background: 'rgba(217,119,6,0.2)' }} />
-        </div>
-      )}
+        );
+      })()}
 
       {/* Official Picks */}
       {(() => {

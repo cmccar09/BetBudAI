@@ -48,9 +48,8 @@ When reviewing or generating picks, always think:
 | Time UTC | BST | Event |
 |---|---|---|
 | 07:00 | 08:00 | `SureBet-Major-Analysis` — deep weekly model run (Mon only) |
-| 11:00 | 12:00 | **Morning pipeline fires** — Betfair fetch → scoring → form enrichment → validate → featured meeting seeded → notify |
-| ~11:15 | ~12:15 | **Initial picks in DynamoDB** — first set of winners visible on site |
-| 12:00 | 13:00 | First refresh — odds updated, picks re-scored |
+| 12:00 | 13:00 | **Morning pipeline fires** — Betfair fetch → scoring → form enrichment → validate → featured meeting seeded → notify |
+| ~12:15 | ~13:15 | **Initial picks in DynamoDB** — first set of winners visible on site, immediately locked |
 | 12:20 | 13:20 | **Subscriber email sent** — picks must be ready before this |
 | 13:00 | 14:00 | Second refresh |
 | 13:30 | 14:30 | **Featured meeting LOCKED** — finalised by 13:30 refresh, does not change after |
