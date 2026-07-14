@@ -2667,16 +2667,6 @@ function Top5PicksView() {
         </div>
       )}
 
-      {/* Header */}
-      <div style={{ background:'linear-gradient(135deg,#1e3a5f 0%,#7c3aed 50%,#1e3a5f 100%)', border:'2px solid #a78bfa', borderRadius:'14px', padding: isMobile ? '16px 14px' : '22px 28px', marginBottom:'20px', color:'white', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-        <div>
-          <div style={{ fontSize:'13px', textTransform:'uppercase', letterSpacing:'1px', color:'#c4b5fd', opacity:0.9 }}>Premium · All Daily Picks</div>
-          <div style={{ fontSize: isMobile ? '20px' : '24px', fontWeight:'900', marginTop:'4px' }}>🏆 Top {displayPickCount} Picks and Intraday</div>
-          <div style={{ fontSize:'13px', opacity:0.75, marginTop:'4px' }}>{today}</div>
-        </div>
-        <button onClick={loadPicks} style={{ background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.4)', borderRadius:'8px', color:'white', padding:'8px 18px', cursor:'pointer', fontSize:'13px', fontWeight:'600' }}>Refresh</button>
-      </div>
-
       {/* Today's Winners Banner */}
       {(() => {
         const winners = winnersToday;
@@ -3220,92 +3210,30 @@ function AnalysisQualityReport({ date }) {
 
   const colors = statusColors[quality.status] || statusColors['PARTIAL'];
 
+  const formPct = quality.data_completeness?.form?.percentage?.toFixed(0);
+  const ranAt = quality.pipeline_ran_at
+    ? new Date(quality.pipeline_ran_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC'
+    : null;
+
   return (
     <div style={{
-      marginTop: '24px',
-      background: colors.bg,
-      border: `2px solid ${colors.border}`,
-      borderRadius: '12px',
-      padding: isMobile ? '14px 16px' : '18px 24px'
+      marginTop: '16px',
+      display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
+      background: 'rgba(255,255,255,0.04)', border: `1px solid ${colors.border}`,
+      borderRadius: '8px', padding: '8px 14px',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ fontSize: '24px' }}>✅</div>
-          <div>
-            <div style={{ fontSize: '16px', fontWeight: '800', color: 'white' }}>Analysis Quality Check</div>
-            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginTop: '2px' }}>
-              {quality.summary.total_horses_analyzed} horses analyzed · {quality.summary.ui_picks_selected} picks selected
-            </div>
-            {quality.pipeline_ran_at && (
-              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', marginTop: '3px' }}>
-                Jobs ran: {new Date(quality.pipeline_ran_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })} UTC
-              </div>
-            )}
-          </div>
-        </div>
-        <div style={{
-          background: colors.bg,
-          border: `1px solid ${colors.border}`,
-          borderRadius: '999px',
-          padding: '6px 14px',
-          fontSize: '12px',
-          fontWeight: '800',
-          color: colors.text,
-          letterSpacing: '0.5px'
-        }}>
-          {quality.status}
-        </div>
-      </div>
-
-      <div style={{
-        background: 'rgba(0,0,0,0.2)',
-        borderRadius: '8px',
-        padding: isMobile ? '12px' : '14px',
-        marginBottom: '12px'
-      }}>
-        <div style={{ fontSize: '14px', fontWeight: '700', color: colors.text, marginBottom: '8px' }}>
-          {quality.verdict}
-        </div>
-        {quality.checks && quality.checks.length > 0 && (
-          <div style={{ display: 'grid', gap: '6px' }}>
-            {quality.checks.map((check, idx) => (
-              <div key={idx} style={{
-                fontSize: '12px',
-                color: 'rgba(255,255,255,0.85)',
-                lineHeight: '1.5',
-                paddingLeft: '4px'
-              }}>
-                {check}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {quality.data_completeness && (
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)', gap: '8px' }}>
-          {Object.entries(quality.data_completeness).map(([field, data]) => (
-            <div key={field} style={{
-              background: 'rgba(255,255,255,0.05)',
-              borderRadius: '6px',
-              padding: '8px 10px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px'
-            }}>
-              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', fontWeight: '700' }}>
-                {field.replace(/_/g, ' ')}
-              </div>
-              <div style={{ fontSize: '16px', fontWeight: '800', color: 'white' }}>
-                {data.percentage.toFixed(0)}%
-              </div>
-              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.45)' }}>
-                {data.count}/{quality.summary.total_horses_analyzed}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <span style={{ fontSize: '14px' }}>✅</span>
+      <span style={{ fontSize: '11px', fontWeight: '700', color: colors.text }}>{quality.status}</span>
+      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>·</span>
+      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>{quality.summary.total_horses_analyzed} horses</span>
+      {formPct && <>
+        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>·</span>
+        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>{formPct}% form data</span>
+      </>}
+      {ranAt && <>
+        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>·</span>
+        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>ran {ranAt}</span>
+      </>}
     </div>
   );
 }
@@ -3364,7 +3292,7 @@ function YesterdayResultsView({ isFreeUser }) {
       // Deduplicate: same course + race_time[:16] => keep highest-scored version
       // Use course+time (not horse name) to handle name variants like apostrophes
       const deduped = {};
-      [...todayPicks, ...yestPicks, ...twoDaysPicks].forEach(p => {
+      [...todayPicks, ...yestPicks].forEach(p => {
         const rt = (p.race_time || '').substring(0, 16);
         const key = (p.course || p.race_course || '') + '|' + rt;
         const sc  = parseFloat(p.comprehensive_score || p.analysis_score || 0);

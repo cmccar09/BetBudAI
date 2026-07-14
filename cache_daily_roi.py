@@ -58,10 +58,27 @@ def _is_ranked_pick(item):
     return show and rank > 0
 
 
+def _parse_odds(raw):
+    """Parse odds from decimal float or fractional string (e.g. '7/5' → 2.4)."""
+    if not raw:
+        return 0.0
+    s = str(raw).strip()
+    if '/' in s:
+        try:
+            num, den = s.split('/', 1)
+            return float(num) / float(den) + 1.0
+        except Exception:
+            return 0.0
+    try:
+        return float(s)
+    except Exception:
+        return 0.0
+
+
 def _settlement_odds(p):
     """Best available odds for settlement (SP > live odds)."""
-    sp = float(p.get('sp_odds') or 0)
-    live = float(p.get('odds') or 0)
+    sp = _parse_odds(p.get('sp_odds'))
+    live = _parse_odds(p.get('odds'))
     return sp if sp > 1.0 else (live if live > 1.0 else 1.0)
 
 

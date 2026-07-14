@@ -103,11 +103,32 @@ def decimal_to_float(obj):
         return [decimal_to_float(item) for item in obj]
     return obj
 
+def _parse_odds(raw):
+    """Parse odds from decimal float or fractional string (e.g. '7/5' → 2.4, 'EVS' → 2.0)."""
+    if not raw:
+        return 0.0
+    s = str(raw).strip().upper()
+    if s in ('EVS', 'EVENS'):
+        return 2.0
+    if '/' in s:
+        try:
+            num, den = s.split('/', 1)
+            return float(num) / float(den) + 1.0
+        except Exception:
+            return 0.0
+    try:
+        return float(s)
+    except Exception:
+        return 0.0
+
+
 def _settlement_odds(p):
     """Return the best available odds for P&L calculations.
     Prefers sp_odds (set at settlement using Betfair SP/lastPriceTraded)
     over the pre-race exchange price stored at pick time."""
-    return float(p.get('sp_odds') or p.get('odds', 0))
+    sp = _parse_odds(p.get('sp_odds'))
+    live = _parse_odds(p.get('odds'))
+    return sp if sp > 1.0 else (live if live > 1.0 else 1.0)
 
 
 FEATURED_MEETING_CALENDAR = [
@@ -1675,7 +1696,7 @@ def get_extended_picks(headers, event):
                 'horse':    i.get('horse'),
                 'course':   i.get('course'),
                 'race_time': i.get('race_time', ''),
-                'odds':     float(i.get('odds') or 0),
+                'odds':     _parse_odds(i.get('odds')),
                 'score':    float(i.get('comprehensive_score') or 0),
                 'grade':    i.get('confidence_grade', ''),
                 'trainer':  i.get('trainer', ''),
@@ -1890,8 +1911,8 @@ def get_latest_winner(headers):
             ]
             if winners:
                 # Pick the best-odds winner for the banner
-                best = max(winners, key=lambda w: float(w.get('sp_odds') or w.get('odds', 0)))
-                dec_odds = float(best.get('sp_odds') or best.get('odds', 0))
+                best = max(winners, key=lambda w: _parse_odds(w.get('sp_odds') or w.get('odds')))
+                dec_odds = _parse_odds(best.get('sp_odds') or best.get('odds'))
                 # Convert decimal to fractional
                 frac_tbl = [
                     (1.50,'1/2'),(2.00,'EVS'),(2.10,'11/10'),(2.20,'6/5'),(2.25,'5/4'),
@@ -2119,8 +2140,8 @@ def export_roi_csv(headers):
             elif oc in ('lost',): oc = 'loss'
 
             odds = _settlement_odds(p)
-            sp_odds = float(p.get('sp_odds') or 0)
-            pre_odds = float(p.get('odds') or 0)
+            sp_odds = _parse_odds(p.get('sp_odds'))
+            pre_odds = _parse_odds(p.get('odds'))
             ef = float(p.get('ew_fraction') or 0.25)
 
             if oc == 'win':
