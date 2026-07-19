@@ -25,6 +25,7 @@ import boto3
 from html import unescape
 from datetime import date, datetime, timedelta, timezone
 from core.enrichment.betfair_fetcher import get_betfair_session, fetch_betfair_sp
+from core.settlement.outcome_standards import calculate_each_way_pnl
 from decimal import Decimal
 from boto3.dynamodb.conditions import Key, Attr
 
@@ -579,7 +580,8 @@ def update_results(date_str):
         race_time_raw = pick.get('race_time', '')   # ISO e.g. "2026-03-20T15:22:00.000Z"
         bet_id = pick['bet_id']
         odds = float(pick.get('odds', 0))
-        stake = float(pick.get('bet_amount', 6))
+        stake = float(pick.get('stake', pick.get('bet_amount', 6)))
+        bet_type = pick.get('bet_type', '')
 
         # Extract date and HH:MM from race_time (ISO format)
         tm_m = re.search(r'(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})', race_time_raw)
@@ -664,22 +666,20 @@ def update_results(date_str):
         winner_sp      = _rd.get('sp_map', {}).get(winner, '')
 
         # Determine outcome based on position
+        _, profit = calculate_each_way_pnl(finish_pos, total_runners, odds, stake, bet_type)
         if finish_pos == 1:
             outcome_lc   = 'win'
             result_emoji = 'WIN'
-            profit = round((odds - 1) * stake, 2)
             pos_label    = '1st'
             analysis     = f'Won at {_to_frac(odds)} ({total_runners} runners)'
         elif finish_pos in (2, 3):
             outcome_lc   = 'placed'
             result_emoji = 'PLACED'
-            profit = -round(stake, 2)   # WIN bet — stake lost; each-way would differ
             pos_label    = '2nd' if finish_pos == 2 else '3rd'
             analysis     = f'{pos_label} of {total_runners}, winner: {winner}'
         else:
             outcome_lc   = 'loss'
             result_emoji = 'LOSS'
-            profit = -round(stake, 2)
             pos_label    = f'{finish_pos}th' if finish_pos else 'Unplaced'
             analysis     = f'{pos_label} of {total_runners}, winner: {winner}' if finish_pos else f'Unplaced, winner: {winner}'
 
@@ -722,7 +722,7 @@ def update_results(date_str):
             if pick_sp_odds:
                 # Recalculate profit using actual SP
                 if outcome_lc == 'win':
-                    profit = round((pick_sp_odds - 1) * stake, 2)
+                    _, profit = calculate_each_way_pnl(finish_pos, total_runners, pick_sp_odds, stake, bet_type)
                     analysis = f'Won at BSP {pick_sp_odds:.2f} ({total_runners} runners)'
                 print(f"    → Betfair SP: {pick_sp_odds:.2f}" +
                       (f"  (profit recalc: {profit:+.2f})" if outcome_lc == 'win' else ''))
@@ -837,6 +837,67 @@ def update_results(date_str):
             if _loss_hints:
                 extra_expr += ', loss_model_hints = :lmh'
                 extra_vals[':lmh'] = _loss_hints[:8]
+
+        # ── WATCHLIST EVALUATION ──────────────────────────────────────────────
+        # After outcome is known, check if this runner should go on the watchlist.
+        # Only evaluates our picks (UI picks) that didn't win.
+        # Winning picks: increment watchlist counter (mark as converted if was on list).
+        try:
+            import sys, os
+            sys.path.insert(0, '/var/task')
+            from watchlist import (evaluate_for_watchlist, add_to_watchlist,
+                                   increment_runs)
+            _horse_form_text = ' '.join(filter(None, [
+                _horse_detail.get('commentary', ''),
+                _horse_detail.get('ride_description', ''),
+            ]))
+            _beaten = None
+            _dists = _rd.get('distances_margins', '')
+            if finish_pos and finish_pos > 1 and _dists:
+                # Try to extract beaten lengths from distances string
+                import re as _re
+                _parts = str(_dists).split(',')
+                if len(_parts) >= finish_pos - 1:
+                    # Sum gaps from 1st to this position (cumulative, not last gap only)
+                    _cum = 0.0
+                    for _gap in _parts[:finish_pos - 1]:
+                        _gap_m = _re.search(r'(\d+\.?\d*)', _gap.strip())
+                        if _gap_m:
+                            _cum += float(_gap_m.group(1))
+                    if _cum > 0:
+                        _beaten = _cum
+
+            if outcome_lc == 'win':
+                increment_runs(horse, won=True)
+            elif outcome_lc in ('placed', 'loss'):
+                increment_runs(horse, won=False)
+                _should_watch, _wl_reason, _wl_cat = evaluate_for_watchlist(
+                    horse=horse,
+                    course=course,
+                    race_time=race_time_raw if 'race_time' in pick else f'{date_str}T{race_hhmm}',
+                    race_type=pick.get('race_type', ''),
+                    position=finish_pos,
+                    beaten_lengths=_beaten,
+                    score=float(pick.get('comprehensive_score') or pick.get('combined_confidence') or 0),
+                    form_text=_horse_form_text,
+                    sire=pick.get('sire', ''),
+                    going=pick.get('going', ''),
+                )
+                if _should_watch:
+                    add_to_watchlist(
+                        horse=horse, course=course,
+                        race_time=f'{date_str}T{race_hhmm}',
+                        race_type=pick.get('race_type', ''),
+                        going=pick.get('going', ''),
+                        sire=pick.get('sire', ''),
+                        reason=_wl_reason, category=_wl_cat,
+                        position=finish_pos,
+                        beaten_lengths=_beaten,
+                        score=float(pick.get('comprehensive_score') or 0),
+                        odds=float(pick.get('odds') or 0),
+                    )
+        except Exception as _wl_err:
+            print(f'  [WATCHLIST] evaluation error for {horse}: {_wl_err}')
 
         # ── Pre-write integrity check ──────────────────────────────────────────
         _integrity_errors = []

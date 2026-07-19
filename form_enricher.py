@@ -1,16 +1,25 @@
 """
-FORM ENRICHER — Two-source parallel enrichment for every runner.
+FORM ENRICHER — Three-source parallel enrichment for every runner.
 
-Sources (run in parallel, SL first, Racing API fills gaps):
-  1. Sporting Life racecard scraping — parses __NEXT_DATA__ JSON to get ALL meetings
-     (25 venues today vs 8 featured previously), covers UK/Irish/international field.
-  2. The Racing API (theracingapi.com) — structured API, covers ~95%+ UK/Irish field
-     when plan includes racecards endpoint. Set RACING_API_KEY env var as "username:password".
+Sources:
+  1. Sporting Life racecard scraping — parses __NEXT_DATA__ JSON for all meetings.
+  2. The Racing API (theracingapi.com) racecards/pro — C/D flags, trainer%, RPR, draw.
+  3. Racing API /horses/{id}/results — full run history for horses SL missed (fallback).
+
+S3 form cache:
+  - Pre-warm Lambda writes enriched form to s3://surebet-pipeline-data/form_cache/YYYY-MM-DD.json
+    at 23:00 UTC the night before. enrich_runners() loads this first, so SL scraping only
+    needs to fill genuine gaps rather than the full field cold.
+  - At the end of enrichment the updated cache is written back to S3 for subsequent refreshes.
+
+Race pool expansion (fetch_racing_api_race_list):
+  - Returns all UK/Irish races from Racing API for a given date, supplementing the
+    Betfair fetch with races that appeared in declarations but not yet in Betfair markets.
 
 Data per run:
   date            : "2026-01-17"
   course          : "Ascot"
-  distance_f      : 18.5        # furlongs (e.g. 2m3f ≈ 18.5f)
+  distance_f      : 18.5
   going           : "Good to Soft"
   position        : 1
   field_size      : 10
@@ -27,19 +36,10 @@ Signals unlocked:
   - or_trajectory_up       +10pts  (needs official_rating)
   - big_field_win          +8pts
 
-Fetch strategy:
-  1. enrich_runners() fans out SL scraping + Racing API call simultaneously.
-     Every runner in today's races gets form data immediately.
-  2. fetch_form() on a single horse: checks _today_form cache, then falls back to
-     the SL profile page (/racing/profiles/horse/{id}) if the horse ID is known.
-     Profile pages include official_rating and beaten_lengths.
-  3. IDs are persisted in _sl_horse_ids.json (360+ known).
-
 Usage:
-  from form_enricher import enrich_runners, get_form_signals
+  from form_enricher import enrich_runners, get_form_signals, fetch_racing_api_race_list
 
   enriched_races = enrich_runners(races)   # adds 'form_runs' to each runner
-  # analyze_horse_comprehensive picks up form_runs from horse_data automatically
 """
 
 import json
@@ -83,6 +83,53 @@ def _save_cache():
 
 
 _load_cache()
+
+# ---------------------------------------------------------------------------
+# S3 form cache — shared across Lambda invocations and the pre-warm Lambda
+# ---------------------------------------------------------------------------
+_S3_BUCKET      = 'surebet-pipeline-data'
+_S3_CACHE_PREFIX = 'form_cache'
+_s3_cache_loaded = None   # date string when cache was last loaded; None = not loaded
+
+
+def _s3_cache_key(date_str: str) -> str:
+    return f'{_S3_CACHE_PREFIX}/{date_str}.json'
+
+
+def load_s3_form_cache(date_str: str = None) -> dict:
+    """
+    Load pre-warmed form cache from S3.
+    Returns {horse_name_lower: [run_dicts]} or {} if not found.
+    """
+    try:
+        import boto3 as _boto3
+        date_str = date_str or datetime.now().strftime('%Y-%m-%d')
+        s3 = _boto3.client('s3', region_name='eu-west-1')
+        obj = s3.get_object(Bucket=_S3_BUCKET, Key=_s3_cache_key(date_str))
+        data = json.loads(obj['Body'].read().decode('utf-8'))
+        print(f"  [form] S3 cache loaded: {len(data)} horses pre-warmed for {date_str}")
+        return data
+    except Exception:
+        return {}
+
+
+def save_s3_form_cache(form_data: dict, date_str: str = None) -> None:
+    """Persist current form data to S3 for next refresh and the pre-warm cycle."""
+    try:
+        import boto3 as _boto3
+        date_str = date_str or datetime.now().strftime('%Y-%m-%d')
+        s3 = _boto3.client('s3', region_name='eu-west-1')
+        body = json.dumps(form_data, default=str).encode('utf-8')
+        s3.put_object(
+            Bucket=_S3_BUCKET,
+            Key=_s3_cache_key(date_str),
+            Body=body,
+            ContentType='application/json',
+        )
+        print(f"  [form] S3 cache saved: {len(form_data)} horses → {_s3_cache_key(date_str)}")
+    except Exception as exc:
+        print(f"  [form] S3 cache save failed (non-fatal): {exc}")
+
 
 # ---------------------------------------------------------------------------
 # SL horse ID map — persistent name → numeric id
@@ -394,6 +441,7 @@ def _fetch_sl_profile(horse_id: int, max_runs: int = 6) -> list[dict]:
     """
     Fetch /racing/profiles/horse/{id}.
     Returns run dicts including official_rating and beaten_lengths.
+    Also extracts pedigree (sire, dam, damsire) into the first run dict's metadata.
     """
     url = f'https://www.sportinglife.com/racing/profiles/horse/{horse_id}'
     html = _http_get(url, timeout=15)
@@ -409,11 +457,33 @@ def _fetch_sl_profile(horse_id: int, max_runs: int = 6) -> list[dict]:
 
     try:
         nd = json.loads(m.group(1))
-        prev_results = nd['props']['pageProps']['profile']['previous_results']
+        profile = nd['props']['pageProps']['profile']
+        prev_results = profile.get('previous_results', [])
     except (KeyError, ValueError):
         return []
 
-    return _parse_sl_runs(prev_results, max_runs)
+    runs = _parse_sl_runs(prev_results, max_runs)
+
+    # Attach pedigree to the run list so callers can access sire/dam
+    def _pname(obj):
+        if isinstance(obj, dict):
+            return str(obj.get('name', '') or '').strip()
+        return str(obj or '').strip()
+
+    sire_name    = _pname(profile.get('sire'))
+    dam_name     = _pname(profile.get('dam'))
+    damsire_name = _pname(profile.get('damsire'))
+
+    if sire_name and runs:
+        runs[0]['_sire']    = sire_name
+        runs[0]['_dam']     = dam_name
+        runs[0]['_damsire'] = damsire_name
+    elif sire_name:
+        # No run history but we still have pedigree — return a pedigree-only entry
+        runs = [{'_sire': sire_name, '_dam': dam_name, '_damsire': damsire_name,
+                 '_pedigree_only': True}]
+
+    return runs
 
 
 # ---------------------------------------------------------------------------
@@ -603,6 +673,148 @@ def fetch_racing_api_form(date_str: str, api_key: str) -> dict:
     return result
 
 
+def _fetch_racing_api_horse_results(horse_id: str, api_key: str, max_runs: int = 6) -> list[dict]:
+    """
+    Fetch historical run results for a single horse from Racing API.
+    Endpoint: GET /v1/horses/{horse_id}/results
+    Used as fallback when SL has no form for this runner.
+    Returns normalised run_dicts compatible with get_form_signals().
+    """
+    if not horse_id or not api_key or ':' not in api_key:
+        return []
+    import base64
+    encoded = base64.b64encode(api_key.encode()).decode()
+    headers_auth = {'Authorization': f'Basic {encoded}', 'Accept': 'application/json'}
+    try:
+        resp = requests.get(
+            f'https://api.theracingapi.com/v1/horses/{horse_id}/results',
+            headers=headers_auth,
+            timeout=15,
+        )
+        if resp.status_code != 200:
+            return []
+        data = resp.json()
+    except Exception:
+        return []
+
+    runs = []
+    for r in (data.get('results') or [])[:max_runs]:
+        pos_raw = r.get('position') or ''
+        try:
+            pos = int(str(pos_raw).strip().lstrip('PpFf').replace('st', '').replace('nd', '').replace('rd', '').replace('th', ''))
+        except (ValueError, TypeError):
+            pos = None
+
+        dist_raw = r.get('distance_f') or r.get('distance') or ''
+        dist_f = None
+        try:
+            dist_f = float(dist_raw) if isinstance(dist_raw, (int, float)) else _dist_to_furlongs(str(dist_raw))
+        except Exception:
+            pass
+
+        runs.append({
+            'date':            str(r.get('date') or ''),
+            'course':          str(r.get('course') or ''),
+            'distance_f':      dist_f,
+            'going':           _norm_going(str(r.get('going') or '')),
+            'position':        pos,
+            'field_size':      _safe_int(r.get('runners') or r.get('field_size')),
+            'official_rating': _safe_int(r.get('official_rating') or r.get('ofr') or r.get('or')),
+            'race_class':      str(r.get('class') or r.get('race_class') or ''),
+            'beaten_lengths':  _parse_beaten_lengths(str(r.get('beaten_lengths') or r.get('btn') or r.get('dist') or '')),
+        })
+    return runs
+
+
+def fetch_racing_api_race_list(date_str: str, api_key: str) -> list[dict]:
+    """
+    Option 3: Return all UK/Irish races from Racing API for date_str.
+    Each race dict has the same shape as Betfair-sourced races so it can be
+    merged directly into the analysis pool in complete_daily_analysis.py.
+
+    Schema returned per race:
+      course, race_time, race_name, race_type, distance_f, going, runners[]
+      runners[]: name, odds (morning SP decimal), draw, official_rating, jockey, trainer
+    """
+    if not api_key or ':' not in api_key:
+        return []
+    import base64
+    encoded = base64.b64encode(api_key.encode()).decode()
+    headers_auth = {'Authorization': f'Basic {encoded}', 'Accept': 'application/json'}
+    try:
+        resp = requests.get(
+            'https://api.theracingapi.com/v1/racecards/pro',
+            headers=headers_auth,
+            params={'date': date_str},
+            timeout=30,
+        )
+        if resp.status_code != 200:
+            print(f'  [racing_api] race_list HTTP {resp.status_code}')
+            return []
+        data = resp.json()
+    except Exception as exc:
+        print(f'  [racing_api] race_list error: {exc}')
+        return []
+
+    races_out = []
+    for race in (data.get('racecards') or []):
+        runners_out = []
+        for runner in (race.get('runners') or []):
+            name = re.sub(r'\s*\([A-Z]{2,3}\)\s*$', '', str(runner.get('horse') or '')).strip()
+            if not name:
+                continue
+            # Use morning SP decimal if available, else 0 (no odds signal)
+            sp_raw = runner.get('sp_dec') or runner.get('sp') or 0
+            try:
+                odds_dec = float(sp_raw)
+            except (ValueError, TypeError):
+                odds_dec = 0.0
+            runners_out.append({
+                'name':             name,
+                'odds':             odds_dec,
+                'draw':             _safe_int(runner.get('draw')),
+                'official_rating':  _safe_int(runner.get('ofr')),
+                'jockey':           str(runner.get('jockey') or ''),
+                'trainer':          str(runner.get('trainer') or ''),
+                'horse_id':         str(runner.get('horse_id') or ''),
+                'ra_data': {
+                    'past_results_flags': str(runner.get('past_results_flags') or '').upper().strip(),
+                    'last_run_days':      _safe_int(runner.get('last_run')),
+                    'rpr':                _safe_int(runner.get('rpr')),
+                    'ts':                 _safe_int(runner.get('ts')),
+                    'ofr':                _safe_int(runner.get('ofr')),
+                    'trainer_14d_pct':    _safe_int((runner.get('trainer_14_days') or {}).get('percent')) or 0,
+                    'trainer_14d_runs':   _safe_int((runner.get('trainer_14_days') or {}).get('runs')) or 0,
+                    'horse_id':           str(runner.get('horse_id') or ''),
+                    'form_string':        str(runner.get('form') or ''),
+                },
+            })
+        if not runners_out:
+            continue
+
+        dist_raw = race.get('distance_f') or race.get('distance') or ''
+        dist_f = None
+        try:
+            dist_f = float(dist_raw) if isinstance(dist_raw, (int, float)) else _dist_to_furlongs(str(dist_raw))
+        except Exception:
+            pass
+
+        races_out.append({
+            'course':       str(race.get('course') or ''),
+            'race_time':    str(race.get('off_dt') or race.get('time') or ''),
+            'race_name':    str(race.get('race_name') or ''),
+            'race_type':    str(race.get('type') or race.get('race_type') or ''),
+            'distance_f':   dist_f,
+            'going':        str(race.get('going') or ''),
+            'race_id':      str(race.get('race_id') or ''),
+            'runners':      runners_out,
+            'source':       'racing_api',  # flag: no live Betfair odds yet
+        })
+
+    print(f'  [racing_api] race_list: {len(races_out)} races, {sum(len(r["runners"]) for r in races_out)} runners')
+    return races_out
+
+
 # ---------------------------------------------------------------------------
 # Main public entry points
 # ---------------------------------------------------------------------------
@@ -682,9 +894,14 @@ def _sl_fan_out(all_urls: list) -> tuple:
 def enrich_runners(races: list[dict], verbose: bool = True,
                    racing_api_key: str = '') -> list[dict]:
     """
-    Parallel two-source enrichment — SL scraping + Racing API run simultaneously.
-    SL data takes priority; Racing API fills every horse SL missed.
-    Set racing_api_key='username:password' from theracingapi.com (free tier).
+    Three-source enrichment — S3 pre-warm cache → SL scraping → Racing API results fallback.
+
+    1. Load S3 pre-warmed cache (written by prewarm_form_cache Lambda at 23:00 UTC).
+       Any horse already in there skips SL scraping entirely.
+    2. Fan-out SL racecard scraping + Racing API Pro call in parallel for remaining horses.
+    3. For runners still missing form_runs after SL, use Racing API /horses/{id}/results
+       in parallel (covers horses not on SL racecards).
+    4. Save updated cache back to S3 so subsequent refreshes benefit from it.
     """
     global _today_form, _today_tf_stars, _sl_ids_dirty
 
@@ -693,6 +910,15 @@ def enrich_runners(races: list[dict], verbose: bool = True,
 
     api_key = racing_api_key or os.environ.get('RACING_API_KEY', '')
     today = datetime.now().strftime('%Y-%m-%d')
+
+    # ── Step 0: Load S3 pre-warmed cache ─────────────────────────────────────
+    global _s3_cache_loaded
+    if _s3_cache_loaded != today:
+        _today_form.clear()
+        s3_cache = load_s3_form_cache(today)
+        if s3_cache:
+            _today_form.update(s3_cache)
+        _s3_cache_loaded = today
 
     # ── Collect SL race URLs for today's venues ───────────────────────────────
     if verbose:
@@ -766,9 +992,15 @@ def enrich_runners(races: list[dict], verbose: bool = True,
             # SL form runs (individual race history)
             runs = fetch_form(name_clean)
             runner['form_runs'] = runs
-            if runs:
+            _has_real_runs = bool(runs) and not (len(runs) == 1 and runs[0].get('_pedigree_only'))
+            if _has_real_runs:
                 enriched += 1
                 runner['form_source'] = 'sl'
+                # Extract pedigree if SL profile returned it (first run carries _sire/_dam)
+                if not runner.get('sire') and runs[0].get('_sire'):
+                    runner['sire']    = runs[0]['_sire']
+                    runner['dam']     = runs[0].get('_dam', '')
+                    runner['damsire'] = runs[0].get('_damsire', '')
 
             # Racing API Pro racecard data — injected for ALL runners (C/D flags,
             # live trainer form, RPR, last_run_days etc.)
@@ -787,6 +1019,51 @@ def enrich_runners(races: list[dict], verbose: bool = True,
         print(f"  [form] SL form_runs: {enriched}/{total_horses} ({pct}%) | "
               f"Racing API ra_data: {ra_injected}/{total_horses} | "
               f"Timeform stars: {tf_count}")
+
+    # ── Step 3: Racing API results fallback ───────────────────────────────────
+    # For runners still missing form_runs but with a Racing API horse_id, fetch
+    # their full run history from /v1/horses/{id}/results in parallel.
+    if api_key:
+        _missing = [
+            (runner, runner['ra_data']['horse_id'])
+            for race in races
+            for runner in race.get('runners', [])
+            if (not runner.get('form_runs') or (
+                len(runner.get('form_runs', [])) == 1 and
+                runner['form_runs'][0].get('_pedigree_only')
+            ))
+            and runner.get('ra_data', {}).get('horse_id')
+        ]
+        if _missing:
+            if verbose:
+                print(f"  [form] Racing API results fallback: {len(_missing)} runners with no SL form…")
+            with ThreadPoolExecutor(max_workers=min(len(_missing), 8)) as pool:
+                futures = {
+                    pool.submit(_fetch_racing_api_horse_results, hid, api_key): runner
+                    for runner, hid in _missing
+                }
+                ra_filled = 0
+                for future in as_completed(futures):
+                    runner = futures[future]
+                    try:
+                        runs = future.result()
+                        if runs:
+                            runner['form_runs'] = runs
+                            runner['form_source'] = 'racing_api_results'
+                            name_key = (runner.get('name') or runner.get('horse') or '').lower()
+                            _today_form[name_key] = runs
+                            ra_filled += 1
+                    except Exception:
+                        pass
+            if verbose:
+                new_pct = round(100 * (enriched + ra_filled) / total_horses) if total_horses else 0
+                print(f"  [form] After RA fallback: {enriched + ra_filled}/{total_horses} ({new_pct}%) — "
+                      f"filled {ra_filled} via Racing API results")
+
+    # ── Step 4: Save updated form cache back to S3 ────────────────────────────
+    if _today_form:
+        save_s3_form_cache(_today_form, today)
+
     return races
 
 

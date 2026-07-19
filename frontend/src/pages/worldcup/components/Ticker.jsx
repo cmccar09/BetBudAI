@@ -28,12 +28,18 @@ const ALL_ITEMS = [
   { gameDate:'2026-07-07', label:'🇦🇷 Argentina vs 🇪🇬 Egypt',          detail:'Jul 7 · R16 · FT', score:'3–2', status:'FT', pred:'✅' },
   { gameDate:'2026-07-07', label:'🇨🇭 Switzerland vs 🇨🇴 Colombia',     detail:'Jul 7 · R16 · FT (pens)', score:'0–0', status:'FT', pred:'❌' },
   // ── Quarter-finals ────────────────────────────────────────────────────────
-  { gameDate:'2026-07-09', label:'🇫🇷 France vs 🇲🇦 Morocco',           detail:'Jul 9 · QF · 15:00 GMT',  score:null, status:'NS', pred:'Pred: 2-0 France' },
-  { gameDate:'2026-07-10', label:'🇪🇸 Spain vs 🇧🇪 Belgium',            detail:'Jul 10 · QF · 19:00 GMT', score:null, status:'NS', pred:'Pred: 2-1 Spain' },
-  { gameDate:'2026-07-11', label:'🇳🇴 Norway vs 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',          detail:'Jul 11 · QF · 15:00 GMT', score:null, status:'NS', pred:'Pred: 1-2 England' },
-  { gameDate:'2026-07-12', label:'🇦🇷 Argentina vs 🇨🇭 Switzerland',    detail:'Jul 12 · QF · 19:00 GMT', score:null, status:'NS', pred:'Pred: 3-0 Argentina' },
+  { gameDate:'2026-07-09', label:'🇫🇷 France vs 🇲🇦 Morocco',           detail:'Jul 9 · QF · FT',  score:'2–0', status:'FT', pred:'✅' },
+  { gameDate:'2026-07-10', label:'🇪🇸 Spain vs 🇧🇪 Belgium',            detail:'Jul 10 · QF · FT', score:'2–1', status:'FT', pred:'✅' },
+  { gameDate:'2026-07-11', label:'🇳🇴 Norway vs 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',          detail:'Jul 11 · QF · FT', score:'1–2', status:'FT', pred:'✅' },
+  { gameDate:'2026-07-12', label:'🇦🇷 Argentina vs 🇨🇭 Switzerland',    detail:'Jul 12 · QF · FT', score:'3–1', status:'FT', pred:'↗️' },
+  // ── Semi-Finals ───────────────────────────────────────────────────────────
+  { gameDate:'2026-07-14', label:'🇫🇷 France vs 🇪🇸 Spain',             detail:'Jul 14 · SF · FT ⚡UPSET', score:'0–2', status:'FT', pred:'❌' },
+  { gameDate:'2026-07-15', label:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇦🇷 Argentina',       detail:'Jul 15 · SF · FT (Messi ×2 assists)', score:'1–2', status:'FT', pred:'✅' },
+  // ── 3rd Place + Final ─────────────────────────────────────────────────────
+  { gameDate:'2026-07-18', label:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇫🇷 France',              detail:'Jul 18 · 3rd Place · FT AET', score:'6–4', status:'FT', pred:'❌' },
+  { gameDate:'2026-07-19', label:'🏆 FIFA World Cup Final',               detail:'TODAY · 3pm ET · MetLife Stadium', score:null, status:'TODAY', pred:'BetBud: Spain 🇪🇸 to win · ~2/1' },
   // ── Tip ──────────────────────────────────────────────────────────────────
-  { label:'🏆 BetBud Tip', detail:'Argentina to win WC 2026 · Messi 8 goals Golden Boot', score:null, status:'TIP', pred:'France QF vs Morocco · England vs Haaland' },
+  { label:'🏆 BetBud Final Bet', detail:'Spain to WIN World Cup 2026 · 37-match unbeaten · 6 clean sheets this tournament · odds ~2/1', score:null, status:'TIP', pred:'Spain vs Argentina · TODAY 3pm ET MetLife' },
 ]
 
 export default function Ticker({ fixtures = [] }) {

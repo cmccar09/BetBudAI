@@ -25,6 +25,7 @@ import boto3
 from html import unescape
 from datetime import date, datetime
 from core.enrichment.betfair_fetcher import get_betfair_session, fetch_betfair_sp
+from core.settlement.outcome_standards import calculate_each_way_pnl
 from decimal import Decimal
 from boto3.dynamodb.conditions import Key, Attr
 
@@ -581,7 +582,8 @@ def update_results(date_str):
         race_time_raw = pick.get('race_time', '')   # ISO e.g. "2026-03-20T15:22:00.000Z"
         bet_id = pick['bet_id']
         odds = float(pick.get('odds', 0))
-        stake = float(pick.get('bet_amount', 6))
+        stake = float(pick.get('stake', pick.get('bet_amount', 6)))
+        bet_type = pick.get('bet_type', '')
 
         # Extract date and HH:MM from race_time (ISO format)
         tm_m = re.search(r'(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})', race_time_raw)
@@ -637,23 +639,25 @@ def update_results(date_str):
         winner_draw    = _rd.get('draw_map', {}).get(winner)
         winner_sp      = _rd.get('sp_map', {}).get(winner, '')
 
+        # Race meta gives the actual field size; all_runners is just the
+        # placed-finishers list (typically top 3-4) so use that as fallback only.
+        total_runners = _rd.get('runners') or total_runners
+
         # Determine outcome based on position
+        calc_outcome, profit = calculate_each_way_pnl(finish_pos, total_runners, odds, stake, bet_type)
         if finish_pos == 1:
             outcome_lc   = 'win'
             result_emoji = 'WIN'
-            profit = round((odds - 1) * stake, 2)
             pos_label    = '1st'
             analysis     = f'Won at {_to_frac(odds)} ({total_runners} runners)'
         elif finish_pos in (2, 3):
-            outcome_lc   = 'placed'
-            result_emoji = 'PLACED'
-            profit = -round(stake, 2)   # WIN bet — stake lost; each-way would differ
+            outcome_lc   = calc_outcome  # 'placed' or 'loss' depending on EW terms / field size
+            result_emoji = 'PLACED' if outcome_lc == 'placed' else 'LOSS'
             pos_label    = '2nd' if finish_pos == 2 else '3rd'
             analysis     = f'{pos_label} of {total_runners}, winner: {winner}'
         else:
             outcome_lc   = 'loss'
             result_emoji = 'LOSS'
-            profit = -round(stake, 2)
             pos_label    = f'{finish_pos}th' if finish_pos else 'Unplaced'
             analysis     = f'{pos_label} of {total_runners}, winner: {winner}' if finish_pos else f'Unplaced, winner: {winner}'
 
@@ -675,9 +679,10 @@ def update_results(date_str):
                     break
             if pick_sp_odds:
                 # Recalculate profit using actual SP
-                if outcome_lc == 'win':
-                    profit = round((pick_sp_odds - 1) * stake, 2)
-                    analysis = f'Won at BSP {pick_sp_odds:.2f} ({total_runners} runners)'
+                if outcome_lc in ('win', 'placed'):
+                    _, profit = calculate_each_way_pnl(finish_pos, total_runners, pick_sp_odds, stake, bet_type)
+                    if outcome_lc == 'win':
+                        analysis = f'Won at BSP {pick_sp_odds:.2f} ({total_runners} runners)'
                 print(f"    → Betfair SP: {pick_sp_odds:.2f}" +
                       (f"  (profit recalc: {profit:+.2f})" if outcome_lc == 'win' else ''))
 

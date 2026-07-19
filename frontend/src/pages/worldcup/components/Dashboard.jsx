@@ -110,21 +110,21 @@ export default function Dashboard() {
                 <span style={{ fontSize: 22 }}>🇦🇷</span>
                 <div>
                   <div style={{ fontWeight: 900, fontSize: 14, color: '#4ade80' }}>Messi</div>
-                  <div style={{ fontSize: 11, color: '#fbbf24', fontWeight: 700 }}>5 goals 🥇</div>
+                  <div style={{ fontSize: 11, color: '#fbbf24', fontWeight: 700 }}>8 goals 🥇</div>
                 </div>
               </div>
-              <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>Pred: Mbappé (+7)</div>
+              <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>Leads via assists · Mbappé (8, out)</div>
             </div>
             <div style={{ background: 'rgba(56,189,248,0.08)', border: '1px solid rgba(56,189,248,0.2)', borderRadius: 10, padding: '10px 12px' }}>
               <div style={{ fontSize: 10, fontWeight: 700, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>👟 Most Assists</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 22 }}>🇫🇷</span>
+                <span style={{ fontSize: 22 }}>🇦🇷</span>
                 <div>
-                  <div style={{ fontWeight: 900, fontSize: 14, color: '#4ade80' }}>Mbappé</div>
-                  <div style={{ fontSize: 11, color: '#38bdf8', fontWeight: 700 }}>2 assists</div>
+                  <div style={{ fontWeight: 900, fontSize: 14, color: '#4ade80' }}>Messi</div>
+                  <div style={{ fontSize: 11, color: '#38bdf8', fontWeight: 700 }}>4 assists 🏆</div>
                 </div>
               </div>
-              <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>+ 4 goals · Joint leader</div>
+              <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>2 vs England · all-time WC record</div>
             </div>
           </div>
 
@@ -132,34 +132,34 @@ export default function Dashboard() {
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1.8fr 1fr' : '1fr 1.6fr 1fr 1fr', gap: 0, alignItems: 'flex-end' }}>
               <div style={{ textAlign: 'center', paddingBottom: 4 }}>
-                <div style={{ fontSize: 26, marginBottom: 3 }}>🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
-                <div style={{ fontWeight: 800, fontSize: 13, color: '#9ca3af' }}>England</div>
+                <div style={{ fontSize: 26, marginBottom: 3 }}>🇫🇷</div>
+                <div style={{ fontWeight: 800, fontSize: 13, color: '#9ca3af' }}>France</div>
                 <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px 6px 0 0', marginTop: 6, padding: '7px 4px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', height: 50 }}>
                   <div style={{ fontSize: 17 }}>🥉</div>
                   <div style={{ fontSize: 9, color: '#6b7280', marginTop: 2 }}>3rd Place</div>
                 </div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 40, marginBottom: 3 }}>🇫🇷</div>
-                <div style={{ fontWeight: 900, fontSize: 20, color: '#fbbf24' }}>France</div>
-                <div style={{ fontSize: 11, color: '#fde68a', marginTop: 1 }}>+500 · AI: 68%</div>
+                <div style={{ fontSize: 40, marginBottom: 3 }}>🇪🇸</div>
+                <div style={{ fontWeight: 900, fontSize: 20, color: '#fbbf24' }}>Spain</div>
+                <div style={{ fontSize: 11, color: '#fde68a', marginTop: 1 }}>BetBud Pick · ~2/1</div>
                 <div style={{ background: 'linear-gradient(180deg,rgba(250,204,21,0.18),rgba(250,204,21,0.06))', border: '1px solid rgba(250,204,21,0.35)', borderRadius: '6px 6px 0 0', marginTop: 6, padding: '10px 4px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', height: 76 }}>
                   <div style={{ fontSize: 24 }}>🏆</div>
-                  <div style={{ fontSize: 10, color: '#fbbf24', fontWeight: 700, marginTop: 2 }}>CHAMPION</div>
+                  <div style={{ fontSize: 10, color: '#fbbf24', fontWeight: 700, marginTop: 2 }}>FINALIST</div>
                 </div>
               </div>
               <div style={{ textAlign: 'center', paddingBottom: 4 }}>
-                <div style={{ fontSize: 26, marginBottom: 3 }}>🇪🇸</div>
-                <div style={{ fontWeight: 800, fontSize: 13, color: '#e2e8f0' }}>Spain</div>
+                <div style={{ fontSize: 26, marginBottom: 3 }}>🇦🇷</div>
+                <div style={{ fontWeight: 800, fontSize: 13, color: '#e2e8f0' }}>Argentina</div>
                 <div style={{ background: 'rgba(226,232,240,0.07)', border: '1px solid rgba(226,232,240,0.15)', borderRadius: '6px 6px 0 0', marginTop: 6, padding: '7px 4px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', height: 62 }}>
                   <div style={{ fontSize: 18 }}>🥈</div>
-                  <div style={{ fontSize: 9, color: '#9ca3af', marginTop: 2 }}>Runner-Up</div>
+                  <div style={{ fontSize: 9, color: '#9ca3af', marginTop: 2 }}>Finalist</div>
                 </div>
               </div>
               {!isMobile && (
               <div style={{ textAlign: 'center', paddingBottom: 4 }}>
-                <div style={{ fontSize: 24, marginBottom: 3 }}>🇵🇹</div>
-                <div style={{ fontWeight: 700, fontSize: 12, color: '#6b7280' }}>Portugal</div>
+                <div style={{ fontSize: 24, marginBottom: 3 }}>🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
+                <div style={{ fontWeight: 700, fontSize: 12, color: '#6b7280' }}>England</div>
                 <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px 6px 0 0', marginTop: 6, padding: '5px 4px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', height: 42 }}>
                   <div style={{ fontSize: 13 }}>4️⃣</div>
                   <div style={{ fontSize: 9, color: '#4b5563', marginTop: 1 }}>4th</div>
@@ -175,19 +175,19 @@ export default function Dashboard() {
             <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.22)', borderRadius: 10, padding: '10px 12px' }}>
               <div style={{ fontSize: 10, fontWeight: 700, color: '#6ee7b7', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>🧤 Clean Sheets</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 22 }}>🇫🇷</span>
+                <span style={{ fontSize: 22 }}>🇪🇸</span>
                 <div>
-                  <div style={{ fontWeight: 900, fontSize: 14, color: '#4ade80' }}>Maignan</div>
-                  <div style={{ fontSize: 11, color: '#6ee7b7', fontWeight: 700 }}>2 CS ✅</div>
+                  <div style={{ fontWeight: 900, fontSize: 14, color: '#4ade80' }}>Simón</div>
+                  <div style={{ fontSize: 11, color: '#6ee7b7', fontWeight: 700 }}>4 CS 🏆 record</div>
                 </div>
               </div>
-              <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>= Pickford · Pred: 5</div>
+              <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>Spain unbeaten · WC record</div>
             </div>
             <div style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.22)', borderRadius: 10, padding: '10px 12px' }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: '#c4b5fd', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>🏅 Last 16</div>
-              <div style={{ fontSize: 13, fontWeight: 800, color: 'white', lineHeight: 1.3 }}>Jul 4–7 · Complete</div>
-              <div style={{ fontSize: 11, color: '#c4b5fd', marginTop: 3 }}>8 matches played</div>
-              <div style={{ fontSize: 10, color: '#64748b', marginTop: 3 }}>QF now underway</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: '#c4b5fd', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>⚽ Semi-Finals</div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: 'white', lineHeight: 1.4 }}>Spain 2-0 France ❌</div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: '#4ade80', lineHeight: 1.4 }}>Argentina 2-1 England ✅</div>
+              <div style={{ fontSize: 10, color: '#64748b', marginTop: 3 }}>Final: Spain vs Argentina · Jul 19</div>
             </div>
           </div>
 

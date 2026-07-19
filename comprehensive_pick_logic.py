@@ -578,7 +578,7 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
     # 4.5. CLAIMING JOCKEY BONUS (NEW 2026-02-20)
     # Claiming jockeys (indicated by numbers in brackets like (5), (7)) get weight allowances
     # In Heavy/Soft going, reduced weight is a significant advantage
-    jockey = horse_data.get('jockey', '')
+    jockey = horse_data.get('jockey') or ''
     claiming_allowance = 0
     if '(' in jockey and ')' in jockey:
         try:
@@ -775,6 +775,50 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
         reasons.append(f"Heavy going (unpredictable, field evens out): -{heavy_penalty}pts")
     else:
         breakdown['heavy_going_penalty'] = 0
+
+    # 5a-i. WATCHLIST IMPROVER SIGNAL
+    # Check if this horse is on the AI watchlist (added after a promising run).
+    # Watchlist = "should have won but circumstances beat it" — backed by data.
+    # +15 pts if active watchlist entry exists for this runner.
+    try:
+        from watchlist import check_watchlist
+        _wl_entry = check_watchlist(horse_data.get('name', ''))
+        if _wl_entry:
+            _wl_pts = 15
+            _wl_cat = str(_wl_entry.get('watchlist_category', ''))
+            _wl_reason = str(_wl_entry.get('watchlist_reason', ''))
+            _wl_runs = int(_wl_entry.get('runs_since_added', 0))
+            score += _wl_pts
+            breakdown['watchlist_improver'] = _wl_pts
+            reasons.append(
+                f'🔖 WATCHLIST IMPROVER ({_wl_cat}, {_wl_runs} run{"s" if _wl_runs != 1 else ""} ago): '
+                f'{_wl_reason} +{_wl_pts}pts'
+            )
+        else:
+            breakdown['watchlist_improver'] = 0
+    except Exception:
+        breakdown['watchlist_improver'] = 0
+
+    # 5a-ii. BLOODSTOCK SIRE GOING SIGNAL
+    # Uses curated sire going-preference database (bloodstock.py).
+    # Only fires when sire name is available from SL profile or Racing API Pro.
+    # +10 pts: sire loves this going (e.g. Kodiac on Good-Firm = bonus)
+    # -8  pts: sire dislikes this going (e.g. Camelot on Firm = penalty)
+    # Zero: versatile sire, unknown sire, or neutral ground (Good).
+    try:
+        from bloodstock import sire_going_signal
+        _sire_name = str(horse_data.get('sire') or '').strip()
+        _going_str = going_data.get(course, {}).get('going', '') or ''
+        _sire_pts, _sire_reason = sire_going_signal(_sire_name, _going_str)
+        if _sire_pts != 0:
+            score += _sire_pts
+            breakdown['sire_going_signal'] = _sire_pts
+            if _sire_reason:
+                reasons.append(_sire_reason)
+        else:
+            breakdown['sire_going_signal'] = 0
+    except Exception:
+        breakdown['sire_going_signal'] = 0
 
     # 5b. GRADED RACE GOING PENALTY CORRECTION
     # If a going penalty was applied but the race is Graded (Grd1/2/3/Listed),

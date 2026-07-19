@@ -81,3 +81,51 @@ OUTCOME_WON = 'WON'
 OUTCOME_LOST = 'LOST'
 OUTCOME_PLACED = 'PLACED'
 OUTCOME_PENDING = 'PENDING'
+
+
+def calculate_each_way_pnl(finish_pos, total_runners, odds, stake, bet_type='Each Way'):
+    """
+    Settle a pick's P&L from its finishing position.
+
+    All BetBudAI UI picks are staked Each Way (complete_daily_analysis.py sets
+    bet_type='Each Way' and a Kelly-sized stake of 2-8 units). An each-way bet
+    splits the stake 50/50 between a win part and a place part:
+      - WIN: both the win part (at full odds) AND the place part (at the
+        each-way fraction) pay out.
+      - PLACED (inside the each-way terms): only the place part pays, at
+        (odds-1) * fraction; the win part's stake is lost.
+      - Outside the each-way terms (or non-EW bet_type): full stake lost
+        unless the horse won outright.
+
+    Each-way terms scale with field size (standard UK bookmaker convention):
+      8+ runners  -> 1/5 odds, 3 places paid
+      5-7 runners -> 1/4 odds, 2 places paid
+      <5 runners  -> each-way not offered (win-only)
+
+    Returns (outcome: 'win'|'placed'|'loss', profit: float rounded to 2dp).
+    """
+    is_ew = str(bet_type or '').strip().lower().replace('-', ' ') == 'each way'
+
+    if total_runners >= 8:
+        ew_fraction, places_paid = 0.2, 3
+    elif total_runners >= 5:
+        ew_fraction, places_paid = 0.25, 2
+    else:
+        ew_fraction, places_paid = 0.0, 1
+
+    if finish_pos == 1:
+        if is_ew:
+            if ew_fraction:
+                profit = (stake / 2) * (odds - 1) + (stake / 2) * (odds - 1) * ew_fraction
+            else:
+                # No place market (<5 runners): win leg (half stake) wins, place leg loses
+                profit = (stake / 2) * (odds - 1) - (stake / 2)
+        else:
+            profit = stake * (odds - 1)
+        return 'win', round(profit, 2)
+
+    if is_ew and ew_fraction and finish_pos and finish_pos <= places_paid:
+        profit = (stake / 2) * (odds - 1) * ew_fraction - (stake / 2)
+        return 'placed', round(profit, 2)
+
+    return 'loss', -round(stake, 2)

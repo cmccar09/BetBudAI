@@ -1,60 +1,48 @@
 const BRACKET = {
-  r32: [
-    { home: '🇫🇷 France', away: '🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland', pred: '3-0', winner: 'France' },
-    { home: '🇧🇷 Brazil', away: '🇲🇦 Morocco', pred: '2-0', winner: 'Brazil' },
-    { home: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', away: '🇭🇷 Croatia', pred: '2-0', winner: 'England' },
-    { home: '🇦🇷 Argentina', away: '🇦🇹 Austria', pred: '2-0', winner: 'Argentina' },
-    { home: '🇪🇸 Spain', away: '🇺🇾 Uruguay', pred: '2-0', winner: 'Spain' },
-    { home: '🇩🇪 Germany', away: '🇪🇨 Ecuador', pred: '3-1', winner: 'Germany' },
-    { home: '🇵🇹 Portugal', away: '🇨🇴 Colombia', pred: '2-1', winner: 'Portugal' },
-    { home: '🇳🇱 Netherlands', away: '🇯🇵 Japan', pred: '2-0', winner: 'Netherlands' },
-    { home: '🇲🇽 Mexico', away: '🇰🇷 S. Korea', pred: '2-1', winner: 'Mexico' },
-    { home: '🇨🇭 Switzerland', away: '🇨🇦 Canada', pred: '1-0', winner: 'Switzerland' },
-    { home: '🇺🇸 USA', away: '🇹🇷 Türkiye', pred: '2-1', winner: 'USA' },
-    { home: '🇳🇴 Norway', away: '🇸🇳 Senegal', pred: '2-0', winner: 'Norway' },
-    { home: '🇧🇪 Belgium', away: '🇪🇬 Egypt', pred: '2-0', winner: 'Belgium' },
-    { home: '🇨🇮 Ivory Coast', away: '🇮🇷 Iran', pred: '2-0', winner: 'Ivory Coast' },
-    { home: '🇦🇺 Australia', away: '🇧🇦 Bosnia', pred: '1-0', winner: 'Australia' },
-    { home: '🇺🇾 Uruguay', away: '🇸🇪 Sweden', pred: '1-1 (4-3p)', winner: 'Uruguay' },
-  ],
   r16: [
-    { home: '🇫🇷 France', away: '🇲🇽 Mexico', pred: '3-0', winner: 'France' },
-    { home: '🇧🇷 Brazil', away: '🇺🇸 USA', pred: '2-1', winner: 'Brazil' },
-    { home: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', away: '🇧🇪 Belgium', pred: '2-0', winner: 'England' },
-    { home: '🇦🇷 Argentina', away: '🇨🇭 Switzerland', pred: '2-0', winner: 'Argentina' },
-    { home: '🇪🇸 Spain', away: '🇦🇺 Australia', pred: '3-0', winner: 'Spain' },
-    { home: '🇩🇪 Germany', away: '🇳🇴 Norway', pred: '2-1', winner: 'Germany' },
-    { home: '🇵🇹 Portugal', away: '🇺🇾 Uruguay', pred: '2-1', winner: 'Portugal' },
-    { home: '🇳🇱 Netherlands', away: '🇨🇮 Ivory Coast', pred: '2-0', winner: 'Netherlands' },
+    { home: '🇫🇷 France',    away: '🇵🇾 Paraguay',    pred: '1-0',       winner: 'France',    hS:1, aS:0 },
+    { home: '🇲🇦 Morocco',   away: '🇨🇦 Canada',      pred: '3-0',       winner: 'Morocco',   hS:3, aS:0 },
+    { home: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',  away: '🇲🇽 Mexico',     pred: '3-2',       winner: 'England',   hS:3, aS:2 },
+    { home: '🇳🇴 Norway',    away: '🇧🇷 Brazil',      pred: '2-1 ⚡',    winner: 'Norway',    hS:2, aS:1 },
+    { home: '🇪🇸 Spain',     away: '🇵🇹 Portugal',    pred: '1-0',       winner: 'Spain',     hS:1, aS:0 },
+    { home: '🇧🇪 Belgium',   away: '🇺🇸 USA',         pred: '4-1',       winner: 'Belgium',   hS:4, aS:1 },
+    { home: '🇦🇷 Argentina', away: '🇪🇬 Egypt',       pred: '3-2',       winner: 'Argentina', hS:3, aS:2 },
+    { home: '🇨🇭 Switzerland',away: '🇨🇴 Colombia',   pred: '0-0 (pens)',winner: 'Switzerland',hS:0,aS:0 },
   ],
   qf: [
-    { home: '🇫🇷 France', away: '🇧🇷 Brazil', pred: '2-1', winner: 'France' },
-    { home: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', away: '🇦🇷 Argentina', pred: '1-0', winner: 'England' },
-    { home: '🇪🇸 Spain', away: '🇩🇪 Germany', pred: '2-1', winner: 'Spain' },
-    { home: '🇵🇹 Portugal', away: '🇳🇱 Netherlands', pred: '2-0', winner: 'Portugal' },
+    { home: '🇫🇷 France',    away: '🇲🇦 Morocco',    pred: '2-0', winner: 'France',    hS:2, aS:0 },
+    { home: '🇪🇸 Spain',     away: '🇧🇪 Belgium',    pred: '2-1', winner: 'Spain',     hS:2, aS:1 },
+    { home: '🇳🇴 Norway',    away: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', pred: '1-2', winner: 'England',   hS:1, aS:2 },
+    { home: '🇦🇷 Argentina', away: '🇨🇭 Switzerland',pred: '3-1', winner: 'Argentina', hS:3, aS:1 },
   ],
   sf: [
-    { home: '🇫🇷 France', away: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', pred: '2-1 AET', winner: 'France' },
-    { home: '🇪🇸 Spain', away: '🇵🇹 Portugal', pred: '1-1 (4-3p)', winner: 'Spain' },
+    { home: '🇫🇷 France',   away: '🇪🇸 Spain',     pred: '0-2 ❌', winner: 'Spain',     hS:0, aS:2 },
+    { home: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', away: '🇦🇷 Argentina', pred: '1-2 ✅', winner: 'Argentina', hS:1, aS:2 },
   ],
   third: [
-    { home: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', away: '🇵🇹 Portugal', pred: '2-1', winner: 'England' },
+    { home: '🇫🇷 France',   away: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', pred: '6-4 AET', winner: 'England', hS: 4, aS: 6 },
   ],
   final: [
-    { home: '🇫🇷 France', away: '🇪🇸 Spain', pred: '2-1', winner: 'France' },
+    { home: '🇪🇸 Spain', away: '🇦🇷 Argentina', pred: 'Spain to win · TODAY 3pm ET', winner: 'Spain' },
   ],
 }
 
 function MatchBox({ m, isWinner }) {
   const winTeam = m.winner
+  const hasResult = m.hS !== undefined && m.hS !== null
   return (
     <div style={{
       background: 'var(--card2)', border: `1px solid ${isWinner ? 'var(--gold)' : 'var(--border)'}`,
       borderRadius: 8, padding: '8px 10px', margin: '4px 2px', fontSize: 12, minWidth: 160,
     }}>
-      <div style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 4 }}>🤖 {m.pred}</div>
+      {hasResult
+        ? <div style={{ fontSize: 10, color: 'var(--accent)', marginBottom: 4, fontWeight: 700 }}>
+            FT {m.hS}–{m.aS}
+          </div>
+        : <div style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 4 }}>🤖 {m.pred}</div>
+      }
       {[m.home, m.away].map((team, ti) => {
-        const isW = team.includes(winTeam) || winTeam === team.split(' ').slice(-1)[0]
+        const isW = hasResult && (team.includes(winTeam) || winTeam === team.split(' ').slice(-1)[0])
         return (
           <div key={ti} style={{
             display: 'flex', justifyContent: 'space-between',
@@ -92,17 +80,14 @@ function Round({ title, matches, highlight }) {
 export default function Bracket() {
   return (
     <div className="page-content">
-      <div className="section-title">🏅 BetBud Knockout Bracket Prediction</div>
+      <div className="section-title">🏅 BetBud Knockout Bracket</div>
 
       <div style={{ padding: '10px 14px', background: 'var(--card2)', border: '1px solid var(--border)', borderRadius: 8, marginBottom: 20, fontSize: 13, color: 'var(--muted)' }}>
-        🤖 BetBud predicted path based on squad ratings, form, draw bracket analysis, and historical head-to-head data.
-        Predictions update automatically as tournament progresses.
+        🤖 BetBud path — SF1: Spain 2-0 France ❌ · SF2: Argentina 2-1 England ✅ · 3rd: England 6-4 France (AET) ❌ · <span style={{ color: '#fbbf24', fontWeight: 700 }}>FINAL TODAY · Spain vs Argentina · 3pm ET</span>
       </div>
 
       {/* Winner highlight */}
-      <div style={{
-        display: 'flex', justifyContent: 'center', marginBottom: 24
-      }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
         <div style={{
           background: 'linear-gradient(135deg,#1e293b,#312e81)',
           border: '2px solid var(--purple)', borderRadius: 12, padding: '16px 32px',
@@ -110,8 +95,9 @@ export default function Bracket() {
         }}>
           <div style={{ fontSize: 40 }}>🏆</div>
           <div style={{ fontSize: 11, color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>BetBud Champion</div>
-          <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--gold)' }}>🇫🇷 France</div>
-          <div style={{ fontSize: 13, color: 'var(--muted)' }}>Pred. score: 2-1 vs 🇪🇸 Spain</div>
+          <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--gold)' }}>🇪🇸 Spain</div>
+          <div style={{ fontSize: 13, color: '#fbbf24', fontWeight: 700 }}>FINAL TODAY · vs 🇦🇷 Argentina · 3pm ET</div>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>SF1: Spain 2-0 France ❌ · SF2: Argentina 2-1 England ✅ · 3rd: England 6-4 France ❌</div>
         </div>
       </div>
 
@@ -127,19 +113,20 @@ export default function Bracket() {
 
       {/* Bracket analysis */}
       <div className="section" style={{ marginTop: 24 }}>
-        <div className="section-title">📊 Bracket Analysis</div>
+        <div className="section-title">📊 Final & Semi-Final 2 Analysis</div>
         <div className="grid-2">
           {[
-            { team: '🇫🇷 France', path: 'Iraq → Scotland → Mexico → Brazil → England → Spain', difficulty: 'Medium', conf: 68 },
-            { team: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', path: 'Panama → Ghana → Croatia → Belgium → Argentina → France', difficulty: 'Hard', conf: 56 },
-            { team: '🇪🇸 Spain', path: 'Cape Verde → Saudi Arabia → Uruguay → Australia → Germany → Portugal', difficulty: 'Medium', conf: 62 },
-            { team: '🇦🇷 Argentina', path: 'Algeria → Jordan → Austria → Switzerland → England (SF loss)', difficulty: 'Medium', conf: 45 },
+            { team: '🇪🇸 Spain', path: 'Portugal → Belgium → France 2-0 (SF ✅) → Final Jul 19', difficulty: 'Medium', conf: 72, note: 'SF: 2-0 France. Oyarzabal pen + Porro. Yamal unstoppable.' },
+            { team: '🇦🇷 Argentina', path: 'Egypt → Switzerland → England 2-1 (SF ✅) → Final Jul 19', difficulty: 'Hard', conf: 58, note: 'SF: 2-1 England. Enzo 85\' + Lautaro 92\'. Messi 2 assists.' },
+            { team: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', path: 'Mexico → Norway → Argentina 1-2 (SF ❌) → 3rd Place WON 6-4 AET', difficulty: 'Hard', conf: 0, note: '3rd place ✅. Came back from SF defeat. Kane 6 goals. Brilliant 6-4 AET win.' },
+            { team: '🇫🇷 France', path: 'Paraguay → Morocco → Spain 0-2 (SF ❌) → 3rd Place LOST 4-6 AET', difficulty: 'Hard', conf: 0, note: 'Finished 4th. Lost 3rd place 4-6 AET to England. Mbappé 8 goals, tournament over.' },
           ].map(a => (
             <div key={a.team} className="card-sm">
               <div style={{ fontWeight: 700, fontSize: 15 }}>{a.team}</div>
               <div style={{ color: 'var(--muted)', fontSize: 12, marginTop: 4 }}>Path: {a.path}</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 3 }}>{a.note}</div>
               <div style={{ display: 'flex', gap: 12, marginTop: 8, alignItems: 'center' }}>
-                <span style={{ fontSize: 12 }}>Bracket difficulty: <strong style={{ color: a.difficulty === 'Hard' ? 'var(--red)' : a.difficulty === 'Medium' ? 'var(--gold)' : 'var(--accent)' }}>{a.difficulty}</strong></span>
+                <span style={{ fontSize: 12 }}>Difficulty: <strong style={{ color: a.difficulty === 'Hard' ? 'var(--red)' : 'var(--gold)' }}>{a.difficulty}</strong></span>
                 <span style={{ fontSize: 12, color: 'var(--muted)' }}>Win conf: <strong style={{ color: 'var(--accent)' }}>{a.conf}%</strong></span>
               </div>
               <div className="conf-bar" style={{ marginTop: 6 }}>
