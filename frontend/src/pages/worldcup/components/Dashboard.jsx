@@ -142,10 +142,10 @@ export default function Dashboard() {
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 40, marginBottom: 3 }}>🇪🇸</div>
                 <div style={{ fontWeight: 900, fontSize: 20, color: '#fbbf24' }}>Spain</div>
-                <div style={{ fontSize: 11, color: '#fde68a', marginTop: 1 }}>BetBud Pick · ~2/1</div>
-                <div style={{ background: 'linear-gradient(180deg,rgba(250,204,21,0.18),rgba(250,204,21,0.06))', border: '1px solid rgba(250,204,21,0.35)', borderRadius: '6px 6px 0 0', marginTop: 6, padding: '10px 4px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', height: 76 }}>
+                <div style={{ fontSize: 11, color: '#4ade80', marginTop: 1, fontWeight: 700 }}>✅ BetBud Pick WON · ~2/1</div>
+                <div style={{ background: 'linear-gradient(180deg,rgba(250,204,21,0.28),rgba(250,204,21,0.10))', border: '1px solid rgba(250,204,21,0.5)', borderRadius: '6px 6px 0 0', marginTop: 6, padding: '10px 4px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', height: 76 }}>
                   <div style={{ fontSize: 24 }}>🏆</div>
-                  <div style={{ fontSize: 10, color: '#fbbf24', fontWeight: 700, marginTop: 2 }}>FINALIST</div>
+                  <div style={{ fontSize: 10, color: '#fbbf24', fontWeight: 800, marginTop: 2 }}>CHAMPIONS</div>
                 </div>
               </div>
               <div style={{ textAlign: 'center', paddingBottom: 4 }}>
@@ -184,10 +184,10 @@ export default function Dashboard() {
               <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>Spain unbeaten · WC record</div>
             </div>
             <div style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.22)', borderRadius: 10, padding: '10px 12px' }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: '#c4b5fd', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>⚽ Semi-Finals</div>
-              <div style={{ fontSize: 12, fontWeight: 800, color: 'white', lineHeight: 1.4 }}>Spain 2-0 France ❌</div>
-              <div style={{ fontSize: 12, fontWeight: 800, color: '#4ade80', lineHeight: 1.4 }}>Argentina 2-1 England ✅</div>
-              <div style={{ fontSize: 10, color: '#64748b', marginTop: 3 }}>Final: Spain vs Argentina · Jul 19</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: '#c4b5fd', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>⚽ Semi-Finals → Final</div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: 'white', lineHeight: 1.4 }}>Spain 2-0 France · Arg 2-1 England</div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: '#4ade80', lineHeight: 1.4 }}>🏆 Final: Spain 1-0 Argentina (AET)</div>
+              <div style={{ fontSize: 10, color: '#4ade80', marginTop: 3, fontWeight: 700 }}>Ferran Torres 106' · BetBud ✅</div>
             </div>
           </div>
 

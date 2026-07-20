@@ -37,9 +37,9 @@ const ALL_ITEMS = [
   { gameDate:'2026-07-15', label:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇦🇷 Argentina',       detail:'Jul 15 · SF · FT (Messi ×2 assists)', score:'1–2', status:'FT', pred:'✅' },
   // ── 3rd Place + Final ─────────────────────────────────────────────────────
   { gameDate:'2026-07-18', label:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇫🇷 France',              detail:'Jul 18 · 3rd Place · FT AET', score:'6–4', status:'FT', pred:'❌' },
-  { gameDate:'2026-07-19', label:'🏆 FIFA World Cup Final',               detail:'TODAY · 3pm ET · MetLife Stadium', score:null, status:'TODAY', pred:'BetBud: Spain 🇪🇸 to win · ~2/1' },
+  { gameDate:'2026-07-19', label:'🏆 FIFA World Cup Final · 🇪🇸 Spain vs 🇦🇷 Argentina', detail:'Jul 19 · MetLife Stadium · AET', score:'1–0', status:'FT', pred:'✅' },
   // ── Tip ──────────────────────────────────────────────────────────────────
-  { label:'🏆 BetBud Final Bet', detail:'Spain to WIN World Cup 2026 · 37-match unbeaten · 6 clean sheets this tournament · odds ~2/1', score:null, status:'TIP', pred:'Spain vs Argentina · TODAY 3pm ET MetLife' },
+  { label:'🏆 SPAIN WORLD CHAMPIONS 2026', detail:'Spain 1-0 Argentina (AET) · Ferran Torres 106\' · BetBud called it at ~2/1 ✅', score:null, status:'TIP', pred:'BetBud CORRECT · Spain ~2/1' },
 ]
 
 export default function Ticker({ fixtures = [] }) {
