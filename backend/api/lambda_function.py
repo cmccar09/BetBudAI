@@ -1787,6 +1787,7 @@ def get_sport_data(headers, sport):
             body['tips_in_form'] = (items.get('TIPS', {}) or {}).get('in_form', [])
             body['course_form'] = (items.get('TIPS', {}) or {}).get('course_form', {})
             body['round_predictions'] = (items.get('TIPS', {}) or {}).get('round_predictions', [])
+            body['daily_bets'] = (items.get('TIPS', {}) or {}).get('daily_bets', [])
             body['yesterday_performance'] = (items.get('TIPS', {}) or {}).get('yesterday_performance', {})
             _rc = items.get('RYDER_CUP', {}) or {}
             body['ryder_cup_last'] = _rc.get('last_edition', {})
@@ -3628,7 +3629,7 @@ def _customer_has_previous_subscription(stripe_customer_id: str) -> bool:
     if not stripe or not stripe_customer_id:
         return False
     try:
-        subs = stripe.Subscription.list(customer=stripe_customer_id, status='all', limit=1)
+        subs = stripe.subscriptions.list(customer=stripe_customer_id, status='all', limit=1)
         data = getattr(subs, 'data', None)
         if data is None and isinstance(subs, dict):
             data = subs.get('data')
@@ -3665,7 +3666,7 @@ def create_checkout_session(headers, event):
         # Reuse or create Stripe customer
         stripe_customer_id = sub.get('stripe_customer_id')
         if not stripe_customer_id:
-            customer = stripe.Customer.create(
+            customer = stripe.customers.create(
                 email=email,
                 name=sub.get('full_name', ''),
                 metadata={'betbudai_email': email}
@@ -3692,7 +3693,7 @@ def create_checkout_session(headers, event):
                 'metadata': {'betbudai_email': email, 'tier': tier},
             }
 
-        session = stripe.checkout.Session.create(
+        session = stripe.checkout.sessions.create(
             customer=stripe_customer_id,
             mode='subscription',
             line_items=[{'price': price_id, 'quantity': 1}],
@@ -3807,7 +3808,7 @@ def _handle_checkout_completed(session):
     trial_end_ts = None
     if subscription_id and stripe:
         try:
-            sub_obj = stripe.Subscription.retrieve(subscription_id)
+            sub_obj = stripe.subscriptions.retrieve(subscription_id)
             sub_safe = _stripe_safe(sub_obj)
             sub_status = sub_safe.get('status', 'active')
             trial_end = sub_safe.get('trial_end')
@@ -3986,7 +3987,7 @@ def get_subscription_status(headers, event):
         # a live subscription, repair local fields immediately.
         if _has_cust and not _has_sub and _status not in ('active', 'trialing', 'canceling', 'free_subscriber') and stripe and 'NOT_CONFIGURED' not in (os.environ.get('STRIPE_SECRET_KEY') or ''):
             try:
-                subs = stripe.Subscription.list(customer=sub.get('stripe_customer_id'), status='all', limit=10)
+                subs = stripe.subscriptions.list(customer=sub.get('stripe_customer_id'), status='all', limit=10)
                 subs_data = subs.data if hasattr(subs, 'data') else []
                 live_sub = next((s for s in subs_data if getattr(s, 'status', '') in ('trialing', 'active', 'past_due', 'unpaid')), None)
                 if live_sub:
@@ -4068,7 +4069,7 @@ def create_customer_portal(headers, event):
             return {'statusCode': 404, 'headers': headers,
                     'body': json.dumps({'error': 'No active subscription found'})}
 
-        session = stripe.billing_portal.Session.create(
+        session = stripe.billing_portal.sessions.create(
             customer=sub['stripe_customer_id'],
             return_url=SITE_URL,
         )
@@ -4097,7 +4098,7 @@ def cancel_subscription(headers, event):
                     'body': json.dumps({'error': 'No active subscription found'})}
 
         # Cancel at end of billing period (not immediately)
-        stripe.Subscription.modify(
+        stripe.subscriptions.modify(
             sub['stripe_subscription_id'],
             cancel_at_period_end=True
         )
@@ -4157,7 +4158,7 @@ def login_subscriber(headers, event):
                 try:
                     stripe_customer_id = item.get('stripe_customer_id')
                     if not stripe_customer_id:
-                        customer = stripe.Customer.create(
+                        customer = stripe.customers.create(
                             email=identifier,
                             name=item.get('full_name', ''),
                             metadata={'betbudai_email': identifier}
@@ -4169,7 +4170,7 @@ def login_subscriber(headers, event):
                             ExpressionAttributeValues={':cid': stripe_customer_id}
                         )
 
-                    session = stripe.checkout.Session.create(
+                    session = stripe.checkout.sessions.create(
                         customer=stripe_customer_id,
                         mode='subscription',
                         line_items=[{'price': STRIPE_PRICE_PREMIUM if checkout_tier == 'premium' else STRIPE_PRICE_VIP, 'quantity': 1}],
@@ -4257,7 +4258,7 @@ def login_subscriber(headers, event):
                     if not _had_previous_sub and not _had_local_trial:
                         sub_data['trial_period_days'] = 3
                         success_url += '&trial=1'
-                    session = stripe.checkout.Session.create(
+                    session = stripe.checkout.sessions.create(
                         customer=item['stripe_customer_id'],
                         mode='subscription',
                         line_items=[{'price': STRIPE_PRICE_PREMIUM if checkout_tier == 'premium' else STRIPE_PRICE_VIP, 'quantity': 1}],
@@ -4273,7 +4274,7 @@ def login_subscriber(headers, event):
             else:
                 # No Stripe customer at all — create one + checkout
                 try:
-                    customer = stripe.Customer.create(
+                    customer = stripe.customers.create(
                         email=identifier,
                         name=item.get('full_name', ''),
                         metadata={'betbudai_email': identifier}
@@ -4289,7 +4290,7 @@ def login_subscriber(headers, event):
                     if not had_previous_sub:
                         sub_data['trial_period_days'] = 3
                         success_url += '&trial=1'
-                    session = stripe.checkout.Session.create(
+                    session = stripe.checkout.sessions.create(
                         customer=customer.id,
                         mode='subscription',
                         line_items=[{'price': STRIPE_PRICE_PREMIUM, 'quantity': 1}],
