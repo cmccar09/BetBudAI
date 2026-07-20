@@ -1123,8 +1123,8 @@ def analyze_and_save_all(force_reanalyse: bool = False):
                         'total_wins', 'timeform_stars', 'DEBUTANT_STEAM')
     _MIN_SCORE_EXT = 80
     _MIN_SIGS_EXT  = 2
-    # Match UI display limit: 4 on weekends (Sat=5, Sun=6), 3 on weekdays
-    _MAX_EXT_PICKS = 4 if now_utc.weekday() >= 5 else 3
+    # Match UI display limit: 4 on weekends (Sat=5, Sun=6), 2 on weekdays
+    _MAX_EXT_PICKS = 4 if now_utc.weekday() >= 5 else 2
 
     _extended_candidates = []
     _top_pick_races = {id(r) for r in top_picks}  # exclude already-selected races

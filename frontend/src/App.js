@@ -3043,7 +3043,7 @@ function Top5PicksView() {
       {/* ── LIVE OPPORTUNITIES (Mon-Fri: 3 picks · Sat-Sun: 4 picks) ── */}
       {(allPicks.length > 0 || extendedPicks.length > 0) && (() => {
         const isWeekend = [0, 6].includes(new Date().getDay());
-        const maxPicks = isWeekend ? 4 : 3;
+        const maxPicks = isWeekend ? 4 : 2;
         // Merge morning picks + extended picks, deduplicate by course+time, sort by score
         const pool = {};
         [...allPicks, ...extendedPicks].forEach(p => {
@@ -3245,8 +3245,11 @@ function YesterdayResultsView({ isFreeUser }) {
       void todayDropped; void yestDropped;
       // Deduplicate: same course + race_time[:16] => keep highest-scored version
       // Use course+time (not horse name) to handle name variants like apostrophes
+      const _todayIsWeekend = [0, 6].includes(new Date().getDay());
+      const _maxExtToday = _todayIsWeekend ? 4 : 2;
       const extendedToday = (extTodayData?.success ? extTodayData.picks || [] : [])
         .filter(p => !p.is_dropped)
+        .slice(0, _maxExtToday)
         .map(p => ({ ...p, _dayLabel: 'Today' }));
       const deduped = {};
       [...todayPicks, ...extendedToday, ...yestPicks].forEach(p => {
@@ -3882,7 +3885,7 @@ function YesterdayResultsView({ isFreeUser }) {
             const oc    = outcomeStyle(rawOutcome);
             const tier  = scoreLabel(pick.comprehensive_score || pick.analysis_score);
             const ft    = formatRaceTime(pick.race_time);
-            const score = parseFloat(pick.comprehensive_score || pick.analysis_score || 0);
+            const score = parseFloat(pick.comprehensive_score || pick.analysis_score || pick.score || 0);
             const winner = pick.result_winner_name || pick.winner_name;
             const pnl   = parseFloat(pick.profit || 0);
             const dropMeta = formatDroppedMeta(pick);
@@ -6668,7 +6671,6 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
               <span style={{ color: '#fbbf24', fontWeight: '900', fontSize: '22px' }}>4 from 4</span>
               {' · '}
               <span style={{ color: '#34d399' }}>100% strike rate</span>
-              {' · Sun 28 Jun'}
             </div>
             <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginTop: '6px' }}>
               4-fold accumulator returned <span style={{ color: '#fbbf24', fontWeight: 700 }}>44× stake</span>

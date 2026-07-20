@@ -1665,13 +1665,26 @@ def get_extended_picks(headers, event):
     """GET /api/picks/extended — today's extended daily picks (any odds, top by score).
     These are the broader winner candidates selected automatically after morning analysis.
     pick_type='extended', score >= 80, 2+ signals, any course/odds/race type.
+    Cap: 2 picks on weekdays (Mon-Fri), 4 on weekends (Sat-Sun).
     """
     try:
         from boto3.dynamodb.conditions import Key as _Key
         from zoneinfo import ZoneInfo
         params = event.get('queryStringParameters') or {}
+        tz_dublin = ZoneInfo('Europe/Dublin')
+        now_dublin = datetime.now(tz_dublin)
         target_date = str(params.get('date') or '').strip()[:10] or \
-                      datetime.now(ZoneInfo('Europe/Dublin')).date().isoformat()
+                      now_dublin.date().isoformat()
+
+        # Determine cap based on day of week for today's picks
+        # For historical dates use the weekday of that date
+        try:
+            from datetime import date as _date
+            td = _date.fromisoformat(target_date)
+            _is_weekend = td.weekday() >= 5  # 5=Sat, 6=Sun
+        except Exception:
+            _is_weekend = now_dublin.weekday() >= 5
+        _max_ext = 4 if _is_weekend else 2
 
         resp = table.query(KeyConditionExpression=_Key('bet_date').eq(target_date))
         items = [decimal_to_float(i) for i in resp.get('Items', [])]
@@ -1684,6 +1697,7 @@ def get_extended_picks(headers, event):
         extended = [i for i in items if str(i.get('pick_type', '')) == 'extended'
                     and i.get('horse') and i.get('course')]
         extended.sort(key=lambda x: -float(x.get('comprehensive_score') or 0))
+        extended = extended[:_max_ext]
 
         picks_out = []
         for i in extended:
@@ -1692,12 +1706,14 @@ def get_extended_picks(headers, event):
                         'price_steam','trainer_reputation','cd_bonus','jockey_quality',
                         'won_last_2_runs','form_trend','total_wins','timeform_stars','DEBUTANT_STEAM')
             sigs = [k for k, v in bd.items() if k in KEY_SIGS and float(v or 0) > 0]
+            score = float(i.get('comprehensive_score') or 0)
             picks_out.append({
                 'horse':    i.get('horse'),
                 'course':   i.get('course'),
                 'race_time': i.get('race_time', ''),
                 'odds':     _parse_odds(i.get('odds')),
-                'score':    float(i.get('comprehensive_score') or 0),
+                'score':              score,
+                'comprehensive_score': score,
                 'grade':    i.get('confidence_grade', ''),
                 'trainer':  i.get('trainer', ''),
                 'jockey':   i.get('jockey', ''),
@@ -1705,6 +1721,7 @@ def get_extended_picks(headers, event):
                 'outcome':  str(i.get('outcome') or i.get('result') or 'pending'),
                 'signals':  sigs,
                 'n_signals': len(sigs),
+                'pick_type': 'extended',
             })
 
         return {
@@ -1712,7 +1729,8 @@ def get_extended_picks(headers, event):
             'body': json.dumps({
                 'success': True, 'date': target_date,
                 'count': len(picks_out), 'picks': picks_out,
-                'methodology': 'Top 5 by score · any odds · any race type · score≥80 · 2+ signals',
+                'max_picks': _max_ext,
+                'methodology': f'Top {_max_ext} by score · any odds · any race type · score>=80 · 2+ signals',
             }, default=str)
         }
     except Exception as e:
