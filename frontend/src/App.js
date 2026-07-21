@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { loadStripe } from '@stripe/stripe-js';
 import { trackEvent, trackPageView } from './analytics';
-import WorldCupPage from './pages/worldcup/WorldCupPage';
+import FootballPage from './pages/football/FootballPage';
 import WimbledonPage from './pages/wimbledon/WimbledonPage';
 import TourDeFrancePage from './pages/tourdefrance/TourDeFrancePage';
 import RugbyPage from './pages/rugby/RugbyPage';
@@ -623,7 +623,7 @@ function App() {
       picks: 'Daily Picks',
       picks5: 'Top 5 Picks',
       majors: featuredMeetingTitle || 'Featured Meet',
-      worldcup: 'World Cup',
+      football: 'Football',
       laythe: 'Favourite Watch',
       account: 'My Account',
       admin: 'Admin',
@@ -845,7 +845,7 @@ function App() {
           { key:'punchestown', label: featuredMeetingMeta?.tabLabel || 'Featured Meet', emoji:'🐎', sub: featuredMeetingMeta?.subLabel || '2 watchlist selections', gated: false, tierRequired: null },
           { key:'laythe',    label:'Favourite Watch',      emoji:'🚫', sub:'Vulnerable Favorites', gated: true, tierRequired: 'vip' },
           { key:'majors',    label:'Major Races',      emoji:'🏆', sub:'Ante-post + previews — free', gated: true, tierRequired: 'free' },
-          { key:'worldcup',  label:'World Cup',        emoji:'⚽', sub:'2026 predictions — free',    gated: true, tierRequired: 'free' },
+          { key:'football',  label:'Football',          emoji:'⚽', sub:'PL · UCL · EL predictions — free', gated: true, tierRequired: 'free' },
           { key:'wimbledon', label:'Pro Tennis',       emoji:'🎾', sub:'Live predictions — free',    gated: true, tierRequired: 'free' },
           { key:'tourdefrance', label:'Pro Cycling',   emoji:'🚴', sub:'Stage predictions — free',  gated: true, tierRequired: 'free' },
           { key:'rugby',     label:'Rugby',            emoji:'🏉', sub:'Nations Championship — free', gated: true, tierRequired: 'free' },
@@ -901,7 +901,7 @@ function App() {
         })}
       </div>
 
-      <main style={page === 'worldcup' ? {} : { maxWidth:'960px', margin:'0 auto', padding:'0 12px' }}>
+      <main style={page === 'football' ? {} : { maxWidth:'960px', margin:'0 auto', padding:'0 12px' }}>
         {paymentSuccess && (
           <div style={{ background:'linear-gradient(135deg,rgba(52,211,153,0.2),rgba(16,185,129,0.15))', border:'1.5px solid rgba(52,211,153,0.5)', borderRadius:'12px', padding:'16px 20px', textAlign:'center', marginBottom:'16px' }}>
             <div style={{ fontSize:'20px', marginBottom:'4px' }}>🎉</div>
@@ -917,7 +917,7 @@ function App() {
             { key:'picks5',   tierRequired: 'free', component: () => <Top5PicksView /> },
             { key:'laythe',   tierRequired: 'vip', component: () => <LayTheFavView /> },
             { key:'majors',   tierRequired: 'free', component: () => <MajorRacesView /> },
-            { key:'worldcup', tierRequired: 'free', component: () => <WorldCupPage /> },
+            { key:'football', tierRequired: 'free', component: () => <FootballPage /> },
             { key:'wimbledon', tierRequired: 'free', component: () => <WimbledonPage /> },
             { key:'tourdefrance', tierRequired: 'free', component: () => <TourDeFrancePage /> },
             { key:'rugby', tierRequired: 'free', component: () => <RugbyPage /> },
@@ -952,7 +952,7 @@ function App() {
             const vipMessage = requiredTier === 'vip';
             const freeMessage = requiredTier === 'free';
             const trialExpired = isAuthenticated && authUser?.subscription_status === 'trial_expired';
-            const worldCupMessage = cfg.key === 'worldcup';
+            const footballMessage = cfg.key === 'football';
 
             // Trial-expired authenticated users get "Subscribe for Free" (no Stripe)
             if (trialExpired && freeMessage) {
@@ -970,7 +970,7 @@ function App() {
                 <div style={{ fontSize:'60px', marginBottom:'24px' }}>🔒</div>
                 <h2 style={{ fontSize:'28px', fontWeight:'900', color:'white', marginBottom:'12px' }}>
                   {freeMessage
-                    ? (worldCupMessage ? '⚽ World Cup Predictions — Free Account Required' : 'Create a Free Account')
+                    ? (footballMessage ? '⚽ Football Predictions — Free Account Required' : 'Create a Free Account')
                     : isAuthenticated
                       ? (vipMessage ? 'Favourite Watch Exclusive' : 'Premium Access Required')
                       : 'Unlock This Content'}
@@ -978,8 +978,8 @@ function App() {
                 <p style={{ fontSize:'16px', color:'rgba(255,255,255,0.7)', marginBottom:'28px', lineHeight:'1.6' }}>
                   {freeMessage ? (
                     <>
-                      {worldCupMessage
-                        ? "Get all the World Cup action — group predictions, knockout bracket, scorers, England XI and BetBud's best bets for the 2026 tournament."
+                      {footballMessage
+                        ? "Get Premier League title race predictions, weekly fixture tips, Champions League and Europa League picks — all updated every week."
                         : 'Sign up free to see daily picks, analysis and results.'}
                       <br/>
                       <strong style={{ color:'#34d399' }}>100% free — no card. Ever.</strong>

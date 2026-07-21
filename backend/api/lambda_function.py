@@ -417,6 +417,8 @@ def lambda_handler(event, context):
             response = get_sport_data(headers, 'rugby')
         elif 'sports/golf' in path and method == 'GET':
             response = get_sport_data(headers, 'golf')
+        elif 'sports/football' in path and method == 'GET':
+            response = get_sport_data(headers, 'football')
         elif 'sports/basketball' in path and method == 'GET':
             response = get_sport_data(headers, 'basketball')
         elif 'sports/nfl' in path and method == 'GET':
@@ -1810,6 +1812,12 @@ def get_sport_data(headers, sport):
             _rc = items.get('RYDER_CUP', {}) or {}
             body['ryder_cup_last'] = _rc.get('last_edition', {})
             body['ryder_cup_next'] = _rc.get('next_edition', {})
+        elif sport == 'football':
+            body['pl_predictions'] = items.get('PL_PREDICTIONS', {})
+            body['pl_fixtures']    = (items.get('PL_FIXTURES', {}) or {}).get('fixtures', [])
+            body['pl_standings']   = (items.get('PL_STANDINGS', {}) or {}).get('standings', [])
+            body['ucl_data']       = items.get('UCL_DATA', {})
+            body['el_data']        = items.get('EL_DATA', {})
         elif sport == 'basketball':
             body['outright'] = (items.get('OUTRIGHT', {}) or {}).get('contenders', [])
             body['standings'] = (items.get('STANDINGS', {}) or {}).get('standings', [])
