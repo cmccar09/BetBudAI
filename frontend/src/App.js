@@ -9,6 +9,8 @@ import RugbyPage from './pages/rugby/RugbyPage';
 import GolfPage from './pages/golf/GolfPage';
 import BasketballPage from './pages/basketball/BasketballPage';
 import NFLPage from './pages/nfl/NFLPage';
+import DartsPage from './pages/darts/DartsPage';
+import GAAPage from './pages/gaa/GAAPage';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL ||
   'https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com';
@@ -842,9 +844,9 @@ function App() {
         {[
           { key:'home',      label:'Home',             emoji:'🏠', sub:'About & sign in',     gated: false, tierRequired: null },
           { key:'picks5',    label:'Daily Picks',      emoji:'🏆', sub:'4+ tips daily — free',       gated: true, tierRequired: 'free' },
-          { key:'punchestown', label: featuredMeetingMeta?.tabLabel || 'Featured Meet', emoji:'🐎', sub: featuredMeetingMeta?.subLabel || '2 watchlist selections', gated: false, tierRequired: null },
           { key:'laythe',    label:'Favourite Watch',      emoji:'🚫', sub:'Vulnerable Favorites', gated: true, tierRequired: 'vip' },
-          { key:'majors',    label:'Major Races',      emoji:'🏆', sub:'Ante-post + previews — free', gated: true, tierRequired: 'free' },
+          { key:'darts',     label:'Darts',            emoji:'🎯', sub:'PDC majors — free',           gated: true, tierRequired: 'free' },
+          { key:'gaa',       label:'GAA',              emoji:'🏐', sub:'Club championships — free',   gated: true, tierRequired: 'free' },
           { key:'football',  label:'Football',          emoji:'⚽', sub:'PL · UCL · EL predictions — free', gated: true, tierRequired: 'free' },
           { key:'wimbledon', label:'Pro Tennis',       emoji:'🎾', sub:'Live predictions — free',    gated: true, tierRequired: 'free' },
           { key:'tourdefrance', label:'Pro Cycling',   emoji:'🚴', sub:'Stage predictions — free',  gated: true, tierRequired: 'free' },
@@ -916,7 +918,8 @@ function App() {
             { key:'picks',    tierRequired: 'free', component: () => <Top5PicksView /> },
             { key:'picks5',   tierRequired: 'free', component: () => <Top5PicksView /> },
             { key:'laythe',   tierRequired: 'vip', component: () => <LayTheFavView /> },
-            { key:'majors',   tierRequired: 'free', component: () => <MajorRacesView /> },
+            { key:'darts',    tierRequired: 'free', component: () => <DartsPage /> },
+            { key:'gaa',      tierRequired: 'free', component: () => <GAAPage /> },
             { key:'football', tierRequired: 'free', component: () => <FootballPage /> },
             { key:'wimbledon', tierRequired: 'free', component: () => <WimbledonPage /> },
             { key:'tourdefrance', tierRequired: 'free', component: () => <TourDeFrancePage /> },
