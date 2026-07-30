@@ -6377,48 +6377,49 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
           setYesterdayPicks(Array.isArray(yesterdayData.picks) ? yesterdayData.picks : []);
           setYesterdayDate(yesterdayData.date || '');
         }
-        if (featuredData?.success && featuredData.races && featuredData.races.length > 0) {
-          // Build featured snapshot - need to check individual race runners
-          const featuredRaces = featuredData.races || [];
-          const toFrac = (d) => { if (!d || d <= 1) return String(d); const n = Math.round((d - 1) * 4); const den = 4; const gcd = (a, b) => b === 0 ? a : gcd(b, a % b); const g = gcd(n, den); return `${n/g}/${den/g}`; };
+        // Build snapshot from all winners today or yesterday (any course)
+        {
+          const toFrac = (d) => {
+            if (!d || d <= 1) return String(d);
+            const n = Math.round((d - 1) * 4); const den = 4;
+            const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+            const g = gcd(n, den); return `${n/g}/${den/g}`;
+          };
+          const extractWinners = (picks) =>
+            (picks || [])
+              .filter(p => ['win','won'].includes((p.outcome || '').toLowerCase()) && p.show_in_ui !== false)
+              .map(p => ({
+                horse:   p.horse || p.horse_name || '?',
+                odds:    p.odds || (p.sp_odds ? toFrac(p.sp_odds) : '?'),
+                decimal: parseFloat(p.sp_odds || p.decimal_odds || 0),
+                course:  p.course || '?',
+              }));
 
-          // Find winning picks from race runners
-          const winningPicks = [];
-          const placedPicks = [];
-          let totalSettled = 0;
+          const todayWinners     = extractWinners(todayData?.picks);
+          const yesterdayWinners = extractWinners(yesterdayData?.picks);
+          const displayWinners   = todayWinners.length > 0 ? todayWinners : yesterdayWinners;
+          const displayDate      = todayWinners.length > 0
+            ? (todayData?.date || todayDate)
+            : (yesterdayData?.date || yesterdayDateStr);
+          const settledToday = (todayData?.picks || [])
+            .filter(p => p.show_in_ui !== false && p.outcome && p.outcome !== 'pending').length;
+          const settledYest  = (yesterdayData?.summary?.wins || 0) + (yesterdayData?.summary?.losses || 0);
+          const displayTotal = Math.max(
+            todayWinners.length > 0 ? settledToday : settledYest,
+            displayWinners.length
+          );
 
-          for (const race of featuredRaces) {
-            if (race.runners && Array.isArray(race.runners)) {
-              for (const runner of race.runners) {
-                if (runner.rank === 1 && runner.outcome) { // This is our pick
-                  totalSettled++;
-                  if (runner.outcome.toLowerCase() === 'win') {
-                    winningPicks.push({ ...runner, race_time: race.time_user, course: race.course });
-                  } else if (runner.outcome.toLowerCase() === 'placed') {
-                    placedPicks.push({ ...runner, race_time: race.time_user, course: race.course });
-                  }
-                  break; // Only one pick per race
-                }
-              }
-            }
-          }
-
-          // Get best winner by odds
-          const bestWinner = winningPicks.length > 0
-            ? winningPicks.reduce((max, r) => (r.odds || 0) > (max.odds || 0) ? r : max, winningPicks[0])
-            : null;
-
-          // Always show snapshot if there are results
-          if (totalSettled > 0 && bestWinner) {
+          if (displayWinners.length > 0) {
+            const best = displayWinners.reduce((m, w) => (w.decimal || 0) > (m.decimal || 0) ? w : m, displayWinners[0]);
             setFeaturedSnapshot({
-              horse: bestWinner.horse,
-              odds: toFrac(bestWinner.odds),
-              isWinner: true,
-              winners: winningPicks.length,
-              placed: placedPicks.length,
-              total: totalSettled,
-              course: featuredData.course || 'Featured Meet',
-              date: featuredData.date || yesterdayDateStr
+              horse:       best.horse,
+              odds:        best.odds,
+              isWinner:    true,
+              allWinners:  displayWinners,
+              winners:     displayWinners.length,
+              total:       displayTotal,
+              course:      [...new Set(displayWinners.map(w => w.course))].join(' · '),
+              date:        displayDate,
             });
           }
         }
@@ -6646,39 +6647,43 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
               </span>
             </div>
             <div style={{ fontSize: isMobile ? '48px' : '56px', textAlign: 'center', marginBottom: '8px' }}>🏇</div>
-            {/* Yesterday's 4 winners — Jun 28 */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', marginBottom: '14px' }}>
-              {[
-                { horse: 'Flying Ace',      odds: '4/6',  course: 'Uttoxeter' },
-                { horse: 'Newtown Rambler', odds: '6/4',  course: 'Uttoxeter' },
-                { horse: 'Purview',         odds: '5/6',  course: 'Curragh'   },
-                { horse: 'King Of Earth',   odds: '4/1',  course: 'Curragh'   },
-              ].map(w => (
-                <div key={w.horse} style={{
-                  background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)',
-                  borderRadius: '8px', padding: '6px 12px', textAlign: 'center'
-                }}>
-                  <div style={{ fontSize: '11px', color: '#6ee7b7', fontWeight: 700 }}>✅ WON</div>
-                  <div style={{ fontSize: '14px', fontWeight: 900, color: '#fbbf24' }}>{w.horse}</div>
-                  <div style={{ fontSize: '12px', color: '#34d399', fontWeight: 700 }}>{w.odds}</div>
-                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)' }}>{w.course}</div>
-                </div>
-              ))}
-            </div>
-            <div style={{
-              color: 'rgba(255,255,255,0.95)',
-              fontSize: isMobile ? '16px' : '18px',
-              fontWeight: '700',
-              textAlign: 'center',
-            }}>
-              <span style={{ color: '#fbbf24', fontWeight: '900', fontSize: '22px' }}>4 from 4</span>
-              {' · '}
-              <span style={{ color: '#34d399' }}>100% strike rate</span>
-            </div>
-            <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginTop: '6px' }}>
-              4-fold accumulator returned <span style={{ color: '#fbbf24', fontWeight: 700 }}>44× stake</span>
-            </div>
-            <div style={{ fontSize: isMobile ? '14px' : '16px', textAlign: 'center', marginTop: '12px' }}>🔥🔥🔥</div>
+            {/* Dynamic winners — pulled from today/yesterday results */}
+            {(() => {
+              const ws    = featuredSnapshot.allWinners || [{ horse: featuredSnapshot.horse, odds: featuredSnapshot.odds, course: featuredSnapshot.course }];
+              const total = featuredSnapshot.total || ws.length;
+              const pct   = total > 0 ? Math.round(ws.length / total * 100) : 100;
+              const parseFrac = s => { const m = String(s||'').match(/^(\d+)\/(\d+)$/); return m ? parseInt(m[1])/parseInt(m[2])+1 : (parseFloat(s)||1); };
+              const acca  = ws.reduce((acc, w) => acc * parseFrac(w.odds), 1);
+              return (
+                <>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', marginBottom: '14px' }}>
+                    {ws.slice(0, 6).map(w => (
+                      <div key={w.horse} style={{
+                        background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)',
+                        borderRadius: '8px', padding: '6px 12px', textAlign: 'center'
+                      }}>
+                        <div style={{ fontSize: '11px', color: '#6ee7b7', fontWeight: 700 }}>✅ WON</div>
+                        <div style={{ fontSize: '14px', fontWeight: 900, color: '#fbbf24' }}>{w.horse}</div>
+                        <div style={{ fontSize: '12px', color: '#34d399', fontWeight: 700 }}>{w.odds}</div>
+                        <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)' }}>{w.course}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ color: 'rgba(255,255,255,0.95)', fontSize: isMobile ? '16px' : '18px', fontWeight: '700', textAlign: 'center' }}>
+                    <span style={{ color: '#fbbf24', fontWeight: '900', fontSize: '22px' }}>{ws.length} from {total}</span>
+                    {' · '}
+                    <span style={{ color: '#34d399' }}>{pct}% strike rate</span>
+                  </div>
+                  {ws.length >= 2 && (
+                    <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginTop: '6px' }}>
+                      {ws.length}-fold accumulator returned{' '}
+                      <span style={{ color: '#fbbf24', fontWeight: 700 }}>{Math.round(acca)}× stake</span>
+                    </div>
+                  )}
+                  <div style={{ fontSize: isMobile ? '14px' : '16px', textAlign: 'center', marginTop: '12px' }}>🔥🔥🔥</div>
+                </>
+              );
+            })()}
           </div>
         )}
 
