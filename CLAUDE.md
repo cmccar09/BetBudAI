@@ -19,6 +19,14 @@ You combine:
 - Learning from results: every winner we missed and every loser we backed is feedback — analyse it
 - Commercial instinct: subscribers are paying for picks that win, not explanations for why data was missing
 
+## The site's goal (set 2026-07-22)
+
+Two things matter above everything else: **find winners, and grow subscribers — target 100,000.**
+Picks quality and subscriber growth aren't in tension; they're the same goal seen from two angles.
+Winners are the product; subscribers are the proof it's working. See the `subscriptions` skill
+(`.claude/skills/subscriptions.md`) for the funnel architecture, known leaks, and what to check or
+build next whenever a change touches sign-up, trial, retention, or analytics.
+
 ## Core selection philosophy
 
 **Never make picks with incomplete data.** Form enrichment must complete before the scoring engine runs its selection pass. If coverage is below 25%, retry. If it's still low, flag it loudly — don't silently produce low-confidence picks.
@@ -120,10 +128,20 @@ If any are red, the pick is flagged as low-confidence — still shown but with a
 ## Business model (updated 2026-07-01)
 
 **Free for all — one paid add-on:**
-- All content (horse racing picks, Pro Tennis, Pro Cycling, Rugby, Pro Golf, World Cup, Major Races) is **free** with a registered account (no card required)
+- All content (horse racing picks, Pro Tennis, Pro Cycling, Rugby, Pro Golf, World Cup, Darts) is **free** with a registered account (no card required)
 - **Favourite Watch** (VIP tier) = **€9.99/mo** — the only paid feature: vulnerable favourite alerts + Betfair lay signals
 - Stripe: use `STRIPE_PRICE_PREMIUM` (€9.99 product) for ALL paid signups. `STRIPE_PRICE_VIP` is now aliased to the same price — do not use a separate VIP price ID.
 - Goal: maximize free signups (build user base / data asset), monetise the exchange-betting niche with the lay product
+
+## Subscriptions, trial funnel and analytics (added 2026-07-22)
+
+Full detail lives in the `subscriptions` skill (`.claude/skills/subscriptions.md`) — summary here:
+
+- **Funnel**: register → `trialing` (3-day no-card trial, `trial_end_timestamp` set at signup) → either upgrade to paid (Stripe) or hit `SubscribeFreeGate` and click "Subscribe for Free" (`POST /api/subscribe-free`) to become `free_subscriber` permanently. Anyone who lets the trial lapse without clicking through is blocked until they do.
+- **`trial-reminder-emailer` Lambda** (new 2026-07-22): daily EventBridge rule `BetBudAI-TrialReminder-Daily` (`cron(0 9 * * ? *)`) emails anyone whose trial ends within 24 hours and hasn't been reminded yet (`trial_reminder_sent` flag prevents duplicates). Source: `trial_reminder_emailer.py`, deployed standalone (not zipped with anything else), reuses `BettingPicksAPIRole`.
+- **`GET /api/admin/analytics`** (built 2026-07-22, credential fixed same day): serves the admin panel's Site Analytics tab from the GA4 Data API. Originally built against the stored `authorized_user` OAuth refresh-token credential, which turned out to be dead (`invalid_grant`) — replaced with proper service-account JWT auth (`analytics-data-sa@betbudai-ga4-sa.iam.gserviceaccount.com`, RS256-signed via the `rsa`/`pyasn1` packages in the `ga4-jwt-deps` layer). **Confirmed working end-to-end 2026-07-22** — live test returned real numbers (18 active users / 60 sessions / 191 pageviews, last 7 days). Full setup/rotation/troubleshooting steps: `.claude/skills/ga4-analytics-setup.md`.
+- **SES is still in sandbox mode**, production access denied (case 177585279500302) — confirmed 2026-07-22. Only 4 identities are verified recipients (`betbudai.com`, `barbara.anders@gmail.com`, `dryanfitness@gmail.com`, `charles.mccarthy@gmail.com`), so **the trial reminder email (and any other transactional email to a real subscriber) will not actually be delivered** until SES production access is granted. Re-apply with an updated use-case description if adding more lifecycle emails, since the current approved description says "transactional only... no marketing or bulk email."
+- **`ga4-jwt-deps` Lambda layer**: published 2026-07-22 while investigating the GA4 credential (pure-Python `rsa`+`pyasn1`, in case service-account JWT signing was ever needed). Turned out unnecessary once the credential was found to be an OAuth refresh token, not a service-account key — left attached to both API Lambdas since it's small and harmless, not because it's used.
 
 ## Multi-sport pages (added 2026-06-30 to 2026-07-01)
 
@@ -136,8 +154,19 @@ If any are red, the pick is flagged as low-confidence — still shown but with a
 | Rugby (Nations Championship) | `rugby` | `frontend/src/pages/rugby/RugbyPage.jsx` | 🏉 Rugby |
 | Golf Majors / Pro Golf | `golf` | `frontend/src/pages/golf/GolfPage.jsx` | ⛳ Pro Golf |
 | World Cup 2026 | `worldcup` | `frontend/src/pages/worldcup/WorldCupPage.jsx` | ⚽ World Cup |
+| Darts (PDC majors) | `darts` | `frontend/src/pages/darts/DartsPage.jsx` | 🎯 Darts |
+| Cork GAA (club championships) | `gaa` | `frontend/src/pages/gaa/GAAPage.jsx` | 🏐 Cork GAA |
 
 All sport tabs are **free tier** (only require account login, no payment). Only `Favourite Watch` requires VIP payment.
+
+**2026-07-27**: added the `gaa` tab — Cork club championships, hurling and football, all confirmed
+grades. Unlike every other sport page, there's no structured API/odds market for this data — see
+`.claude/skills/gaa-page.md` for why tips are analysis-based (not odds-driven) and mostly marked
+"insufficient data" outside Premier Senior Hurling/Football. **Not yet deployed**: no `gaa-scraper`
+Lambda, not in the Step Functions fan-out, frontend not rebuilt — confirm with the user before
+running those steps.
+
+**2026-07-22**: the `darts` tab replaced the `majors` (Major Races) tab in the public nav bar and route table in `App.js` — `MajorRacesView` and `MAJOR_RACES` still exist in the codebase (used by the separate admin "Major Races AI" section) but are no longer reachable from the public tab bar.
 
 ### Sport data scrapers (all at repo root)
 | File | Lambda name | What it scrapes |
@@ -146,6 +175,8 @@ All sport tabs are **free tier** (only require account login, no payment). Only 
 | `tour_de_france_scraper.py` | `tour-de-france-scraper` | Stage schedule (static), procyclingstats.com stage results, Betfair outright |
 | `rugby_scraper.py` | `rugby-scraper` | BBC Sport `__INITIAL_DATA__` — Nations Championship results, try scorers, venue; Betfair outright |
 | `golf_scraper.py` | `golf-scraper` | ESPN golf API — major leaderboards with round-by-round scores; Betfair outright |
+| `darts_scraper.py` | `darts-scraper` (**not yet deployed** — code written 2026-07-22, Lambda/Step Functions provisioning pending) | Static PDC major tournament schedule (verified 2026-07-22); Betfair outright WINNER market for the next/live major; leg-score predictions for confirmed live fixtures |
+| `gaa_scraper.py` | `gaa-scraper` (**not yet deployed** — code written 2026-07-27, Lambda/Step Functions provisioning pending) | Static, manually-verified Cork club championship data (both codes, all confirmed grades); best-effort Betfair outright attempt (usually empty — no reliable market for this level); analysis-based division-winner tips, honest about low confidence outside Premier Senior Hurling/Football |
 
 ### DynamoDB: BetBudAI_Sports
 New table added for all sport pages. PK = `sport`, SK = `data_key`.
@@ -154,6 +185,7 @@ PK 'wimbledon'     → MATCHES, OUTRIGHT_MEN, OUTRIGHT_WOMEN, HISTORY, TIPS
 PK 'tourdefrance'  → SCHEDULE, RESULTS, OUTRIGHT, HISTORY, TEAMS, SPECIALISTS, TIPS
 PK 'rugby'         → FIXTURES, RESULTS, OUTRIGHT, HISTORY, TIPS, RWC_2027
 PK 'golf'          → MAJORS, OUTRIGHT, HISTORY, TIPS, RYDER_CUP
+PK 'darts'         → TOURNAMENTS, OUTRIGHT, HISTORY, TIPS, META
 ```
 
 ### Step Functions: Sports fan-out
@@ -180,6 +212,7 @@ All served by `BettingPicksAPI` (`backend/api/lambda_function.py`):
 - `GET /api/sports/tourdefrance` — Pro Cycling data
 - `GET /api/sports/rugby` — Rugby data (Nations Championship + RWC 2027)
 - `GET /api/sports/golf` — Pro Golf data (majors, Ryder Cup)
+- `GET /api/sports/darts` — Darts data (PDC major tournaments, outright odds, live-fixture predictions)
 - `GET /api/picks/extended` — Extended daily picks (top 5 by score, any odds, beyond main UI picks)
 
 ## Environment

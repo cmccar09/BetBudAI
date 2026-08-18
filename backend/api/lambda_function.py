@@ -423,6 +423,12 @@ def lambda_handler(event, context):
             response = get_sport_data(headers, 'basketball')
         elif 'sports/nfl' in path and method == 'GET':
             response = get_sport_data(headers, 'nfl')
+        elif 'sports/darts' in path and method == 'GET':
+            response = get_sport_data(headers, 'darts')
+        elif 'sports/gaa' in path and method == 'GET':
+            response = get_sport_data(headers, 'gaa')
+        elif 'admin/analytics' in path and method == 'GET':
+            response = get_admin_analytics(headers, event)
         elif 'picks/yesterday' in path:
             response = get_yesterday_picks(headers)
         elif 'picks/analysis-quality' in path:
@@ -1830,6 +1836,13 @@ def get_sport_data(headers, sport):
             body['games_today'] = (items.get('SCOREBOARD', {}) or {}).get('games', [])
             body['superbowl_history'] = (items.get('HISTORY', {}) or {}).get('superbowl_history', [])
             body['tip'] = {k: v for k, v in (items.get('TIPS', {}) or {}).items() if k != 'updated_at'}
+        elif sport == 'darts':
+            body['tournaments'] = (items.get('TOURNAMENTS', {}) or {}).get('tournaments', [])
+            body['outright'] = (items.get('OUTRIGHT', {}) or {}).get('contenders', [])
+            body['outright_tournament'] = (items.get('OUTRIGHT', {}) or {}).get('tournament', '')
+            body['recent_winners'] = (items.get('HISTORY', {}) or {}).get('recent_winners', [])
+            body['live_fixtures'] = (items.get('TIPS', {}) or {}).get('live_fixtures', [])
+            body['predictions'] = (items.get('TIPS', {}) or {}).get('predictions', [])
         else:
             # Generic fallback for future sports — return all data_key payloads as-is
             body['data'] = {k: v for k, v in items.items() if k != 'META'}
@@ -1900,6 +1913,182 @@ def get_yesterday_picks(headers):
             'date': yesterday
         })
     }
+
+
+def _b64url(data: bytes) -> str:
+    import base64
+    return base64.urlsafe_b64encode(data).rstrip(b'=').decode('ascii')
+
+
+def _pkcs8_pem_to_pkcs1_der(pem: str) -> bytes:
+    """Google service-account keys are PKCS#8 PEM ('BEGIN PRIVATE KEY'). The
+    pure-python `rsa` package (from the ga4-jwt-deps layer) only loads PKCS#1
+    ('BEGIN RSA PRIVATE KEY'), so unwrap the PKCS#8 envelope with pyasn1's
+    generic DER decoder and pull out the embedded PKCS#1 OCTET STRING."""
+    import base64
+    from pyasn1.codec.der import decoder as _der_decoder
+    b64 = ''.join(line for line in pem.strip().splitlines() if not line.startswith('-----'))
+    pkcs8_der = base64.b64decode(b64)
+    decoded, _ = _der_decoder.decode(pkcs8_der)
+    return bytes(decoded[2])  # PrivateKeyInfo ::= SEQUENCE { version, algorithm, privateKey OCTET STRING }
+
+
+def _ga4_get_access_token():
+    """Get a short-lived GA4 Data API access token from the stored credential
+    (Secrets Manager: ga4-service-account). Supports two credential shapes:
+      - 'service_account' (current, since 2026-07-22): signs a JWT (RS256, via
+        the pure-python `rsa` package) and exchanges it via the RFC 7523
+        JWT-bearer flow. No consent screen, doesn't expire from inactivity.
+      - 'authorized_user' (legacy OAuth refresh-token) — kept as a fallback
+        in case the secret ever reverts to that shape.
+    """
+    import time
+    import urllib.request as _ur
+    import urllib.parse as _up
+    secrets_client = boto3.client('secretsmanager', region_name='eu-west-1')
+    secret = json.loads(secrets_client.get_secret_value(SecretId='ga4-service-account')['SecretString'])
+    token_uri = secret.get('token_uri', 'https://oauth2.googleapis.com/token')
+
+    if secret.get('type') == 'service_account':
+        import rsa
+        now = int(time.time())
+        header = {'alg': 'RS256', 'typ': 'JWT'}
+        claims = {
+            'iss': secret['client_email'],
+            'scope': 'https://www.googleapis.com/auth/analytics.readonly',
+            'aud': token_uri,
+            'iat': now,
+            'exp': now + 3600,
+        }
+        signing_input = (
+            f"{_b64url(json.dumps(header, separators=(',', ':')).encode())}."
+            f"{_b64url(json.dumps(claims, separators=(',', ':')).encode())}"
+        )
+        pkcs1_der = _pkcs8_pem_to_pkcs1_der(secret['private_key'])
+        priv_key = rsa.PrivateKey.load_pkcs1(pkcs1_der, format='DER')
+        signature = rsa.sign(signing_input.encode('ascii'), priv_key, 'SHA-256')
+        assertion = f'{signing_input}.{_b64url(signature)}'
+
+        data = _up.urlencode({
+            'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'assertion': assertion,
+        }).encode('utf-8')
+    else:
+        data = _up.urlencode({
+            'client_id': secret['client_id'],
+            'client_secret': secret['client_secret'],
+            'refresh_token': secret['refresh_token'],
+            'grant_type': 'refresh_token',
+        }).encode('utf-8')
+
+    req = _ur.Request(token_uri, data=data, method='POST',
+                       headers={'Content-Type': 'application/x-www-form-urlencoded'})
+    with _ur.urlopen(req, timeout=15) as resp:
+        result = json.loads(resp.read().decode('utf-8'))
+    return result['access_token']
+
+
+def _ga4_run_report(access_token, property_id, start_date, metrics):
+    import urllib.request as _ur
+    url = f'https://analyticsdata.googleapis.com/v1beta/properties/{property_id}:runReport'
+    payload = json.dumps({
+        'dateRanges': [{'startDate': start_date, 'endDate': 'today'}],
+        'metrics': [{'name': m} for m in metrics],
+    }).encode('utf-8')
+    req = _ur.Request(url, data=payload, method='POST', headers={
+        'Authorization': f'Bearer {access_token}', 'Content-Type': 'application/json',
+    })
+    with _ur.urlopen(req, timeout=15) as resp:
+        return json.loads(resp.read().decode('utf-8'))
+
+
+def _ga4_run_event_report(access_token, property_id, start_date):
+    import urllib.request as _ur
+    url = f'https://analyticsdata.googleapis.com/v1beta/properties/{property_id}:runReport'
+    payload = json.dumps({
+        'dateRanges': [{'startDate': start_date, 'endDate': 'today'}],
+        'dimensions': [{'name': 'eventName'}],
+        'metrics': [{'name': 'eventCount'}],
+        'limit': 20,
+    }).encode('utf-8')
+    req = _ur.Request(url, data=payload, method='POST', headers={
+        'Authorization': f'Bearer {access_token}', 'Content-Type': 'application/json',
+    })
+    with _ur.urlopen(req, timeout=15) as resp:
+        return json.loads(resp.read().decode('utf-8'))
+
+
+def _ga4_metrics_from_report(report):
+    names = [h['name'] for h in report.get('metricHeaders', [])]
+    rows = report.get('rows') or []
+    if not rows:
+        return {n: 0 for n in names}
+    values = rows[0].get('metricValues', [])
+    return {n: (values[i]['value'] if i < len(values) else 0) for i, n in enumerate(names)}
+
+
+def get_admin_analytics(headers, event):
+    """GET /api/admin/analytics — GA4 summary for the admin panel. Admin-only.
+    Shape matches what frontend/src/App.js's Site Analytics tab expects:
+    { success, configured, summary: { last_7_days, last_30_days, events_last_7_days },
+      credential_source, property_id } or { success, configured: false, message }.
+    """
+    raw_headers = event.get('headers', {}) or {}
+    admin_token = raw_headers.get('x-admin-token', '') or raw_headers.get('X-Admin-Token', '')
+    if not admin_token:
+        return {'statusCode': 403, 'headers': headers, 'body': json.dumps({'success': False, 'error': 'Admin auth required'})}
+    sess_key = f'__session__{admin_token}'
+    sess = subscribers_table.get_item(Key={'email': sess_key}).get('Item')
+    if not sess or sess.get('role') != 'admin':
+        return {'statusCode': 403, 'headers': headers, 'body': json.dumps({'success': False, 'error': 'Admin auth required'})}
+
+    property_id = os.environ.get('GA4_PROPERTY_ID', '537650672')
+
+    try:
+        access_token = _ga4_get_access_token()
+    except Exception as e:
+        print(f'[ga4] token exchange failed: {e}')
+        return {'statusCode': 200, 'headers': headers, 'body': json.dumps({
+            'success': True, 'configured': False, 'message': f'GA4 credentials not usable: {e}',
+        })}
+
+    try:
+        r7 = _ga4_run_report(access_token, property_id, '7daysAgo', ['activeUsers', 'sessions', 'screenPageViews'])
+        r30 = _ga4_run_report(access_token, property_id, '30daysAgo', ['activeUsers', 'sessions'])
+        revents = _ga4_run_event_report(access_token, property_id, '7daysAgo')
+
+        last_7 = _ga4_metrics_from_report(r7)
+        last_30 = _ga4_metrics_from_report(r30)
+
+        events_7d = {}
+        for row in (revents.get('rows') or []):
+            name = row['dimensionValues'][0]['value']
+            count = row['metricValues'][0]['value']
+            events_7d[name] = int(count)
+
+        summary = {
+            'last_7_days': {
+                'activeUsers': int(last_7.get('activeUsers', 0) or 0),
+                'sessions': int(last_7.get('sessions', 0) or 0),
+                'screenPageViews': int(last_7.get('screenPageViews', 0) or 0),
+            },
+            'last_30_days': {
+                'activeUsers': int(last_30.get('activeUsers', 0) or 0),
+                'sessions': int(last_30.get('sessions', 0) or 0),
+            },
+            'events_last_7_days': events_7d,
+        }
+
+        return {'statusCode': 200, 'headers': headers, 'body': json.dumps({
+            'success': True, 'configured': True, 'summary': summary,
+            'credential_source': 'secretsmanager:ga4-service-account',
+            'property_id': property_id,
+        })}
+    except Exception as e:
+        print(f'[ga4] report fetch failed: {e}')
+        return {'statusCode': 200, 'headers': headers, 'body': json.dumps({
+            'success': True, 'configured': False, 'message': f'GA4 report request failed: {e}',
+        })}
 
 
 def get_health(headers):
@@ -5592,10 +5781,20 @@ def _lay_profit_pts(fav_odds, outcome, stake=_LAY_STAKE_PTS, commission=_LAY_COM
 
 
 def _build_daily_lay_snapshot(day, rows, generated_iso):
-    # Only count races that scored 4+ — these are the actionable candidates shown to users
-    candidates = [r for r in rows if float(r.get('lay_score') or 0) >= 4]
-    settled = [r for r in candidates if _normalise_fav_outcome(r.get('outcome')) in ('win', 'loss')]
-    fav_lost = [r for r in settled if _normalise_fav_outcome(r.get('outcome')) == 'loss']
+    # Track three tiers separately so the history table shows meaningful signal quality.
+    # "Selected" (shown in the history table) = 7+ (Strong Lay), not 4+ (Caution),
+    # because 4+ selects virtually every race and makes the lay_win_pct meaningless.
+    all_candidates = [r for r in rows if float(r.get('lay_score') or 0) >= 4]
+    strong         = [r for r in rows if float(r.get('lay_score') or 0) >= 7]
+    premium        = [r for r in rows if float(r.get('lay_score') or 0) >= 10]
+
+    # Settled = settled strong-lay candidates only (the signal we actually act on)
+    settled   = [r for r in strong if _normalise_fav_outcome(r.get('outcome')) in ('win', 'loss')]
+    fav_lost  = [r for r in settled if _normalise_fav_outcome(r.get('outcome')) == 'loss']
+
+    # Also track premium-tier stats separately
+    settled_p  = [r for r in premium if _normalise_fav_outcome(r.get('outcome')) in ('win', 'loss')]
+    fav_lost_p = [r for r in settled_p if _normalise_fav_outcome(r.get('outcome')) == 'loss']
 
     races_settled = []
     day_profit_pts = 0.0
@@ -5617,13 +5816,18 @@ def _build_daily_lay_snapshot(day, rows, generated_iso):
 
     summary = {
         'date': day,
-        'total': len(candidates),
-        'caution': len(candidates),
-        'strong': len([r for r in candidates if float(r.get('lay_score') or 0) >= 9]),
-        'red_flag': len([r for r in candidates if float(r.get('lay_score') or 0) >= 13]),
-        'settled': len(settled),
+        'total': len(all_candidates),
+        'selected': len(strong),                 # 7+ tier — the meaningful signal threshold
+        'caution': len(all_candidates),          # 4+ (kept for backwards compat)
+        'strong': len(strong),                   # 7+
+        'premium': len(premium),                 # 10+
+        'red_flag': len([r for r in rows if float(r.get('lay_score') or 0) >= 13]),
+        'settled': len(settled),                 # settled within 7+ tier
         'fav_lost': len(fav_lost),
         'lay_win_pct': round((len(fav_lost) / len(settled)) * 100, 1) if settled else None,
+        'premium_settled': len(settled_p),
+        'premium_fav_lost': len(fav_lost_p),
+        'premium_lay_win_pct': round((len(fav_lost_p) / len(settled_p)) * 100, 1) if settled_p else None,
         'profit_pts': round(day_profit_pts, 2),
         'staked_pts': round(len(settled) * _LAY_STAKE_PTS, 2),
     }
@@ -6103,22 +6307,31 @@ def get_favs_run_lambda(headers, event):
         strong    = [r for r in all_results if r['lay_score'] >= 7]
         red_flag  = [r for r in all_results if r['lay_score'] >= 10]
 
-        # ── VIP ROLLERS ELITE LAY FILTER ─────────────────────────────────────
-        # Qualifies when ALL four conditions are met:
-        #   1. Handicap race
-        #   2. Lay score 13+
-        #   3. 8+ runners
-        #   4. Favourite priced below 2/1 (decimal < 3.0)
+        # ── VIP ELITE LAY FILTER ──────────────────────────────────────────────
+        # Data-validated (984 settled races, 2026-08-17):
+        # Only profitable combo at scale: score 13+ AND lay odds 2.0–2.5
+        # → 80 races, 60% win rate, +7.7% ROI.
+        # The 2.5–3.0 band loses −53.92 pts (57% win rate but 1.75× liability).
+        # Handicap / runners requirements removed — the profitable races are non-handicap.
+        LAY_ODDS_MIN  = 2.0   # below this the liability math is fine but vols are low
+        LAY_ODDS_MAX  = 2.5   # above this we cannot break even at observed win rates
         vip_elite = [
             r for r in all_results
             if r.get('lay_score', 0) >= 13
-            and 'handicap' in str(r.get('race_type', '')).lower()
-            and r.get('runners', 0) >= 8
-            and 0 < r.get('fav_odds', 99) < 3.0
+            and LAY_ODDS_MIN <= r.get('fav_odds', 0) < LAY_ODDS_MAX
         ]
 
-        # Lay win % — how often the favourite lost (settled races only)
-        settled   = [r for r in all_results if r.get('outcome') and r['outcome'].lower() in ('win','won','loss','lost')]
+        # strong_capped — 7+ score but capped at LAY_ODDS_MAX (removes the losing 2.5–3.0 band)
+        strong_capped = [
+            r for r in all_results
+            if (r.get('lay_score') or 0) >= 7
+            and r.get('fav_odds', 0) <= LAY_ODDS_MAX
+        ]
+
+        # Lay win % — calculated on the odds-capped 7+ tier.
+        # Un-capped 7+ includes the 2.5–3.0 band which distorts stats heavily downward.
+        strong_results = [r for r in all_results if (r.get('lay_score') or 0) >= 7 and r.get('fav_odds', 0) <= LAY_ODDS_MAX]
+        settled   = [r for r in strong_results if r.get('outcome') and r['outcome'].lower() in ('win','won','loss','lost')]
         fav_lost  = [r for r in settled if r['outcome'].lower() in ('loss','lost')]
         lay_win_pct = round(len(fav_lost) / len(settled) * 100, 1) if settled else None
 
@@ -6126,14 +6339,19 @@ def get_favs_run_lambda(headers, event):
             out = io.StringIO()
             fields = [
                 'date', 'race_time', 'course', 'race_name', 'favourite', 'fav_odds',
-                'fav_sys_score', 'score_gap', 'runners', 'lay_score', 'verdict',
-                'outcome', 'lay_correct', 'our_pick', 'form', 'trainer', 'jockey',
+                'fav_sys_score', 'score_gap', 'runners', 'lay_score', 'tier', 'verdict',
+                'outcome', 'lay_correct', 'profit_pts', 'our_pick', 'form', 'trainer', 'jockey',
                 'flags', 'details',
             ]
             writer = csv.DictWriter(out, fieldnames=fields)
             writer.writeheader()
             for r in all_results:
                 outcome = str(r.get('outcome') or '').lower()
+                _score = float(r.get('lay_score') or 0)
+                _odds  = float(r.get('fav_odds') or 0)
+                _norm  = _normalise_fav_outcome(r.get('outcome'))
+                _pnl   = _lay_profit_pts(_odds, _norm) if outcome in ('win','won','loss','lost') else ''
+                tier   = 'Elite(13+,2.0-2.5)' if (_score >= 13 and 2.0 <= _odds < 2.5) else 'Premium(10+)' if _score >= 10 else 'Strong(7+)' if _score >= 7 else 'Caution(4+)' if _score >= 4 else 'None'
                 writer.writerow({
                     'date': r.get('date', ''),
                     'race_time': r.get('race_time', ''),
@@ -6145,9 +6363,11 @@ def get_favs_run_lambda(headers, event):
                     'score_gap': r.get('score_gap', ''),
                     'runners': r.get('runners', ''),
                     'lay_score': r.get('lay_score', ''),
+                    'tier': tier,
                     'verdict': r.get('verdict', ''),
                     'outcome': r.get('outcome', ''),
-                    'lay_correct': 'yes' if (outcome in ('loss', 'lost') and (r.get('lay_score') or 0) >= 4) else 'no' if outcome in ('win', 'won', 'loss', 'lost') else '',
+                    'lay_correct': 'yes' if (outcome in ('loss', 'lost') and _score >= 7) else 'no' if outcome in ('win', 'won', 'loss', 'lost') else '',
+                    'profit_pts': _pnl,
                     'our_pick': r.get('our_pick', False),
                     'form': r.get('form', ''),
                     'trainer': r.get('trainer', ''),
@@ -6186,12 +6406,15 @@ def get_favs_run_lambda(headers, event):
             'body': json.dumps({
                 'success':   True,
                 'generated': datetime.now().isoformat(),
-                'summary':   {'total': len(all_results), 'caution': len(caution), 'strong': len(strong), 'red_flag': len(red_flag),
+                'summary':   {'total': len(all_results), 'caution': len(caution), 'strong': len(strong),
+                              'strong_capped': len(strong_capped), 'red_flag': len(red_flag),
                               'settled': len(settled), 'fav_lost': len(fav_lost), 'lay_win_pct': lay_win_pct,
-                              'vip_elite_count': len(vip_elite)},
+                              'vip_elite_count': len(vip_elite),
+                              'odds_min': LAY_ODDS_MIN, 'odds_max': LAY_ODDS_MAX},
                 'csv_url':   f'/api/favs-run?date={target_date}&days={days}&format=csv',
                 'races':     all_results,
                 'vip_elite': vip_elite,
+                'strong_capped': strong_capped,
                 'history_days': history_days,
                 'history_summary': history_summary,
             }, default=str)

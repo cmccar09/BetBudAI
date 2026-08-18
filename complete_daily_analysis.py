@@ -800,6 +800,31 @@ def analyze_and_save_all(force_reanalyse: bool = False):
                 breakdown['final_score_cap'] = -_fsc_reduction
                 reasons.append(f"Final cap {_FINAL_SCORE_CAP}pts (post-enrichment was {score + _fsc_reduction:.0f}): -{_fsc_reduction:.0f}pts")
 
+            # ── Learning signal adjustment ───────────────────────────────────
+            # Apply odds-category and venue signals from the nightly learning cycle.
+            # _learning_odds_roi / _learning_best_courses are loaded at STAGE 0.
+            if odds > 1.0:
+                _odds_cat = ('favorite' if odds <= 3.0 else
+                             'mid_price' if odds <= 6.0 else
+                             'outsider' if odds <= 12.0 else 'longshot')
+                _cat_data = _learning_odds_roi.get(_odds_cat, {})
+                if _cat_data.get('n', 0) >= 5:
+                    _cat_roi = float(_cat_data.get('roi', 0))
+                    if _cat_roi < -10:
+                        score = max(score - 5, 0)
+                        breakdown['learning_odds'] = -5
+                        reasons.append(
+                            f"Learning: {_odds_cat} ROI {_cat_roi:+.1f}% over {_cat_data['n']} bets: -5pts")
+                    elif _cat_roi > 10:
+                        score += 5
+                        breakdown['learning_odds'] = 5
+                        reasons.append(
+                            f"Learning: {_odds_cat} ROI {_cat_roi:+.1f}% over {_cat_data['n']} bets: +5pts")
+            if venue in _learning_best_courses:
+                score += 8
+                breakdown['learning_venue'] = 8
+                reasons.append(f"Learning: {venue} best-performing venue: +8pts")
+
             # Track this race's market favourite so divergence check can run after selection
             if odds > 1.0 and odds == favourite_odds:
                 _race_fav_score = score
@@ -842,6 +867,10 @@ def analyze_and_save_all(force_reanalyse: bool = False):
                 'analysis_type':       'comprehensive_7factor',
                 'score_breakdown':     breakdown,
                 'selection_reasons':   reasons,
+                'tags':                ','.join(
+                    k.upper() for k, v in breakdown.items()
+                    if isinstance(v, (int, float)) and v > 0
+                ),
                 'sport':               'horses',
                 'race_type':           _classify_race_type(market_name),
                 'outcome':             'pending',
@@ -939,8 +968,11 @@ def analyze_and_save_all(force_reanalyse: bool = False):
         'Novice Hurdle', 'Novice Chase', 'Hurdle', 'Chase', 'Flat',
     }
     # Rule 2 — odds window where we actually win (data: 66.7% WR in 2.0-3.5 band)
+    # Weekend (Sat/Sun): keep tight 2.8 ceiling — higher card volume means we can be selective.
+    # Weekday: widen to 3.5 — thin non-handicap fields rarely have a horse in the 2.0-2.8 band.
     _ODDS_MIN = 2.0
-    _ODDS_MAX = 2.8  # 2026-06-25: tightened from 3.5 — 2.5-3.5 band showed 18% WR vs 36% at 2.0-2.5
+    _is_weekend = now_utc.weekday() >= 5
+    _ODDS_MAX = 2.8 if _is_weekend else 3.5
     # Rule 3 — signal count: at least 2 meaningful signals must fire
     _KEY_SIGNALS = ('market_leader', 'deep_form', 'going_suitability',
                     'price_steam', 'trainer_reputation', 'cd_bonus', 'jockey_quality')

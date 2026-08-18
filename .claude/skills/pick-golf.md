@@ -312,4 +312,59 @@ YESTERDAY'S ROUND RECAP
 - Ryder Cup context: note any Ryder Cup 2027 (Adare Manor, Ireland) implications for European players — motivated players perform differently in pressure tournaments.
 - If a major has ended, pivot to "next major preview" using the MAJORS schedule from golf_scraper.py.
 - Flag any weather disruption (wind > 25mph at links = scoring chaos, back low scorers not long hitters).
-- **Royal Birkdale 2026 (The Open, July 16-19)**: current pre-tournament picks — Fleetwood EW @25/1 (Liverpool native, links mastery, 8/10 signals HIGH FIT), McIlroy @5/1 (links born-and-bred, home course motivation, 10/10 signals HIGH FIT). McIlroy is a banker at any price > 6/1. Fleetwood EW is the value angle at 25/1.
+
+---
+
+## Section F — 3-Tier Bet Structure
+
+Every major update should output three bets across the odds spectrum. This gives subscribers options at every stake level and satisfies the EW value goal (20/1+) automatically.
+
+| Tier | Odds range | Selection type | Goal |
+|---|---|---|---|
+| 🔵 SHORT | < 10/1 | Class player, within striking distance | Anchor — wins ~1 in 5 backed at these odds |
+| 🟡 MEDIUM | 10/1–25/1 | Contender with course-fit edge | Value — back when links signals present |
+| 🔴 LONG | 25/1+ | Course specialist or in-form outsider ignored by market | Satisfies 20/1+ EW goal; one hit pays the season |
+
+**When to apply:**
+- After R1: issue all 3 based on leaderboard + Betfair OUTRIGHT data
+- After R2/cut: reassess. Any player who missed cut → CLOSE. Leaders who are major-less → caution on SHORT
+- R3/R4: SHORT tier becomes strongest signal (proven closers near the lead)
+
+**Formatting (for DynamoDB `round_predictions` cards):**
+```
+prediction: "🔵 SHORT ODDS WIN: [Player] @ [decimal] ([fractional])"
+reason: "[1–2 lines: why this player wins from here — form, class, course fit, position]"
+```
+
+---
+
+## Royal Birkdale 2026 — R2 State (July 17)
+
+**Leaderboard (after R2):** Wallace/Suber/Coody co-lead at -5 · Scheffler -2 (T14) · Fleetwood -1 (T26) · McIlroy +2 · Spieth +3
+
+**Betfair OUTRIGHT (live):** Scheffler 7.2 · Young 11.5 · MacIntyre 16.5 · Morikawa 17.5 · Fleetwood 19.5
+
+**BetBud 3-tier picks:**
+
+🔵 **SHORT: Scheffler @ 7.2 (13/2)**
+- World #1, -2 after R1, 3 shots off pace — class over 72 holes
+- Drifted from 3.85 pre-tournament = value built in
+- Two majors in 18 months; best iron player in the world
+- Pick status: ⏳ IN PLAY — needs R3 charge
+
+🟡 **MEDIUM: MacIntyre @ 16.5 (16/1)**
+- Scottish links specialist at -3, top 10 after R1
+- Won 2024 Scottish Open, flights irons low, scrambles from pot bunkers
+- Best-value Betfair contender — proper pedigree, fair price
+- Pick status: ✅ WELL PLACED — in the mix
+
+🔴 **LONG: Matt Wallace @ est. 50/1+**
+- Current co-leader at -5; fired 66 in R2 — best form in the field
+- English links feel, European Tour winner
+- Not in Betfair top 5 → big odds despite leading
+- Pick status: ✅ CO-LEADER — dream position
+
+**Pre-tournament picks (learning log):**
+- McIlroy WIN @ 11/1 ❌ — at +2, missed cut danger. Links motivation didn't translate to form this week
+- Fleetwood EW @ 14/1 ✅ — at -1, inside cut, in the money
+- Spieth EW ❌ — at +3, cut endangered. 2017 magic not repeating

@@ -49,18 +49,18 @@ FALLBACK_OUTRIGHT_WOMEN = [
 
 # Wimbledon champions, last 5 years — static reference data.
 PREVIOUS_CHAMPIONS_MEN = [
+    {'year': 2026, 'winner': 'Jannik Sinner',   'country': 'Italy',   'final_score': '6-7 7-6 6-3 6-4 vs Zverev'},
     {'year': 2025, 'winner': 'Jannik Sinner',   'country': 'Italy'},
     {'year': 2024, 'winner': 'Carlos Alcaraz',  'country': 'Spain'},
     {'year': 2023, 'winner': 'Carlos Alcaraz',  'country': 'Spain'},
     {'year': 2022, 'winner': 'Novak Djokovic',  'country': 'Serbia'},
-    {'year': 2021, 'winner': 'Novak Djokovic',  'country': 'Serbia'},
 ]
 PREVIOUS_CHAMPIONS_WOMEN = [
-    {'year': 2025, 'winner': 'Iga Świątek',       'country': 'Poland'},
-    {'year': 2024, 'winner': 'Barbora Krejčíková', 'country': 'Czech Republic'},
-    {'year': 2023, 'winner': 'Markéta Vondroušová','country': 'Czech Republic'},
-    {'year': 2022, 'winner': 'Elena Rybakina',    'country': 'Kazakhstan'},
-    {'year': 2021, 'winner': 'Ashleigh Barty',    'country': 'Australia'},
+    {'year': 2026, 'winner': 'Linda Noskova',    'country': 'Czech Republic', 'final_score': '6-2 5-7 6-3 vs Muchova'},
+    {'year': 2025, 'winner': 'Iga Swiatek',      'country': 'Poland'},
+    {'year': 2024, 'winner': 'Barbora Krejcikova','country': 'Czech Republic'},
+    {'year': 2023, 'winner': 'Marketa Vondrousova','country': 'Czech Republic'},
+    {'year': 2022, 'winner': 'Elena Rybakina',   'country': 'Kazakhstan'},
 ]
 
 
@@ -77,6 +77,9 @@ def _to_decimal(obj):
 
 # ── ESPN scoreboard scrape ──────────────────────────────────────────────────
 
+WIMBLEDON_KEYWORDS = ('wimbledon', 'the championships')
+
+
 def fetch_espn_matches():
     """Fetch the full Wimbledon scoreboard (all rounds, M+W singles) from ESPN."""
     try:
@@ -89,6 +92,12 @@ def fetch_espn_matches():
 
     events = data.get('events', [])
     if not events:
+        return []
+
+    # Guard: verify the first event is actually Wimbledon, not a different ATP tournament.
+    event_name = (events[0].get('name') or events[0].get('shortName') or '').lower()
+    if not any(kw in event_name for kw in WIMBLEDON_KEYWORDS):
+        print(f'[wimbledon_scraper] ESPN event is not Wimbledon: "{event_name}" — skipping scrape')
         return []
 
     matches = []
@@ -378,8 +387,28 @@ def fetch_betfair_outright(market_label_filter):
 def lambda_handler(event, context):
     now_iso = datetime.now(timezone.utc).isoformat()
     today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    is_complete = today > TOURNAMENT_END
+    is_live = TOURNAMENT_START <= today <= TOURNAMENT_END
 
-    print(f'[wimbledon_scraper] Starting daily scrape at {now_iso}')
+    print(f'[wimbledon_scraper] Starting daily scrape at {now_iso} (live={is_live}, complete={is_complete})')
+
+    # After the tournament ends: only update META to preserve is_complete flag.
+    # Do NOT scrape ESPN or overwrite MATCHES/TIPS/OUTRIGHT — ESPN will have
+    # switched to a different tournament and would corrupt the completed data.
+    if is_complete:
+        try:
+            sports_table.update_item(
+                Key={'sport': 'wimbledon', 'data_key': 'META'},
+                UpdateExpression='SET is_complete = :c, is_live = :l, updated_at = :ua',
+                ExpressionAttributeValues={':c': True, ':l': False, ':ua': now_iso},
+            )
+            print('[wimbledon_scraper] Tournament complete — updated META only, skipping ESPN scrape')
+        except Exception as e:
+            print(f'[wimbledon_scraper] META update error: {e}')
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'success': True, 'skipped': True, 'reason': 'tournament_complete', 'updated_at': now_iso}),
+        }
 
     matches = fetch_espn_matches()
     outright_men = fetch_betfair_outright('Men')
@@ -395,7 +424,6 @@ def lambda_handler(event, context):
 
     # Determine current round from most recent completed matches
     completed = [m for m in matches if m['completed']]
-    current_round = len(completed)
 
     try:
         if matches:
@@ -432,7 +460,6 @@ def lambda_handler(event, context):
                 'contenders': outright_men,
                 'updated_at': now_iso,
             }))
-            print(f'[wimbledon_scraper] Saved men\'s outright: {outright_men}')
 
         if outright_women:
             sports_table.put_item(Item=_to_decimal({
@@ -441,7 +468,6 @@ def lambda_handler(event, context):
                 'contenders': outright_women,
                 'updated_at': now_iso,
             }))
-            print(f'[wimbledon_scraper] Saved women\'s outright: {outright_women}')
 
         sports_table.put_item(Item=_to_decimal({
             'sport': 'wimbledon',
@@ -449,7 +475,8 @@ def lambda_handler(event, context):
             'tournament_start': TOURNAMENT_START,
             'tournament_end': TOURNAMENT_END,
             'updated_at': now_iso,
-            'is_live': TOURNAMENT_START <= today <= TOURNAMENT_END,
+            'is_live': is_live,
+            'is_complete': False,
             'matches_completed': len(completed),
             'matches_total': len(matches),
         }))

@@ -3,20 +3,18 @@ import { useState, useEffect } from 'react';
 const API_BASE_URL = process.env.REACT_APP_API_URL ||
   'https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com';
 
-// Seeded fallback outright odds (real research, used only if live Betfair scrape is empty)
+// Fallback: show actual 2026 Wimbledon results when live odds unavailable
 const FALLBACK_MEN = [
-  { name: 'Jannik Sinner', odds: 1.6 },
-  { name: 'Novak Djokovic', odds: 8.0 },
-  { name: 'Alexander Zverev', odds: 9.0 },
-  { name: 'Ben Shelton', odds: 12.0 },
-  { name: 'Felix Auger-Aliassime', odds: 15.0 },
+  { name: 'Jannik Sinner 🏆', odds: 0 },
+  { name: 'Alexander Zverev', odds: 0 },
+  { name: 'Novak Djokovic', odds: 0 },
+  { name: 'Arthur Fery (wildcard)', odds: 0 },
 ];
 const FALLBACK_WOMEN = [
-  { name: 'Aryna Sabalenka', odds: 4.5 },
-  { name: 'Elena Rybakina', odds: 6.5 },
-  { name: 'Iga Swiatek', odds: 8.5 },
-  { name: 'Coco Gauff', odds: 10.0 },
-  { name: 'Naomi Osaka', odds: 12.0 },
+  { name: 'Linda Noskova 🏆', odds: 0 },
+  { name: 'Karolina Muchova', odds: 0 },
+  { name: 'Coco Gauff', odds: 0 },
+  { name: 'Marta Kostyuk', odds: 0 },
 ];
 
 const TABS = [
@@ -139,6 +137,7 @@ export default function WimbledonPage() {
   const tipsPredictions = data?.tips_predictions || [];
   const yesterdayPerf = data?.yesterday_performance || {};
 
+  const isComplete = meta.is_complete === true;
   const completed = matches.filter(m => m.completed).sort((a, b) => new Date(b.date) - new Date(a.date));
   const scheduled = matches.filter(m => !m.completed);
   const recentResults = completed.slice(0, 20);
@@ -155,6 +154,7 @@ export default function WimbledonPage() {
         <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 6 }}>
           AI predictions & live results · {meta.tournament_start} – {meta.tournament_end}
           {meta.is_live && <span style={{ marginLeft: 8, color: '#34d399', fontWeight: 800 }}>● LIVE</span>}
+          {meta.is_complete && <span style={{ marginLeft: 8, color: '#fbbf24', fontWeight: 800 }}>✅ COMPLETED</span>}
         </div>
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>
           {meta.matches_completed}/{meta.matches_total} matches played · updated {meta.updated_at ? new Date(meta.updated_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '—'}
@@ -175,13 +175,45 @@ export default function WimbledonPage() {
       <div style={{ maxWidth: 900, margin: '0 auto', padding: isMobile ? 16 : 24 }}>
         {tab === 'dashboard' && (
           <>
+            {/* Champion card — shows when tournament is complete */}
+            {isComplete && (
+              <div style={{ background: 'linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%)', border: '1px solid rgba(251,191,36,0.4)', borderRadius: 16, padding: '20px 24px', marginBottom: 20 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(251,191,36,0.8)', textTransform: 'uppercase', letterSpacing: 2, textAlign: 'center', marginBottom: 14 }}>
+                  🏆 2026 Wimbledon Champions
+                </div>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: 220, background: 'rgba(251,191,36,0.07)', border: '1px solid rgba(251,191,36,0.25)', borderRadius: 12, padding: '14px 16px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 11, color: '#fbbf24', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>🎾 Men's Singles</div>
+                    <div style={{ fontSize: 26, fontWeight: 900, color: 'white' }}>Jannik Sinner</div>
+                    <div style={{ fontSize: 12, color: '#fbbf24', marginTop: 4 }}>🇮🇹 Italy · 5th Grand Slam</div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 6 }}>def. Zverev 6-7 7-6 6-3 6-4</div>
+                    <div style={{ fontSize: 10, color: '#34d399', marginTop: 4 }}>✅ BetBud picked Sinner</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 220, background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 12, padding: '14px 16px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 11, color: '#a78bfa', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>🎾 Women's Singles</div>
+                    <div style={{ fontSize: 26, fontWeight: 900, color: 'white' }}>Linda Noskova</div>
+                    <div style={{ fontSize: 12, color: '#a78bfa', marginTop: 4 }}>🇨🇿 Czech Republic · First slam</div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 6 }}>def. Muchova 6-2 5-7 6-3</div>
+                    <div style={{ fontSize: 10, color: '#fbbf24', marginTop: 4 }}>⚡ Upset — beat 5 seeds en route</div>
+                  </div>
+                </div>
+                {/* US Open preview teaser */}
+                <div style={{ marginTop: 14, padding: '10px 14px', background: 'rgba(96,165,250,0.08)', border: '1px solid rgba(96,165,250,0.2)', borderRadius: 10, textAlign: 'center' }}>
+                  <span style={{ fontSize: 12, color: '#60a5fa', fontWeight: 700 }}>⛳ Next up: US Open</span>
+                  <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginLeft: 8 }}>~25 Aug · Flushing Meadows · BetBud picks in Tips tab</span>
+                </div>
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 20 }}>
               <OutrightBoard title="Men's Singles" contenders={outrightMen} flag="🎾" />
               <OutrightBoard title="Women's Singles" contenders={outrightWomen} flag="🎾" />
             </div>
+            {!isComplete && (
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', textAlign: 'center', marginBottom: 24 }}>
               {data?.outright_men?.length > 0 ? 'Live Betfair Exchange odds' : 'Pre-tournament odds — live exchange odds update automatically once available'}
             </div>
+            )}
             {/* Yesterday's picks performance */}
             {yesterdayPerf.total > 0 && (
               <div style={{ background: yesterdayPerf.win_pct >= 60 ? 'rgba(52,211,153,0.08)' : 'rgba(251,191,36,0.06)', border: `1px solid ${yesterdayPerf.win_pct >= 60 ? 'rgba(52,211,153,0.3)' : 'rgba(251,191,36,0.2)'}`, borderRadius: 10, padding: '12px 16px', marginBottom: 24 }}>
@@ -281,15 +313,15 @@ export default function WimbledonPage() {
         {tab === 'tips' && (
           <>
             <div style={{ fontSize: 13, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
-              💡 BetBud Tips
+              💡 BetBud Tips {isComplete ? '— US Open Preview' : ''}
             </div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 16 }}>
-              Based on real match data scraped this run — not betting advice, just analysis.
+              {isComplete ? 'Wimbledon complete. US Open starts ~25 Aug at Flushing Meadows.' : 'Based on real match data scraped this run — not betting advice, just analysis.'}
             </div>
 
             {tipsPredictions.length > 0 && (
               <div style={{ marginBottom: 24 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Predictions — Next Matches</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>{isComplete ? 'US Open BetBud Picks' : 'Predictions — Next Matches'}</div>
                 {tipsPredictions.map(p => (
                   <div key={p.match_id} style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 8, padding: '10px 14px', marginBottom: 6 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: 'white' }}>

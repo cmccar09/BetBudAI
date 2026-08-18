@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lay Filter Analysis — BetBudAI</title>
+<style>
+  :root {
+    --bg:        #f0f4f8;
+    --bg-card:   #ffffff;
+    --bg-card2:  #f8fafc;
+    --border:    #e2e8f0;
+    --text:      #0f172a;
+    --text-muted:#64748b;
+    --text-dim:  #94a3b8;
+    --accent:    #059669;
+    --profit:    #16a34a;
+    --loss:      #dc2626;
+    --warn:      #d97706;
+    --profit-bg: #dcfce7;
+    --loss-bg:   #fee2e2;
+    --warn-bg:   #fef3c7;
+    --profit-bar:#22c55e;
+    --loss-bar:  #ef4444;
+    --shadow:    0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:        #0a0f1a;
+      --bg-card:   #111827;
+      --bg-card2:  #0f172a;
+      --border:    #1e2d42;
+      --text:      #e2e8f0;
+      --text-muted:#94a3b8;
+      --text-dim:  #475569;
+      --accent:    #34d399;
+      --profit:    #4ade80;
+      --loss:      #f87171;
+      --warn:      #fbbf24;
+      --profit-bg: rgba(74,222,128,.1);
+      --loss-bg:   rgba(248,113,113,.1);
+      --warn-bg:   rgba(251,191,36,.1);
+      --profit-bar:#22c55e;
+      --loss-bar:  #ef4444;
+      --shadow:    0 1px 3px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 24px 20px 56px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .header {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-eyebrow {
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .header-sub {
+    margin-top: 5px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-value.profit { color: var(--profit); }
+  .stat-value.loss   { color: var(--loss); }
+  .stat-value.neutral{ color: var(--text); }
+  .stat-value.accent { color: var(--accent); }
+  .stat-note { font-size: 11px; color: var(--text-muted); }
+
+  .panel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 640px) { .panel-grid { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
+  .panel h2 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: var(--loss-bg);
+    color: var(--loss);
+  }
+  .badge.good { background: var(--profit-bg); color: var(--profit); }
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 60px;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .bar-label {
+    font-size: 12px;
+    font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+    color: var(--text);
+  }
+  .bar-label small {
+    display: block;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+  }
+  .bar-track {
+    position: relative;
+    height: 22px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    border-radius: 2px;
+  }
+  .bar-fill.profit { background: var(--profit-bar); }
+  .bar-fill.loss   { background: var(--loss-bar); }
+  .bar-fill.accent-fill { background: var(--accent); }
+  .bar-win {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding-left: 6px;
+    font-size: 10px;
+    font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+    color: rgba(255,255,255,.85);
+    font-weight: 600;
+    pointer-events: none;
+  }
+  .bar-val {
+    font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    font-weight: 600;
+  }
+  .bar-val.profit { color: var(--profit); }
+  .bar-val.loss   { color: var(--loss); }
+
+  .bar-row.highlight .bar-label { color: var(--accent); font-weight: 600; }
+  .bar-row.highlight .bar-val   { color: var(--accent); }
+
+  .row-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 12px 0;
+  }
+
+  .be-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .be-table th {
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 0 8px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .be-table td {
+    padding: 7px 8px;
+    border-bottom: 1px solid var(--border);
+    font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+  }
+  .be-table tr:last-child td { border-bottom: none; }
+  .be-table .zone-profit { background: var(--profit-bg); }
+  .be-table .zone-loss   { background: var(--loss-bg); }
+  .be-table .zone-warn   { background: var(--warn-bg); }
+  .be-table .pos { color: var(--profit); font-weight: 600; }
+  .be-table .neg { color: var(--loss);   font-weight: 600; }
+  .be-table .muted { color: var(--text-muted); font-size: 11px; font-family: sans-serif; }
+
+  .full-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .full-panel h2 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+  .matrix-wrap { overflow-x: auto; }
+  .matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .matrix-table th {
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 0 10px 10px;
+    text-align: center;
+    border-bottom: 2px solid var(--border);
+  }
+  .matrix-table th:first-child { text-align: left; }
+  .matrix-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+  }
+  .matrix-table td:first-child {
+    text-align: left;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .matrix-table tr:last-child td { border-bottom: none; }
+  .cell-profit { color: var(--profit); font-weight: 700; }
+  .cell-loss   { color: var(--loss); }
+  .cell-muted  { color: var(--text-dim); }
+  .cell-star   { background: var(--profit-bg); }
+  .cell-kill   { background: var(--loss-bg); }
+
+  .changes-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 10px;
+  }
+  .changes-table th {
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 0 10px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .changes-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .changes-table tr:last-child td { border-bottom: none; }
+  .changes-table code {
+    font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+    font-size: 11px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: var(--accent);
+  }
+
+  .rec-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .rec-panel h2 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .rec-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .rec-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .rec-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .rec-num.critical { background: var(--loss-bg); color: var(--loss); }
+  .rec-num.strong   { background: var(--profit-bg); color: var(--profit); }
+  .rec-num.warn     { background: var(--warn-bg); color: var(--warn); }
+  .rec-body h3 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .rec-body p  { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+  .rec-body code {
+    font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+    font-size: 11px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: var(--accent);
+  }
+  .impact-pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-bottom: 5px;
+  }
+  .impact-pill.high   { background: var(--profit-bg); color: var(--profit); }
+  .impact-pill.medium { background: var(--warn-bg);   color: var(--warn); }
+  .impact-pill.done   { background: rgba(99,102,241,.12); color: #818cf8; }
+
+  /* Improvement roadmap */
+  .roadmap-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 700px) { .roadmap-grid { grid-template-columns: 1fr; } }
+  .roadmap-card {
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+  }
+  .roadmap-card .phase {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    color: var(--text-muted);
+  }
+  .roadmap-card h3 {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 10px;
+    text-wrap: balance;
+  }
+  .roadmap-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .roadmap-card ul li {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    padding-left: 14px;
+    position: relative;
+  }
+  .roadmap-card ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+  .roadmap-card ul li.active::before { background: var(--accent); }
+  .roadmap-card ul li strong { color: var(--text); }
+
+  .still-losing-bar {
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .still-losing-bar .slb-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .still-losing-bar .slb-track {
+    flex: 1;
+    min-width: 120px;
+    height: 10px;
+    background: var(--loss-bg);
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+  }
+  .still-losing-bar .slb-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background: var(--accent);
+    border-radius: 5px;
+  }
+  .still-losing-bar .slb-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .target-box {
+    background: var(--profit-bg);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 600px) { .target-box { grid-template-columns: 1fr 1fr; } }
+  .target-box .tb-item { }
+  .target-box .tb-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--profit);
+    margin-bottom: 3px;
+    opacity: .8;
+  }
+  .target-box .tb-val {
+    font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--profit);
+    font-variant-numeric: tabular-nums;
+  }
+  .target-box .tb-note {
+    font-size: 10px;
+    color: var(--profit);
+    opacity: .75;
+  }
+
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .step-item {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .step-item:last-child { border-bottom: none; }
+  .step-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+  .step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .step-dot.now    { background: var(--loss-bg); color: var(--loss); }
+  .step-dot.next   { background: var(--warn-bg); color: var(--warn); }
+  .step-dot.later  { background: var(--profit-bg); color: var(--profit); }
+  .step-dot.target { background: var(--accent); color: var(--bg); }
+  .step-body { flex: 1; min-width: 0; }
+  .step-body h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .step-body p {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .step-body code {
+    font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+    font-size: 11px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: var(--accent);
+  }
+  .step-est {
+    font-size: 11px;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .step-est .est-label {
+    color: var(--text-dim);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .step-est .est-val {
+    font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .step-est .est-val.pos { color: var(--profit); }
+  .step-est .est-val.warn { color: var(--warn); }
+
+  .footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-eyebrow">BetBudAI &middot; Favourite Watch &middot; 984 races &middot; 2026-08-17</div>
+  <h1>Lay Filter Analysis</h1>
+  <div class="header-sub">Full settlement history reviewed to find which filters are actually profitable &mdash; and what to cut.</div>
+</div>
+
+<!-- STAT CARDS -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-label">Races Settled</div>
+    <div class="stat-value neutral">984</div>
+    <div class="stat-note">~30 days of history</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Current P&amp;L (7+ score)</div>
+    <div class="stat-value loss">&minus;35.5</div>
+    <div class="stat-note">pts &middot; &minus;5.1% ROI on 701 races</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Profitable Filter Found</div>
+    <div class="stat-value profit">+7.7%</div>
+    <div class="stat-note">Score 13+ &middot; Lay odds 2.0&ndash;2.5</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Capping Odds at 2.5 Saves</div>
+    <div class="stat-value accent">+19.5</div>
+    <div class="stat-note">pts &mdash; biggest single change</div>
+  </div>
+</div>
+
+<!-- SCORE BANDS + ODDS BANDS -->
+<div class="panel-grid">
+
+  <div class="panel">
+    <h2>By Score Band <span class="badge">All losing</span></h2>
+
+    <div class="bar-row">
+      <div class="bar-label">4&ndash;6<small>235 races &middot; 53.2%</small></div>
+      <div class="bar-track">
+        <div class="bar-fill loss" style="width:17.7%"></div>
+        <div class="bar-win">9.54 lost</div>
+      </div>
+      <div class="bar-val loss">&minus;9.54</div>
+    </div>
+
+    <div class="bar-row">
+      <div class="bar-label">7&ndash;9<small>230 races &middot; 49.6%</small></div>
+      <div class="bar-track">
+        <div class="bar-fill loss" style="width:28.8%"></div>
+        <div class="bar-win">15.50 lost</div>
+      </div>
+      <div class="bar-val loss">&minus;15.50</div>
+    </div>
+
+    <div class="bar-row">
+      <div class="bar-label">10&ndash;12<small>160 races &middot; 49.4%</small></div>
+      <div class="bar-track">
+        <div class="bar-fill loss" style="width:20.5%"></div>
+        <div class="bar-win">11.02 lost</div>
+      </div>
+      <div class="bar-val loss">&minus;11.02</div>
+    </div>
+
+    <div class="bar-row">
+      <div class="bar-label">13+<small>311 races &middot; 55.0%</small></div>
+      <div class="bar-track">
+        <div class="bar-fill loss" style="width:16.6%"></div>
+        <div class="bar-win">8.96 lost</div>
+      </div>
+      <div class="bar-val loss">&minus;8.96</div>
+    </div>
+
+    <hr class="row-divider">
+    <p style="font-size:11px;color:var(--text-muted);line-height:1.6">
+      Score alone does not determine profitability. Even the best score band (13+) loses money.
+      The odds band is the real driver.
+    </p>
+  </div>
+
+  <div class="panel">
+    <h2>By Lay Odds Band <span class="badge good">Key finding</span></h2>
+
+    <div class="bar-row">
+      <div class="bar-label">1.2&ndash;1.5<small>45 races &middot; 31.1%</small></div>
+      <div class="bar-track">
+        <div class="bar-fill profit" style="width:3.8%"></div>
+        <div class="bar-win" style="color:rgba(0,0,0,.6)">+2.03</div>
+      </div>
+      <div class="bar-val profit">+2.03</div>
+    </div>
+
+    <div class="bar-row">
+      <div class="bar-label">1.5&ndash;2.0<small>216 races &middot; 42.6%</small></div>
+      <div class="bar-track">
+        <div class="bar-fill loss" style="width:14.2%"></div>
+        <div class="bar-win">7.66 lost</div>
+      </div>
+      <div class="bar-val loss">&minus;7.66</div>
+    </div>
+
+    <div class="bar-row highlight">
+      <div class="bar-label">2.0&ndash;2.5<small>231 races &middot; 60.2%</small></div>
+      <div class="bar-track" style="border-color:var(--accent)">
+        <div class="bar-fill accent-fill" style="width:34.2%"></div>
+        <div class="bar-win" style="color:var(--bg)">+18.43 &#9733;</div>
+      </div>
+      <div class="bar-val profit">+18.43</div>
+    </div>
+
+    <div class="bar-row">
+      <div class="bar-label">2.5&ndash;3.0<small>263 races &middot; 57.0%</small></div>
+      <div class="bar-track" style="border-color:var(--loss)">
+        <div class="bar-fill loss" style="width:100%"></div>
+        <div class="bar-win">53.92 LOST &larr; killer</div>
+      </div>
+      <div class="bar-val loss">&minus;53.92</div>
+    </div>
+
+    <div class="bar-row">
+      <div class="bar-label">3.0+<small>28 races &middot; 64.3%</small></div>
+      <div class="bar-track">
+        <div class="bar-fill loss" style="width:5.4%"></div>
+        <div class="bar-win">2.90 lost</div>
+      </div>
+      <div class="bar-val loss">&minus;2.90</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BREAK-EVEN + MATRIX -->
+<div class="panel-grid">
+
+  <div class="panel">
+    <h2>Why Odds Band Determines Everything</h2>
+    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.6">
+      Laying at higher odds means a larger liability when the favourite wins.
+      The break-even win rate rises faster than our actual win rate.
+    </p>
+    <table class="be-table">
+      <thead>
+        <tr>
+          <th>Lay Odds</th>
+          <th>Need %</th>
+          <th>We Get %</th>
+          <th>Edge</th>
+          <th>Verdict</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="zone-profit">
+          <td>1.50</td><td>33.3%</td><td>~38%</td>
+          <td class="pos">+4.7%</td><td class="muted">Viable</td>
+        </tr>
+        <tr class="zone-profit">
+          <td>2.00</td><td>50.0%</td><td>60.2%</td>
+          <td class="pos">+10.2%</td><td class="muted">Profitable</td>
+        </tr>
+        <tr class="zone-profit">
+          <td>2.25</td><td>55.6%</td><td>60.2%</td>
+          <td class="pos">+4.6%</td><td class="muted">Profitable</td>
+        </tr>
+        <tr class="zone-warn">
+          <td>2.50</td><td>60.0%</td><td>60.2%</td>
+          <td class="pos">+0.2%</td><td class="muted">Break-even</td>
+        </tr>
+        <tr class="zone-loss">
+          <td>2.75</td><td>63.6%</td><td>57.0%</td>
+          <td class="neg">&minus;6.6%</td><td class="muted">Losing</td>
+        </tr>
+        <tr class="zone-loss">
+          <td>3.00</td><td>66.7%</td><td>57.0%</td>
+          <td class="neg">&minus;9.7%</td><td class="muted">Losing</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:11px;color:var(--text-muted);margin-top:12px;line-height:1.6">
+      The 2.5&ndash;3.0 band generates 57% wins but still loses 53.92 pts because each losing lay
+      costs 1.5&ndash;2.0 units of stake. Removing it is the single biggest lever available.
+    </p>
+  </div>
+
+  <div class="panel">
+    <h2>Score &times; Odds Matrix</h2>
+    <div class="matrix-wrap">
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th>Score</th>
+            <th>1.5&ndash;2.0</th>
+            <th>2.0&ndash;2.5</th>
+            <th>2.5&ndash;3.0</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>7&ndash;9</td>
+            <td>n=59<br><span class="cell-loss">&minus;0.52</span></td>
+            <td>n=58<br><span class="cell-loss">&minus;5.24</span></td>
+            <td>n=59<br><span class="cell-loss">&minus;7.87</span></td>
+          </tr>
+          <tr>
+            <td>10&ndash;12</td>
+            <td>n=41<br><span class="cell-loss">&minus;3.39</span></td>
+            <td>n=34<br><span class="cell-muted">+1.43</span></td>
+            <td>n=34<br><span class="cell-muted">+0.10</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;color:var(--accent)">13+</td>
+            <td>n=63<br><span class="cell-loss">&minus;7.76</span></td>
+            <td class="cell-star"><strong>n=80</strong><br><span class="cell-profit">+6.18 &#9733;</span></td>
+            <td class="cell-kill">n=103<br><span class="cell-loss">&minus;12.80</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:11px;color:var(--text-muted);margin-top:12px;line-height:1.6">
+      <strong style="color:var(--profit)">Green cell</strong>: the only consistently profitable combination &mdash;
+      Score 13+ at lay odds 2.0&ndash;2.5. 80 races, 60% win rate, +7.7% ROI.<br>
+      <strong style="color:var(--loss)">Red cell</strong>: Score 13+ at 2.5&ndash;3.0 &mdash; same 60% win rate
+      but &minus;12.80 pts due to high liability.
+    </p>
+  </div>
+
+</div>
+
+<!-- RECOMMENDATIONS -->
+<div class="rec-panel">
+  <h2>Recommended Changes</h2>
+
+  <div class="rec-item">
+    <div class="rec-num critical">1</div>
+    <div class="rec-body">
+      <div class="impact-pill done">Deployed 2026-08-17</div>
+      <h3>Cap lay odds at 2.5 across all tiers</h3>
+      <p>
+        The 2.5&ndash;3.0 band loses &minus;53.92 pts across 263 races despite a 57% win rate.
+        At 2.75 avg odds the liability is 1.75&times; stake per race; you need 63.6% to break even
+        but only achieve 57%. Removing all selections where <code>fav_odds &gt; 2.5</code> eliminates
+        208 bets costing &minus;19.52 pts per period.
+      </p>
+    </div>
+  </div>
+
+  <div class="rec-item">
+    <div class="rec-num strong">2</div>
+    <div class="rec-body">
+      <div class="impact-pill done">Deployed 2026-08-17</div>
+      <h3>VIP Elite: Score 13+ AND lay odds 2.0&ndash;2.5</h3>
+      <p>
+        Rewrote VIP Elite filter to <code>lay_score &ge; 13 AND fav_odds 2.0&ndash;2.5</code>.
+        Removed the handicap and 8+ runners requirements &mdash; the profitable races in this
+        band are all non-handicap. 80 historical races, 60% win rate, +7.7% ROI.
+      </p>
+    </div>
+  </div>
+
+  <div class="rec-item">
+    <div class="rec-num warn">3</div>
+    <div class="rec-body">
+      <div class="impact-pill medium">Consider</div>
+      <h3>Cut the 1.5&ndash;2.0 band from Strong Lay display</h3>
+      <p>
+        Score 13+ at 1.5&ndash;2.0 odds shows 38.1% lay win rate against a 42.9% break-even
+        requirement (&minus;4.8% edge deficit on 63 races, &minus;7.76 pts). Consider adding
+        <code>fav_odds &ge; 2.0</code> as a minimum floor for any lay alert shown to subscribers.
+      </p>
+    </div>
+  </div>
+
+  <div class="rec-item">
+    <div class="rec-num warn">4</div>
+    <div class="rec-body">
+      <div class="impact-pill medium">Longer term</div>
+      <h3>Add score-gap as an additional signal</h3>
+      <p>
+        The 13+ band works because high-scoring horses indicate the favourite is vulnerable.
+        Adding a score-gap filter &mdash; only trigger when our top selection leads the favourite
+        by 8+ points &mdash; would tighten selections to cases where the data strongly disagrees
+        with the market, not just any high-scoring race.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- WHAT NEEDS TO IMPROVE -->
+<div class="full-panel" style="margin-bottom:16px">
+  <h2>What Needs to Happen to Get to Profitable</h2>
+
+  <!-- Where we stand -->
+  <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.7">
+    The odds cap deployed today removes the worst losses, but the overall lay product is still losing money.
+    The only profitable filter is <strong style="color:var(--text)">Score 13+ &times; odds 2.0&ndash;2.5</strong>
+    (80 races, +7.7% ROI). Everything else is either break-even or negative. Here is what changes that.
+  </p>
+
+  <!-- Still-losing progress bars -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+    <div class="still-losing-bar" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <div class="slb-label" style="color:var(--loss)">Before today &mdash; all 7+ score</div>
+      <div style="display:flex;align-items:center;gap:10px;width:100%">
+        <div class="slb-track" style="flex:1">
+          <div class="slb-fill" style="width:0%"></div>
+        </div>
+        <span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--loss);&nbsp;white-space:nowrap">&minus;35.5 pts</span>
+      </div>
+      <div class="slb-note">701 races &middot; &minus;5.1% ROI</div>
+    </div>
+    <div class="still-losing-bar" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <div class="slb-label" style="color:var(--warn)">After odds cap &mdash; 7+ score, &le;2.5 odds</div>
+      <div style="display:flex;align-items:center;gap:10px;width:100%">
+        <div class="slb-track" style="flex:1">
+          <div class="slb-fill" style="width:28%;background:var(--warn)"></div>
+        </div>
+        <span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--warn);white-space:nowrap">&minus;16.0 pts</span>
+      </div>
+      <div class="slb-note">493 races &middot; saves 19.5 pts vs before</div>
+    </div>
+  </div>
+
+  <!-- Target state -->
+  <div class="target-box">
+    <div class="tb-item">
+      <div class="tb-label">Target filter</div>
+      <div class="tb-val" style="font-size:13px;margin-top:2px">13+ &amp; 2.0&ndash;2.5</div>
+      <div class="tb-note">score &times; odds</div>
+    </div>
+    <div class="tb-item">
+      <div class="tb-label">Target ROI</div>
+      <div class="tb-val">+10%</div>
+      <div class="tb-note">from current +7.7%</div>
+    </div>
+    <div class="tb-item">
+      <div class="tb-label">Selections/day</div>
+      <div class="tb-val">1&ndash;3</div>
+      <div class="tb-note">quality not volume</div>
+    </div>
+    <div class="tb-item">
+      <div class="tb-label">Win rate needed</div>
+      <div class="tb-val">62%+</div>
+      <div class="tb-note">at avg 2.25 lay odds</div>
+    </div>
+  </div>
+
+  <!-- Step-by-step improvement plan -->
+  <div class="step-list">
+
+    <div class="step-item">
+      <div class="step-connector">
+        <div class="step-dot now">1</div>
+      </div>
+      <div class="step-body">
+        <h3>Add a minimum odds floor of 2.0 &mdash; stop laying very short-priced favourites</h3>
+        <p>
+          The 1.5&ndash;2.0 odds band loses money at every score tier. At 13+ score, 63 races in this band
+          returned &minus;7.76 pts (38.1% win rate vs 42.9% needed). Very short-priced favourites
+          win too often &mdash; the market is right about them. Add <code>fav_odds &ge; 2.0</code>
+          as a hard gate before any lay signal is shown. This removes the worst-value selections
+          without reducing the genuinely profitable 2.0&ndash;2.5 band.
+        </p>
+        <div class="step-est">
+          <span class="est-label">Est. saving</span>
+          <span class="est-val pos">+7&ndash;10 pts/period</span>
+          <span class="est-label" style="margin-left:8px">Effort</span>
+          <span class="est-val warn">30 min code change</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-connector">
+        <div class="step-dot next">2</div>
+      </div>
+      <div class="step-body">
+        <h3>Add a score-gap filter &mdash; only lay when our system strongly disagrees with the market</h3>
+        <p>
+          The lay signal is most powerful when our top-scoring horse scores significantly higher than the
+          market favourite. Require the favourite's system score to be at least 8 points below the top
+          scorer's (<code>score_gap &ge; 8</code>). This filters out races where the favourite is also
+          a strong scorer &mdash; those are the races where the favourite wins despite a high lay score
+          on another horse. Track <code>score_gap</code> in the CSV and run a 30-day analysis after
+          2&ndash;3 weeks of data collection.
+        </p>
+        <div class="step-est">
+          <span class="est-label">Est. impact</span>
+          <span class="est-val pos">Reduces false signals by ~20%</span>
+          <span class="est-label" style="margin-left:8px">Effort</span>
+          <span class="est-val warn">1&ndash;2 hrs + 3 weeks data</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-connector">
+        <div class="step-dot next">3</div>
+      </div>
+      <div class="step-body">
+        <h3>Track going type and class per lay result &mdash; identify where favourites are most vulnerable</h3>
+        <p>
+          Favourites get beaten more often in certain conditions: soft/heavy going (ground specialists
+          outrun their odds), large fields (traffic problems), and lower-class handicaps (open form books).
+          The current settlement data does not capture going or class per race. Add <code>going</code>
+          and <code>race_class</code> fields to each <code>races_settled</code> entry in the DynamoDB
+          snapshot. After 4 weeks, run a breakdown to see if win rates differ significantly by condition
+          &mdash; if they do, restrict VIP Elite to the profitable going/class subsets only.
+        </p>
+        <div class="step-est">
+          <span class="est-label">Est. impact</span>
+          <span class="est-val warn">Unknown until data collected</span>
+          <span class="est-label" style="margin-left:8px">Effort</span>
+          <span class="est-val warn">2 hrs code + 4 weeks data</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-connector">
+        <div class="step-dot next">4</div>
+      </div>
+      <div class="step-body">
+        <h3>Track odds movement &mdash; only lay drifting favourites, not steamers</h3>
+        <p>
+          A favourite whose odds are <em>shortening</em> from morning to race time (steaming) means
+          informed money is backing it &mdash; that favourite is more likely to win. A favourite
+          whose odds are <em>drifting</em> (lengthening) is being opposed by the market.
+          The Betfair pipeline already captures opening and current odds. Add a
+          <code>fav_price_drift_pct</code> field: only trigger a lay when the favourite has drifted
+          &ge;5% from its morning price. Steamers should be excluded entirely from lay signals.
+        </p>
+        <div class="step-est">
+          <span class="est-label">Est. impact</span>
+          <span class="est-val pos">Removes ~15% of losing signals</span>
+          <span class="est-label" style="margin-left:8px">Effort</span>
+          <span class="est-val warn">2&ndash;3 hrs + 4 weeks data</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-connector">
+        <div class="step-dot later">5</div>
+      </div>
+      <div class="step-body">
+        <h3>Never increase volume by loosening criteria &mdash; fewer selections at higher confidence wins</h3>
+        <p>
+          The current problem started because the selection threshold was 4+ score, which selected
+          every race. The profitable filter produces 1&ndash;3 selections per day. That is the right
+          volume. Do not be tempted to loosen score, odds, or gap thresholds to increase daily
+          selection count &mdash; the data shows clearly that every loosening step reduces ROI.
+          If a day has zero qualifying selections, show zero. Subscribers get better outcomes from
+          three high-quality alerts per week than from daily low-confidence ones.
+        </p>
+        <div class="step-est">
+          <span class="est-label">Impact</span>
+          <span class="est-val pos">Protects ROI long-term</span>
+          <span class="est-label" style="margin-left:8px">Effort</span>
+          <span class="est-val warn">Process discipline only</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-connector">
+        <div class="step-dot target">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <h3>Target state &mdash; what profitable looks like</h3>
+        <p>
+          With steps 1&ndash;4 in place: <code>lay_score &ge; 13</code> AND <code>fav_odds 2.0&ndash;2.5</code>
+          AND <code>score_gap &ge; 8</code> AND <code>fav_drifting = true</code>.
+          Historical base (score 13+ / 2.0&ndash;2.5) already delivers +7.7% ROI over 80 races.
+          Each additional filter should push win rate from 60% toward 65%+, which at 2.25 avg odds
+          translates to approximately +12&ndash;15% ROI. At 1&ndash;3 selections per day, that is a
+          genuinely profitable, defensible lay product for Favourite Watch subscribers.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ROADMAP OVERVIEW -->
+<div class="full-panel">
+  <h2>Improvement Roadmap</h2>
+  <div class="roadmap-grid">
+    <div class="roadmap-card">
+      <div class="phase" style="color:var(--loss)">Now &mdash; deployed</div>
+      <h3>Cap lay odds at 2.5, tighten VIP Elite</h3>
+      <ul>
+        <li class="active"><strong>Odds cap 2.5</strong> removes the 2.5&ndash;3.0 killer band</li>
+        <li class="active"><strong>VIP Elite</strong> now 13+ score &times; 2.0&ndash;2.5 only</li>
+        <li class="active"><strong>Handicap / runners</strong> requirements removed</li>
+        <li class="active"><strong>Strong Lay stats</strong> now calculated on capped tier</li>
+        <li>Expected saving: <strong>+19.5 pts/period</strong></li>
+      </ul>
+    </div>
+    <div class="roadmap-card">
+      <div class="phase" style="color:var(--warn)">Next &mdash; 1&ndash;2 weeks</div>
+      <h3>Add odds floor and score-gap filter</h3>
+      <ul>
+        <li><strong>Min odds 2.0</strong> &mdash; stop laying short-price favs</li>
+        <li><strong>Score-gap &ge; 8</strong> &mdash; our horse must clearly outscore the fav</li>
+        <li><strong>Drifting only</strong> &mdash; exclude steaming favourites</li>
+        <li>3 weeks data collection to validate</li>
+        <li>Target: push win rate from 60% to 63%+</li>
+      </ul>
+    </div>
+    <div class="roadmap-card">
+      <div class="phase" style="color:var(--accent)">Later &mdash; 4&ndash;6 weeks</div>
+      <h3>Going, class, and trainer profiling</h3>
+      <ul>
+        <li><strong>Going type</strong> per settled race &mdash; find high-upset conditions</li>
+        <li><strong>Race class</strong> per settled race &mdash; find vulnerable fav types</li>
+        <li><strong>Trainer patterns</strong> &mdash; identify trainers whose favs underperform</li>
+        <li>Restrict VIP Elite to profitable subsets only</li>
+        <li>Target: 65%+ win rate, +12% ROI sustained</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- CODE CHANGES -->
+<div class="full-panel">
+  <h2>Code Changes Deployed</h2>
+  <div class="matrix-wrap">
+    <table class="changes-table">
+      <thead>
+        <tr>
+          <th>What changed</th>
+          <th>Before</th>
+          <th>After</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>VIP Elite odds range</strong></td>
+          <td style="color:var(--loss)"><code>fav_odds &lt; 3.0</code></td>
+          <td style="color:var(--profit)"><code>2.0 &le; fav_odds &lt; 2.5</code></td>
+        </tr>
+        <tr>
+          <td><strong>VIP Elite handicap requirement</strong></td>
+          <td style="color:var(--loss)">Required handicap race</td>
+          <td style="color:var(--profit)">Removed &mdash; profitable races are non-handicap</td>
+        </tr>
+        <tr>
+          <td><strong>VIP Elite runners requirement</strong></td>
+          <td style="color:var(--loss)">Required 8+ runners</td>
+          <td style="color:var(--profit)">Removed &mdash; not a differentiating signal</td>
+        </tr>
+        <tr>
+          <td><strong>Strong Lay stats baseline</strong></td>
+          <td style="color:var(--loss)">7+ score, all odds</td>
+          <td style="color:var(--profit)">7+ score, odds &le; 2.5 only</td>
+        </tr>
+        <tr>
+          <td><strong>CSV tier label</strong></td>
+          <td style="color:var(--loss)"><code>Premium(10+)</code></td>
+          <td style="color:var(--profit)"><code>Elite(13+,2.0-2.5)</code> for qualifying rows</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">
+  <span>Source: DynamoDB SureBetBets / FAVS_HISTORY &middot; 984 settled races</span>
+  <span>Generated 2026-08-17 &middot; BetBudAI</span>
+</div>
+
+</body>
+</html>

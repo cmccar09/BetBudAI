@@ -93,7 +93,7 @@ aws dynamodb get-item --table-name BetBudAI_Sports `
   🕐 LIVE OPPORTUNITIES (top extended picks by score):
   1. [Horse] @ [odds] — [course] [time] | score=[n]
   2. [Horse] @ [odds] — [course] [time] | score=[n]
-  [up to 4]
+  [up to 3 weekdays / 4 weekends]
 
 ⚽ WORLD CUP
   [Match] [time GMT]

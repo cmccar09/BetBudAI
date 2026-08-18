@@ -183,6 +183,83 @@ def fetch_major_result(query_date):
 
 # ── Form analysis ────────────────────────────────────────────────────────────
 
+# The Open 2026 — 5 daily bet templates across short / medium / long tiers.
+# base_reason is the analysis; generate_daily_bets() prefixes live position context.
+THE_OPEN_2026_DAILY_BETS = [
+    {
+        'selection': 'Sam Burns — Outright Win',
+        'bet_type': 'Outright Win',
+        'odds': '~3/1',
+        'tier': 'short',
+        'player_key': 'Sam Burns',
+        'base_reason': '54-hole leader at Royal Birkdale. Louisiana precision iron player — the profile that wins links majors. Two PGA Tour wins, proven under pressure. 2-shot cushion going into Sunday.',
+    },
+    {
+        'selection': 'Ryan Fox — Each-Way',
+        'bet_type': 'Each-Way',
+        'odds': '6/1 EW',
+        'tier': 'medium',
+        'player_key': 'Ryan Fox',
+        'base_reason': 'Shot a record-equalling 62 in R3. Extraordinary momentum — New Zealander with powerful links instincts. Two shots off the lead; a player in that form can chase anyone down.',
+    },
+    {
+        'selection': 'Tommy Fleetwood — Top 5',
+        'bet_type': 'Top 5',
+        'odds': '~5/2',
+        'tier': 'medium',
+        'player_key': 'Tommy Fleetwood',
+        'base_reason': 'Liverpool native playing at home. The Claret Jug is his career ambition — near-miss at 2018 Carnoustie. One shot off the lead on Sunday with a roaring home crowd behind him.',
+    },
+    {
+        'selection': 'Si Woo Kim — Each-Way',
+        'bet_type': 'Each-Way',
+        'odds': '12/1 EW',
+        'tier': 'medium',
+        'player_key': 'Si Woo Kim',
+        'base_reason': 'T2 at -8 but ignored by the market. South Korean who won the Players Championship — proven clutch performer. Stealthy Sunday contender at value odds.',
+    },
+    {
+        'selection': 'Jackson Suber — Top 10',
+        'bet_type': 'Top 10',
+        'odds': 'est. 20/1+',
+        'tier': 'long',
+        'player_key': 'Jackson Suber',
+        'base_reason': 'T4 at -7, the tournament\'s most consistent ball-striker. At 20/1+ for a top 10, if this 22-year-old makes a Sunday charge it could be the story of the decade.',
+    },
+]
+
+
+def generate_daily_bets(the_open, outright_odds):
+    """5 structured bets, tier-labelled, refreshed daily with live position context."""
+    if not the_open:
+        return []
+
+    lb = the_open.get('leaderboard', [])
+    status = the_open.get('status', 'upcoming')
+
+    # Build name → position/score lookups from live leaderboard
+    score_map = {p.get('name', ''): p.get('score', '') for p in lb}
+    pos_map = {p.get('name', ''): p.get('position', '') for p in lb}
+
+    bets = []
+    for template in THE_OPEN_2026_DAILY_BETS:
+        player = template.get('player_key', '')
+        score = score_map.get(player, '')
+        pos = pos_map.get(player, '')
+        pos_str = f'T{pos}' if pos else ''
+        position_prefix = f'{pos_str} {score} — '.strip(' — ') + ' — ' if pos_str else ''
+        bets.append({
+            'selection': template['selection'],
+            'bet_type': template['bet_type'],
+            'odds': template['odds'],
+            'tier': template['tier'],
+            'reason': f'{position_prefix}{template["base_reason"]}' if pos_str else template['base_reason'],
+            'status': 'open' if status in ('live', 'upcoming') else 'closed',
+        })
+
+    return bets
+
+
 def generate_tips(majors_with_results):
     """
     Identify in-form players: those with multiple top-10 finishes across the
@@ -368,6 +445,8 @@ def lambda_handler(event, context):
     is_live = any(m['status'] == 'live' for m in majors_with_results)
     outright = fetch_betfair_outright(next_major['name']) if next_major else []
     tips = generate_tips(majors_with_results)
+    the_open = next((m for m in majors_with_results if m['name'] == 'The Open Championship'), None)
+    daily_bets = generate_daily_bets(the_open, outright)
 
     try:
         sports_table.put_item(Item=_to_decimal({
@@ -392,9 +471,10 @@ def lambda_handler(event, context):
             'course_form': tips['course_form'],
             'round_predictions': tips['round_predictions'],
             'yesterday_performance': tips['yesterday_performance'],
+            'daily_bets': daily_bets,
             'updated_at': now_iso,
         }))
-        print(f'[golf_scraper] Saved {len(tips["in_form"])} in-form, {len(tips.get("round_predictions",[]))} round predictions')
+        print(f'[golf_scraper] Saved {len(tips["in_form"])} in-form, {len(daily_bets)} daily bets')
 
         sports_table.put_item(Item=_to_decimal({
             'sport': 'golf',

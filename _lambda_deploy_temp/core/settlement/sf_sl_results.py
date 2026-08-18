@@ -4,51 +4,62 @@ Deployed as: surebet-sl-results
 Runs every 30 minutes to fetch and settle race results
 """
 
-import json
 import logging
+import os
+import boto3
 from datetime import datetime, timezone
+from boto3.dynamodb.conditions import Key, Attr
 from core.settlement.sl_results_fetcher import update_results
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+REGION = os.environ.get('AWS_DEFAULT_REGION', 'eu-west-1')
+
+
+def _count_settled(date_str):
+    """Paginated count of settled UI picks for the date."""
+    db = boto3.resource('dynamodb', region_name=REGION)
+    t = db.Table('SureBetBets')
+    picks, kw = [], {'KeyConditionExpression': Key('bet_date').eq(date_str),
+                     'FilterExpression': Attr('show_in_ui').eq(True)}
+    while True:
+        resp = t.query(**kw)
+        picks.extend(resp.get('Items', []))
+        if not resp.get('LastEvaluatedKey'):
+            break
+        kw['ExclusiveStartKey'] = resp['LastEvaluatedKey']
+    settled = [p for p in picks if p.get('outcome') and
+               str(p['outcome']).lower() not in ('pending', '')]
+    winners = [p for p in settled if str(p.get('outcome', '')).lower() in ('win', 'won')]
+    return len(settled), len(winners)
+
 
 def lambda_handler(event, context):
-    """
-    Handler for Sporting Life results fetcher
-    
-    Triggers update_results to fetch from sportinglife.com/racing/fast-results
-    and settle any pending picks in DynamoDB
-    
-    Event payload:
-    {
-        "date": "2026-05-12"  # Optional, defaults to today
-    }
-    """
     try:
-        target_date = event.get('date')
-        if not target_date:
-            target_date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
-        
-        logger.info(f"Starting Sporting Life results fetch for {target_date}")
-        logger.info(f"Source: https://www.sportinglife.com/racing/fast-results/all")
-        
-        # Call the update_results function
+        target_date = event.get('date') or datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        logger.info(f"[sf_sl_results] Starting SL results fetch for {target_date}")
+
         update_results(target_date)
-        
-        # Return success
+
+        results_recorded, winners = _count_settled(target_date)
+        logger.info(f"[sf_sl_results] settled={results_recorded} winners={winners}")
+
         return {
-            'statusCode': 200,
-            'date': target_date,
-            'success': True,
-            'message': 'Sporting Life results fetched and settled successfully'
+            'success'         : True,
+            'date'            : target_date,
+            'results_recorded': results_recorded,
+            'winners'         : winners,
+            'source'          : 'sporting_life',
         }
-    
+
     except Exception as e:
-        logger.error(f"Error fetching Sporting Life results: {str(e)}", exc_info=True)
+        logger.error(f"[sf_sl_results] ERROR: {e}", exc_info=True)
         return {
-            'statusCode': 500,
-            'success': False,
-            'error': str(e),
-            'message': f'Failed to fetch Sporting Life results: {str(e)}'
+            'success'         : False,
+            'date'            : event.get('date', ''),
+            'results_recorded': 0,
+            'winners'         : 0,
+            'source'          : 'sporting_life',
+            'error'           : str(e),
         }

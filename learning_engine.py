@@ -136,7 +136,7 @@ def generate_learning_insights(analysis, min_sample_size=8):
     
     Args:
         analysis: Performance data from analyze_performance_patterns
-        min_sample_size: Minimum number of bets required before making recommendations (default: 20)
+        min_sample_size: Minimum number of bets required before making recommendations (default: 8)
     """
     
     insights = []
@@ -149,11 +149,10 @@ def generate_learning_insights(analysis, min_sample_size=8):
             roi = (stats['roi'] / stats['total']) * 100
             print(f"{odds_range}: {stats['wins']}/{stats['total']} wins ({win_rate:.1f}%) ROI: {roi:+.1f}%")
             
-            # Only generate insights if we have enough data (min 20 bets)
             if stats['total'] >= min_sample_size:
-                if roi < -50:
+                if roi < -10:
                     insights.append(f"AVOID {odds_range} selections - losing {-roi:.0f}% ROI (n={stats['total']})")
-                elif roi > 20:
+                elif roi > 10:
                     insights.append(f"FOCUS on {odds_range} selections - strong {roi:.0f}% ROI (n={stats['total']})")
     
     # Bet type performance (only with sufficient sample)
@@ -165,8 +164,8 @@ def generate_learning_insights(analysis, min_sample_size=8):
             print(f"{bet_type}: {stats['wins']} wins, {stats['places']} places from {stats['total']} bets")
             print(f"  Win rate: {win_rate:.1f}%, Place rate: {place_rate:.1f}%")
             
-            # Only flag issues if we have minimum 15 bets of this type
-            if stats['total'] >= 15:
+            # Only flag issues if we have minimum 5 bets of this type
+            if stats['total'] >= 5:
                 if bet_type == 'EW' and place_rate < 40:
                     insights.append(f"Each-way place rate too low ({place_rate:.0f}%) - tighten EW criteria (n={stats['total']})")
                 elif bet_type == 'WIN' and win_rate < 20:

@@ -47,7 +47,7 @@ function WcAnalysis({ data, hideBet = false }) {
             ⭐ BetBud Top Bet
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12, flexWrap: 'wrap' }}>
-            <div style={{ fontSize: 40 }}>🇦🇷</div>
+            <div style={{ fontSize: 40 }}>{topBet.flag || '🇪🇸'}</div>
             <div>
               <div style={{ fontSize: 22, fontWeight: 900, color: 'white' }}>{topBet.team}</div>
               <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>{topBet.bet_type}</div>
@@ -237,7 +237,7 @@ export default function WorldCupPage() {
                       <span style={{ fontSize: 10, fontWeight: 800, color: '#4ade80', textTransform: 'uppercase', letterSpacing: 1 }}>⭐ BetBud Top Bet</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 10, flexWrap: 'wrap' }}>
-                      <div style={{ fontSize: 36 }}>🇦🇷</div>
+                      <div style={{ fontSize: 36 }}>{topBet.flag || '🇪🇸'}</div>
                       <div>
                         <div style={{ fontSize: 22, fontWeight: 900, color: 'white' }}>{topBet.team}</div>
                         <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{topBet.bet_type}</div>

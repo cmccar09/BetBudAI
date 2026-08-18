@@ -1,5 +1,7 @@
 # BetBud Betting Picks — Master Skill
 
+> **MISSION: FIND WINNERS.** Every pick issued must be the best horse / team / player available given today's data. Skip the day before issuing a low-confidence pick. Subscribers pay to win — not for explanations of why data was missing.
+
 Generate betting picks for the specified sport with measurable goals per sport, using verified real match/squad data.
 
 ## Usage
@@ -24,7 +26,7 @@ Map the input to the correct skill and data source:
 
 | Arg | Sport | DynamoDB table / key | Goal |
 |---|---|---|---|
-| `racing` | Horse Racing | `SureBetBets` (date-index) | ≥ 75% win rate · ≥ 60% ROI · 1 pick/day |
+| `racing` | Horse Racing | `SureBetBets` (bet_date PK, no GSI) | ≥ 75% win rate · ≥ 60% ROI · 1 morning + 2 extended (weekday) / 4 extended (weekend) |
 | `worldcup` | World Cup | `BetBudAI_Sports` PK=worldcup | ≥ 65% match accuracy · ≥ 20% FTS |
 | `tennis` | Pro Tennis | `BetBudAI_Sports` PK=wimbledon | ≥ 70% match accuracy · 1 EW per slam |
 | `cycling` | Tour de France | `BetBudAI_Sports` PK=tourdefrance | ≥ 35% stage winners · 1 EW per Tour |
@@ -73,7 +75,7 @@ aws dynamodb get-item --table-name BetBudAI_Sports `
 5. Odds not drifting (current ≤ morning price)
 6. At least one of: C&D winner / going match win / steam signal
 
-**Selection:** single Best Bet + optional Each-Way. Skip the day if gate fails.
+**Selection:** 1 morning Best Bet + extended picks (max 2 on weekdays Mon–Fri, max 4 on weekends Sat–Sun). Skip the day if gate fails.
 
 ---
 

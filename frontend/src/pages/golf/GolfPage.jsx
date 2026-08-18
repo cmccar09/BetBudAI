@@ -5,11 +5,11 @@ const API_BASE_URL = process.env.REACT_APP_API_URL ||
 
 // Seeded fallback outright odds for The Open (real research, used only if live Betfair scrape is empty)
 const FALLBACK_OUTRIGHT = [
-  { name: 'Scottie Scheffler', odds: 5.0 },
-  { name: 'Rory McIlroy', odds: 8.0 },
-  { name: 'Jon Rahm', odds: 15.0 },
-  { name: 'Xander Schauffele', odds: 17.0 },
-  { name: 'Matt Fitzpatrick', odds: 26.0 },
+  { name: 'Scottie Scheffler', odds: 3.85 },
+  { name: 'Rory McIlroy', odds: 12.5 },
+  { name: 'Tommy Fleetwood', odds: 15.0 },
+  { name: 'Matt Fitzpatrick', odds: 19.5 },
+  { name: 'Robert MacIntyre', odds: 23.0 },
 ];
 
 const TABS = [
@@ -164,6 +164,7 @@ export default function GolfPage() {
   const tipsInForm = data?.tips_in_form || [];
   const courseForm = data?.course_form || {};
   const roundPredictions = data?.round_predictions || [];
+  const dailyBets = data?.daily_bets || [];
   const yesterdayPerf = data?.yesterday_performance || {};
   const completed = majors.filter(m => m.status === 'completed');
   const nextMajor = majors.find(m => m.status !== 'completed');
@@ -201,9 +202,44 @@ export default function GolfPage() {
         {tab === 'dashboard' && (
           <>
             <OutrightBoard contenders={outright} tournament={outrightTournament} />
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', textAlign: 'center', margin: '12px 0 24px' }}>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', textAlign: 'center', margin: '12px 0 16px' }}>
               {data?.outright?.length > 0 ? 'Live Betfair Exchange odds' : 'Pre-tournament odds — live exchange odds update automatically once available'}
             </div>
+
+            {/* BetBud 5 daily bets — right under the outright leaderboard */}
+            {dailyBets.length > 0 && (
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: 1, margin: '0 0 10px' }}>
+                  🎯 BetBud Open Bets
+                  <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.35)', marginLeft: 8, textTransform: 'none' }}>updates daily</span>
+                </div>
+                {dailyBets.map((bet, i) => {
+                  const tierColor = bet.tier === 'short' ? '#60a5fa' : bet.tier === 'long' ? '#f87171' : '#fbbf24';
+                  return (
+                    <div key={i} style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${tierColor}33`, borderLeft: `3px solid ${tierColor}`, borderRadius: 8, padding: '12px 14px', marginBottom: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                        <span style={{ background: `${tierColor}22`, color: tierColor, fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: 1 }}>{bet.tier}</span>
+                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>{bet.bet_type}</span>
+                        <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 800, color: tierColor }}>{bet.odds}</span>
+                      </div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: 'white', marginBottom: 4 }}>{bet.selection}</div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>{bet.reason}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            {dailyBets.length === 0 && roundPredictions.length > 0 && (
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: 1, margin: '0 0 10px' }}>⛳ BetBud Open Picks</div>
+                {roundPredictions.map((p, i) => (
+                  <div key={i} style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 8, padding: '10px 14px', marginBottom: 6 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'white' }}>{p.prediction}</div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{p.reason}</div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div style={{ fontSize: 13, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>2026 Major Winners So Far</div>
             {completed.map(m => <MajorCard key={m.name} m={m} />)}
@@ -223,19 +259,6 @@ export default function GolfPage() {
                 <div style={{ fontSize: 13, fontWeight: 800, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: 1, margin: '20px 0 10px' }}>Up Next</div>
                 <MajorCard m={nextMajor} />
               </>
-            )}
-
-            {/* BetBud round predictions */}
-            {roundPredictions.length > 0 && (
-              <div style={{ marginBottom: 20 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: 1, margin: '20px 0 10px' }}>⛳ BetBud Round Predictions</div>
-                {roundPredictions.map((p, i) => (
-                  <div key={i} style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 8, padding: '10px 14px', marginBottom: 6 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'white' }}>{p.prediction}</div>
-                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{p.reason}</div>
-                  </div>
-                ))}
-              </div>
             )}
 
             {/* Course form — Royal Birkdale */}
@@ -274,11 +297,58 @@ export default function GolfPage() {
         )}
         {tab === 'tips' && (
           <>
+            {/* Live Open R4 bets — shown first when active */}
+            {dailyBets.length > 0 && (
+              <div style={{ marginBottom: 28 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
+                  🎯 BetBud Open Bets — R4 Sunday
+                </div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 12 }}>
+                  Today's picks across short / medium / long odds tiers — updated daily at 06:00 UTC.
+                </div>
+                {dailyBets.map((bet, i) => {
+                  const tierColor = bet.tier === 'short' ? '#60a5fa' : bet.tier === 'long' ? '#f87171' : '#fbbf24';
+                  return (
+                    <div key={i} style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${tierColor}33`, borderLeft: `3px solid ${tierColor}`, borderRadius: 8, padding: '12px 14px', marginBottom: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                        <span style={{ background: `${tierColor}22`, color: tierColor, fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: 1 }}>{bet.tier}</span>
+                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>{bet.bet_type}</span>
+                        <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 800, color: tierColor }}>{bet.odds}</span>
+                      </div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: 'white', marginBottom: 4 }}>{bet.selection}</div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>{bet.reason}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Live Open leaderboard snapshot */}
+            {(() => {
+              const liveOpen = majors.find(m => m.name === 'The Open Championship' && m.status === 'live' && m.leaderboard?.length > 0);
+              if (!liveOpen) return null;
+              return (
+                <div style={{ marginBottom: 24 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: '#f87171', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
+                    🔴 Live — The Open Championship R4
+                  </div>
+                  <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(248,113,113,0.25)', borderRadius: 10, padding: '12px 14px' }}>
+                    {liveOpen.leaderboard.slice(0, 10).map((p, i) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, padding: '4px 0', borderBottom: i < 9 ? '1px solid rgba(255,255,255,0.04)' : 'none', color: i === 0 ? '#fbbf24' : 'rgba(255,255,255,0.7)', fontWeight: i === 0 ? 700 : 400 }}>
+                        <span>{i + 1}. {p.name}</span>
+                        <span style={{ color: '#34d399', fontWeight: 700 }}>{p.score}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             <div style={{ fontSize: 13, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
-              💡 BetBud Tips — In-Form Players
+              📈 Season Form — 2026 Majors
             </div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 16 }}>
-              Players with multiple top-10 finishes across 2026's majors so far — not betting advice.
+              Players with multiple top-10 finishes across 2026's completed majors.
             </div>
             {tipsInForm.length > 0 ? tipsInForm.map((p, i) => (
               <div key={i} style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 8, padding: '10px 14px', marginBottom: 6 }}>
