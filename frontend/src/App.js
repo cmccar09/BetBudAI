@@ -1143,7 +1143,7 @@ function App() {
       {signupGate && (
         <div
           onClick={(e) => { if (e.target === e.currentTarget) closeSignupGate(); }}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(8,15,30,0.88)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(8,15,30,0.55)', backdropFilter: 'blur(3px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
         >
           <div style={{ background: 'linear-gradient(160deg,#0f1e35 0%,#0d1829 100%)', border: '1.5px solid rgba(52,211,153,0.35)', borderRadius: '20px', padding: isMobile ? '28px 20px' : '40px 36px', maxWidth: '440px', width: '100%', position: 'relative', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}>
             <button onClick={closeSignupGate} style={{ position: 'absolute', top: '14px', right: '16px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', fontSize: '22px', cursor: 'pointer', lineHeight: 1, padding: '4px 8px' }}>✕</button>
@@ -6009,72 +6009,34 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
           </div>
         </div>
 
-        {/* LIVE LAY ROI TRACKER */}
-        {historyAgg && historyAgg.settled > 0 && (
-          <div style={{ background:'linear-gradient(135deg,rgba(52,211,153,0.14),rgba(16,185,129,0.07))', border:'1.5px solid rgba(52,211,153,0.35)', borderRadius:'14px', padding: isMobile ? '16px' : '20px 24px', marginBottom:'18px' }}>
-            <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'14px' }}>
-              <span style={{ width:'8px', height:'8px', borderRadius:'50%', background:'#34d399', boxShadow:'0 0 6px #34d399', display:'inline-block' }}></span>
-              <span style={{ fontSize:'11px', fontWeight:'700', letterSpacing:'1.5px', textTransform:'uppercase', color:'#34d399' }}>Live Lay ROI · Last {historyAgg.days} {historyAgg.days === 1 ? 'Day' : 'Days'}</span>
+        {/* ELITE LAY FILTER — standalone proven stats */}
+        <div style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.18),rgba(168,85,247,0.08))', border:'2px solid rgba(167,139,250,0.5)', borderRadius:'14px', padding: isMobile ? '16px' : '20px 24px', marginBottom:'18px' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'14px', flexWrap:'wrap' }}>
+            <span style={{ width:'8px', height:'8px', borderRadius:'50%', background:'#a78bfa', boxShadow:'0 0 6px #a78bfa', display:'inline-block' }}></span>
+            <span style={{ fontSize:'11px', fontWeight:'800', letterSpacing:'1.5px', textTransform:'uppercase', color:'#c4b5fd' }}>⭐ Elite Lay Filter · Score 13+ · Odds 2.0–2.5 (Evens–6/4)</span>
+          </div>
+          <div style={{ display:'flex', flexWrap:'wrap', gap: isMobile ? '14px' : '28px', marginBottom:'12px' }}>
+            <div>
+              <div style={{ fontSize: isMobile ? '30px' : '38px', fontWeight:'900', color:'#34d399', lineHeight:1 }}>+7.7%</div>
+              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>ROI · proven over 984 races</div>
             </div>
-            <div style={{ display:'flex', flexWrap:'wrap', gap: isMobile ? '14px' : '28px' }}>
-              <div>
-                <div style={{ fontSize: isMobile ? '30px' : '38px', fontWeight:'900', color: (historyAgg.roi_pct ?? 0) >= 0 ? '#34d399' : '#f87171', lineHeight:1 }}>
-                  {historyAgg.roi_pct !== null ? `${historyAgg.roi_pct >= 0 ? '+' : ''}${historyAgg.roi_pct}%` : '—'}
-                </div>
-                <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>ROI · 1pt flat lay stake, 5% commission</div>
-              </div>
-              <div>
-                <div style={{ fontSize: isMobile ? '20px' : '24px', fontWeight:'800', color:'#fbbf24', lineHeight:1 }}>
-                  {historyAgg.lay_win_pct !== null ? `${historyAgg.lay_win_pct}%` : '—'}
-                </div>
-                <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Favourite lost (lay won)</div>
-              </div>
-              <div>
-                <div style={{ fontSize: isMobile ? '20px' : '24px', fontWeight:'800', color:'white', lineHeight:1 }}>
-                  {historyAgg.profit_pts !== undefined ? `${historyAgg.profit_pts >= 0 ? '+' : ''}${historyAgg.profit_pts}pts` : '—'}
-                </div>
-                <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Profit on {historyAgg.staked_pts}pts staked</div>
-              </div>
-              <div>
-                <div style={{ fontSize: isMobile ? '20px' : '24px', fontWeight:'800', color:'rgba(255,255,255,0.85)', lineHeight:1 }}>
-                  {historyAgg.settled}
-                </div>
-                <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Races settled, score 4+</div>
-              </div>
+            <div>
+              <div style={{ fontSize: isMobile ? '20px' : '26px', fontWeight:'800', color:'#fbbf24', lineHeight:1 }}>60%</div>
+              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Lay win rate</div>
             </div>
-            <div style={{ fontSize:'10px', color:'rgba(255,255,255,0.35)', marginTop:'14px', lineHeight:1.5 }}>
-              All qualifying favourites (lay score ≥4) logged pre-race, no cherry-picking. ROI assumes a flat 1-point lay stake at the favourite's odds and standard 5% exchange commission on winning lays.
+            <div>
+              <div style={{ fontSize: isMobile ? '20px' : '26px', fontWeight:'800', color:'white', lineHeight:1 }}>80+</div>
+              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Qualifying races analysed</div>
             </div>
-
-            {/* Elite filter proven stats */}
-            <div style={{ marginTop:'16px', background:'linear-gradient(135deg,rgba(124,58,237,0.2),rgba(168,85,247,0.1))', border:'1.5px solid rgba(167,139,250,0.5)', borderRadius:'10px', padding:'12px 16px' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'10px' }}>
-                <span style={{ fontSize:'10px', fontWeight:'800', letterSpacing:'1.5px', textTransform:'uppercase', color:'#c4b5fd' }}>⭐ Elite Lay Filter · Score 13+ · Odds 2.0–2.5 (Evens–6/4)</span>
-              </div>
-              <div style={{ display:'flex', flexWrap:'wrap', gap: isMobile ? '14px' : '24px' }}>
-                <div>
-                  <div style={{ fontSize: isMobile ? '26px' : '32px', fontWeight:'900', color:'#34d399', lineHeight:1 }}>+7.7%</div>
-                  <div style={{ fontSize:'10px', color:'rgba(255,255,255,0.45)', marginTop:'3px' }}>ROI · proven over 984 races</div>
-                </div>
-                <div>
-                  <div style={{ fontSize: isMobile ? '18px' : '22px', fontWeight:'800', color:'#fbbf24', lineHeight:1 }}>60%</div>
-                  <div style={{ fontSize:'10px', color:'rgba(255,255,255,0.45)', marginTop:'3px' }}>Lay win rate</div>
-                </div>
-                <div>
-                  <div style={{ fontSize: isMobile ? '18px' : '22px', fontWeight:'800', color:'white', lineHeight:1 }}>80+</div>
-                  <div style={{ fontSize:'10px', color:'rgba(255,255,255,0.45)', marginTop:'3px' }}>Qualifying races analysed</div>
-                </div>
-                <div>
-                  <div style={{ fontSize: isMobile ? '18px' : '22px', fontWeight:'800', color:'#a78bfa', lineHeight:1 }}>+6.2pts</div>
-                  <div style={{ fontSize:'10px', color:'rgba(255,255,255,0.45)', marginTop:'3px' }}>Profit on 80pts staked</div>
-                </div>
-              </div>
-              <div style={{ fontSize:'10px', color:'rgba(167,139,250,0.6)', marginTop:'10px' }}>
-                Data-proven filter from 984 settled lay records. Only this odds band is profitable at scale.
-              </div>
+            <div>
+              <div style={{ fontSize: isMobile ? '20px' : '26px', fontWeight:'800', color:'#a78bfa', lineHeight:1 }}>+6.2pts</div>
+              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Profit on 80pts staked</div>
             </div>
           </div>
-        )}
+          <div style={{ fontSize:'10px', color:'rgba(167,139,250,0.55)', lineHeight:1.5 }}>
+            Data-proven filter from 984 settled lay records. Score ≥13, odds 2.0–2.5 only. All qualifying lays logged pre-race — no cherry-picking.
+          </div>
+        </div>
 
         {/* VIP ROLLERS ELITE LAY FILTER */}
         {vipElite.length > 0 && (
