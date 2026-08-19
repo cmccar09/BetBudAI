@@ -695,9 +695,102 @@ function App() {
     navigateToPage('home');
   };
 
+  // ── Signup gate overlay state ─────────────────────────────────────────────
+  const [signupGate, setSignupGate] = useState(null); // null | { tab, label, emoji }
+  const [gateEmail, setGateEmail] = useState('');
+  const [gateMode, setGateMode] = useState('register'); // 'register' | 'login'
+  const [gateForm, setGateForm] = useState({ fullName:'', email:'', password:'', agreeTerms:false });
+  const [gateLoginForm, setGateLoginForm] = useState({ emailOrUser:'', password:'' });
+  const [gateState, setGateState] = useState('idle');
+  const [gateError, setGateError] = useState('');
+
+  const openSignupGate = (tab, label, emoji) => {
+    setSignupGate({ tab, label, emoji });
+    setGateEmail('');
+    setGateError('');
+    setGateState('idle');
+    setGateMode('register');
+    trackEvent('signup_gate_shown', { tab, user_status: 'guest' });
+  };
+  const closeSignupGate = () => setSignupGate(null);
+
+  const handleGateRegister = async (e) => {
+    e.preventDefault();
+    setGateError('');
+    const emailVal = (gateForm.email || gateEmail).trim().toLowerCase();
+    const emailRe = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+    if (!gateForm.fullName.trim() || gateForm.fullName.trim().length < 3)
+      return setGateError('Please enter your full name.');
+    if (!emailRe.test(emailVal))
+      return setGateError('Please enter a valid email address.');
+    if (!gateForm.password || gateForm.password.length < 8)
+      return setGateError('Password must be at least 8 characters.');
+    if (!gateForm.agreeTerms)
+      return setGateError('Please agree to the Terms of Service.');
+    setGateState('loading');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/register`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName: gateForm.fullName.trim(), email: emailVal, password: gateForm.password, agreeTerms: true, tier: 'premium' }),
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        handleAuthSuccess(data.user);
+        closeSignupGate();
+        navigateToPage(signupGate?.tab || 'picks5', { destination: signupGate?.tab });
+      } else {
+        setGateError(data.error || 'Registration failed. Please try again.');
+        setGateState('idle');
+      }
+    } catch { setGateError('Network error. Please try again.'); setGateState('idle'); }
+  };
+
+  const handleGateLogin = async (e) => {
+    e.preventDefault();
+    setGateError('');
+    if (!gateLoginForm.emailOrUser.trim() || !gateLoginForm.password)
+      return setGateError('Please enter your email/username and password.');
+    setGateState('loading');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/login`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailOrUsername: gateLoginForm.emailOrUser.trim().toLowerCase(), password: gateLoginForm.password }),
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        handleAuthSuccess(data.user);
+        closeSignupGate();
+        navigateToPage(signupGate?.tab || 'picks5', { destination: signupGate?.tab });
+      } else {
+        setGateError(data.error || 'Login failed. Please check your details.');
+        setGateState('idle');
+      }
+    } catch { setGateError('Network error. Please try again.'); setGateState('idle'); }
+  };
+
   const handleTabClick = (key) => {
-    // All content pages are public. Only admin requires auth.
+    // Admin always requires auth
     if (key === 'admin' && !isAdmin) return;
+    // Non-home tabs gate non-authenticated users
+    if (key !== 'home' && !isAuthenticated) {
+      const tabDef = [
+        { key:'picks5',    label:'Daily Picks',      emoji:'🏆' },
+        { key:'punchestown', label:'Featured Meeting', emoji:'🐎' },
+        { key:'laythe',    label:'Favourite Watch',   emoji:'🏇' },
+        { key:'darts',     label:'Darts',             emoji:'🎯' },
+        { key:'gaa',       label:'Cork GAA',          emoji:'🏐' },
+        { key:'football',  label:'Football',          emoji:'⚽' },
+        { key:'wimbledon', label:'Pro Tennis',        emoji:'🎾' },
+        { key:'tourdefrance', label:'Pro Cycling',    emoji:'🚴' },
+        { key:'rugby',     label:'Rugby',             emoji:'🏉' },
+        { key:'golf',      label:'Pro Golf',          emoji:'⛳' },
+        { key:'basketball',label:'Basketball',        emoji:'🏀' },
+        { key:'nfl',       label:'NFL',               emoji:'🏈' },
+        { key:'prediction-markets', label:'Prediction Markets', emoji:'🎲' },
+      ].find(t => t.key === key) || { key, label: key, emoji: '🔒' };
+      openSignupGate(tabDef.key, tabDef.label, tabDef.emoji);
+      return;
+    }
     navigateToPage(key, { destination: key });
   };
 
@@ -1045,6 +1138,65 @@ function App() {
           return cfg.component();
         })()}
       </main>
+
+      {/* ── SIGNUP GATE OVERLAY ──────────────────────────────────────────── */}
+      {signupGate && (
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) closeSignupGate(); }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(8,15,30,0.88)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
+        >
+          <div style={{ background: 'linear-gradient(160deg,#0f1e35 0%,#0d1829 100%)', border: '1.5px solid rgba(52,211,153,0.35)', borderRadius: '20px', padding: isMobile ? '28px 20px' : '40px 36px', maxWidth: '440px', width: '100%', position: 'relative', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}>
+            <button onClick={closeSignupGate} style={{ position: 'absolute', top: '14px', right: '16px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', fontSize: '22px', cursor: 'pointer', lineHeight: 1, padding: '4px 8px' }}>✕</button>
+
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <div style={{ fontSize: '40px', marginBottom: '10px' }}>{signupGate.emoji}</div>
+              <div style={{ fontSize: '12px', fontWeight: '700', color: '#34d399', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '6px' }}>Free Access Required</div>
+              <div style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '900', color: 'white', lineHeight: 1.2, marginBottom: '6px' }}>{signupGate.label}</div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)' }}>Create a free account to access all picks across every sport.</div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '6px', marginBottom: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '4px' }}>
+              {[{ m:'register', l:'Create Account' }, { m:'login', l:'Sign In' }].map(t => (
+                <button key={t.m} onClick={() => { setGateMode(t.m); setGateError(''); setGateState('idle'); }} style={{ flex: 1, padding: '8px', borderRadius: '7px', border: 'none', background: gateMode === t.m ? 'rgba(52,211,153,0.2)' : 'transparent', color: gateMode === t.m ? '#34d399' : 'rgba(255,255,255,0.4)', fontWeight: '700', fontSize: '13px', cursor: 'pointer' }}>
+                  {t.l}
+                </button>
+              ))}
+            </div>
+
+            {gateError && (
+              <div style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)', borderRadius: '8px', padding: '10px 14px', color: '#f87171', fontSize: '13px', marginBottom: '14px' }}>⚠ {gateError}</div>
+            )}
+
+            {gateMode === 'register' ? (
+              <form onSubmit={handleGateRegister} noValidate>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+                  <input type="text" placeholder="Full name" autoComplete="name" required value={gateForm.fullName} onChange={e => setGateForm(p => ({ ...p, fullName: e.target.value }))} style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', borderRadius: '9px', padding: '12px 14px', color: 'white', fontSize: '14px', outline: 'none' }} />
+                  <input type="email" placeholder="Email address" autoComplete="email" required value={gateForm.email} onChange={e => setGateForm(p => ({ ...p, email: e.target.value }))} style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', borderRadius: '9px', padding: '12px 14px', color: 'white', fontSize: '14px', outline: 'none' }} />
+                  <input type="password" placeholder="Password (8+ characters)" autoComplete="new-password" required value={gateForm.password} onChange={e => setGateForm(p => ({ ...p, password: e.target.value }))} style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', borderRadius: '9px', padding: '12px 14px', color: 'white', fontSize: '14px', outline: 'none' }} />
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={gateForm.agreeTerms} onChange={e => setGateForm(p => ({ ...p, agreeTerms: e.target.checked }))} style={{ marginTop: '2px', accentColor: '#34d399', flexShrink: 0 }} />
+                    <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>I agree to the Terms of Service and confirm I am 18+</span>
+                  </label>
+                </div>
+                <button type="submit" disabled={gateState === 'loading'} style={{ width: '100%', background: gateState === 'loading' ? 'rgba(5,150,105,0.5)' : 'linear-gradient(135deg,#059669,#047857)', border: 'none', borderRadius: '10px', padding: '14px', color: 'white', fontSize: '15px', fontWeight: '900', cursor: gateState === 'loading' ? 'not-allowed' : 'pointer', boxShadow: '0 4px 18px rgba(5,150,105,0.35)', marginBottom: '10px' }}>
+                  {gateState === 'loading' ? '⏳ Creating account…' : `Access ${signupGate.label} — Free →`}
+                </button>
+                <div style={{ textAlign: 'center', fontSize: '11px', color: 'rgba(255,255,255,0.25)' }}>No credit card · No subscription · No catch</div>
+              </form>
+            ) : (
+              <form onSubmit={handleGateLogin} noValidate>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+                  <input type="text" placeholder="Email or username" autoComplete="username" required value={gateLoginForm.emailOrUser} onChange={e => setGateLoginForm(p => ({ ...p, emailOrUser: e.target.value }))} style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', borderRadius: '9px', padding: '12px 14px', color: 'white', fontSize: '14px', outline: 'none' }} />
+                  <input type="password" placeholder="Password" autoComplete="current-password" required value={gateLoginForm.password} onChange={e => setGateLoginForm(p => ({ ...p, password: e.target.value }))} style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', borderRadius: '9px', padding: '12px 14px', color: 'white', fontSize: '14px', outline: 'none' }} />
+                </div>
+                <button type="submit" disabled={gateState === 'loading'} style={{ width: '100%', background: gateState === 'loading' ? 'rgba(5,150,105,0.5)' : 'linear-gradient(135deg,#059669,#047857)', border: 'none', borderRadius: '10px', padding: '14px', color: 'white', fontSize: '15px', fontWeight: '900', cursor: gateState === 'loading' ? 'not-allowed' : 'pointer', boxShadow: '0 4px 18px rgba(5,150,105,0.35)' }}>
+                  {gateState === 'loading' ? '⏳ Signing in…' : 'Sign In →'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
