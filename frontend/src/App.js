@@ -6986,29 +6986,39 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
           <div style={{ textAlign: 'center', padding: '24px 24px 16px', background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(52,211,153,0.25)', borderRadius: '16px', marginBottom: '16px' }}>
             <h3 style={{ color: '#34d399', fontSize: '20px', fontWeight: '800', margin: '0 0 6px' }}>✅ You're signed in!</h3>
             <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', margin: '0 0 16px' }}>Use the tabs above to access today's picks, results and more.</p>
-            {/* Share button */}
-            <button
-              onClick={() => {
-                const shareData = {
-                  title: 'BetBudAI — Free AI Racing Picks',
-                  text: 'I use BetBudAI for daily horse racing picks — totally free, AI-powered, with a live ROI tracker. Check it out!',
-                  url: 'https://www.betbudai.com',
-                };
-                if (navigator.share) {
-                  navigator.share(shareData).catch(() => null);
-                } else {
-                  navigator.clipboard.writeText('https://www.betbudai.com').then(() => {
-                    alert('Link copied to clipboard!');
-                  }).catch(() => null);
-                }
-                trackEvent('share_click', { location: 'home_authenticated', user: authUser?.username });
-              }}
-              style={{ background: 'rgba(52,211,153,0.12)', border: '1.5px solid rgba(52,211,153,0.4)', borderRadius: '10px', padding: '10px 22px', color: '#34d399', fontSize: '13px', fontWeight: '800', cursor: 'pointer', letterSpacing: '0.3px' }}
-            >
-              📤 Share BetBudAI with a friend
-            </button>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {/* Share button */}
+              <button
+                onClick={() => {
+                  const shareData = {
+                    title: 'BetBudAI — Free AI Racing Picks',
+                    text: 'I use BetBudAI for daily horse racing picks — totally free, AI-powered, with a live ROI tracker. Check it out!',
+                    url: 'https://www.betbudai.com',
+                  };
+                  if (navigator.share) {
+                    navigator.share(shareData).catch(() => null);
+                  } else {
+                    navigator.clipboard.writeText('https://www.betbudai.com').then(() => {
+                      alert('Link copied to clipboard!');
+                    }).catch(() => null);
+                  }
+                  trackEvent('share_click', { location: 'home_authenticated', user: authUser?.username });
+                }}
+                style={{ background: 'rgba(52,211,153,0.12)', border: '1.5px solid rgba(52,211,153,0.4)', borderRadius: '10px', padding: '10px 22px', color: '#34d399', fontSize: '13px', fontWeight: '800', cursor: 'pointer', letterSpacing: '0.3px' }}
+              >
+                📤 Share BetBudAI with a friend
+              </button>
+              {/* Favourite Watch upsell — only for free tier */}
+              {(!authUser?.subscription_tier || authUser?.subscription_tier === 'free' || authUser?.subscription_tier === 'free_subscriber') && (
+                <button
+                  onClick={() => trackEvent('tab_click', { tab: 'laythe', source: 'home_upsell' }) || document.querySelector('[data-tab="laythe"]')?.click()}
+                  style={{ background: 'rgba(245,158,11,0.1)', border: '1.5px solid rgba(245,158,11,0.35)', borderRadius: '10px', padding: '10px 22px', color: '#fbbf24', fontSize: '13px', fontWeight: '800', cursor: 'pointer', letterSpacing: '0.3px' }}
+                >
+                  🏇 Explore Favourite Watch
+                </button>
+              )}
+            </div>
           </div>
-          <UpgradeCards authUser={authUser} />
         </div>
       ) : (
       <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '16px', padding: isMobile ? '24px 16px' : '36px 32px', marginBottom: '40px' }}>
