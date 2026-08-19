@@ -64,9 +64,9 @@ const DIVISIONS = [
   {
     id: 'PSHC', label: 'PSHC', emoji: '🏑', sport: 'hurling',
     color: '#60a5fa', fullName: 'Premier Senior Hurling', groups: PSHC_GROUPS, placeholder: false,
-    champ: 'Sarsfields', tip: 'Midleton', tipAlt: 'Charleville',
-    tipReason: "Dominant Round 1 win (0-25 to 0-17). Defending champions Sarsfields already knocked out of their stride.",
-    tipAltReason: "Shocked defending champions Sarsfields by 2 points — serious dark horse.",
+    champ: 'Sarsfields', tip: 'Midleton', tipAlt: 'Kanturk',
+    tipReason: "Most dominant R1 win in PSHC (0-25 to 0-17 vs St Finbarr's). Defending champions Sarsfields already knocked out of their stride — Midleton the form side heading into R2.",
+    tipAltReason: "Demolished Fr O'Neill's 3-25 to 2-15 in R1 — highest score in the championship. North Cork power house, very dangerous.",
     gaacorkUrl: 'https://gaacork.ie/league/215986/',
   },
   {
@@ -145,9 +145,9 @@ const DIVISIONS = [
 // ── Accumulator ───────────────────────────────────────────────────────────
 const ACCA_STAKE = 10;
 const ACCA_SELECTIONS = [
-  { comp: 'IFA R2', match: 'Buttevant v Kilmurry', pick: 'Buttevant', estOdds: 1.73, estFrac: '8/11', confidence: 'MEDIUM-HIGH', reason: "Buttevant 20-point R1 win — the most dominant performance across all 10 championships. Kilmurry won by 4; this gulf in form is decisive." },
-  { comp: 'PJFC R2', match: 'Kilmacabea v Canovee', pick: 'Canovee', estOdds: 1.80, estFrac: '4/5', confidence: 'MEDIUM-HIGH', reason: "Canovee destroyed St Nicks by 20 points in R1 — the standout Group 3 result. Both sides were very impressive but Canovee's scoring power is exceptional." },
-  { comp: 'PJFC R2', match: 'Kinsale v Cullen', pick: 'Kinsale', estOdds: 1.67, estFrac: '4/6', confidence: 'MEDIUM', reason: "Kinsale won R1 by 5pts (away); Cullen won by 7 at home. Group 1 top-of-table clash — Kinsale's R1 away win is the stronger form signal." },
+  { comp: 'PSHC R2', match: 'Newcestown v Midleton', pick: 'Midleton', estOdds: 1.67, estFrac: '4/6', confidence: 'MEDIUM-HIGH', reason: "Midleton dominant in R1 — 8pt win over St Finbarr's (0-25 to 0-17). Newcestown lost by 9pts to Bride Rovers and must win here. Midleton look the strongest team in Group 3." },
+  { comp: 'PSHC R2', match: 'Charleville v Douglas', pick: 'Charleville', estOdds: 1.60, estFrac: '8/13', confidence: 'MEDIUM-HIGH', reason: "Charleville shocked defending champions Sarsfields in R1. Douglas drew R1 with Newtownshandrum. Charleville on 2pts, momentum is with the North Cork side." },
+  { comp: 'PSHC R2', match: 'Glen Rovers v Kanturk', pick: 'Kanturk', estOdds: 1.73, estFrac: '8/11', confidence: 'MEDIUM-HIGH', reason: "Kanturk were the standout performers of PSHC R1 — demolished Fr O'Neill's by 13pts (3-25 to 2-15). Glen Rovers lost by 2pts. Kanturk are the team to beat in Group 1." },
 ];
 const ACCA_COMBINED = ACCA_SELECTIONS.reduce((acc, s) => acc * s.estOdds, 1);
 const ACCA_RETURN   = +(ACCA_STAKE * ACCA_COMBINED).toFixed(2);
@@ -182,8 +182,8 @@ const FIXTURES = [
 
   // ─── PSHC ROUND 2 (22–23 Aug) ───
   { id:'pshc-r2-newcestown-midleton', code:'hurling', comp:'PSHC', group:'Group 3', round:'Round 2', home:'Newcestown', away:'Midleton', venue:'Páirc Uí Rinn', date:'Sat 22 Aug 2026', time:'15:00', status:'upcoming', isUpset:false, result:null, pick:'Midleton', pickLabel:'Back Midleton', confidence:'MEDIUM-HIGH', context:"Midleton dominant in R1 (8pt win over Finbarrs). Newcestown lost R1 to Bride Rovers — must win here.", analysis:'', key_factors:[], watch:null },
-  { id:'pshc-r2-newtownshandrum-sarsfields', code:'hurling', comp:'PSHC', group:'Group 2', round:'Round 2', home:'Newtownshandrum', away:'Sarsfields', venue:'Mallow', date:'Sat 22 Aug 2026', time:'15:00', status:'upcoming', isUpset:false, result:null, pick:'Sarsfields', pickLabel:'Back Sarsfields', confidence:'MEDIUM', context:"Sarsfields on 1pt (draw). Newtownshandrum on 1pt (draw). Sarsfields — defending champions — need a response after shock R1 defeat.", analysis:'', key_factors:[], watch:null },
-  { id:'pshc-r2-charleville-douglas', code:'hurling', comp:'PSHC', group:'Group 2', round:'Round 2', home:'Charleville', away:'Douglas', venue:'Mallow', date:'Sat 22 Aug 2026', time:'17:00', status:'upcoming', isUpset:false, result:null, pick:'Charleville', pickLabel:'Back Charleville', confidence:'MEDIUM', context:"Charleville shocked Sarsfields in R1. Douglas drew with Newtownshandrum. Both on 2pts.", analysis:'', key_factors:[], watch:null },
+  { id:'pshc-r2-newtownshandrum-sarsfields', code:'hurling', comp:'PSHC', group:'Group 2', round:'Round 2', home:'Newtownshandrum', away:'Sarsfields', venue:'Mallow', date:'Sat 22 Aug 2026', time:'15:00', status:'upcoming', isUpset:false, result:null, pick:'Sarsfields', pickLabel:'Back Sarsfields', confidence:'MEDIUM', context:"Sarsfields on 0pts (LOST to Charleville in R1). Newtownshandrum on 1pt (drew with Douglas). Defending champions need a response or face early exit.", analysis:'', key_factors:[], watch:null },
+  { id:'pshc-r2-charleville-douglas', code:'hurling', comp:'PSHC', group:'Group 2', round:'Round 2', home:'Charleville', away:'Douglas', venue:'Mallow', date:'Sat 22 Aug 2026', time:'17:00', status:'upcoming', isUpset:false, result:null, pick:'Charleville', pickLabel:'Back Charleville', confidence:'MEDIUM-HIGH', context:"Charleville shocked Sarsfields in R1 (2pts). Douglas drew with Newtownshandrum (1pt). Charleville are the form side and have the points advantage.", analysis:'', key_factors:[], watch:null },
   { id:'pshc-r2-finbarrs-briderovers', code:'hurling', comp:'PSHC', group:'Group 3', round:'Round 2', home:"St Finbarr's", away:'Bride Rovers', venue:'Páirc Uí Rinn', date:'Sat 22 Aug 2026', time:'17:00', status:'upcoming', isUpset:false, result:null, pick:'Bride Rovers', pickLabel:'Back Bride Rovers', confidence:'MEDIUM', context:"Bride Rovers dominated in R1 (won by 12pts). Finbarrs hammered by Midleton and must bounce back.", analysis:'', key_factors:[], watch:null },
   { id:'pshc-r2-froneills-blackrock', code:'hurling', comp:'PSHC', group:'Group 1', round:'Round 2', home:"Fr O'Neill's", away:'Blackrock', venue:'Midleton', date:'Sun 23 Aug 2026', time:'16:00', status:'upcoming', isUpset:false, result:null, pick:'Blackrock', pickLabel:'Back Blackrock', confidence:'MEDIUM', context:"Blackrock won R1 by 2pts. Fr O'Neills lost by 16pts to Kanturk — must bounce back.", analysis:'', key_factors:[], watch:null },
   { id:'pshc-r2-glenrovers-kanturk', code:'hurling', comp:'PSHC', group:'Group 1', round:'Round 2', home:'Glen Rovers', away:'Kanturk', venue:'Castletownroche', date:'Sun 23 Aug 2026', time:'16:00', status:'upcoming', isUpset:false, result:null, pick:'Kanturk', pickLabel:'Back Kanturk', confidence:'MEDIUM-HIGH', context:"Kanturk demolished Fr O'Neills in R1 (16pt win). Glen Rovers lost by 2 to Blackrock.", analysis:'', key_factors:[], watch:null },

@@ -389,6 +389,8 @@ def lambda_handler(event, context):
             response = update_daily_email_preference(headers, event)
         elif 'daily-picks-ready-email/send' in path and method == 'POST':
             response = maybe_send_daily_picks_ready_email(headers, event)
+        elif 'home-stats' in path and method == 'GET':
+            response = get_home_stats(headers)
         elif 'results/latest-winner' in path:
             response = get_latest_winner(headers)
         elif 'results/export-csv' in path:
@@ -2296,6 +2298,74 @@ def get_cumulative_roi(headers):
             'headers': headers,
             'body': json.dumps({'success': False, 'error': str(e)})
         }
+
+
+def get_home_stats(headers):
+    """Public home-page social proof: subscriber count, 7-day win streak, today's NAP teaser."""
+    from boto3.dynamodb.conditions import Key
+    from datetime import timedelta, date as _date
+
+    try:
+        count_resp = subscribers_table.scan(Select='COUNT')
+        subscriber_count = count_resp.get('Count', 0)
+    except Exception:
+        subscriber_count = 0
+
+    wins_7 = 0
+    total_7 = 0
+    try:
+        today_d = _date.today()
+        for i in range(7):
+            d = str(today_d - timedelta(days=i))
+            resp = table.query(
+                KeyConditionExpression=Key('bet_date').eq(d),
+                ProjectionExpression='outcome, show_in_ui, is_learning_pick, is_dropped, pick_rank',
+            )
+            for p in resp.get('Items', []):
+                if not p.get('show_in_ui', False) or p.get('is_learning_pick', False) or p.get('is_dropped', False):
+                    continue
+                if not (p.get('pick_rank', 0) or 0):
+                    continue
+                outcome = str(p.get('outcome', '')).lower()
+                if outcome in ('win', 'won', 'loss', 'lost', 'placed'):
+                    total_7 += 1
+                    if outcome in ('win', 'won'):
+                        wins_7 += 1
+    except Exception:
+        pass
+
+    today_nap = None
+    try:
+        today_d = _date.today()
+        resp = table.query(
+            KeyConditionExpression=Key('bet_date').eq(str(today_d)),
+            ProjectionExpression='horse, course, race_time, show_in_ui, pick_rank, comprehensive_score, is_dropped, is_learning_pick',
+        )
+        picks = [decimal_to_float(p) for p in resp.get('Items', [])
+                 if p.get('show_in_ui', False) and not p.get('is_dropped', False)
+                 and not p.get('is_learning_pick', False) and (p.get('pick_rank', 0) or 0) > 0]
+        if picks:
+            picks.sort(key=lambda p: float(p.get('comprehensive_score', 0) or 0), reverse=True)
+            nap = picks[0]
+            today_nap = {
+                'horse': nap.get('horse', ''),
+                'course': nap.get('course', ''),
+                'race_time': str(nap.get('race_time', '')),
+            }
+    except Exception:
+        pass
+
+    return {
+        'statusCode': 200,
+        'headers': headers,
+        'body': json.dumps({
+            'success': True,
+            'subscriber_count': subscriber_count,
+            'wins_7': wins_7,
+            'total_7': total_7,
+            'today_nap': today_nap,
+        })
+    }
 
 
 def export_roi_csv(headers):

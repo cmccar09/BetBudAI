@@ -841,7 +841,7 @@ function App() {
           { key:'home',      label:'Home',             emoji:'🏠', sub:'About & sign in',     gated: false, tierRequired: null },
           { key:'picks5',    label:'Daily Picks',      emoji:'🏆', sub:'4+ tips daily — free',       gated: false, tierRequired: null },
           { key:'punchestown', label:'Featured Meet', emoji:'🐎', sub:'Race card analysis — free', gated: false, tierRequired: null },
-          { key:'laythe',    label:'Favourite Watch',      emoji:'🚫', sub:'Vulnerable Favorites', gated: false, tierRequired: null },
+          { key:'laythe',    label:'Favourite Watch',      emoji:'🏇', sub:'Vulnerable Favorites', gated: false, tierRequired: null },
           { key:'darts',     label:'Darts',            emoji:'🎯', sub:'PDC majors — free',           gated: false, tierRequired: null },
           { key:'gaa',       label:'GAA',              emoji:'🏐', sub:'Club championships — free',   gated: false, tierRequired: null },
           { key:'football',  label:'Football',          emoji:'⚽', sub:'PL · UCL · EL predictions — free', gated: false, tierRequired: null },
@@ -6293,6 +6293,10 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
   const [featuredSnapshot, setFeaturedSnapshot] = useState(null);
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
 
+  const [homeStats, setHomeStats] = useState(null);
+  const [quickEmail, setQuickEmail] = useState('');
+  const [emailStep, setEmailStep] = useState('email'); // 'email' | 'form'
+
   const [form, setForm] = useState({
     fullName: '', email: '', age: '',
     username: '', password: '', confirmPassword: '', agreeTerms: false,
@@ -6389,8 +6393,10 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
       fetch(`${API_BASE_URL}/api/results/today`).then(r => r.json()).catch(() => null),
       fetch(`${API_BASE_URL}/api/results/yesterday`).then(r => r.json()).catch(() => null),
       fetch(`${API_BASE_URL}/api/picks/featured-meeting?date=${yesterdayDateStr}`).then(r => r.json()).catch(() => null),
+      fetch(`${API_BASE_URL}/api/home-stats`).then(r => r.json()).catch(() => null),
     ])
-      .then(([roiData, latestData, todayData, yesterdayData, featuredData]) => {
+      .then(([roiData, latestData, todayData, yesterdayData, featuredData, homeStatsData]) => {
+        if (homeStatsData?.success) setHomeStats(homeStatsData);
         if (roiData?.success || roiData?.roi != null) { setRoi(roiData.roi); setSettled(roiData.settled); }
         if (latestData?.success && latestData.fractional_odds) setLatestWinner(latestData);
         if (todayData?.success) {
@@ -6467,6 +6473,16 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
 
   const selectedTrialLabel = selectedTrialTier === 'vip' ? 'Favourite Watch' : 'Premium';
   const selectedTrialPrice = selectedTrialTier === 'vip' ? '€9.99' : '€9.99';
+
+  const handleQuickEmail = () => {
+    const email = quickEmail.trim();
+    if (email) setForm(prev => ({ ...prev, email }));
+    setEmailStep('form');
+    setSelectedTrialTier('premium');
+    setAuthMode('register');
+    setFormError('');
+    trackEvent('signup_click', { location: 'home_cta_quick_email', tier: 'free' });
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -6760,6 +6776,44 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
             </div>
           ))}
         </div>
+
+        {/* Win streak banner */}
+        {homeStats && homeStats.total_7 > 0 && (
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'linear-gradient(135deg,rgba(251,191,36,0.14),rgba(245,158,11,0.08))', border: '1.5px solid rgba(251,191,36,0.35)', borderRadius: '12px', padding: '10px 20px', marginBottom: '4px' }}>
+            <span style={{ fontSize: '18px' }}>🔥</span>
+            <span style={{ color: '#fbbf24', fontWeight: '800', fontSize: '14px' }}>
+              Last 7 days: <span style={{ color: 'white', fontSize: '17px' }}>{homeStats.wins_7} wins</span> from {homeStats.total_7} picks
+            </span>
+            {homeStats.total_7 > 0 && (
+              <span style={{ color: 'rgba(251,191,36,0.7)', fontSize: '12px', fontWeight: '600' }}>
+                ({Math.round(homeStats.wins_7 / homeStats.total_7 * 100)}% SR)
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* NAP teaser for non-authenticated users */}
+        {!isAuthenticated && homeStats?.today_nap?.horse && (
+          <div style={{ maxWidth: '380px', margin: '14px auto 0', position: 'relative', textAlign: 'center' }}>
+            <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', padding: '14px 18px', overflow: 'hidden' }}>
+              <div style={{ fontSize: '11px', fontWeight: '700', color: '#fbbf24', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '8px' }}>⭐ Today's NAP Pick</div>
+              <div style={{ filter: 'blur(7px)', userSelect: 'none', pointerEvents: 'none' }}>
+                <div style={{ fontSize: '20px', fontWeight: '900', color: 'white', marginBottom: '4px' }}>
+                  {homeStats.today_nap.horse}
+                </div>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>
+                  {homeStats.today_nap.course} · {homeStats.today_nap.race_time}
+                </div>
+              </div>
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(2px)', borderRadius: '12px' }}>
+                <div style={{ fontSize: '13px', fontWeight: '700', color: 'white', marginBottom: '8px' }}>🔒 Sign up free to unlock</div>
+                <button onClick={() => { setAuthMode('register'); setSelectedTrialTier('premium'); setFormError(''); trackEvent('signup_click', { location: 'nap_teaser', tier: 'free' }); }} style={{ background: 'linear-gradient(135deg,#059669,#047857)', border: 'none', borderRadius: '8px', padding: '8px 18px', color: 'white', fontSize: '12px', fontWeight: '800', cursor: 'pointer' }}>
+                  Reveal Today's NAP →
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
 
@@ -6827,50 +6881,85 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
         </div>
       )}
 
-      {/* ── CLEAN 2-OPTION CTA ────────────────────────────────────────── */}
+      {/* ── FREE SIGNUP CTA ───────────────────────────────────────────── */}
       {!isAuthenticated && (
-      <div style={{ maxWidth: '560px', margin: '0 auto 28px', padding: '0 16px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <div style={{ fontSize: isMobile ? '17px' : '20px', fontWeight: '900', color: 'white', marginBottom: '6px' }}>
-            Everything is <span style={{ color: '#34d399' }}>free</span> — just create an account.
+      <div style={{ maxWidth: '520px', margin: '0 auto 28px', padding: '0 16px' }}>
+        <div style={{ background: 'linear-gradient(135deg,rgba(52,211,153,0.13),rgba(16,185,129,0.06))', border: '2px solid rgba(52,211,153,0.45)', borderRadius: '16px', padding: isMobile ? '20px 18px' : '28px 28px', textAlign: 'center' }}>
+          {/* Pill */}
+          <div style={{ display: 'inline-block', background: 'rgba(52,211,153,0.18)', border: '1px solid rgba(52,211,153,0.4)', borderRadius: '50px', padding: '4px 16px', fontSize: '11px', fontWeight: '800', color: '#34d399', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px' }}>
+            100% Free — No Card Ever
           </div>
-          <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
-            Daily horse racing picks, Pro Tennis, Pro Cycling, Rugby, Pro Golf, World Cup — all free.<br/>
-            One premium add-on for serious Betfair users.
+          <div style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '900', color: 'white', lineHeight: 1.2, marginBottom: '16px' }}>
+            Join free and get every pick<br/>across every sport — today.
+          </div>
+          {/* 3-column reasons */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '8px', marginBottom: '20px' }}>
+            {[
+              ['🏇', 'Daily racing picks'],
+              ['⭐', 'NAP & NB selections'],
+              ['🏇', 'Lay alerts · Elite filter'],
+              ['⚽', 'Football tips'],
+              ['🎾', 'Tennis & Darts'],
+              ['📊', 'AI score breakdown'],
+            ].map(([icon, label], i) => (
+              <div key={i} style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '8px 6px', fontSize: '11px', color: 'rgba(255,255,255,0.75)', fontWeight: '600' }}>
+                <div style={{ fontSize: '16px', marginBottom: '3px' }}>{icon}</div>
+                {label}
+              </div>
+            ))}
+          </div>
+          {/* Social proof — live subscriber count */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? '16px' : '28px', marginBottom: '18px', flexWrap: 'wrap' }}>
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '700' }}>
+              <span>👥</span>
+              <span style={{ color: '#34d399' }}>
+                {homeStats?.subscriber_count > 0 ? `Join ${homeStats.subscriber_count.toLocaleString()} members` : 'Growing community'}
+              </span>
+            </div>
+            {[['✅', 'No trial expiry'], ['🔓', 'Instant full access']].map(([icon, txt], i) => (
+              <div key={i} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span>{icon}</span><span>{txt}</span>
+              </div>
+            ))}
+          </div>
+          {/* 2-step email capture */}
+          {emailStep === 'email' ? (
+            <>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                <input
+                  type="email"
+                  placeholder="Enter your email..."
+                  value={quickEmail}
+                  onChange={e => setQuickEmail(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleQuickEmail()}
+                  style={{ flex: 1, background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.18)', borderRadius: '8px', padding: '12px 14px', color: 'white', fontSize: '14px', outline: 'none' }}
+                />
+                <button
+                  onClick={handleQuickEmail}
+                  style={{ background: 'linear-gradient(135deg,#059669,#047857)', border: 'none', borderRadius: '8px', padding: '12px 16px', color: 'white', fontSize: '14px', fontWeight: '900', cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 4px 14px rgba(5,150,105,0.4)' }}
+                >
+                  Get Free Picks →
+                </button>
+              </div>
+              <div style={{ textAlign: 'center', fontSize: '11px', color: 'rgba(255,255,255,0.25)', marginBottom: '8px' }}>
+                or{' '}
+                <span onClick={() => { setSelectedTrialTier('premium'); setAuthMode('register'); setFormError(''); trackEvent('signup_click', { location: 'home_cta_skip_email', tier: 'free' }); }} style={{ color: '#34d399', cursor: 'pointer', textDecoration: 'underline' }}>
+                  create account directly
+                </span>
+              </div>
+            </>
+          ) : (
+            <button
+              onClick={() => { trackEvent('signup_click', { location: 'home_cta_free_main', tier: 'free', user_status: 'guest' }); setSelectedTrialTier('premium'); setAuthMode('register'); setFormError(''); }}
+              style={{ width: '100%', background: 'linear-gradient(135deg,#059669,#047857)', border: 'none', borderRadius: '10px', padding: '14px', color: 'white', fontSize: '15px', fontWeight: '900', cursor: 'pointer', letterSpacing: '0.2px', boxShadow: '0 4px 18px rgba(5,150,105,0.4)', marginBottom: '10px' }}
+            >
+              Create Free Account →
+            </button>
+          )}
+          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>
+            No credit card · No subscription · No catch
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '12px', flexDirection: isMobile ? 'column' : 'row' }}>
-          {/* Free */}
-          <div style={{ flex: 1, background: 'linear-gradient(135deg,rgba(52,211,153,0.12),rgba(16,185,129,0.06))', border: '2px solid rgba(52,211,153,0.4)', borderRadius: '12px', padding: '18px 16px', textAlign: 'center' }}>
-            <div style={{ fontSize: '22px', fontWeight: '900', color: '#34d399', marginBottom: '4px' }}>Free</div>
-            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginBottom: '14px', lineHeight: 1.6 }}>
-              ✓ Horse racing AI picks<br/>
-              ✓ Pro Tennis · Pro Cycling<br/>
-              ✓ Rugby · Pro Golf · World Cup<br/>
-              ✓ Live ROI tracker<br/>
-              ✓ No card required, ever
-            </div>
-            <button onClick={() => { trackEvent('signup_click', { location: 'home_cta_free', tier: 'free', user_status: 'guest' }); setSelectedTrialTier('premium'); setAuthMode('register'); setFormError(''); }} style={{ width: '100%', background: 'linear-gradient(135deg,#059669,#047857)', border: 'none', borderRadius: '8px', padding: '10px', color: 'white', fontSize: '13px', fontWeight: '800', cursor: 'pointer' }}>
-              Create Free Account
-            </button>
-          </div>
-          {/* Favourite Watch */}
-          <div style={{ flex: 1, background: 'linear-gradient(135deg,rgba(245,158,11,0.12),rgba(251,191,36,0.06))', border: '2px solid rgba(245,158,11,0.45)', borderRadius: '12px', padding: '18px 16px', textAlign: 'center', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: '-9px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,#f59e0b,#d97706)', borderRadius: '10px', padding: '2px 10px', fontSize: '9px', fontWeight: '800', color: 'white', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>🚫 For Exchange Players</div>
-            <div style={{ fontSize: '22px', fontWeight: '900', color: '#fbbf24', marginBottom: '2px' }}>€9.99<span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>/mo</span></div>
-            <div style={{ fontSize: '12px', fontWeight: '700', color: '#fbbf24', marginBottom: '12px' }}>Favourite Watch</div>
-            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginBottom: '14px', lineHeight: 1.6 }}>
-              ✓ Everything in Free<br/>
-              ✓ Vulnerable favorites flagged<br/>
-              ✓ Exchange lay alerts daily<br/>
-              ✓ Betfair account recommended
-            </div>
-            <button onClick={() => { trackEvent('signup_click', { location: 'home_cta_vip', tier: 'vip_trial', user_status: 'guest' }); setSelectedTrialTier('vip'); setAuthMode('register'); setFormError(''); }} style={{ width: '100%', background: 'linear-gradient(135deg,#f59e0b,#d97706)', border: 'none', borderRadius: '8px', padding: '10px', color: 'white', fontSize: '13px', fontWeight: '800', cursor: 'pointer' }}>
-              Start Free Trial
-            </button>
-          </div>
-        </div>
-        <div style={{ textAlign: 'center', fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '10px' }}>🔒 Powered by Stripe · Cancel anytime</div>
       </div>
       )}
 
@@ -6894,9 +6983,30 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
       {/* ── AUTH SECTION ──────────────────────────────────────────────── */}
       {isAuthenticated ? (
         <div style={{ marginBottom: '40px' }}>
-          <div style={{ textAlign: 'center', padding: '24px 24px 16px', background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(52,211,153,0.25)', borderRadius: '16px', marginBottom: '24px' }}>
+          <div style={{ textAlign: 'center', padding: '24px 24px 16px', background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(52,211,153,0.25)', borderRadius: '16px', marginBottom: '16px' }}>
             <h3 style={{ color: '#34d399', fontSize: '20px', fontWeight: '800', margin: '0 0 6px' }}>✅ You're signed in!</h3>
-            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', margin: 0 }}>Use the tabs above to access today's picks, results and more.</p>
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', margin: '0 0 16px' }}>Use the tabs above to access today's picks, results and more.</p>
+            {/* Share button */}
+            <button
+              onClick={() => {
+                const shareData = {
+                  title: 'BetBudAI — Free AI Racing Picks',
+                  text: 'I use BetBudAI for daily horse racing picks — totally free, AI-powered, with a live ROI tracker. Check it out!',
+                  url: 'https://www.betbudai.com',
+                };
+                if (navigator.share) {
+                  navigator.share(shareData).catch(() => null);
+                } else {
+                  navigator.clipboard.writeText('https://www.betbudai.com').then(() => {
+                    alert('Link copied to clipboard!');
+                  }).catch(() => null);
+                }
+                trackEvent('share_click', { location: 'home_authenticated', user: authUser?.username });
+              }}
+              style={{ background: 'rgba(52,211,153,0.12)', border: '1.5px solid rgba(52,211,153,0.4)', borderRadius: '10px', padding: '10px 22px', color: '#34d399', fontSize: '13px', fontWeight: '800', cursor: 'pointer', letterSpacing: '0.3px' }}
+            >
+              📤 Share BetBudAI with a friend
+            </button>
           </div>
           <UpgradeCards authUser={authUser} />
         </div>
