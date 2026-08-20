@@ -6977,27 +6977,6 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
             </div>
           </div>
 
-          {/* Feature grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '20px' }}>
-            {[
-              ['🏇', 'All horse-racing selections'],
-              ['⭐', 'NAP / NB daily picks'],
-              ['🚫', 'Favourite Watch · Elite Lays'],
-              ['📊', 'AI scores and analysis'],
-              ['⚽', 'Football predictions'],
-              ['🎾', 'Tennis & all court sports'],
-              ['🏐', 'GAA — hurling & football'],
-              ['⛳', 'Golf, Darts & more sports'],
-              ['📈', 'Live results & ROI tracker'],
-              ['🤖', '20+ AI signals per race'],
-            ].map(([icon, text], i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '10px', padding: '10px 12px' }}>
-                <span style={{ fontSize: '17px', flexShrink: 0 }}>{icon}</span>
-                <span style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(255,255,255,0.82)' }}>{text}</span>
-              </div>
-            ))}
-          </div>
-
           {/* CTA */}
           <button
             onClick={() => { trackEvent('signup_click', { location: 'home_free_hero', tier: 'free', user_status: 'guest' }); setSelectedTrialTier('premium'); setAuthMode('register'); setFormError(''); }}
