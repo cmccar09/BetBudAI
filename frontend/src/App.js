@@ -3361,6 +3361,7 @@ function YesterdayResultsView({ isFreeUser }) {
   const [isMobile, setIsMobile]       = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
   const [cumulRoi, setCumulRoi]         = useState(null);
   const [layData,  setLayData]          = useState(null);
+  const [weekStats, setWeekStats]       = useState(null);
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < 1024);
@@ -3382,15 +3383,17 @@ function YesterdayResultsView({ isFreeUser }) {
       const twoDaysAgo = new Date(); twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
       const twoDaysAgoStr = twoDaysAgo.toISOString().slice(0, 10);
       const twoDaysAgoLabel = twoDaysAgo.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Europe/Dublin' });
-      const [todayRes, yestRes, cumulRes, twoDaysRes, extTodayRes] = await Promise.all([
+      const [todayRes, yestRes, cumulRes, twoDaysRes, extTodayRes, weekRes] = await Promise.all([
         fetch(API_BASE_URL + '/api/results/today'),
         fetch(API_BASE_URL + '/api/results/yesterday'),
         fetch(API_BASE_URL + '/api/results/cumulative-roi'),
         fetch(`${API_BASE_URL}/api/picks/extended?date=${twoDaysAgoStr}`),
         fetch(API_BASE_URL + '/api/picks/extended'),
+        fetch(API_BASE_URL + '/api/home-stats'),
       ]);
-      const [todayData, yestData, cumulData, twoDaysData, extTodayData] = await Promise.all([todayRes.json(), yestRes.json(), cumulRes.json(), twoDaysRes.json(), extTodayRes.json()]);
+      const [todayData, yestData, cumulData, twoDaysData, extTodayData, weekData] = await Promise.all([todayRes.json(), yestRes.json(), cumulRes.json(), twoDaysRes.json(), extTodayRes.json(), weekRes.json()]);
       if (cumulData.success) setCumulRoi(cumulData);
+      if (weekData?.success) setWeekStats(weekData);
 
       const todayPicks = (todayData.success ? todayData.picks || [] : [])
         .map(p => ({ ...p, _dayLabel: 'Today' }));
@@ -3626,6 +3629,38 @@ function YesterdayResultsView({ isFreeUser }) {
           Refresh
         </button>
       </div>
+
+      {/* Weekly picks recap card */}
+      {weekStats?.total_7 > 0 && (() => {
+        const w = weekStats;
+        const wPct = w.total_7 > 0 ? Math.round((w.wins_7 / w.total_7) * 100) : null;
+        return (
+          <div style={{ background:'linear-gradient(135deg,rgba(5,150,105,0.18),rgba(16,185,129,0.08))', border:'1.5px solid rgba(52,211,153,0.4)', borderRadius:'14px', padding: isMobile ? '14px' : '16px 22px', marginBottom:'16px' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'6px', marginBottom:'12px' }}>
+              <div style={{ fontSize:'11px', fontWeight:'800', letterSpacing:'1.2px', textTransform:'uppercase', color:'#34d399' }}>📊 Last 7 Days — Picks Recap</div>
+              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.4)' }}>Rolling · all daily picks</div>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'10px', textAlign:'center' }}>
+              {[
+                { val: w.total_7,   lbl: 'Selections', c:'#93c5fd' },
+                { val: w.wins_7,    lbl: 'Wins',        c:'#34d399' },
+                { val: w.losses_7 ?? (w.total_7 - w.wins_7 - (w.places_7 || 0)), lbl: 'Losers', c:'#f87171' },
+                { val: wPct != null ? `${wPct}%` : '—', lbl: 'Win %', c:'#fbbf24' },
+              ].map(s => (
+                <div key={s.lbl}>
+                  <div style={{ fontSize: isMobile ? '22px' : '28px', fontWeight:'800', color:s.c, lineHeight:1 }}>{s.val}</div>
+                  <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>{s.lbl}</div>
+                </div>
+              ))}
+            </div>
+            {(w.places_7 > 0) && (
+              <div style={{ marginTop:'10px', textAlign:'center', fontSize:'11px', color:'rgba(255,255,255,0.4)' }}>
+                + {w.places_7} placed
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Summary bar */}
       {picks.length > 0 && (() => {
@@ -6118,42 +6153,37 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
         </div>
       </div>
 
-      {/* Rolling history */}
-      {dailyHistory.length > 0 && (
-        <div style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(34,211,238,0.28)', borderRadius:'12px', padding: isMobile ? '12px' : '14px 18px', marginBottom:'14px' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:'10px', flexWrap:'wrap', marginBottom:'10px' }}>
-            <div style={{ fontSize:'12px', fontWeight:'800', letterSpacing:'0.8px', textTransform:'uppercase', color:'#67e8f9' }}>Rolling Lay History</div>
-            <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.6)' }}>
-              {historyAgg.days || dailyHistory.length} days · {historyAgg.settled || 0} settled · {historyAgg.fav_lost || 0} favs beaten · {historyAgg.lay_win_pct != null ? `${historyAgg.lay_win_pct}%` : '—'} lay win
+      {/* Weekly recap card */}
+      {dailyHistory.length > 0 && (() => {
+        const week = dailyHistory.slice(0, 7);
+        const wkSelections = week.reduce((a, d) => a + ((d.summary || {}).settled || 0), 0);
+        const wkWins      = week.reduce((a, d) => a + ((d.summary || {}).fav_lost || 0), 0);
+        const wkLosers    = wkSelections - wkWins;
+        const wkPct       = wkSelections > 0 ? Math.round((wkWins / wkSelections) * 100) : null;
+        const newestDate  = week[0]?.date || '';
+        const oldestDate  = week[week.length - 1]?.date || '';
+        return (
+          <div style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.18),rgba(34,211,238,0.08))', border:'1.5px solid rgba(167,139,250,0.4)', borderRadius:'14px', padding: isMobile ? '14px' : '16px 22px', marginBottom:'14px' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'6px', marginBottom:'12px' }}>
+              <div style={{ fontSize:'11px', fontWeight:'800', letterSpacing:'1.2px', textTransform:'uppercase', color:'#a78bfa' }}>📊 Weekly Lay Recap</div>
+              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)' }}>{oldestDate} – {newestDate}</div>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'10px', textAlign:'center' }}>
+              {[
+                { val: wkSelections, lbl: 'Selections', c: '#c4b5fd' },
+                { val: wkWins,       lbl: 'Wins',       c: '#34d399' },
+                { val: wkLosers,     lbl: 'Losers',     c: '#f87171' },
+                { val: wkPct != null ? `${wkPct}%` : '—', lbl: 'Lay Win %', c: '#22d3ee' },
+              ].map(s => (
+                <div key={s.lbl}>
+                  <div style={{ fontSize: isMobile ? '22px' : '28px', fontWeight:'800', color:s.c, lineHeight:1 }}>{s.val}</div>
+                  <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>{s.lbl}</div>
+                </div>
+              ))}
             </div>
           </div>
-          <div style={{ overflowX:'auto' }}>
-            <table style={{ width:'100%', borderCollapse:'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom:'1px solid rgba(255,255,255,0.15)' }}>
-                  {['Date', 'Reviewed', 'Selected', 'Favs Beaten', 'Lay Win %'].map(h => (
-                    <th key={h} style={{ textAlign:'left', padding:'6px 8px', fontSize:'11px', color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:'0.7px' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {dailyHistory.slice(0, 3).map((day, idx) => {
-                  const s = day.summary || {};
-                  return (
-                    <tr key={`${day.date}-${idx}`} style={{ borderBottom:'1px solid rgba(255,255,255,0.08)' }}>
-                      <td style={{ padding:'6px 8px', fontSize:'12px', color:'white' }}>{day.date || '-'}</td>
-                      <td style={{ padding:'6px 8px', fontSize:'12px', color:'rgba(255,255,255,0.8)' }}>{s.total || 0}</td>
-                      <td style={{ padding:'6px 8px', fontSize:'12px', color:'rgba(255,255,255,0.8)' }}>{s.settled || 0}</td>
-                      <td style={{ padding:'6px 8px', fontSize:'12px', color:'#34d399' }}>{s.fav_lost || 0}</td>
-                      <td style={{ padding:'6px 8px', fontSize:'12px', color:'#22d3ee', fontWeight:'700' }}>{s.lay_win_pct != null ? `${s.lay_win_pct}%` : '—'}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Filter bar — single Elite tier */}
       <div style={{ display:'flex', gap:'8px', marginBottom:'16px', flexWrap:'wrap', alignItems:'center' }}>

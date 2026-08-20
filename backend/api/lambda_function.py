@@ -2306,12 +2306,26 @@ def get_home_stats(headers):
     from datetime import timedelta, date as _date
 
     try:
-        count_resp = subscribers_table.scan(Select='COUNT')
+        from boto3.dynamodb.conditions import Attr
+        count_resp = subscribers_table.scan(
+            Select='COUNT',
+            FilterExpression=Attr('email').contains('@') & ~Attr('email').begins_with('u#') & ~Attr('email').begins_with('__session__'),
+        )
         subscriber_count = count_resp.get('Count', 0)
+        # handle pagination (unlikely at this scale but safe)
+        while count_resp.get('LastEvaluatedKey'):
+            count_resp = subscribers_table.scan(
+                Select='COUNT',
+                FilterExpression=Attr('email').contains('@') & ~Attr('email').begins_with('u#') & ~Attr('email').begins_with('__session__'),
+                ExclusiveStartKey=count_resp['LastEvaluatedKey'],
+            )
+            subscriber_count += count_resp.get('Count', 0)
     except Exception:
         subscriber_count = 0
 
     wins_7 = 0
+    losses_7 = 0
+    places_7 = 0
     total_7 = 0
     try:
         today_d = _date.today()
@@ -2327,10 +2341,12 @@ def get_home_stats(headers):
                 if not (p.get('pick_rank', 0) or 0):
                     continue
                 outcome = str(p.get('outcome', '')).lower()
-                if outcome in ('win', 'won', 'loss', 'lost', 'placed'):
-                    total_7 += 1
-                    if outcome in ('win', 'won'):
-                        wins_7 += 1
+                if outcome in ('win', 'won'):
+                    total_7 += 1; wins_7 += 1
+                elif outcome in ('loss', 'lost'):
+                    total_7 += 1; losses_7 += 1
+                elif outcome == 'placed':
+                    total_7 += 1; places_7 += 1
     except Exception:
         pass
 
@@ -2362,6 +2378,8 @@ def get_home_stats(headers):
             'success': True,
             'subscriber_count': subscriber_count,
             'wins_7': wins_7,
+            'losses_7': losses_7,
+            'places_7': places_7,
             'total_7': total_7,
             'today_nap': today_nap,
         })

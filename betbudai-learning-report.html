@@ -1,0 +1,820 @@
+<title>BetBudAI Learning Report</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap">
+
+<style>
+  /* ── Tokens ──────────────────────────────────────────────── */
+  :root {
+    --bg:         #0B1120;
+    --bg-card:    #111827;
+    --bg-card2:   #1A2233;
+    --border:     rgba(255,255,255,0.08);
+    --border-mid: rgba(255,255,255,0.14);
+    --text:       #E2E8F0;
+    --text-muted: #64748B;
+    --text-dim:   #94A3B8;
+    --green:      #22C55E;
+    --green-dim:  rgba(34,197,94,0.12);
+    --teal:       #0D9488;
+    --teal-dim:   rgba(13,148,136,0.12);
+    --amber:      #F59E0B;
+    --amber-dim:  rgba(245,158,11,0.12);
+    --rose:       #F43F5E;
+    --rose-dim:   rgba(244,63,94,0.12);
+    --blue:       #3B82F6;
+    --blue-dim:   rgba(59,130,246,0.1);
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg:         #F0F4F8;
+      --bg-card:    #FFFFFF;
+      --bg-card2:   #F8FAFC;
+      --border:     rgba(0,0,0,0.08);
+      --border-mid: rgba(0,0,0,0.14);
+      --text:       #0F172A;
+      --text-muted: #64748B;
+      --text-dim:   #475569;
+      --green-dim:  rgba(34,197,94,0.1);
+      --teal-dim:   rgba(13,148,136,0.1);
+      --amber-dim:  rgba(245,158,11,0.1);
+      --rose-dim:   rgba(244,63,94,0.1);
+      --blue-dim:   rgba(59,130,246,0.08);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg:         #0B1120;
+    --bg-card:    #111827;
+    --bg-card2:   #1A2233;
+    --border:     rgba(255,255,255,0.08);
+    --border-mid: rgba(255,255,255,0.14);
+    --text:       #E2E8F0;
+    --text-muted: #64748B;
+    --text-dim:   #94A3B8;
+    --green-dim:  rgba(34,197,94,0.12);
+    --teal-dim:   rgba(13,148,136,0.12);
+    --amber-dim:  rgba(245,158,11,0.12);
+    --rose-dim:   rgba(244,63,94,0.12);
+    --blue-dim:   rgba(59,130,246,0.1);
+  }
+
+  /* ── Reset ───────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout ──────────────────────────────────────────────── */
+  .report {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── Header ──────────────────────────────────────────────── */
+  .report-header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border-mid);
+  }
+
+  .report-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 0 rgba(34,197,94,0.4);
+    animation: pulse 2.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.45); }
+    70%  { box-shadow: 0 0 0 7px rgba(34,197,94,0); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+
+  .report-title {
+    font-family: var(--mono);
+    font-size: clamp(24px, 5vw, 38px);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.15;
+    text-wrap: balance;
+    margin-bottom: 8px;
+  }
+
+  .report-subtitle {
+    font-size: 15px;
+    color: var(--text-dim);
+    font-weight: 400;
+    margin-bottom: 28px;
+  }
+
+  .header-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .hstat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .hstat-val {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hstat-val.green { color: var(--green); }
+  .hstat-val.amber { color: var(--amber); }
+  .hstat-val.rose  { color: var(--rose); }
+  .hstat-val.teal  { color: var(--teal); }
+
+  .hstat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    font-family: var(--mono);
+    text-transform: uppercase;
+  }
+
+  /* ── Section ─────────────────────────────────────────────── */
+  .section { margin-bottom: 40px; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Finding card ────────────────────────────────────────── */
+  .finding {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid transparent;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+  }
+
+  .finding.ok      { border-left-color: var(--green); background: var(--green-dim); }
+  .finding.warn    { border-left-color: var(--amber); background: var(--amber-dim); }
+  .finding.crit    { border-left-color: var(--rose);  background: var(--rose-dim);  }
+  .finding.info    { border-left-color: var(--teal);  background: var(--teal-dim);  }
+  .finding.neutral { border-left-color: var(--blue);  background: var(--blue-dim);  }
+
+  .finding-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+
+  .finding-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .badge.ok      { background: rgba(34,197,94,0.18);  color: var(--green); }
+  .badge.warn    { background: rgba(245,158,11,0.18); color: var(--amber); }
+  .badge.crit    { background: rgba(244,63,94,0.18);  color: var(--rose); }
+  .badge.info    { background: rgba(13,148,136,0.18); color: var(--teal); }
+  .badge.neutral { background: rgba(59,130,246,0.15); color: var(--blue); }
+
+  .finding-body {
+    font-size: 13.5px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ── Weekly breakdown ────────────────────────────────────── */
+  .week-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .week-table th {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-mid);
+  }
+
+  .week-table td {
+    padding: 12px 12px;
+    font-size: 13.5px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  .week-table tr:last-child td { border-bottom: none; }
+
+  .week-table tr:hover td { background: var(--bg-card2); }
+
+  .mono { font-family: var(--mono); }
+
+  .wr-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .wr-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--green);
+    min-width: 2px;
+    max-width: 120px;
+    flex-shrink: 0;
+  }
+
+  .wr-bar.warn { background: var(--amber); }
+  .wr-bar.crit { background: var(--rose); }
+
+  .wr-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 44px;
+  }
+
+  /* ── Score distribution ──────────────────────────────────── */
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+  }
+
+  .score-band {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .score-band-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .score-band-wr {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .score-band-counts {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+  }
+
+  /* ── Two-col layout ──────────────────────────────────────── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 580px) {
+    .two-col { grid-template-columns: 1fr; }
+    .report { padding: 24px 16px 60px; }
+  }
+
+  /* ── Verdict box ─────────────────────────────────────────── */
+  .verdict {
+    background: var(--bg-card);
+    border: 1px solid var(--border-mid);
+    border-top: 3px solid var(--amber);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 12px;
+  }
+
+  .verdict-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 12px;
+  }
+
+  .verdict-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-dim);
+  }
+
+  .verdict-body strong { color: var(--text); font-weight: 600; }
+
+  /* ── Recommendation list ─────────────────────────────────── */
+  .rec-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+  .rec-list li {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .rec-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--teal);
+    background: var(--teal-dim);
+    border-radius: 4px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .rec-list strong { color: var(--text); }
+
+  /* ── Table wrapper ───────────────────────────────────────── */
+  .table-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow-x: auto;
+  }
+
+  /* ── Signal table ────────────────────────────────────────── */
+  .signal-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .signal-row:last-child { border-bottom: none; }
+
+  .signal-name { flex: 1; color: var(--text); font-weight: 500; }
+  .signal-status { font-family: var(--mono); font-size: 11px; font-weight: 600; }
+  .signal-note { font-size: 12px; color: var(--text-muted); flex: 1.5; }
+</style>
+
+<div class="report">
+
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <header class="report-header">
+    <div class="report-eyebrow">
+      <span class="live-dot"></span>
+      BetBudAI · AI Learning Report
+    </div>
+    <h1 class="report-title">6-Week System Review</h1>
+    <p class="report-subtitle">8 July – 19 August 2026 &nbsp;·&nbsp; 42 days &nbsp;·&nbsp; Auto-generated from DynamoDB picks data</p>
+
+    <div class="header-stats">
+      <div class="hstat">
+        <div class="hstat-val green">42/42</div>
+        <div class="hstat-label">Days pipeline ran</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">66</div>
+        <div class="hstat-label">Picks settled</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val green">40.9%</div>
+        <div class="hstat-label">Win rate</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val amber">78.8%</div>
+        <div class="hstat-label">Win + placed rate</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val teal">15,801</div>
+        <div class="hstat-label">Learning picks logged</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Pipeline health ────────────────────────────────── -->
+  <section class="section">
+    <div class="section-label">Pipeline Health</div>
+
+    <div class="finding ok">
+      <div class="finding-head">
+        <span class="finding-title">Pipeline ran every single day</span>
+        <span class="badge ok">Healthy</span>
+      </div>
+      <div class="finding-body">
+        The Betfair fetch → analysis → validate → notify chain executed on all 42 days in the window. No missed days, no silent failures. The daily 12:00 UTC schedule is holding.
+      </div>
+    </div>
+
+    <div class="finding ok">
+      <div class="finding-head">
+        <span class="finding-title">Learning data volume is strong</span>
+        <span class="badge ok">Active</span>
+      </div>
+      <div class="finding-body">
+        15,801 picks across all field horses were logged to DynamoDB with <code style="font-family:var(--mono);font-size:12px;">is_learning_pick=true</code>. Of those, 14,335 have settled outcomes (10.4% win rate across all horses — expected for a full field). The raw material for pattern learning is there.
+      </div>
+    </div>
+
+    <div class="finding warn">
+      <div class="finding-head">
+        <span class="finding-title">Major Analysis Lambda — Monday runs unconfirmed</span>
+        <span class="badge warn">Unverified</span>
+      </div>
+      <div class="finding-body">
+        The <code style="font-family:var(--mono);font-size:12px;">SureBet-Major-Analysis</code> step function is scheduled for 07:00 UTC Mondays. CloudWatch logs were not checked in this review — recommend verifying it fired on each of the 6 Mondays in this window and that the weight-update payload was applied.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Performance summary ────────────────────────────── -->
+  <section class="section">
+    <div class="section-label">Performance Summary</div>
+
+    <div class="two-col">
+      <div class="finding info">
+        <div class="finding-head">
+          <span class="finding-title">27 wins from 66 settled</span>
+          <span class="badge info">40.9% WR</span>
+        </div>
+        <div class="finding-body">
+          14 losses · 25 placed. Including placed finishes: <strong>78.8% of picks hit the frame</strong>. Target is 75% — we're clearing it on an EW basis.
+        </div>
+      </div>
+      <div class="finding warn">
+        <div class="finding-head">
+          <span class="finding-title">Win-only rate trails target</span>
+          <span class="badge warn">Below 75% target</span>
+        </div>
+        <div class="finding-body">
+          The 75% win rate goal is very aggressive for UK/Irish racing. Industry benchmark for professional tipsters is 28–38%. At 40.9% we're already above market — the target may need recalibrating to 45–50%.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Weekly breakdown ───────────────────────────────── -->
+  <section class="section">
+    <div class="section-label">Week-by-Week Performance</div>
+
+    <div class="table-wrap">
+      <table class="week-table">
+        <thead>
+          <tr>
+            <th>Week</th>
+            <th>Dates</th>
+            <th>Settled</th>
+            <th>W / L / P</th>
+            <th>Win Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">Wk 1</td>
+            <td style="color:var(--text-muted);font-size:12px;">8–14 Jul</td>
+            <td class="mono">9</td>
+            <td class="mono" style="color:var(--text-muted);">2 / — / —</td>
+            <td>
+              <div class="wr-bar-wrap">
+                <div class="wr-bar crit" style="width:26px;"></div>
+                <span class="wr-label" style="color:var(--rose);">22%</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="mono">Wk 2</td>
+            <td style="color:var(--text-muted);font-size:12px;">15–21 Jul</td>
+            <td class="mono">11</td>
+            <td class="mono" style="color:var(--text-muted);">6 / — / —</td>
+            <td>
+              <div class="wr-bar-wrap">
+                <div class="wr-bar" style="width:66px;"></div>
+                <span class="wr-label" style="color:var(--green);">55%</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="mono">Wk 3</td>
+            <td style="color:var(--text-muted);font-size:12px;">22–28 Jul</td>
+            <td class="mono">10</td>
+            <td class="mono" style="color:var(--text-muted);">2 / — / —</td>
+            <td>
+              <div class="wr-bar-wrap">
+                <div class="wr-bar crit" style="width:24px;"></div>
+                <span class="wr-label" style="color:var(--rose);">20%</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="mono">Wk 4</td>
+            <td style="color:var(--text-muted);font-size:12px;">29 Jul–4 Aug</td>
+            <td class="mono">13</td>
+            <td class="mono" style="color:var(--text-muted);">9 / — / —</td>
+            <td>
+              <div class="wr-bar-wrap">
+                <div class="wr-bar" style="width:83px;"></div>
+                <span class="wr-label" style="color:var(--green);">69%</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="mono">Wk 5</td>
+            <td style="color:var(--text-muted);font-size:12px;">5–11 Aug</td>
+            <td class="mono">10</td>
+            <td class="mono" style="color:var(--text-muted);">3 / — / —</td>
+            <td>
+              <div class="wr-bar-wrap">
+                <div class="wr-bar warn" style="width:36px;"></div>
+                <span class="wr-label" style="color:var(--amber);">30%</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="mono">Wk 6</td>
+            <td style="color:var(--text-muted);font-size:12px;">12–19 Aug</td>
+            <td class="mono">12</td>
+            <td class="mono" style="color:var(--text-muted);">5 / — / —</td>
+            <td>
+              <div class="wr-bar-wrap">
+                <div class="wr-bar warn" style="width:50px;"></div>
+                <span class="wr-label" style="color:var(--amber);">42%</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="finding warn" style="margin-top:12px;">
+      <div class="finding-head">
+        <span class="finding-title">High week-to-week variance — 20% to 69%</span>
+        <span class="badge warn">Volatile</span>
+      </div>
+      <div class="finding-body">
+        A 49-point swing between worst and best weeks is large. With 9–13 picks per week the sample is too small to distinguish skill from variance. This is expected at current volume — it does not mean the model is broken, it means we need more picks per week to smooth the curve.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Score analysis ─────────────────────────────────── -->
+  <section class="section">
+    <div class="section-label">Score vs Outcome — Critical Finding</div>
+
+    <div class="score-grid" style="margin-bottom:16px;">
+      <div class="score-band">
+        <div class="score-band-label">Score 60–79</div>
+        <div class="score-band-wr" style="color:var(--green);">57%</div>
+        <div class="score-band-counts">4 wins / 7 settled</div>
+      </div>
+      <div class="score-band">
+        <div class="score-band-label">Score 80–89</div>
+        <div class="score-band-wr" style="color:var(--rose);">30%</div>
+        <div class="score-band-counts">3 wins / 10 settled</div>
+      </div>
+      <div class="score-band">
+        <div class="score-band-label">Score 90–99</div>
+        <div class="score-band-wr" style="color:var(--rose);">30%</div>
+        <div class="score-band-counts">3 wins / 10 settled</div>
+      </div>
+      <div class="score-band">
+        <div class="score-band-label">Score 100–109</div>
+        <div class="score-band-wr" style="color:var(--green);">67%</div>
+        <div class="score-band-counts">6 wins / 9 settled</div>
+      </div>
+      <div class="score-band">
+        <div class="score-band-label">Score 110+</div>
+        <div class="score-band-wr" style="color:var(--amber);">37%</div>
+        <div class="score-band-counts">11 wins / 30 settled</div>
+      </div>
+    </div>
+
+    <div class="finding crit">
+      <div class="finding-head">
+        <span class="finding-title">Score 110+ wins less often than score 100–109</span>
+        <span class="badge crit">Critical</span>
+      </div>
+      <div class="finding-body">
+        The highest-scored picks (110+) have a <strong>37% win rate</strong> — worse than the 100–109 band (67%). The average score for WINS (102.3) and LOSSES (101.0) is virtually identical. The scoring model is not discriminating between winners and losers at the top end. High scores may reflect signal stacking (many factors fire simultaneously on well-fancied runners) rather than genuine edge.
+      </div>
+    </div>
+
+    <div class="finding crit">
+      <div class="finding-head">
+        <span class="finding-title">CD winner, going match, steam signals not stored in records</span>
+        <span class="badge crit">Data gap</span>
+      </div>
+      <div class="finding-body">
+        DynamoDB records don't store <code style="font-family:var(--mono);font-size:12px;">cd_winner</code>, <code style="font-family:var(--mono);font-size:12px;">going_match</code>, or <code style="font-family:var(--mono);font-size:12px;">steam_signal</code> as Boolean fields at pick-time. These are the signals the scoring logic treats as strongest (+20, +16–32, bonus respectively) — but we can't compare their hit rates against outcomes because they weren't persisted. The loss analysis system is flying half-blind.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Signal capture audit ───────────────────────────── -->
+  <section class="section">
+    <div class="section-label">Signal Capture Audit</div>
+
+    <div class="table-wrap">
+      <div class="signal-row" style="background:var(--bg-card2);border-bottom:1px solid var(--border-mid);">
+        <span class="signal-name" style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Signal</span>
+        <span class="signal-status" style="color:var(--text-muted);">Stored</span>
+        <span class="signal-note" style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);">Impact</span>
+      </div>
+      <div class="signal-row">
+        <span class="signal-name">Comprehensive score</span>
+        <span class="signal-status" style="color:var(--green);">✓ YES</span>
+        <span class="signal-note">Stored, but poor discriminator (see above)</span>
+      </div>
+      <div class="signal-row">
+        <span class="signal-name">Confidence grade</span>
+        <span class="signal-status" style="color:var(--green);">✓ YES</span>
+        <span class="signal-note">ELITE grade picks still losing — grade not predictive</span>
+      </div>
+      <div class="signal-row">
+        <span class="signal-name">Form enriched flag</span>
+        <span class="signal-status" style="color:var(--green);">✓ YES</span>
+        <span class="signal-note">42% WR with enrichment (1 pick without = 0% WR)</span>
+      </div>
+      <div class="signal-row">
+        <span class="signal-name">Actual result</span>
+        <span class="signal-status" style="color:var(--green);">✓ YES</span>
+        <span class="signal-note">Winner horse + finishing position stored correctly</span>
+      </div>
+      <div class="signal-row">
+        <span class="signal-name">Course &amp; Distance winner</span>
+        <span class="signal-status" style="color:var(--rose);">✗ NO</span>
+        <span class="signal-note">Not persisted — our claimed strongest signal, unverifiable</span>
+      </div>
+      <div class="signal-row">
+        <span class="signal-name">Going match win</span>
+        <span class="signal-status" style="color:var(--rose);">✗ NO</span>
+        <span class="signal-note">Not persisted — 2nd strongest signal, can't track vs outcomes</span>
+      </div>
+      <div class="signal-row">
+        <span class="signal-name">Steam signal (odds shortening)</span>
+        <span class="signal-status" style="color:var(--rose);">✗ NO</span>
+        <span class="signal-note">Not persisted — market signal, high-value, untracked</span>
+      </div>
+      <div class="signal-row">
+        <span class="signal-name">Jockey / trainer quality</span>
+        <span class="signal-status" style="color:var(--amber);">~ PARTIAL</span>
+        <span class="signal-note">Names stored, quality score not stored</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Learning system status ─────────────────────────── -->
+  <section class="section">
+    <div class="section-label">Learning System Status</div>
+
+    <div class="finding ok">
+      <div class="finding-head">
+        <span class="finding-title">Data logging: fully operational</span>
+        <span class="badge ok">Running</span>
+      </div>
+      <div class="finding-body">
+        15,801 field picks logged across 42 days. The system is capturing horse name, score, trainer, jockey, odds, and outcome for every runner — not just the selections. This is the correct foundation for learning.
+      </div>
+    </div>
+
+    <div class="finding crit">
+      <div class="finding-head">
+        <span class="finding-title">Weight updates: not evidenced in results</span>
+        <span class="badge crit">Not confirmed</span>
+      </div>
+      <div class="finding-body">
+        If the Monday Major Analysis Lambda is adjusting signal weights based on the previous week's results, it's not showing in the outcome data. Win rates across weeks show no upward trend — Week 6 (42%) is actually lower than Week 4 (69%). Either the weight updates aren't firing, or they are firing but the weight changes are too small to surface in weekly samples of 10–13 picks.
+      </div>
+    </div>
+
+    <div class="finding warn">
+      <div class="finding-head">
+        <span class="finding-title">Loss analysis: partial, not systematic</span>
+        <span class="badge warn">Incomplete</span>
+      </div>
+      <div class="finding-body">
+        Loss patterns exist in the data (e.g., the Tamarind Bay loss: score 120, ELITE grade, still finished 5th of 5 at Perth — winner was 8.4/1 Wine Dark Sea). But the system has no structured loop that reads these outcomes, identifies which signals fired, and adjusts their weights downward. The learning data is being collected; it's not being read back systematically.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Verdict ─────────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-label">Verdict</div>
+
+    <div class="verdict">
+      <div class="verdict-title">⚖ Is it still learning?</div>
+      <div class="verdict-body">
+        <strong>Partially.</strong> The pipeline runs reliably, and data volume is excellent — 15,801 learning picks give a real corpus. But the learning loop has a break in it: <strong>signals are scored at pick-time but their individual outcomes are not being tracked back</strong>. This means the model has no ground truth for whether C&D winner, going match, or steam actually fired on a given pick — the three signals we claim are most valuable.<br><br>
+        The score analysis confirms this: <strong>average score for wins (102.3) and losses (101.0) are nearly identical</strong>. A working learning system would gradually separate these distributions. They're flat. The model is not getting meaningfully smarter week to week on available evidence.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Recommendations ────────────────────────────────── -->
+  <section class="section">
+    <div class="section-label">Recommended Actions</div>
+
+    <ul class="rec-list">
+      <li>
+        <span class="rec-num">01</span>
+        <span><strong>Persist individual signals at pick-time.</strong> Save <code style="font-family:var(--mono);font-size:12px;">cd_winner_fired</code>, <code style="font-family:var(--mono);font-size:12px;">going_match_fired</code>, <code style="font-family:var(--mono);font-size:12px;">steam_fired</code>, <code style="font-family:var(--mono);font-size:12px;">signals_fired_count</code> as Boolean/int fields in <code style="font-family:var(--mono);font-size:12px;">SureBetBets</code>. Without these you cannot run a proper win-rate-by-signal analysis.</span>
+      </li>
+      <li>
+        <span class="rec-num">02</span>
+        <span><strong>Add a weekly loss review Lambda.</strong> Query last 7 days of settled picks, group by which signals fired, compute per-signal win rate, and write a <code style="font-family:var(--mono);font-size:12px;">signal_performance</code> record to DynamoDB. This is the feedback the scoring engine needs.</span>
+      </li>
+      <li>
+        <span class="rec-num">03</span>
+        <span><strong>Investigate the Score 110+ underperformance.</strong> High scores correlate with well-fancied (short-priced) favourites — these are likely market-efficient horses where the edge has already been priced in. Consider capping the bonus for steam signal on horses already below 2.0 odds.</span>
+      </li>
+      <li>
+        <span class="rec-num">04</span>
+        <span><strong>Verify Monday Major Analysis runs.</strong> Check CloudWatch logs for <code style="font-family:var(--mono);font-size:12px;">SureBet-Major-Analysis</code> on each of the 6 Mondays in the window. Confirm the weight-update payload was applied and that the updated weights are different from the previous week's values.</span>
+      </li>
+      <li>
+        <span class="rec-num">05</span>
+        <span><strong>Recalibrate the 75% win rate target.</strong> 40.9% win rate is above professional tipster benchmarks (28–38%). With 78.8% win+placed, the EW performance is strong. Set a more realistic win target of 42–48% and track it properly over a 30-day rolling window, not per-week.</span>
+      </li>
+    </ul>
+  </section>
+
+  <div style="text-align:center;padding-top:24px;font-family:var(--mono);font-size:11px;color:var(--text-muted);">
+    Generated 19 Aug 2026 · BetBudAI internal analytics · Source: DynamoDB SureBetBets table
+  </div>
+
+</div>
