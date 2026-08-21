@@ -223,6 +223,9 @@ All served by `BettingPicksAPI` (`backend/api/lambda_function.py`):
 
 ## Domain conventions — sports data
 
+- **Truth on null: if real data is unavailable, show nothing.** Never invent fixtures, scores, odds, managers, or player names. Fake data shown to subscribers destroys trust faster than an empty card. An empty state ("No fixtures yet") is always better than a made-up one.
+- **Cite all static facts.** Any fixture, player, manager, or odds figure hardcoded into a scraper must have a `# Source:` comment with the URL and date it was verified. If you can't cite it, don't write it.
+- **Verify before committing.** Before hardcoding any static fallback data (fixtures, squads, managers), fetch it from Sky Sports, BBC Sport, or FotMob and confirm it is real. Do not guess based on prior-season knowledge or training data.
 - **Always use real match results** for tickers and sport pages — never hardcode placeholder scores; stale or invented data breaks subscriber trust
 - **Measurable goals per sport** (enforce when generating picks or reviewing scraper output):
 

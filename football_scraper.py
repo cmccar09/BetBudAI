@@ -255,13 +255,21 @@ def fetch_espn_fixtures(league, limit=10):
     return []
 
 
-# Static GW1/GW2 fixtures for bet card seeding when ESPN is unreachable
+# Real GW2 + GW3 fixtures — Source: skysports.com/football/fixtures, verified 21 Aug 2026
+# Update each week from Sky Sports / BBC Sport / FotMob. Never invent fixtures.
+# Used as fallback when ESPN API is unreachable from Lambda
 STATIC_PL_FIXTURES = [
-    {'id': 's1', 'date': '2026-08-23T11:30Z', 'home': 'Manchester City',        'away': 'Chelsea',              'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Etihad Stadium'},
-    {'id': 's2', 'date': '2026-08-23T14:00Z', 'home': 'Arsenal',               'away': 'Liverpool',             'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Emirates Stadium'},
-    {'id': 's3', 'date': '2026-08-23T14:00Z', 'home': 'Tottenham Hotspur',     'away': 'Aston Villa',           'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Tottenham Hotspur Stadium'},
-    {'id': 's4', 'date': '2026-08-24T13:00Z', 'home': 'Newcastle United',      'away': 'Manchester United',     'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'St. James Park'},
-    {'id': 's5', 'date': '2026-08-24T15:30Z', 'home': 'Brighton & Hove Albion','away': 'Brentford',             'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Amex Stadium'},
+    # GW2 — 22-24 August 2026
+    {'id': 's1', 'date': '2026-08-22T16:30Z', 'home': 'Brentford',              'away': 'Tottenham Hotspur',    'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Gtech Community Stadium'},
+    {'id': 's2', 'date': '2026-08-23T13:00Z', 'home': 'Manchester City',        'away': 'Bournemouth',          'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Etihad Stadium'},
+    {'id': 's3', 'date': '2026-08-23T13:00Z', 'home': 'Brighton & Hove Albion', 'away': 'Aston Villa',          'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Amex Stadium'},
+    {'id': 's4', 'date': '2026-08-23T15:30Z', 'home': 'Newcastle United',       'away': 'Liverpool',            'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': "St. James' Park"},
+    {'id': 's5', 'date': '2026-08-24T19:00Z', 'home': 'Fulham',                 'away': 'Chelsea',              'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Craven Cottage'},
+    # GW3 — 28-31 August 2026
+    {'id': 's6', 'date': '2026-08-28T19:00Z', 'home': 'Crystal Palace',         'away': 'Manchester City',      'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Selhurst Park'},
+    {'id': 's7', 'date': '2026-08-29T16:30Z', 'home': 'Tottenham Hotspur',      'away': 'Newcastle United',     'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Tottenham Hotspur Stadium'},
+    {'id': 's8', 'date': '2026-08-30T13:00Z', 'home': 'Chelsea',                'away': 'Brighton & Hove Albion','completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Stamford Bridge'},
+    {'id': 's9', 'date': '2026-08-31T19:00Z', 'home': 'Aston Villa',            'away': 'Arsenal',              'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Villa Park'},
 ]
 
 
@@ -456,7 +464,13 @@ def lambda_handler(event, context):
         if not fx.get('prediction'):
             fx['prediction'] = predict_match(fx['home'], fx['away'])
 
-    source_fixtures = pl_fixtures if pl_fixtures else STATIC_PL_FIXTURES
+    if pl_fixtures:
+        source_fixtures = pl_fixtures
+    else:
+        # Filter static fixtures to upcoming only, sorted nearest first
+        now_iso = datetime.now(timezone.utc).isoformat()
+        upcoming = [f for f in STATIC_PL_FIXTURES if f['date'] >= now_iso[:10]]
+        source_fixtures = sorted(upcoming, key=lambda f: f['date']) or STATIC_PL_FIXTURES
     weekly_bets = []
     for fx in source_fixtures:
         if not fx.get('completed') and fx.get('prediction'):

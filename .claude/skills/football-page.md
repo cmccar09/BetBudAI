@@ -177,6 +177,30 @@ import FootballPage from './pages/football/FootballPage';
 
 ---
 
+## Rule: truth on null — never post fake data
+
+**If real data is unavailable, show nothing. Never invent fixtures, scores, odds, or predictions.**
+
+| Situation | Correct behaviour | Wrong behaviour |
+|---|---|---|
+| ESPN returns 0 fixtures | Show "No fixtures found — check back later" | Invent guessed fixture pairs |
+| Standings empty | Show no BTTS %, or show "—" | Calculate from made-up averages |
+| Transfer unverified | Do not mention it | State as fact from memory |
+| Manager name unknown | Say "Manager TBC" | Guess based on old reports |
+| Odds unavailable | Show no odds | Invent approximate odds |
+
+**Cite all facts.** Every prediction, player name, manager reference, or odds figure in `football_scraper.py` must have a source noted in a comment or in this skill. Format:
+```python
+# Source: Transfermarkt 2026/27 squad page, verified 21 Aug 2026
+```
+
+**Static fallback fixtures** in `STATIC_PL_FIXTURES` must be:
+- Verified from Sky Sports / BBC Sport / FotMob before committing
+- Dated accurately (UTC)
+- Removed or updated each game week — stale fixtures are fake data
+
+---
+
 ## Daily data sources — check these first
 
 Use these URLs when updating predictions, checking team news, verifying transfers, or reviewing fixtures before generating picks. Always prefer live sources over static data in the scraper.
