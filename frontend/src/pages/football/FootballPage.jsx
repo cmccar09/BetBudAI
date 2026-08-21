@@ -12,31 +12,32 @@ const TABS = [
 // ─── Fallback static data ─────────────────────────────────────────────────────
 const FB_PL = {
   title: {
-    team: 'Manchester City', odds: '2/1', confidence: 78,
-    reasoning: 'Six titles in nine years. Machine-like squad depth and the best manager in the game. No reason to fade pre-season.',
+    team: 'Arsenal', odds: '3/1', confidence: 72,
+    reasoning: 'Defending champions — Arsenal ended Man City\'s dominance in 2025/26 and have the squad depth and momentum to back up. Mikel Arteta\'s system is now at peak maturity.',
   },
   top_four: [
-    { pos: 1, team: 'Manchester City',  odds: '2/1',  badge: '🔵', note: 'Title favourites — relentless' },
-    { pos: 2, team: 'Arsenal',          odds: '3/1',  badge: '🔴', note: 'Closest challengers, strongest depth in years' },
-    { pos: 3, team: 'Liverpool',        odds: '5/1',  badge: '❤️', note: 'European pedigree, Salah era rolling on' },
-    { pos: 4, team: 'Chelsea',          odds: '8/1',  badge: '🔵', note: 'Year 3 of the rebuild — squad finally clicks' },
+    { pos: 1, team: 'Arsenal',          odds: '3/1',  badge: '🔴', note: 'Defending champions — Arteta squad at peak maturity' },
+    { pos: 2, team: 'Manchester City',  odds: '4/1',  badge: '🔵', note: 'Enzo Maresca takes over — Haaland the key, lost Rodri' },
+    { pos: 3, team: 'Liverpool',        odds: '5/1',  badge: '❤️', note: 'Massive rebuild — Wirtz + Isak is a statement of intent' },
+    { pos: 4, team: 'Chelsea',          odds: '10/1', badge: '🔵', note: 'Maresca left for City — new chapter at Stamford Bridge' },
   ],
   top_six: [
-    { team: 'Manchester United', odds: '10/1' },
-    { team: 'Tottenham Hotspur', odds: '12/1' },
+    { team: 'Manchester United', odds: '12/1' },
+    { team: 'Tottenham Hotspur', odds: '14/1' },
     { team: 'Newcastle United',  odds: '16/1' },
     { team: 'Aston Villa',       odds: '20/1' },
   ],
   relegation: [
-    { team: 'Ipswich Town',   odds: '1/2',  note: 'Promoted side, brutal schedule' },
-    { team: 'Southampton',    odds: '4/7',  note: 'Struggled for goals last season' },
-    { team: 'Leicester City', odds: '5/6',  note: 'Yo-yo club, thin squad depth' },
+    { team: 'Ipswich Town',   odds: '1/2',  note: 'Second season up — squad quality gap showing' },
+    { team: 'Southampton',    odds: '4/7',  note: 'Struggled badly last season, thin margins' },
+    { team: 'Leicester City', odds: '5/6',  note: 'Yo-yo club history, squad depth concerns' },
   ],
   golden_boot: [
-    { player: 'Erling Haaland', team: 'Man City',  odds: '3/1'  },
-    { player: 'Bukayo Saka',    team: 'Arsenal',    odds: '8/1'  },
-    { player: 'Cole Palmer',    team: 'Chelsea',    odds: '10/1' },
-    { player: 'Mo Salah',       team: 'Liverpool',  odds: '12/1' },
+    { player: 'Erling Haaland',  team: 'Man City',  odds: '3/1'  },
+    { player: 'Alexander Isak',  team: 'Liverpool', odds: '6/1'  },
+    { player: 'Bukayo Saka',     team: 'Arsenal',   odds: '8/1'  },
+    { player: 'Florian Wirtz',   team: 'Liverpool', odds: '8/1'  },
+    { player: 'Cole Palmer',     team: 'Chelsea',   odds: '10/1' },
   ],
 };
 

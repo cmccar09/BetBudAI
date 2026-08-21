@@ -177,6 +177,24 @@ import FootballPage from './pages/football/FootballPage';
 
 ---
 
+## Verified 2026/27 season facts (updated August 2026)
+
+| Fact | Detail |
+|---|---|
+| 2025/26 PL Champion | **Arsenal** (ended Man City's dominance) |
+| Man City manager | **Enzo Maresca** (ex-Chelsea, appointed 01/07/2026) |
+| Man City key departure | Rodri → Barcelona (€60m); Pep Guardiola left end of 2024/25 |
+| Liverpool key departures | Mohamed Salah (left — no longer at club) |
+| Liverpool key arrivals | Alexander Isak (€85m, from Newcastle), Florian Wirtz (€100m), Hugo Ekitiké (€80m) |
+| Liverpool first scorer pick | Alexander Isak (not Salah) |
+| Title pick 2026/27 | Arsenal (defending champions, 3/1) |
+| Top 4 order | Arsenal → Man City → Liverpool → Chelsea |
+| Golden Boot | Haaland 3/1, Isak 6/1, Saka 8/1, Wirtz 8/1, Palmer 10/1 |
+
+**When updating predictions**: always verify these facts first before changing odds. Sources: Transfermarkt, fotmob.com, premierleague.com.
+
+---
+
 ## Season calendar (update each August)
 
 | Event | Date |

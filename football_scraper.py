@@ -39,43 +39,44 @@ ESPN_SOCCER = 'https://site.api.espn.com/apis/site/v2/sports/soccer'
 # Predictions based on squad strength, transfer activity, and pre-season market.
 
 PL_TITLE_PREDICTION = {
-    'team':       'Manchester City',
-    'odds':       '2/1',
-    'decimal':    3.0,
-    'confidence': 78,
-    'reasoning':  'Six titles in nine years. Machine-like squad depth and the best manager in the game. No reason to fade pre-season — until someone beats them, City are the pick.',
+    'team':       'Arsenal',
+    'odds':       '3/1',
+    'decimal':    4.0,
+    'confidence': 72,
+    'reasoning':  'Defending champions — Arsenal ended Man City\'s dominance in 2025/26 and have the squad depth and momentum to back up. Mikel Arteta\'s system is now at peak maturity. First choice to retain.',
 }
 
 PL_TOP_FOUR = [
-    {'pos': 1, 'team': 'Manchester City',   'odds': '2/1',   'decimal': 3.0,  'badge': '🔵', 'note': 'Title favourites — relentless'},
-    {'pos': 2, 'team': 'Arsenal',           'odds': '3/1',   'decimal': 4.0,  'badge': '🔴', 'note': 'Closer every season, strongest challenge'},
-    {'pos': 3, 'team': 'Liverpool',         'odds': '5/1',   'decimal': 6.0,  'badge': '❤️', 'note': 'European pedigree, Salah era rolling on'},
-    {'pos': 4, 'team': 'Chelsea',           'odds': '8/1',   'decimal': 9.0,  'badge': '🔵', 'note': 'Massive squad investment — year 3 clicks'},
+    {'pos': 1, 'team': 'Arsenal',           'odds': '3/1',  'decimal': 4.0,  'badge': '🔴', 'note': 'Defending champions — Arteta squad at peak maturity'},
+    {'pos': 2, 'team': 'Manchester City',   'odds': '4/1',  'decimal': 5.0,  'badge': '🔵', 'note': 'Enzo Maresca takes over — Haaland the difference-maker, lost Rodri'},
+    {'pos': 3, 'team': 'Liverpool',         'odds': '5/1',  'decimal': 6.0,  'badge': '❤️', 'note': 'Massive rebuild — Wirtz + Isak arrival is a statement of intent'},
+    {'pos': 4, 'team': 'Chelsea',           'odds': '10/1', 'decimal': 11.0, 'badge': '🔵', 'note': 'Maresca left for City — new era at Stamford Bridge'},
 ]
 
 PL_TOP_SIX_CONTENDERS = [
-    {'team': 'Manchester United', 'odds': '10/1', 'decimal': 11.0},
-    {'team': 'Tottenham Hotspur', 'odds': '12/1', 'decimal': 13.0},
+    {'team': 'Manchester United', 'odds': '12/1', 'decimal': 13.0},
+    {'team': 'Tottenham Hotspur', 'odds': '14/1', 'decimal': 15.0},
     {'team': 'Newcastle United',  'odds': '16/1', 'decimal': 17.0},
     {'team': 'Aston Villa',       'odds': '20/1', 'decimal': 21.0},
 ]
 
 PL_RELEGATION = [
-    {'team': 'Ipswich Town',   'odds': '1/2',  'decimal': 1.5,  'note': 'Promoted side facing brutal schedule'},
-    {'team': 'Southampton',    'odds': '4/7',  'decimal': 1.57, 'note': 'Struggled for goals in previous season'},
-    {'team': 'Leicester City', 'odds': '5/6',  'decimal': 1.83, 'note': 'Yo-yo club, thin squad depth'},
+    {'team': 'Ipswich Town',   'odds': '1/2',  'decimal': 1.5,  'note': 'Second season up — squad quality gap showing'},
+    {'team': 'Southampton',    'odds': '4/7',  'decimal': 1.57, 'note': 'Struggled badly last season, thin margins'},
+    {'team': 'Leicester City', 'odds': '5/6',  'decimal': 1.83, 'note': 'Yo-yo club history, squad depth concerns'},
 ]
 
 PL_GOLDEN_BOOT = [
-    {'player': 'Erling Haaland', 'team': 'Man City',  'goals_last_season': 27, 'odds': '3/1',  'decimal': 4.0},
-    {'player': 'Bukayo Saka',    'team': 'Arsenal',    'goals_last_season': 20, 'odds': '8/1',  'decimal': 9.0},
-    {'player': 'Cole Palmer',    'team': 'Chelsea',    'goals_last_season': 18, 'odds': '10/1', 'decimal': 11.0},
-    {'player': 'Mo Salah',       'team': 'Liverpool',  'goals_last_season': 22, 'odds': '12/1', 'decimal': 13.0},
+    {'player': 'Erling Haaland',   'team': 'Man City',  'goals_last_season': 27, 'odds': '3/1',  'decimal': 4.0},
+    {'player': 'Alexander Isak',   'team': 'Liverpool', 'goals_last_season': 21, 'odds': '6/1',  'decimal': 7.0},
+    {'player': 'Bukayo Saka',      'team': 'Arsenal',   'goals_last_season': 20, 'odds': '8/1',  'decimal': 9.0},
+    {'player': 'Florian Wirtz',    'team': 'Liverpool', 'goals_last_season': 18, 'odds': '8/1',  'decimal': 9.0},
+    {'player': 'Cole Palmer',      'team': 'Chelsea',   'goals_last_season': 18, 'odds': '10/1', 'decimal': 11.0},
 ]
 
 UCL_ENGLISH_CLUBS = [
-    {'team': 'Manchester City',  'how': 'PL Champions'},
-    {'team': 'Arsenal',          'how': 'PL 2nd'},
+    {'team': 'Arsenal',          'how': 'PL Champions'},
+    {'team': 'Manchester City',  'how': 'PL 2nd'},
     {'team': 'Liverpool',        'how': 'PL 3rd'},
     {'team': 'Chelsea',          'how': 'PL 4th'},
 ]
@@ -105,8 +106,9 @@ EL_CONTENDERS = [
 
 # Team strength ratings for match prediction model
 TEAM_STRENGTH = {
-    'Manchester City': 95, 'Arsenal': 90, 'Liverpool': 88, 'Chelsea': 82,
-    'Manchester United': 78, 'Tottenham Hotspur': 77, 'Newcastle United': 75,
+    # Updated 2026/27: Arsenal defending champions, Man City lost Pep+Rodri, Liverpool rebuilt with Isak+Wirtz
+    'Arsenal': 93, 'Manchester City': 90, 'Liverpool': 91, 'Chelsea': 80,
+    'Manchester United': 76, 'Tottenham Hotspur': 76, 'Newcastle United': 75,
     'Aston Villa': 73, 'Brighton & Hove Albion': 70, 'West Ham United': 68,
     'Brentford': 66, 'Fulham': 65, 'Crystal Palace': 64,
     'Wolverhampton Wanderers': 63, 'Everton': 62, 'Bournemouth': 61,
@@ -125,7 +127,7 @@ TEAM_STRENGTH = {
 FIRST_SCORERS = {
     'Manchester City':          {'name': 'Erling Haaland',         'odds': '7/4',  'note': 'Penalty taker · leads PL scorers'},
     'Arsenal':                  {'name': 'Bukayo Saka',             'odds': '9/2',  'note': 'Set-piece specialist · top Arsenal scorer'},
-    'Liverpool':                {'name': 'Mohamed Salah',           'odds': '3/1',  'note': 'Penalty taker · most clinical in the PL'},
+    'Liverpool':                {'name': 'Alexander Isak',          'odds': '9/4',  'note': 'Signed from Newcastle · clinical finisher · key man'},
     'Chelsea':                  {'name': 'Cole Palmer',             'odds': '7/2',  'note': 'Penalty taker · free-kick threat'},
     'Manchester United':        {'name': 'Rasmus Hojlund',          'odds': '4/1',  'note': 'Target man · primary striker'},
     'Tottenham Hotspur':        {'name': 'Heung-min Son',           'odds': '7/2',  'note': 'Consistent scorer · strong finisher'},
