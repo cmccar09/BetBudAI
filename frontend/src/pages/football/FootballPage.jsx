@@ -244,6 +244,81 @@ function EnglishClubsBadge({ clubs }) {
   );
 }
 
+// ─── Match bet cards ──────────────────────────────────────────────────────────
+function MatchBetCard({ fx, isMobile }) {
+  const bets = fx.bets || {};
+  const dateStr = fx.date ? new Date(fx.date).toLocaleDateString('en-GB', {
+    weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+  }) : '';
+
+  const picks = [
+    { key: 'safe',     emoji: '🛡️', label: 'Safe Pick', color: '#34d399', bg: 'rgba(52,211,153,0.1)',  border: 'rgba(52,211,153,0.25)',  data: bets.safe     },
+    { key: 'value',    emoji: '💰', label: 'Value',     color: '#fbbf24', bg: 'rgba(251,191,36,0.1)',  border: 'rgba(251,191,36,0.25)',  data: bets.value    },
+    { key: 'longshot', emoji: '🎯', label: 'Longshot',  color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.25)', data: bets.longshot },
+  ];
+
+  return (
+    <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+      borderRadius: 14, overflow: 'hidden', marginBottom: 14 }}>
+      {/* Fixture header */}
+      <div style={{ padding: '12px 18px', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.2)' }}>
+        {dateStr && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginBottom: 5 }}>{dateStr}</div>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: isMobile ? 14 : 16, fontWeight: 900, color: 'white' }}>{fx.home}</span>
+          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', padding: '1px 7px',
+            background: 'rgba(255,255,255,0.06)', borderRadius: 5 }}>vs</span>
+          <span style={{ fontSize: isMobile ? 14 : 15, fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>{fx.away}</span>
+          {fx.prediction && <PredictionBadge result={fx.prediction.result} />}
+        </div>
+      </div>
+      {/* 3 picks */}
+      <div style={{ padding: isMobile ? '10px 12px' : '12px 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {picks.map(p => p.data ? (
+          <div key={p.key} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 12px',
+            background: p.bg, border: `1px solid ${p.border}`, borderRadius: 10 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 10, fontWeight: 800, color: p.color, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                  {p.emoji} {p.label}
+                </span>
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>· {p.data.market}</span>
+              </div>
+              <div style={{ fontSize: isMobile ? 13 : 14, fontWeight: 900, color: 'white', marginBottom: 3 }}>
+                {p.data.pick}
+                {p.data.team && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginLeft: 6 }}>({p.data.team})</span>}
+              </div>
+              {p.data.reason && (
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.4 }}>{p.data.reason}</div>
+              )}
+            </div>
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <div style={{ fontSize: 15, fontWeight: 900, color: p.color }}>{p.data.odds}</div>
+              {p.data.pct != null && (
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{p.data.pct}% prob</div>
+              )}
+            </div>
+          </div>
+        ) : null)}
+      </div>
+    </div>
+  );
+}
+
+function WeeklyBetsSection({ weeklyBets, isMobile }) {
+  if (!weeklyBets || weeklyBets.length === 0) return null;
+  return (
+    <Card style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.28)' }}>
+      <SectionLabel>🎯 This Week's Best Bets</SectionLabel>
+      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 14 }}>
+        3-pick cards per fixture — Safe Pick · Value (with BTTS %) · Longshot
+      </div>
+      {weeklyBets.map(fx => (
+        <MatchBetCard key={fx.id || `${fx.home}-${fx.away}`} fx={fx} isMobile={isMobile} />
+      ))}
+    </Card>
+  );
+}
+
 // ─── Premier League Tab ───────────────────────────────────────────────────────
 function PremierLeagueTab({ apiData, isMobile }) {
   const pl = apiData?.pl_predictions || {};
@@ -252,9 +327,10 @@ function PremierLeagueTab({ apiData, isMobile }) {
   const topSix    = pl.top_six   || FB_PL.top_six;
   const relegate  = pl.relegation || FB_PL.relegation;
   const gBoot     = pl.golden_boot || FB_PL.golden_boot;
-  const fixtures  = apiData?.pl_fixtures || [];
-  const standings = apiData?.pl_standings || [];
-  const isLive    = standings.length > 0;
+  const fixtures    = apiData?.pl_fixtures || [];
+  const weeklyBets  = apiData?.pl_weekly_bets || [];
+  const standings   = apiData?.pl_standings || [];
+  const isLive      = standings.length > 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -328,6 +404,9 @@ function PremierLeagueTab({ apiData, isMobile }) {
           </div>
         )}
       </Card>
+
+      {/* Weekly best bets */}
+      <WeeklyBetsSection weeklyBets={weeklyBets} isMobile={isMobile} />
 
       {/* Fixtures (when live) */}
       {fixtures.length > 0 && (
