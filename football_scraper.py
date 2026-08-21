@@ -322,6 +322,14 @@ def calc_team_stats(standings):
     return stats
 
 
+def strength_to_avg_goals(strength):
+    """Map team strength (51–96) to expected goals scored per game.
+
+    Calibrated to PL averages: elite clubs ~1.8-2.0, mid-table ~1.1-1.3, promoted ~0.7-0.9.
+    """
+    return round(0.7 + max(strength - 51, 0) * 0.025, 2)
+
+
 def calc_btts_prob(avg_home_for, avg_away_for):
     """Poisson probability both teams score ≥ 1 goal."""
     p_home = 1 - math.exp(-max(avg_home_for, 0.1))
@@ -337,9 +345,16 @@ def generate_match_bets(fx, team_stats):
     score  = pred.get('score', '2-1')
     conf   = pred.get('confidence', 50)
 
-    # PL average if no games played yet
-    h_stats = team_stats.get(home, {'avg_for': 1.35, 'avg_against': 1.1})
-    a_stats = team_stats.get(away, {'avg_for': 1.1,  'avg_against': 1.35})
+    # Use live stats from standings when available; fall back to strength-derived goals
+    def _stats(team):
+        if team in team_stats:
+            return team_stats[team]
+        s = TEAM_STRENGTH.get(team, 65)
+        avg = strength_to_avg_goals(s)
+        return {'avg_for': avg, 'avg_against': strength_to_avg_goals(72 - (s - 65))}
+
+    h_stats = _stats(home)
+    a_stats = _stats(away)
 
     # ── Safe Pick: match result ───────────────────────────────────────────────
     h_str = TEAM_STRENGTH.get(home, 65) + 5
