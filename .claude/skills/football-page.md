@@ -177,6 +177,26 @@ import FootballPage from './pages/football/FootballPage';
 
 ---
 
+## Daily data sources — check these first
+
+Use these URLs when updating predictions, checking team news, verifying transfers, or reviewing fixtures before generating picks. Always prefer live sources over static data in the scraper.
+
+| Source | URL | Best for |
+|---|---|---|
+| Sky Sports PL | https://www.skysports.com/premier-league | Breaking news, team news, transfers, analysis, live scores, fixtures — best all-rounder |
+| BBC Sport Football | https://www.bbc.com/sport/football | Reliable news, match reports, straightforward facts — good for verification |
+| FotMob | https://www.fotmob.com/leagues/47/overview/premier-league | Live scores, line-ups, stats, fixtures — best for real-time match data |
+| The Athletic | https://www.theathletic.com/football | Deep team news and analysis (subscription required for some content) |
+
+**When to check each:**
+- **Before generating predictions** → Sky Sports (team news, injuries, suspensions) + FotMob (confirmed line-ups)
+- **Verifying a transfer or manager change** → BBC Sport or Sky Sports
+- **Live score / result check** → FotMob
+- **Deep tactical / squad analysis** → The Athletic
+- **Correcting stale static data** → Sky Sports + BBC Sport together
+
+---
+
 ## Verified 2026/27 season facts (updated August 2026)
 
 | Fact | Detail |
