@@ -399,7 +399,7 @@ def lambda_handler(event, context):
             response = get_cumulative_roi(headers)
         elif 'results/yesterday' in path:
             response = check_yesterday_results(headers)
-        elif 'results/today' in path or path.endswith('/results'):
+        elif ('results/today' in path or path.endswith('/results')) and 'vegas' not in path:
             response = check_today_results(headers)
         elif 'picks/greyhounds' in path:
             response = get_greyhound_picks(headers)
@@ -429,6 +429,12 @@ def lambda_handler(event, context):
             response = get_sport_data(headers, 'darts')
         elif 'sports/gaa' in path and method == 'GET':
             response = get_sport_data(headers, 'gaa')
+        elif 'vegas/results' in path and method == 'GET':
+            response = get_vegas_results(headers, event)
+        elif 'vegas/learning' in path and method == 'GET':
+            response = get_vegas_learning(headers, event)
+        elif 'vegas' in path and method == 'GET':
+            response = get_vegas_picks(headers, event)
         elif 'admin/analytics' in path and method == 'GET':
             response = get_admin_analytics(headers, event)
         elif 'picks/yesterday' in path:
@@ -1670,6 +1676,629 @@ def get_punchestown_tomorrow_picks(headers, event):
             'headers': headers,
             'body': json.dumps({'success': False, 'error': str(e)})
         }
+
+def get_vegas_results(headers, event):
+    """GET /api/vegas/results — yesterday's Vegas picks with results + running ROI."""
+    try:
+        from zoneinfo import ZoneInfo
+        tz_d = ZoneInfo('Europe/Dublin')
+    except Exception:
+        from datetime import timezone as _tz
+        tz_d = _tz.utc
+
+    try:
+        from boto3.dynamodb.conditions import Key as _Key, Attr as _Attr
+        now    = datetime.now(tz_d)
+        today  = now.date().isoformat()
+        yesterday = (now.date() - timedelta(days=1)).isoformat()
+
+        # Yesterday's Vegas picks (settled or pending)
+        y_resp = table.query(
+            KeyConditionExpression=_Key('bet_date').eq(yesterday),
+            FilterExpression=_Attr('pick_type').eq('vegas'),
+        )
+        y_items = [decimal_to_float(i) for i in y_resp.get('Items', [])]
+
+        # Settlement Lambda only writes result_won for WINNERS via name-fallback.
+        # Losers are never explicitly written — they stay with no result_won attribute.
+        # All UK/Irish races settle by 21:00 BST, so any pick from yesterday with no
+        # result_won attribute is implicitly a LOST bet.
+        def _result_str(p, is_yesterday=False):
+            rw = p.get('result_won')
+            if rw is True:   return 'WON'
+            if rw is False:  return 'LOST'
+            if is_yesterday: return 'LOST'   # no result written = race ran, horse lost
+            return 'PENDING'
+
+        yesterday_picks = []
+        for p in y_items:
+            res = _result_str(p, is_yesterday=True)
+            yesterday_picks.append({
+                'horse':       p.get('horse', ''),
+                'venue':       p.get('venue', ''),
+                'race_time':   p.get('race_time', ''),
+                'odds':        p.get('odds', 0),
+                'grade':       p.get('benter_grade', 'VALUE'),
+                'score':       p.get('score', 0),
+                'value_edge':  p.get('value_edge', 0),
+                'kelly_units': p.get('kelly_units', 0),
+                'result':      res,
+                'result_won':  p.get('result_won'),
+            })
+
+        # Sort: WON first, then LOST, then PENDING
+        order = {'WON': 0, 'LOST': 1, 'PENDING': 2}
+        yesterday_picks.sort(key=lambda x: order.get(x['result'], 3))
+
+        y_settled = [p for p in yesterday_picks if p['result'] in ('WON', 'LOST')]
+        y_wins    = sum(1 for p in y_settled if p['result'] == 'WON')
+        y_lost    = sum(1 for p in y_settled if p['result'] == 'LOST')
+        y_pending = sum(1 for p in yesterday_picks if p['result'] == 'PENDING')
+        y_pnl     = sum((p['odds'] - 1 if p['result'] == 'WON' else -1) for p in y_settled)
+        y_roi     = round(y_pnl / max(1, len(y_settled)) * 100, 1) if y_settled else None
+
+        # Running ROI — all settled Vegas picks ever (level stakes)
+        # Includes implicit losers: picks from past dates with no result_won attribute
+        all_resp = table.scan(
+            FilterExpression=_Attr('pick_type').eq('vegas'),
+            ProjectionExpression='result_won, odds, bet_date, benter_grade',
+        )
+        all_items = [decimal_to_float(i) for i in all_resp.get('Items', [])]
+        while all_resp.get('LastEvaluatedKey'):
+            all_resp = table.scan(
+                FilterExpression=_Attr('pick_type').eq('vegas'),
+                ProjectionExpression='result_won, odds, bet_date, benter_grade',
+                ExclusiveStartKey=all_resp['LastEvaluatedKey'],
+            )
+            all_items.extend([decimal_to_float(i) for i in all_resp.get('Items', [])])
+
+        # Treat past dates with no result_won as LOST; exclude today (may still be running)
+        settled_all = []
+        for i in all_items:
+            rw = i.get('result_won')
+            bd = i.get('bet_date', '')
+            if isinstance(rw, bool):
+                settled_all.append(i)
+            elif bd and bd < today:
+                # No result written but race is over — implicit loss
+                settled_all.append({**i, 'result_won': False})
+        total_w = sum(1 for p in settled_all if p['result_won'])
+        total_l = len(settled_all) - total_w
+        total_pnl = sum((p['odds'] - 1 if p['result_won'] else -1) for p in settled_all)
+        running_roi = round(total_pnl / max(1, len(settled_all)) * 100, 1) if settled_all else None
+
+        # Grade breakdown for running ROI
+        grade_roi = {}
+        for g in ('ELITE', 'STRONG', 'VALUE'):
+            gp = [p for p in settled_all if p.get('benter_grade') == g]
+            if gp:
+                gw = sum(1 for p in gp if p['result_won'])
+                gpl = sum((p['odds'] - 1 if p['result_won'] else -1) for p in gp)
+                grade_roi[g] = {
+                    'n': len(gp), 'w': gw, 'l': len(gp) - gw,
+                    'roi': round(gpl / len(gp) * 100, 1),
+                    'pnl': round(gpl, 2),
+                }
+
+        return {
+            'statusCode': 200,
+            'headers': headers,
+            'body': json.dumps({
+                'success': True,
+                'yesterday': {
+                    'date':      yesterday,
+                    'picks':     yesterday_picks,
+                    'won':       y_wins,
+                    'lost':      y_lost,
+                    'pending':   y_pending,
+                    'pnl':       round(y_pnl, 2),
+                    'roi':       y_roi,
+                    'no_picks':  len(y_items) == 0,
+                },
+                'running': {
+                    'settled': len(settled_all),
+                    'won':     total_w,
+                    'lost':    total_l,
+                    'pnl':     round(total_pnl, 2),
+                    'roi':     running_roi,
+                    'grade_roi': grade_roi,
+                },
+            }, default=str),
+        }
+
+    except Exception as exc:
+        import traceback
+        print(f'get_vegas_results error: {exc}\n{traceback.format_exc()}')
+        return {
+            'statusCode': 500,
+            'headers': headers,
+            'body': json.dumps({'success': False, 'error': str(exc)}),
+        }
+
+
+def get_vegas_learning(headers, event):
+    """GET /api/vegas/learning — calibration stats from all settled Vegas picks."""
+    try:
+        from boto3.dynamodb.conditions import Attr as _Attr
+
+        # Scan all Vegas picks that have been settled (result_won is a bool)
+        resp = table.scan(
+            FilterExpression=_Attr('pick_type').eq('vegas') & _Attr('result_won').exists()
+        )
+        items = [decimal_to_float(i) for i in resp.get('Items', [])]
+        while resp.get('LastEvaluatedKey'):
+            resp = table.scan(
+                FilterExpression=_Attr('pick_type').eq('vegas') & _Attr('result_won').exists(),
+                ExclusiveStartKey=resp['LastEvaluatedKey'],
+            )
+            items.extend([decimal_to_float(i) for i in resp.get('Items', [])])
+
+        settled = [i for i in items if isinstance(i.get('result_won'), bool)]
+
+        if not settled:
+            return {
+                'statusCode': 200,
+                'headers': headers,
+                'body': json.dumps({'success': True, 'settled_count': 0,
+                                    'message': 'No settled Vegas picks yet — check back after races run.'}),
+            }
+
+        wins = [p for p in settled if p['result_won']]
+        n = len(settled)
+        overall_wr   = round(len(wins) / n * 100, 1)
+        overall_roi  = round(sum((p['odds'] - 1 if p['result_won'] else -1) for p in settled) / n * 100, 1)
+        brier        = round(sum((p.get('combined_prob', 50) / 100 - (1 if p['result_won'] else 0)) ** 2
+                                  for p in settled) / n, 4)
+
+        def _band_stats(picks):
+            if not picks:
+                return None
+            w = sum(1 for p in picks if p['result_won'])
+            roi = sum((p['odds'] - 1 if p['result_won'] else -1) for p in picks) / len(picks) * 100
+            return {'n': len(picks), 'wr': round(w / len(picks) * 100, 1), 'roi': round(roi, 1)}
+
+        # Score bands
+        score_bands = []
+        for lo, hi in [(70, 80), (80, 90), (90, 100), (100, 200)]:
+            band = [p for p in settled if lo <= p.get('score', 0) < hi]
+            s = _band_stats(band)
+            if s:
+                s['band'] = f'{lo}-{hi}'
+                score_bands.append(s)
+
+        # Benter grade breakdown
+        grade_stats = {}
+        for g in ('ELITE', 'STRONG', 'VALUE'):
+            s = _band_stats([p for p in settled if p.get('benter_grade') == g])
+            if s:
+                grade_stats[g] = s
+
+        # Calibration buckets (every 20% of combined_prob)
+        calibration = []
+        for lo_p in range(0, 100, 20):
+            hi_p = lo_p + 20
+            bucket = [p for p in settled if lo_p <= p.get('combined_prob', 0) < hi_p]
+            if bucket:
+                mean_pred  = sum(p.get('combined_prob', 0) for p in bucket) / len(bucket)
+                actual_wr  = sum(1 for p in bucket if p['result_won']) / len(bucket) * 100
+                calibration.append({
+                    'range': f'{lo_p}-{hi_p}%',
+                    'mean_pred': round(mean_pred, 1),
+                    'actual_wr': round(actual_wr, 1),
+                    'n': len(bucket),
+                })
+
+        # Edge buckets
+        edge_bands = []
+        for lo_e, hi_e in [(10, 15), (15, 20), (20, 30), (30, 100)]:
+            band = [p for p in settled if lo_e <= p.get('value_edge', 0) < hi_e]
+            s = _band_stats(band)
+            if s:
+                s['edge_range'] = f'{lo_e}-{hi_e}%'
+                edge_bands.append(s)
+
+        # Parameter suggestions
+        suggestions = []
+        avg_pred   = sum(p.get('combined_prob', 0) for p in settled) / n
+        actual_pct = overall_wr
+
+        if avg_pred > actual_pct * 2 and n >= 10:
+            suggestions.append({
+                'param': 'TEMPERATURE', 'current': '20', 'suggested': '30',
+                'reason': f'Model avg {avg_pred:.1f}% vs actual {actual_pct:.1f}% — overconfident, flatten softmax',
+            })
+        val_s = grade_stats.get('VALUE')
+        if val_s and val_s['roi'] < -10 and val_s['n'] >= 5:
+            suggestions.append({
+                'param': 'MIN_EDGE', 'current': '10%', 'suggested': '15%',
+                'reason': f"VALUE picks ROI {val_s['roi']:.1f}% over {val_s['n']} races — low-edge picks losing",
+            })
+        low_sc = next((s for s in score_bands if s['band'] == '70-80'), None)
+        if low_sc and low_sc['roi'] < -15 and low_sc['n'] >= 5:
+            suggestions.append({
+                'param': 'SCORE_GATE', 'current': '70', 'suggested': '80',
+                'reason': f"Score 70-80 ROI {low_sc['roi']:.1f}% over {low_sc['n']} picks — raise gate",
+            })
+
+        # Calibration health label
+        if brier < 0.15:
+            calib_label = 'GOOD'
+        elif brier < 0.20:
+            calib_label = 'SLIGHT OVERCONFIDENCE'
+        elif brier < 0.25:
+            calib_label = 'OVERCONFIDENT'
+        else:
+            calib_label = 'POOR — check partial field coverage'
+
+        return {
+            'statusCode': 200,
+            'headers': headers,
+            'body': json.dumps({
+                'success':       True,
+                'settled_count': n,
+                'wins':          len(wins),
+                'overall_wr':    overall_wr,
+                'overall_roi':   overall_roi,
+                'brier_score':   brier,
+                'calib_label':   calib_label,
+                'score_bands':   score_bands,
+                'grade_stats':   grade_stats,
+                'edge_bands':    edge_bands,
+                'calibration':   calibration,
+                'suggestions':   suggestions,
+            }, default=str),
+        }
+
+    except Exception as exc:
+        import traceback
+        print(f'get_vegas_learning error: {exc}\n{traceback.format_exc()}')
+        return {
+            'statusCode': 500,
+            'headers': headers,
+            'body': json.dumps({'success': False, 'error': str(exc)}),
+        }
+
+
+def get_vegas_picks(headers, event):
+    """GET /api/vegas — Benter combined model: value bets where our model diverges from market.
+
+    For each race today, computes softmax probabilities from scores, compares to Betfair
+    market implied probabilities, and flags horses where combined probability exceeds market
+    by >= MIN_EDGE. Also returns Harville exacta suggestions (with Benter bias correction).
+    """
+    import math
+    try:
+        from zoneinfo import ZoneInfo
+        tz_dublin = ZoneInfo('Europe/Dublin')
+    except Exception:
+        from datetime import timezone as _tz
+        tz_dublin = _tz.utc
+
+    # Benter model parameters
+    ALPHA   = 1.0   # weight for fundamental model log-probability
+    BETA    = 1.0   # weight for market implied log-probability
+    TEMP    = 20.0  # softmax temperature for score → probability conversion
+    GAMMA   = 0.81  # Harville win bias correction (Benter 1994)
+    DELTA   = 0.65  # Harville place bias correction
+    MIN_EDGE = 0.10  # minimum 10% edge over market to qualify as a value bet
+
+    try:
+        from boto3.dynamodb.conditions import Key as _Key
+        now_dublin = datetime.now(tz_dublin)
+        target_date = now_dublin.date().isoformat()
+
+        # Fetch all today's scored picks
+        resp = table.query(KeyConditionExpression=_Key('bet_date').eq(target_date))
+        items = [decimal_to_float(i) for i in resp.get('Items', [])]
+        while resp.get('LastEvaluatedKey'):
+            resp = table.query(
+                KeyConditionExpression=_Key('bet_date').eq(target_date),
+                ExclusiveStartKey=resp['LastEvaluatedKey'])
+            items.extend([decimal_to_float(i) for i in resp.get('Items', [])])
+
+        # Filter to picks with all_horses field (each pick carries the full race field)
+        scored = [i for i in items if
+                  i.get('horse') and
+                  isinstance(i.get('all_horses'), list) and
+                  len(i.get('all_horses', [])) >= 2 and
+                  str(i.get('pick_type', '')) not in ('CONFIG',)]
+
+        # De-duplicate races: use the first record's all_horses as the field descriptor
+        races = {}
+        for pick in scored:
+            venue = str(pick.get('course') or pick.get('venue') or '').strip()
+            race_time = str(pick.get('race_time') or '').strip()
+            if not venue or not race_time:
+                continue
+            race_key = f"{venue}|{race_time}"
+            if race_key not in races:
+                races[race_key] = {
+                    'venue': venue,
+                    'race_time': race_time,
+                    'race_type': pick.get('race_type', ''),
+                    'race_name': pick.get('race_name', '') or pick.get('market_name', ''),
+                    'all_horses': pick['all_horses'],
+                }
+
+        value_bets = []
+        exactas = []
+
+        for race_key, race in races.items():
+            horses_raw = race['all_horses']
+
+            # Parse and validate horses
+            valid = []
+            for h in horses_raw:
+                if not isinstance(h, dict):
+                    continue
+                try:
+                    score = float(h.get('score', 0) or 0)
+                    odds  = float(h.get('odds', 0) or 0)
+                except (TypeError, ValueError):
+                    continue
+                if score > 0 and odds > 1.01:
+                    valid.append({
+                        'horse':   str(h.get('horse', '')),
+                        'jockey':  str(h.get('jockey', '')),
+                        'trainer': str(h.get('trainer', '')),
+                        'score':   score,
+                        'odds':    odds,
+                    })
+
+            if len(valid) < 2:
+                continue
+
+            scores    = [h['score'] for h in valid]
+            odds_list = [h['odds']  for h in valid]
+
+            # 1. Model probabilities via temperature-scaled softmax
+            max_s   = max(scores)
+            exps    = [math.exp((s - max_s) / TEMP) for s in scores]
+            sum_exp = sum(exps)
+            model_probs = [e / sum_exp for e in exps]
+
+            # 2. Market implied probabilities (overround-normalised)
+            raw_impl  = [1.0 / o for o in odds_list]
+            overround = sum(raw_impl)
+            market_probs = [p / overround for p in raw_impl]
+
+            # 3. Benter combined model: softmax over (α·log(model) + β·log(market))
+            log_comb = []
+            for mp, mkt in zip(model_probs, market_probs):
+                if mp > 1e-6 and mkt > 1e-6:
+                    log_comb.append(ALPHA * math.log(mp) + BETA * math.log(mkt))
+                else:
+                    log_comb.append(-50.0)
+            max_lc   = max(log_comb)
+            exps2    = [math.exp(lc - max_lc) for lc in log_comb]
+            sum_exp2 = sum(exps2)
+            combined_probs = [e / sum_exp2 for e in exps2]
+
+            # Coverage discount — the softmax above runs only over runners we scored.
+            # In a 14-runner handicap where we have 6 scored runners, the model over-
+            # concentrates probability on those 6.  Scale combined_probs down by the
+            # fraction of the field we actually observed so the implied win probability
+            # is honest about the unscored runners.  Intentionally NOT re-normalised —
+            # the residual (1 - sum) represents probability mass "held" by runners we
+            # didn't see.  After this, combined_prob is comparable to market_prob.
+            field_size     = max(len(valid), len(horses_raw))
+            coverage       = len(valid) / max(1, field_size)          # 0–1
+            combined_probs = [p * coverage for p in combined_probs]
+
+            # 4. Flag value bets: combined_prob > market_prob by >= MIN_EDGE
+            for i, h in enumerate(valid):
+                value_edge  = combined_probs[i] - market_probs[i]
+                value_ratio = combined_probs[i] / market_probs[i] if market_probs[i] > 0 else 0
+                ev = combined_probs[i] * h['odds'] - 1.0
+
+                # Score gate: only surface picks where our model has enough signal
+                if value_edge >= MIN_EDGE and h['score'] >= 80:
+                    p  = combined_probs[i]
+                    b  = h['odds'] - 1.0
+                    kf = ((b * p - (1 - p)) / b) if b > 0 else 0
+                    kelly_half  = round(max(0.0, min(0.12, kf * 0.5)), 4)
+                    kelly_units = round(kelly_half * 100, 1)
+
+                    grade = ('ELITE' if value_ratio >= 2.0
+                             else 'STRONG' if value_ratio >= 1.5
+                             else 'VALUE')
+
+                    # Build Benter advice note
+                    odds_v = round(h['odds'], 2)
+                    sc     = round(h['score'])
+                    if grade == 'ELITE':
+                        action = f"Back to win — {kelly_units}u stake (half-Kelly)."
+                        if odds_v > 12:
+                            action += " Long price: back consistently over a series, not just once."
+                        elif odds_v < 2.5:
+                            action += " Short price: confirm Betfair steam before placing."
+                        benter = ("Benter would back this. ELITE edge — model sees 2× what "
+                                  "the market prices. This is the core bet type his system was built on.")
+                    elif grade == 'STRONG':
+                        action = f"Back to win — {kelly_units}u stake."
+                        if odds_v > 10:
+                            action += " Long price: use smaller level-stakes unit if Kelly feels large."
+                        elif odds_v < 3:
+                            action += " Short price — reduce to 50% of Kelly if unsure."
+                        benter = ("Benter would back this. STRONG edge meets his minimum "
+                                  "divergence threshold. He would stake exactly as Kelly says — no rounding down.")
+                    else:
+                        half_k = max(1.0, round(kelly_units / 2, 1))
+                        action = f"Small stake only — {half_k}u max. Edge is narrow; watch first if possible."
+                        benter = ("Benter would flag but not act on VALUE grade alone. "
+                                  "Edge may be within softmax noise from partial field coverage. "
+                                  "Wait for STRONG/ELITE confirmation before staking.")
+
+                    if sc < 90:
+                        benter += f" Score {sc} — some signals incomplete; treat as speculative."
+
+                    value_bets.append({
+                        'horse':        h['horse'],
+                        'jockey':       h['jockey'],
+                        'trainer':      h['trainer'],
+                        'venue':        race['venue'],
+                        'race_time':    race['race_time'],
+                        'race_type':    race['race_type'],
+                        'race_name':    race['race_name'],
+                        'odds':         odds_v,
+                        'score':        sc,
+                        'model_prob':   round(model_probs[i] * 100, 1),
+                        'market_prob':  round(market_probs[i] * 100, 1),
+                        'combined_prob': round(combined_probs[i] * 100, 1),
+                        'value_edge':   round(value_edge * 100, 1),
+                        'value_ratio':  round(value_ratio, 2),
+                        'ev':           round(ev, 3),
+                        'kelly_units':   kelly_units,
+                        'benter_grade':  grade,
+                        'action':        action,
+                        'benter_note':   benter,
+                        'coverage':      round(coverage * 100),
+                        'field_scored':  len(valid),
+                        'field_known':   field_size,
+                    })
+
+            # 5. Harville exacta — coverage-aware (do NOT renormalise combined_probs)
+            # combined_probs are already coverage-discounted (sum ≈ coverage fraction)
+            # Win prob  = combined_probs[i]  (our best estimate, unmodified)
+            # Place den = 1.0 - win_prob     (full field minus the winner, including unseen runners)
+            ranked = sorted(range(len(combined_probs)), key=lambda x: -combined_probs[x])
+            if len(ranked) >= 2:
+                i_win   = ranked[0]
+                i_place = ranked[1]
+
+                win_p   = combined_probs[i_win]
+                # Conditional: of the remaining probability mass (full field), what fraction belongs to horse j?
+                denom   = 1.0 - win_p
+                place_p = (combined_probs[i_place] / denom) if denom > 0 else 0
+                exacta_prob = win_p * place_p
+
+                # Gate: drop if inflated (>35%) or too weak (<3%)
+                if 0.03 <= exacta_prob <= 0.35:
+                    # Rough Betfair forecast price estimate: product of win odds × 0.6
+                    odds_w  = round(valid[i_win]['odds'], 2)
+                    odds_p  = round(valid[i_place]['odds'], 2)
+                    betfair_est = round(odds_w * odds_p * 0.6, 1)
+                    fair_px = round(1.0 / exacta_prob, 1) if exacta_prob > 0 else 999
+                    exactas.append({
+                        'venue':        race['venue'],
+                        'race_time':    race['race_time'],
+                        'race_name':    race['race_name'],
+                        'horse_win':    valid[i_win]['horse'],
+                        'horse_place':  valid[i_place]['horse'],
+                        'win_prob':     round(win_p * 100, 1),
+                        'place_prob':   round(place_p * 100, 1),
+                        'exacta_prob':  round(exacta_prob * 100, 2),
+                        'fair_price':   fair_px,
+                        'betfair_est':  betfair_est,
+                        'value':        betfair_est > fair_px,
+                        'odds_win':     odds_w,
+                        'odds_place':   odds_p,
+                    })
+
+        # Sort by value ratio descending
+        value_bets.sort(key=lambda x: -x['value_ratio'])
+        exactas.sort(key=lambda x: -x['exacta_prob'])
+
+        # One pick per race — list is sorted desc so first occurrence is best
+        _seen_races = set()
+        _deduped = []
+        for vb in value_bets:
+            _rk = f"{vb['venue']}|{vb['race_time']}"
+            if _rk not in _seen_races:
+                _seen_races.add(_rk)
+                _deduped.append(vb)
+        value_bets = _deduped
+
+        # Daily exposure cap — the 12% half-Kelly cap above sizes ONE bet against
+        # the current bankroll; it says nothing about what happens when many
+        # picks fire the same day. Scale every pick down proportionally so the
+        # day's combined recommended stake never exceeds DAILY_EXPOSURE_CAP units.
+        # 2026-08-27: added after a 16-pick day asked for 185u combined — 14 of
+        # those picks were already hitting the per-pick cap on their own.
+        DAILY_EXPOSURE_CAP = 50.0
+        _raw_total = round(sum(vb['kelly_units'] for vb in value_bets), 1)
+        daily_exposure_scaled = _raw_total > DAILY_EXPOSURE_CAP and _raw_total > 0
+        if daily_exposure_scaled:
+            _scale = DAILY_EXPOSURE_CAP / _raw_total
+            for vb in value_bets:
+                old_units = vb['kelly_units']
+                new_units = round(old_units * _scale, 1)
+                # Reconstruct only the displayed stake number, not the whole
+                # sentence — VALUE grade shows half of kelly_units, not the raw figure.
+                old_disp = old_units if vb['benter_grade'] != 'VALUE' else max(1.0, round(old_units / 2, 1))
+                new_disp = new_units if vb['benter_grade'] != 'VALUE' else max(1.0, round(new_units / 2, 1))
+                vb['action'] = vb['action'].replace(f"{old_disp}u", f"{new_disp}u")
+                vb['kelly_units'] = new_units
+        daily_total_stake = round(sum(vb['kelly_units'] for vb in value_bets), 1)
+
+        # Persist value bets for daily learning (idempotent)
+        _params_snap = json.dumps({'alpha': ALPHA, 'beta': BETA, 'temp': TEMP, 'min_edge': MIN_EDGE})
+        for vb in value_bets:
+            _bid = ('vegas_' + vb['race_time'] + '_' + vb['venue'] + '_' + vb['horse']
+                    ).replace(' ', '_').replace(':', '').replace('.', '').replace("'", '')
+            try:
+                table.put_item(
+                    Item={
+                        'bet_id':        _bid,
+                        'bet_date':      target_date,
+                        'pick_type':     'vegas',
+                        'horse':         vb['horse'],
+                        'venue':         vb['venue'],
+                        'race_time':     vb['race_time'],
+                        'race_type':     vb.get('race_type', ''),
+                        'odds':          Decimal(str(round(vb['odds'], 2))),
+                        'score':         Decimal(str(round(vb['score']))),
+                        'model_prob':    Decimal(str(round(vb['model_prob'], 2))),
+                        'market_prob':   Decimal(str(round(vb['market_prob'], 2))),
+                        'combined_prob': Decimal(str(round(vb['combined_prob'], 2))),
+                        'value_edge':    Decimal(str(round(vb['value_edge'], 2))),
+                        'value_ratio':   Decimal(str(round(vb['value_ratio'], 3))),
+                        'kelly_units':   Decimal(str(vb['kelly_units'])),
+                        'benter_grade':  vb['benter_grade'],
+                        'model_params':  _params_snap,
+                        'jockey':        vb.get('jockey', ''),
+                        'trainer':       vb.get('trainer', ''),
+                    },
+                    ConditionExpression='attribute_not_exists(bet_id)',
+                )
+            except Exception:
+                pass  # already saved today or DDB error — don't fail the response
+
+        return {
+            'statusCode': 200,
+            'headers': headers,
+            'body': json.dumps({
+                'success':       True,
+                'date':          target_date,
+                'value_bets':    value_bets,
+                'exactas':       exactas[:5],
+                'races_analysed': len(races),
+                'daily_exposure': {
+                    'total_stake_units': daily_total_stake,
+                    'cap':                DAILY_EXPOSURE_CAP,
+                    'scaled':             daily_exposure_scaled,
+                    'raw_total_before_scaling': _raw_total,
+                },
+                'methodology': {
+                    'model':            'Benter Combined (α=1.0, β=1.0)',
+                    'temperature':      TEMP,
+                    'min_edge':         f'{int(MIN_EDGE*100)}%',
+                    'harville_gamma':   GAMMA,
+                    'harville_delta':   DELTA,
+                    'kelly':            'half-Kelly, capped 12% per pick, day capped at 50u total',
+                },
+            }, default=str),
+        }
+
+    except Exception as exc:
+        import traceback
+        print(f'get_vegas_picks error: {exc}\n{traceback.format_exc()}')
+        return {
+            'statusCode': 500,
+            'headers': headers,
+            'body': json.dumps({'success': False, 'error': str(exc)}),
+        }
+
 
 def get_extended_picks(headers, event):
     """GET /api/picks/extended — today's extended daily picks (any odds, top by score).
@@ -5853,6 +6482,33 @@ def _analyse_date_lambda(target_date_str, tbl, winner_map=None):
 _LAY_COMMISSION = 0.05   # Betfair exchange standard commission on net winnings
 _LAY_STAKE_PTS  = 1.0    # flat 1-point lay stake per qualifying race, for ROI tracking
 
+# Elite Lay tier — the only combo validated as profitable at scale (see get_favs_run_lambda
+# for the backing data note). Score 13+ AND lay odds Evens–6/4 (2.0–2.5).
+_LAY_ELITE_SCORE_MIN = 13
+_LAY_ELITE_ODDS_MIN  = 2.0
+_LAY_ELITE_ODDS_MAX  = 2.5
+
+def _elite_stats_from_races(races):
+    """Filter a list of race dicts (each carrying lay_score/fav_odds/outcome) down to the
+    Elite tier (score 13+, odds 2.0-2.5) and return settled/fav_lost/win% counts.
+    Used both when building a fresh daily snapshot (from the full raw day) and when
+    reading back older stored snapshots that predate elite-tier tracking (derived from
+    their already-stored races_settled list — no raw data is fabricated or estimated)."""
+    elite = [
+        r for r in (races or [])
+        if float(r.get('lay_score') or 0) >= _LAY_ELITE_SCORE_MIN
+        and _LAY_ELITE_ODDS_MIN <= float(r.get('fav_odds') or 0) < _LAY_ELITE_ODDS_MAX
+    ]
+    settled  = [r for r in elite if _normalise_fav_outcome(r.get('outcome')) in ('win', 'loss')]
+    fav_lost = [r for r in settled if _normalise_fav_outcome(r.get('outcome')) == 'loss']
+    return {
+        'elite': len(elite),
+        'elite_settled': len(settled),
+        'elite_fav_lost': len(fav_lost),
+        'elite_lay_win_pct': round((len(fav_lost) / len(settled)) * 100, 1) if settled else None,
+    }
+
+
 def _lay_profit_pts(fav_odds, outcome, stake=_LAY_STAKE_PTS, commission=_LAY_COMMISSION):
     """
     P&L in points for laying the favourite at fav_odds with a flat stake.
@@ -5903,6 +6559,10 @@ def _build_daily_lay_snapshot(day, rows, generated_iso):
             'profit_pts': _profit,
         })
 
+    # Elite tier (score 13+, odds 2.0-2.5) — computed from the full raw day so an unsettled
+    # elite candidate still counts toward 'elite' even before it has a result.
+    elite_stats = _elite_stats_from_races(rows)
+
     summary = {
         'date': day,
         'total': len(all_candidates),
@@ -5911,12 +6571,17 @@ def _build_daily_lay_snapshot(day, rows, generated_iso):
         'strong': len(strong),                   # 7+
         'premium': len(premium),                 # 10+
         'red_flag': len([r for r in rows if float(r.get('lay_score') or 0) >= 13]),
-        'settled': len(settled),                 # settled within 7+ tier
+        'settled': len(settled),                 # settled within 7+ tier (legacy, kept for backwards compat)
         'fav_lost': len(fav_lost),
         'lay_win_pct': round((len(fav_lost) / len(settled)) * 100, 1) if settled else None,
         'premium_settled': len(settled_p),
         'premium_fav_lost': len(fav_lost_p),
         'premium_lay_win_pct': round((len(fav_lost_p) / len(settled_p)) * 100, 1) if settled_p else None,
+        # Elite tier — score 13+ AND odds 2.0-2.5 — the tier actually shown on-site.
+        'elite': elite_stats['elite'],
+        'elite_settled': elite_stats['elite_settled'],
+        'elite_fav_lost': elite_stats['elite_fav_lost'],
+        'elite_lay_win_pct': elite_stats['elite_lay_win_pct'],
         'profit_pts': round(day_profit_pts, 2),
         'staked_pts': round(len(settled) * _LAY_STAKE_PTS, 2),
     }
@@ -5941,14 +6606,28 @@ def _save_daily_lay_snapshot(tbl, snapshot):
 
 
 def _load_lay_history(tbl, days_back=30):
-    """Load recent favs history snapshots (most recent first)."""
+    """Load recent favs history snapshots (most recent first).
+
+    Snapshots written before Elite-tier tracking was added won't have elite_settled /
+    elite_fav_lost in their stored summary. Backfill those fields at read time by
+    re-filtering the day's already-stored races_settled list (which has always carried
+    lay_score + fav_odds per race) down to the Elite tier — this recovers exact historical
+    counts with no estimation, since races_settled is a superset of the Elite tier
+    (13+ is a subset of the 7+ tier that races_settled was built from)."""
     try:
         from boto3.dynamodb.conditions import Key as DKey
         resp = tbl.query(KeyConditionExpression=DKey('bet_date').eq('FAVS_HISTORY'))
         items = [_dec(it) for it in resp.get('Items', [])]
         items = [it for it in items if str(it.get('history_type', '')) == 'favs_run_daily']
         items.sort(key=lambda it: str(it.get('date', '')), reverse=True)
-        return items[:days_back]
+        items = items[:days_back]
+        for it in items:
+            summ = it.get('summary') or {}
+            if summ.get('elite_settled') is None:
+                summ = dict(summ)
+                summ.update(_elite_stats_from_races(it.get('races_settled') or []))
+                it['summary'] = summ
+        return items
     except Exception as e:
         print(f'[_load_lay_history] warning: {e}')
         return []
@@ -6479,14 +7158,20 @@ def get_favs_run_lambda(headers, event):
         hist_fav_lost = sum(int((d.get('summary') or {}).get('fav_lost') or 0) for d in history_days)
         hist_profit = sum(float((d.get('summary') or {}).get('profit_pts') or 0) for d in history_days)
         hist_staked = sum(float((d.get('summary') or {}).get('staked_pts') or 0) for d in history_days)
+        hist_elite_settled  = sum(int((d.get('summary') or {}).get('elite_settled') or 0) for d in history_days)
+        hist_elite_fav_lost = sum(int((d.get('summary') or {}).get('elite_fav_lost') or 0) for d in history_days)
         history_summary = {
             'days': len(history_days),
-            'settled': hist_settled,
+            'settled': hist_settled,                 # legacy 7+ tier (kept for backwards compat)
             'fav_lost': hist_fav_lost,
             'lay_win_pct': round((hist_fav_lost / hist_settled) * 100, 1) if hist_settled else None,
             'profit_pts': round(hist_profit, 2),
             'staked_pts': round(hist_staked, 2),
             'roi_pct': round((hist_profit / hist_staked) * 100, 1) if hist_staked else None,
+            # Elite tier — score 13+, odds 2.0-2.5 — the tier actually shown on-site.
+            'elite_settled': hist_elite_settled,
+            'elite_fav_lost': hist_elite_fav_lost,
+            'elite_lay_win_pct': round((hist_elite_fav_lost / hist_elite_settled) * 100, 1) if hist_elite_settled else None,
         }
 
         return {
