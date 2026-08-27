@@ -1677,6 +1677,26 @@ def get_punchestown_tomorrow_picks(headers, event):
             'body': json.dumps({'success': False, 'error': str(e)})
         }
 
+def _vegas_result_won(p):
+    """Normalize a Vegas pick's settlement into a win/not-win bool, or None if unsettled.
+
+    Two writers settle Vegas picks: the older Betfair-fallback path writes a
+    `result_won` bool directly; the SL fast-results path (sl_results_fetcher.py,
+    live since the 2026-08-27 pipeline fix) writes a lowercase `outcome` string
+    ('win' / 'placed' / 'loss') instead and never sets `result_won`. Vegas is a
+    win-only product, so 'placed' counts as not-won here.
+    """
+    rw = p.get('result_won')
+    if isinstance(rw, bool):
+        return rw
+    outcome = str(p.get('outcome') or '').strip().lower()
+    if outcome in ('win', 'won'):
+        return True
+    if outcome in ('placed', 'place', 'loss', 'lost'):
+        return False
+    return None
+
+
 def get_vegas_results(headers, event):
     """GET /api/vegas/results — yesterday's Vegas picks with results + running ROI."""
     try:
@@ -1699,12 +1719,10 @@ def get_vegas_results(headers, event):
         )
         y_items = [decimal_to_float(i) for i in y_resp.get('Items', [])]
 
-        # Settlement Lambda only writes result_won for WINNERS via name-fallback.
-        # Losers are never explicitly written — they stay with no result_won attribute.
-        # All UK/Irish races settle by 21:00 BST, so any pick from yesterday with no
-        # result_won attribute is implicitly a LOST bet.
+        # All UK/Irish races settle by 21:00 BST, so any pick from yesterday with
+        # no settlement at all (neither writer touched it) is implicitly a LOST bet.
         def _result_str(p, is_yesterday=False):
-            rw = p.get('result_won')
+            rw = _vegas_result_won(p)
             if rw is True:   return 'WON'
             if rw is False:  return 'LOST'
             if is_yesterday: return 'LOST'   # no result written = race ran, horse lost
@@ -1741,24 +1759,24 @@ def get_vegas_results(headers, event):
         # Includes implicit losers: picks from past dates with no result_won attribute
         all_resp = table.scan(
             FilterExpression=_Attr('pick_type').eq('vegas'),
-            ProjectionExpression='result_won, odds, bet_date, benter_grade',
+            ProjectionExpression='result_won, outcome, odds, bet_date, benter_grade',
         )
         all_items = [decimal_to_float(i) for i in all_resp.get('Items', [])]
         while all_resp.get('LastEvaluatedKey'):
             all_resp = table.scan(
                 FilterExpression=_Attr('pick_type').eq('vegas'),
-                ProjectionExpression='result_won, odds, bet_date, benter_grade',
+                ProjectionExpression='result_won, outcome, odds, bet_date, benter_grade',
                 ExclusiveStartKey=all_resp['LastEvaluatedKey'],
             )
             all_items.extend([decimal_to_float(i) for i in all_resp.get('Items', [])])
 
-        # Treat past dates with no result_won as LOST; exclude today (may still be running)
+        # Treat past dates with no settlement at all as LOST; exclude today (may still be running)
         settled_all = []
         for i in all_items:
-            rw = i.get('result_won')
+            rw = _vegas_result_won(i)
             bd = i.get('bet_date', '')
-            if isinstance(rw, bool):
-                settled_all.append(i)
+            if rw is not None:
+                settled_all.append({**i, 'result_won': rw})
             elif bd and bd < today:
                 # No result written but race is over — implicit loss
                 settled_all.append({**i, 'result_won': False})
@@ -1821,18 +1839,24 @@ def get_vegas_learning(headers, event):
     try:
         from boto3.dynamodb.conditions import Attr as _Attr
 
-        # Scan all Vegas picks that have been settled (result_won is a bool)
-        resp = table.scan(
-            FilterExpression=_Attr('pick_type').eq('vegas') & _Attr('result_won').exists()
+        # Scan all Vegas picks that have been settled by either writer —
+        # legacy result_won bool, or the SL fast-results `outcome` string.
+        _settled_filter = _Attr('pick_type').eq('vegas') & (
+            _Attr('result_won').exists() | _Attr('outcome').exists()
         )
+        resp = table.scan(FilterExpression=_settled_filter)
         items = [decimal_to_float(i) for i in resp.get('Items', [])]
         while resp.get('LastEvaluatedKey'):
             resp = table.scan(
-                FilterExpression=_Attr('pick_type').eq('vegas') & _Attr('result_won').exists(),
+                FilterExpression=_settled_filter,
                 ExclusiveStartKey=resp['LastEvaluatedKey'],
             )
             items.extend([decimal_to_float(i) for i in resp.get('Items', [])])
 
+        for i in items:
+            rw = _vegas_result_won(i)
+            if rw is not None:
+                i['result_won'] = rw
         settled = [i for i in items if isinstance(i.get('result_won'), bool)]
 
         if not settled:
@@ -2264,6 +2288,43 @@ def get_vegas_picks(headers, event):
             except Exception:
                 pass  # already saved today or DDB error — don't fail the response
 
+        # Attach live result status per pick, read from the same `items` fetched
+        # at the top of this function (includes vegas_ records from earlier runs
+        # today, settled in place by the 30-min results poller as races finish).
+        _vegas_by_bid = {i['bet_id']: i for i in items if str(i.get('pick_type', '')) == 'vegas'}
+        for vb in value_bets:
+            _bid = ('vegas_' + vb['race_time'] + '_' + vb['venue'] + '_' + vb['horse']
+                    ).replace(' ', '_').replace(':', '').replace('.', '').replace("'", '')
+            _rec = _vegas_by_bid.get(_bid)
+            outcome_raw = str((_rec or {}).get('outcome') or '').strip().lower()
+            if outcome_raw in ('win', 'won'):
+                vb['result_status'] = 'won'
+            elif outcome_raw in ('placed', 'place'):
+                vb['result_status'] = 'placed'
+            elif outcome_raw in ('loss', 'lost'):
+                vb['result_status'] = 'lost'
+            elif (_rec or {}).get('result_won') is True:
+                vb['result_status'] = 'won'
+            elif (_rec or {}).get('result_won') is False:
+                vb['result_status'] = 'lost'
+            else:
+                vb['result_status'] = 'pending'
+            vb['finish_position']     = (_rec or {}).get('finish_position')
+            vb['result_winner_name']  = (_rec or {}).get('result_winner_name') or (_rec or {}).get('winner_name')
+
+        today_settled = [vb for vb in value_bets if vb['result_status'] in ('won', 'placed', 'lost')
+                          and vb['benter_grade'] != 'VALUE']
+        today_summary = {
+            'won':     sum(1 for vb in value_bets if vb['result_status'] == 'won'),
+            'placed':  sum(1 for vb in value_bets if vb['result_status'] == 'placed'),
+            'lost':    sum(1 for vb in value_bets if vb['result_status'] == 'lost'),
+            'pending': sum(1 for vb in value_bets if vb['result_status'] == 'pending'),
+            'pnl_units': round(sum(
+                (vb['kelly_units'] * (vb['odds'] - 1)) if vb['result_status'] == 'won' else -vb['kelly_units']
+                for vb in today_settled
+            ), 1),
+        }
+
         return {
             'statusCode': 200,
             'headers': headers,
@@ -2273,6 +2334,7 @@ def get_vegas_picks(headers, event):
                 'value_bets':    value_bets,
                 'exactas':       exactas[:5],
                 'races_analysed': len(races),
+                'today_summary': today_summary,
                 'daily_exposure': {
                     'total_stake_units': daily_total_stake,
                     'cap':                DAILY_EXPOSURE_CAP,

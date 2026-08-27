@@ -8,6 +8,12 @@ const GRADE_CONFIG = {
   VALUE:  { label: 'VALUE',  bg: 'rgba(96,165,250,0.12)',  border: '#60a5fa', color: '#60a5fa' },
 };
 
+const STATUS_CONFIG = {
+  won:    { label: 'WON',    bg: 'rgba(52,211,153,0.2)', border: '#34d399', color: '#34d399' },
+  placed: { label: 'PLACED', bg: 'rgba(251,191,36,0.2)', border: '#fbbf24', color: '#fbbf24' },
+  lost:   { label: 'LOST',   bg: 'rgba(248,113,113,0.2)', border: '#f87171', color: '#f87171' },
+};
+
 function formatTime(raceTime) {
   if (!raceTime) return '';
   try {
@@ -38,19 +44,22 @@ function EdgeBar({ edge, maxEdge = 40 }) {
 
 function ValueBetCard({ pick, isMobile }) {
   const grade = GRADE_CONFIG[pick.benter_grade] || GRADE_CONFIG.VALUE;
+  const status = STATUS_CONFIG[pick.result_status];
   const kellyDisplay = pick.kelly_units > 0 ? `${pick.kelly_units}u` : '—';
   const frac = toFractional(pick.odds);
+  const edgeColor = status ? status.border : grade.border;
 
   return (
     <div style={{
       background: 'rgba(30,41,69,0.9)',
-      border: `1px solid ${grade.border}33`,
-      borderLeft: `3px solid ${grade.border}`,
+      border: `1px solid ${edgeColor}33`,
+      borderLeft: `3px solid ${edgeColor}`,
       borderRadius: 8,
       padding: isMobile ? '14px 16px' : '18px 20px',
       display: 'flex',
       flexDirection: 'column',
       gap: 10,
+      opacity: pick.result_status === 'lost' ? 0.75 : 1,
     }}>
       {/* Header row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -62,11 +71,24 @@ function ValueBetCard({ pick, isMobile }) {
             {pick.venue} · {formatTime(pick.race_time)}
             {pick.race_type ? ` · ${pick.race_type}` : ''}
           </div>
+          {status && (
+            <div style={{ fontSize: 11, color: status.color, marginTop: 4, fontFamily: 'monospace' }}>
+              {pick.finish_position ? `Finished ${pick.finish_position === 1 ? '1st' : pick.finish_position === 2 ? '2nd' : pick.finish_position === 3 ? '3rd' : `${pick.finish_position}th`}` : status.label}
+              {pick.result_status !== 'won' && pick.result_winner_name ? ` · winner: ${pick.result_winner_name}` : ''}
+            </div>
+          )}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-          <span style={{ background: grade.bg, border: `1px solid ${grade.border}`, color: grade.color, fontSize: 9, letterSpacing: '0.12em', padding: '3px 7px', borderRadius: 3, fontFamily: 'monospace', fontWeight: 600 }}>
-            {grade.label}
-          </span>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {status && (
+              <span style={{ background: status.bg, border: `1px solid ${status.border}`, color: status.color, fontSize: 9, letterSpacing: '0.12em', padding: '3px 7px', borderRadius: 3, fontFamily: 'monospace', fontWeight: 700 }}>
+                {status.label}
+              </span>
+            )}
+            <span style={{ background: grade.bg, border: `1px solid ${grade.border}`, color: grade.color, fontSize: 9, letterSpacing: '0.12em', padding: '3px 7px', borderRadius: 3, fontFamily: 'monospace', fontWeight: 600 }}>
+              {grade.label}
+            </span>
+          </div>
           <span style={{ fontSize: 18, fontWeight: 700, color: '#fbbf24', fontFamily: 'monospace' }}>
             {frac || pick.odds}
           </span>
@@ -529,8 +551,28 @@ export default function VegasPage() {
       {!loading && !error && data?.value_bets?.length > 0 && (() => {
         const backAll  = (data.value_bets || []).filter(p => p.benter_grade === 'ELITE' || p.benter_grade === 'STRONG');
         const watchOnly = (data.value_bets || []).filter(p => p.benter_grade === 'VALUE');
+        const ts = data.today_summary || {};
         return (
           <>
+            {/* Today's results summary */}
+            <div style={{ background: 'rgba(30,41,69,0.6)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '14px 16px', marginBottom: 16 }}>
+              <div style={{ fontSize: 10, letterSpacing: '0.12em', color: 'rgba(226,232,240,0.4)', fontFamily: 'monospace', marginBottom: 10 }}>TODAY'S RESULTS</div>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(5,1fr)', gap: 10 }}>
+                {[
+                  { label: 'Won', value: ts.won ?? 0, color: '#34d399' },
+                  { label: 'Placed', value: ts.placed ?? 0, color: '#fbbf24' },
+                  { label: 'Lost', value: ts.lost ?? 0, color: '#f87171' },
+                  { label: 'Pending', value: ts.pending ?? 0, color: 'rgba(226,232,240,0.5)' },
+                  { label: 'P&L', value: `${(ts.pnl_units ?? 0) > 0 ? '+' : ''}${ts.pnl_units ?? 0}u`, color: (ts.pnl_units ?? 0) >= 0 ? '#34d399' : '#f87171' },
+                ].map(s => (
+                  <div key={s.label}>
+                    <div style={{ fontSize: 9, letterSpacing: '0.1em', color: 'rgba(226,232,240,0.4)', fontFamily: 'monospace' }}>{s.label.toUpperCase()}</div>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: s.color, fontFamily: 'monospace' }}>{s.value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Daily exposure cap warning */}
             {data.daily_exposure?.scaled && (
               <div style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.25)', borderRadius: 8, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
