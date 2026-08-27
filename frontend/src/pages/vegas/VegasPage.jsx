@@ -536,7 +536,7 @@ export default function VegasPage() {
               <div style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.25)', borderRadius: 8, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
                 <div style={{ fontSize: 12, color: 'rgba(226,232,240,0.75)', lineHeight: 1.6 }}>
-                  <strong style={{ color: '#fbbf24' }}>Stakes scaled down for today's card.</strong> {backAll.length + watchOnly.length} picks qualified at once — backing every one at its raw half-Kelly size would call for {data.daily_exposure.raw_total_before_scaling}u combined in a single day. Every stake below has been scaled proportionally so the day's total stays at {data.daily_exposure.total_stake_units}u — bigger-edge picks are still sized bigger relative to the rest, it's the day as a whole that's capped.
+                  <strong style={{ color: '#fbbf24' }}>Stakes scaled down for today's card.</strong> {backAll.length} picks qualified at once — backing every one at its raw half-Kelly size would call for {data.daily_exposure.raw_total_before_scaling}u combined in a single day. Every stake below has been scaled proportionally so the day's total stays at {data.daily_exposure.total_stake_units}u — bigger-edge picks are still sized bigger relative to the rest, it's the day as a whole that's capped.
                 </div>
               </div>
             )}
@@ -559,23 +559,12 @@ export default function VegasPage() {
               </>
             )}
 
-            {/* Watch only — VALUE grade */}
-            {watchOnly.length > 0 && (
-              <>
-                {sectionHead('Watch Only — Do Not Stake')}
-                <div style={{ background: 'rgba(248,113,113,0.05)', border: '1px solid rgba(248,113,113,0.15)', borderRadius: 8, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                  <span style={{ fontSize: 16, flexShrink: 0 }}>👁</span>
-                  <div style={{ fontSize: 12, color: 'rgba(226,232,240,0.7)', lineHeight: 1.6 }}>
-                    <strong style={{ color: '#f87171' }}>Do not stake on VALUE grade.</strong> The edge here (ratio 1.0–1.5×) is within the noise range of our partial field coverage. Log these for tracking purposes — if they consistently win over 50+ picks, the model may warrant a lower grade threshold.
-                  </div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, opacity: 0.7 }}>
-                  {watchOnly.map((pick, i) => (
-                    <ValueBetCard key={`${pick.horse}-${pick.race_time}-${i}`} pick={pick} isMobile={isMobile} />
-                  ))}
-                </div>
-              </>
-            )}
+            {/* VALUE grade is not shown — edge (ratio 1.0-1.5x) is within partial-field
+                coverage noise and the site explicitly says not to stake on it, so
+                surfacing it as a "pick" only confuses subscribers. Still computed and
+                persisted to DynamoDB every run for background tracking — once 50+ have
+                settled the model calibration can tell us if the grade threshold should
+                move (see the vegas skill). */}
 
             {/* No backable picks today */}
             {backAll.length === 0 && watchOnly.length > 0 && (

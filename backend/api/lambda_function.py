@@ -2215,21 +2215,21 @@ def get_vegas_picks(headers, event):
         # day's combined recommended stake never exceeds DAILY_EXPOSURE_CAP units.
         # 2026-08-27: added after a 16-pick day asked for 185u combined — 14 of
         # those picks were already hitting the per-pick cap on their own.
+        # VALUE grade is excluded: it's "do not stake" (background tracking only,
+        # not shown on the page as of 2026-08-27), so it shouldn't eat into the
+        # exposure budget meant for picks subscribers actually act on.
         DAILY_EXPOSURE_CAP = 50.0
-        _raw_total = round(sum(vb['kelly_units'] for vb in value_bets), 1)
+        _stakeable = [vb for vb in value_bets if vb['benter_grade'] != 'VALUE']
+        _raw_total = round(sum(vb['kelly_units'] for vb in _stakeable), 1)
         daily_exposure_scaled = _raw_total > DAILY_EXPOSURE_CAP and _raw_total > 0
         if daily_exposure_scaled:
             _scale = DAILY_EXPOSURE_CAP / _raw_total
-            for vb in value_bets:
+            for vb in _stakeable:
                 old_units = vb['kelly_units']
                 new_units = round(old_units * _scale, 1)
-                # Reconstruct only the displayed stake number, not the whole
-                # sentence — VALUE grade shows half of kelly_units, not the raw figure.
-                old_disp = old_units if vb['benter_grade'] != 'VALUE' else max(1.0, round(old_units / 2, 1))
-                new_disp = new_units if vb['benter_grade'] != 'VALUE' else max(1.0, round(new_units / 2, 1))
-                vb['action'] = vb['action'].replace(f"{old_disp}u", f"{new_disp}u")
+                vb['action'] = vb['action'].replace(f"{old_units}u", f"{new_units}u")
                 vb['kelly_units'] = new_units
-        daily_total_stake = round(sum(vb['kelly_units'] for vb in value_bets), 1)
+        daily_total_stake = round(sum(vb['kelly_units'] for vb in _stakeable), 1)
 
         # Persist value bets for daily learning (idempotent)
         _params_snap = json.dumps({'alpha': ALPHA, 'beta': BETA, 'temp': TEMP, 'min_edge': MIN_EDGE})
