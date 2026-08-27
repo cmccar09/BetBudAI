@@ -2268,6 +2268,11 @@ def get_vegas_picks(headers, event):
                         'pick_type':     'vegas',
                         'horse':         vb['horse'],
                         'venue':         vb['venue'],
+                        # sl_results_fetcher.py (the settlement matcher) reads `course`,
+                        # not `venue` — without this, Vegas picks never match and sit
+                        # PENDING forever regardless of whether the poller is running.
+                        # Found 2026-08-27.
+                        'course':        vb['venue'],
                         'race_time':     vb['race_time'],
                         'race_type':     vb.get('race_type', ''),
                         'odds':          Decimal(str(round(vb['odds'], 2))),
