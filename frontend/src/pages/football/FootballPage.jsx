@@ -4,9 +4,10 @@ const API_BASE_URL = process.env.REACT_APP_API_URL ||
   'https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com';
 
 const TABS = [
-  { id: 'pl',  label: 'Premier League',   emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-  { id: 'ucl', label: 'Champions League', emoji: '⭐' },
-  { id: 'el',  label: 'Europa League',    emoji: '🟠' },
+  { id: 'pl',       label: 'Premier League',   emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  { id: 'fixtures', label: 'Fixtures',          emoji: '📅' },
+  { id: 'ucl',      label: 'Champions League', emoji: '⭐' },
+  { id: 'el',       label: 'Europa League',    emoji: '🟠' },
 ];
 
 // ─── Fallback static data ─────────────────────────────────────────────────────
@@ -28,9 +29,10 @@ const FB_PL = {
     { team: 'Aston Villa',       odds: '20/1' },
   ],
   relegation: [
-    { team: 'Ipswich Town',   odds: '1/2',  note: 'Second season up — squad quality gap showing' },
-    { team: 'Southampton',    odds: '4/7',  note: 'Struggled badly last season, thin margins' },
-    { team: 'Leicester City', odds: '5/6',  note: 'Yo-yo club history, squad depth concerns' },
+    { team: 'Coventry City',  odds: '4/9',  note: 'Promoted — first PL season, brutal early fixtures' },
+    { team: 'Hull City',      odds: '1/2',  note: 'Promoted — squad thin at PL level' },
+    { team: 'Sunderland',     odds: '4/7',  note: 'Back in top flight — punching at ceiling' },
+    { team: 'Ipswich Town',   odds: '5/6',  note: 'Second season up — quality gap still apparent' },
   ],
   golden_boot: [
     { player: 'Erling Haaland',  team: 'Man City',  odds: '3/1'  },
@@ -252,10 +254,11 @@ function MatchBetCard({ fx, isMobile }) {
     weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
   }) : '';
 
+  const bttsLabel = bets.value?.pct != null ? `BTTS · ${bets.value.pct}% likely` : 'BTTS';
   const picks = [
-    { key: 'safe',     emoji: '🛡️', label: 'Safe Pick', color: '#34d399', bg: 'rgba(52,211,153,0.1)',  border: 'rgba(52,211,153,0.25)',  data: bets.safe     },
-    { key: 'value',    emoji: '💰', label: 'Value',     color: '#fbbf24', bg: 'rgba(251,191,36,0.1)',  border: 'rgba(251,191,36,0.25)',  data: bets.value    },
-    { key: 'longshot', emoji: '🎯', label: 'Longshot',  color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.25)', data: bets.longshot },
+    { key: 'safe',     emoji: '🛡️', label: 'Match Result',    color: '#34d399', bg: 'rgba(52,211,153,0.1)',  border: 'rgba(52,211,153,0.25)',  data: bets.safe     },
+    { key: 'value',    emoji: '💰', label: bttsLabel,          color: '#fbbf24', bg: 'rgba(251,191,36,0.1)',  border: 'rgba(251,191,36,0.25)',  data: bets.value    },
+    { key: 'longshot', emoji: '🎯', label: '1st Goalscorer',   color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.25)', data: bets.longshot },
   ];
 
   return (
@@ -266,11 +269,23 @@ function MatchBetCard({ fx, isMobile }) {
         {dateStr && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginBottom: 5 }}>{dateStr}</div>}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <span style={{ fontSize: isMobile ? 14 : 16, fontWeight: 900, color: 'white' }}>{fx.home}</span>
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', padding: '1px 7px',
-            background: 'rgba(255,255,255,0.06)', borderRadius: 5 }}>vs</span>
+          {fx.prediction?.score ? (
+            <span style={{ fontSize: 16, fontWeight: 900, color: '#fbbf24', padding: '2px 10px',
+              background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: 7, letterSpacing: 1 }}>
+              {fx.prediction.score}
+            </span>
+          ) : (
+            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', padding: '1px 7px',
+              background: 'rgba(255,255,255,0.06)', borderRadius: 5 }}>vs</span>
+          )}
           <span style={{ fontSize: isMobile ? 14 : 15, fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>{fx.away}</span>
           {fx.prediction && <PredictionBadge result={fx.prediction.result} />}
         </div>
+        {fx.prediction?.score && (
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>
+            AI predicted score · {fx.prediction.confidence}% confidence
+          </div>
+        )}
       </div>
       {/* 3 picks */}
       <div style={{ padding: isMobile ? '10px 12px' : '12px 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -346,66 +361,6 @@ function PremierLeagueTab({ apiData, isMobile }) {
         </div>
       </Card>
 
-      {/* Title prediction */}
-      <Card style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)' }}>
-        <SectionLabel>🏆 BetBud Title Pick</SectionLabel>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-          <div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: '#fbbf24' }}>{title.team}</div>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 4, maxWidth: 380 }}>
-              {title.reasoning}
-            </div>
-          </div>
-          <div style={{ textAlign: 'center', padding: '10px 20px', borderRadius: 10,
-            background: 'rgba(251,191,36,0.15)', border: '1px solid rgba(251,191,36,0.3)' }}>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>ODDS</div>
-            <div style={{ fontSize: 26, fontWeight: 900, color: '#fbbf24' }}>{title.odds}</div>
-            <div style={{ fontSize: 11, color: '#34d399', marginTop: 2 }}>{title.confidence}% confidence</div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Top 4 predictions */}
-      <Card>
-        <SectionLabel>Top 4 Predictions</SectionLabel>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {topFour.map(t => (
-            <div key={t.team} style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '11px 14px', borderRadius: 8,
-              background: t.pos === 1 ? 'rgba(251,191,36,0.08)' : 'rgba(255,255,255,0.03)',
-              border: t.pos === 1 ? '1px solid rgba(251,191,36,0.2)' : '1px solid rgba(255,255,255,0.06)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 14, fontWeight: 900, color: t.pos === 1 ? '#fbbf24' : 'rgba(255,255,255,0.35)', width: 22 }}>
-                  {t.pos === 1 ? '🥇' : t.pos === 2 ? '🥈' : t.pos === 3 ? '🥉' : `${t.pos}`}
-                </span>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: 'white' }}>{t.badge} {t.team}</div>
-                  {t.note && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>{t.note}</div>}
-                </div>
-              </div>
-              <span style={{ fontSize: 14, fontWeight: 900, color: '#34d399' }}>{t.odds}</span>
-            </div>
-          ))}
-        </div>
-
-        {topSix && topSix.length > 0 && (
-          <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 8, fontWeight: 700 }}>ALSO WORTH WATCHING</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {topSix.map(t => (
-                <div key={t.team} style={{ fontSize: 13, padding: '5px 12px', borderRadius: 8,
-                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  <span style={{ color: 'white', fontWeight: 700 }}>{t.team}</span>
-                  <span style={{ color: '#34d399', marginLeft: 8, fontWeight: 800 }}>{t.odds}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </Card>
-
       {/* Weekly best bets */}
       <WeeklyBetsSection weeklyBets={weeklyBets} isMobile={isMobile} />
 
@@ -465,6 +420,66 @@ function PremierLeagueTab({ apiData, isMobile }) {
             <span style={{ fontSize: 14, fontWeight: 900, color: '#34d399' }}>{g.odds}</span>
           </div>
         ))}
+      </Card>
+
+      {/* Title prediction — moved to the end: season-long forecast, not this week's action */}
+      <Card style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)' }}>
+        <SectionLabel>🏆 BetBud Title Pick</SectionLabel>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: '#fbbf24' }}>{title.team}</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 4, maxWidth: 380 }}>
+              {title.reasoning}
+            </div>
+          </div>
+          <div style={{ textAlign: 'center', padding: '10px 20px', borderRadius: 10,
+            background: 'rgba(251,191,36,0.15)', border: '1px solid rgba(251,191,36,0.3)' }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>ODDS</div>
+            <div style={{ fontSize: 26, fontWeight: 900, color: '#fbbf24' }}>{title.odds}</div>
+            <div style={{ fontSize: 11, color: '#34d399', marginTop: 2 }}>{title.confidence}% confidence</div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Top 4 predictions */}
+      <Card>
+        <SectionLabel>Top 4 Predictions</SectionLabel>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {topFour.map(t => (
+            <div key={t.team} style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: '11px 14px', borderRadius: 8,
+              background: t.pos === 1 ? 'rgba(251,191,36,0.08)' : 'rgba(255,255,255,0.03)',
+              border: t.pos === 1 ? '1px solid rgba(251,191,36,0.2)' : '1px solid rgba(255,255,255,0.06)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 14, fontWeight: 900, color: t.pos === 1 ? '#fbbf24' : 'rgba(255,255,255,0.35)', width: 22 }}>
+                  {t.pos === 1 ? '🥇' : t.pos === 2 ? '🥈' : t.pos === 3 ? '🥉' : `${t.pos}`}
+                </span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'white' }}>{t.badge} {t.team}</div>
+                  {t.note && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>{t.note}</div>}
+                </div>
+              </div>
+              <span style={{ fontSize: 14, fontWeight: 900, color: '#34d399' }}>{t.odds}</span>
+            </div>
+          ))}
+        </div>
+
+        {topSix && topSix.length > 0 && (
+          <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 8, fontWeight: 700 }}>ALSO WORTH WATCHING</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {topSix.map(t => (
+                <div key={t.team} style={{ fontSize: 13, padding: '5px 12px', borderRadius: 8,
+                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <span style={{ color: 'white', fontWeight: 700 }}>{t.team}</span>
+                  <span style={{ color: '#34d399', marginLeft: 8, fontWeight: 800 }}>{t.odds}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Card>
     </div>
   );
@@ -582,6 +597,151 @@ function EuropaLeagueTab({ apiData, isMobile }) {
   );
 }
 
+// ─── Fixtures + Table Tab ─────────────────────────────────────────────────────
+function FixturesTab({ apiData, isMobile }) {
+  // pl_weekly_bets has predictions + bets from static fallback (ESPN blocked from Lambda)
+  // pl_fixtures is from ESPN live feed (usually empty); merge both, weekly_bets takes priority
+  const weeklyBets   = apiData?.pl_weekly_bets || [];
+  const espnFixtures = apiData?.pl_fixtures || [];
+  const standings    = apiData?.pl_standings || [];
+
+  // Build a unified fixture list: weekly_bets first (they have predictions/bets),
+  // then any ESPN fixtures not already covered
+  const weeklyIds = new Set(weeklyBets.map(f => f.id));
+  const extraEspn = espnFixtures.filter(f => !weeklyIds.has(f.id));
+  const allFixtures = [...weeklyBets, ...extraEspn];
+
+  // Split into completed and upcoming
+  const completed = [...allFixtures].filter(f => f.completed)
+    .sort((a, b) => b.date.localeCompare(a.date));
+  const upcoming  = [...allFixtures].filter(f => !f.completed)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB', {
+    weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+  }) : '';
+
+  const ResultRow = ({ fx }) => (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: isMobile ? '10px 12px' : '12px 16px', marginBottom: 6,
+      background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10,
+    }}>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>{fmtDate(fx.date)}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: 'white' }}>{fx.home}</span>
+          <span style={{ fontSize: 18, fontWeight: 900, color: '#fbbf24', padding: '0 6px' }}>
+            {fx.home_score} – {fx.away_score}
+          </span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>{fx.away}</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  const UpcomingRow = ({ fx }) => {
+    const bets = fx.bets;
+    const pred = fx.prediction || {};
+    const resultMap = { home_win: { lbl: `${fx.home} Win`, c: '#34d399' }, away_win: { lbl: `${fx.away} Win`, c: '#60a5fa' }, draw: { lbl: 'Draw', c: '#fbbf24' } };
+    const r = resultMap[pred.result] || {};
+    return (
+      <div style={{
+        padding: isMobile ? '10px 12px' : '12px 16px', marginBottom: 8,
+        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10,
+      }}>
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>{fmtDate(fx.date)}</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+          {/* Teams + predicted score */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: 'white' }}>{fx.home}</span>
+            {pred.score ? (
+              <span style={{ fontSize: 16, fontWeight: 900, color: '#fbbf24', padding: '2px 10px',
+                background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: 7, letterSpacing: 1 }}>
+                {pred.score}
+              </span>
+            ) : (
+              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', padding: '1px 6px',
+                background: 'rgba(255,255,255,0.06)', borderRadius: 5 }}>vs</span>
+            )}
+            <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>{fx.away}</span>
+          </div>
+          {/* Result label + confidence */}
+          {r.lbl && (
+            <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 9px', borderRadius: 6,
+              background: `${r.c}22`, color: r.c, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              {r.lbl} · {pred.confidence}%
+            </span>
+          )}
+        </div>
+        {pred.score && (
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 3 }}>
+            AI predicted score · model confidence {pred.confidence}%
+          </div>
+        )}
+        {bets && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
+            {[
+              { label: '🛡️ Match Result', pick: bets.safe?.pick,     odds: bets.safe?.odds,     c: '#34d399' },
+              { label: `💰 BTTS${bets.value?.pct != null ? ` (${bets.value?.pct}% likely)` : ''}`, pick: bets.value?.pick, odds: bets.value?.odds, c: '#fbbf24' },
+              { label: '🎯 1st Goalscorer', pick: bets.longshot?.pick, odds: bets.longshot?.odds, c: '#a78bfa' },
+            ].filter(b => b.pick).map(b => (
+              <div key={b.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '7px 12px', borderRadius: 8,
+                background: `${b.c}10`, border: `1px solid ${b.c}30` }}>
+                <div>
+                  <span style={{ fontSize: 11, color: b.c, fontWeight: 700, display: 'block', marginBottom: 1 }}>{b.label}</span>
+                  <span style={{ fontSize: 13, color: 'white', fontWeight: 800 }}>{b.pick}</span>
+                </div>
+                {b.odds && <span style={{ fontSize: 15, color: b.c, fontWeight: 900, marginLeft: 12 }}>{b.odds}</span>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+
+      {/* Upcoming */}
+      <Card>
+        <SectionLabel>📅 Upcoming Fixtures</SectionLabel>
+        {upcoming.length === 0
+          ? <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>No upcoming fixtures yet</div>
+          : upcoming.map(fx => <UpcomingRow key={fx.id || `${fx.home}-${fx.away}`} fx={fx} />)
+        }
+      </Card>
+
+      {/* Results */}
+      {completed.length > 0 && (
+        <Card>
+          <SectionLabel>✅ Recent Results</SectionLabel>
+          {completed.map(fx => <ResultRow key={fx.id || `${fx.home}-${fx.away}`} fx={fx} />)}
+        </Card>
+      )}
+
+      {/* League table */}
+      {standings.length > 0 && (
+        <Card>
+          <SectionLabel>📊 League Table</SectionLabel>
+          <StandingsTable standings={standings} isMobile={isMobile} />
+        </Card>
+      )}
+
+      {standings.length === 0 && (
+        <Card>
+          <SectionLabel>📊 League Table</SectionLabel>
+          <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
+            League table will appear once matches have been played
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function FootballPage() {
   const [activeTab, setActiveTab] = useState('pl');
@@ -638,9 +798,10 @@ export default function FootballPage() {
       )}
 
       {/* Tab content */}
-      {!loading && activeTab === 'pl'  && <PremierLeagueTab   apiData={apiData} isMobile={isMobile} />}
-      {!loading && activeTab === 'ucl' && <ChampionsLeagueTab apiData={apiData} isMobile={isMobile} />}
-      {!loading && activeTab === 'el'  && <EuropaLeagueTab    apiData={apiData} isMobile={isMobile} />}
+      {!loading && activeTab === 'pl'       && <PremierLeagueTab   apiData={apiData} isMobile={isMobile} />}
+      {!loading && activeTab === 'fixtures' && <FixturesTab         apiData={apiData} isMobile={isMobile} />}
+      {!loading && activeTab === 'ucl'      && <ChampionsLeagueTab  apiData={apiData} isMobile={isMobile} />}
+      {!loading && activeTab === 'el'       && <EuropaLeagueTab     apiData={apiData} isMobile={isMobile} />}
     </div>
   );
 }

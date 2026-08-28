@@ -61,9 +61,10 @@ PL_TOP_SIX_CONTENDERS = [
 ]
 
 PL_RELEGATION = [
-    {'team': 'Ipswich Town',   'odds': '1/2',  'decimal': 1.5,  'note': 'Second season up — squad quality gap showing'},
-    {'team': 'Southampton',    'odds': '4/7',  'decimal': 1.57, 'note': 'Struggled badly last season, thin margins'},
-    {'team': 'Leicester City', 'odds': '5/6',  'decimal': 1.83, 'note': 'Yo-yo club history, squad depth concerns'},
+    {'team': 'Coventry City',  'odds': '4/9',  'decimal': 1.44, 'note': 'Promoted side — first PL season, brutal fixtures early'},
+    {'team': 'Hull City',      'odds': '1/2',  'decimal': 1.5,  'note': 'Promoted — squad thin at PL level'},
+    {'team': 'Sunderland',     'odds': '4/7',  'decimal': 1.57, 'note': 'Back in top flight — punching at ceiling'},
+    {'team': 'Ipswich Town',   'odds': '5/6',  'decimal': 1.83, 'note': 'Second season up — quality gap still apparent'},
 ]
 
 PL_GOLDEN_BOOT = [
@@ -113,7 +114,9 @@ TEAM_STRENGTH = {
     'Brentford': 66, 'Fulham': 65, 'Crystal Palace': 64,
     'Wolverhampton Wanderers': 63, 'Everton': 62, 'Bournemouth': 61,
     'Nottingham Forest': 60, 'Ipswich Town': 55, 'Leicester City': 57,
-    'Southampton': 54, 'Sheffield United': 53, 'Burnley': 52, 'Luton Town': 51,
+    'Southampton': 54,
+    # Promoted 2026/27 — Source: Sky Sports fixtures, verified 21 Aug 2026
+    'Coventry City': 58, 'Hull City': 56, 'Sunderland': 57, 'Leeds United': 61,
     # European clubs
     'Real Madrid': 96, 'Bayern Munich': 92, 'PSG': 89,
     'Inter Milan': 85, 'Atletico Madrid': 84, 'Bayer Leverkusen': 83,
@@ -173,24 +176,80 @@ def save(data_key, payload):
 
 
 def predict_match(home, away):
-    """Simple strength-based match prediction with home advantage."""
-    h = TEAM_STRENGTH.get(home, 65) + 5  # +5 home advantage
-    a = TEAM_STRENGTH.get(away, 65)
-    diff = h - a
+    """Poisson-based prediction — score, result, and BTTS all from the same model.
+    The predicted score is always drawn from scorelines that agree with BOTH the
+    BTTS verdict AND the predicted result, so none of the three can contradict
+    each other."""
+    h_str = TEAM_STRENGTH.get(home, 65) + 5  # +5 home advantage
+    a_str = TEAM_STRENGTH.get(away, 65)
+    lam_h = strength_to_avg_goals(h_str)
+    lam_a = strength_to_avg_goals(a_str)
 
-    if diff >= 15:
-        return {'result': 'home_win', 'score': '2-0', 'confidence': 75}
-    if diff >= 8:
-        return {'result': 'home_win', 'score': '2-1', 'confidence': 62}
-    if diff >= 3:
-        return {'result': 'home_win', 'score': '1-0', 'confidence': 52}
-    if diff >= -3:
-        return {'result': 'draw',     'score': '1-1', 'confidence': 45}
-    if diff >= -8:
-        return {'result': 'away_win', 'score': '0-1', 'confidence': 52}
-    if diff >= -15:
-        return {'result': 'away_win', 'score': '1-2', 'confidence': 62}
-    return {'result': 'away_win', 'score': '0-2', 'confidence': 75}
+    probs = {}
+    p_home_win = p_draw = p_away_win = 0.0
+
+    for h in range(6):
+        ph = math.exp(-lam_h) * (lam_h ** h) / math.factorial(h)
+        for a in range(6):
+            pa  = math.exp(-lam_a) * (lam_a ** a) / math.factorial(a)
+            probs[(h, a)] = ph * pa
+            if h > a:   p_home_win += ph * pa
+            elif h == a: p_draw    += ph * pa
+            else:        p_away_win += ph * pa
+
+    # Result + confidence
+    if p_home_win >= p_away_win and p_home_win >= p_draw:
+        result = 'home_win'; conf = round(p_home_win * 100)
+    elif p_away_win > p_home_win and p_away_win >= p_draw:
+        result = 'away_win'; conf = round(p_away_win * 100)
+    else:
+        result = 'draw';     conf = round(p_draw * 100)
+
+    # BTTS verdict — computed here so score selection can be consistent with it
+    btts_pct = calc_btts_prob(lam_h, lam_a)
+    btts_yes = btts_pct >= 50
+
+    # Pick most likely score from scorelines that AGREE with BOTH the BTTS verdict
+    # and the predicted result. BTTS-agreement alone isn't enough: the single most
+    # probable joint (h, a) cell is very often a low draw score like 1-1 even when
+    # one side clearly leads on SUMMED win probability (e.g. away_win at 39.8% can
+    # still lose to a draw's 25.6% for the single most-likely-CELL vote, because
+    # away-win probability is spread thin across many cells — 0-1, 1-2, 0-2, 2-3...
+    # — no single one of which beats the 1-1 peak). Without this filter, "predicted
+    # result: away win" and "predicted score: 1-1" would both be true and directly
+    # contradict each other, which is exactly the bug this produced in practice
+    # (found 2026-08-28, e.g. Fulham 70 vs Chelsea 80 → away_win 39.8% yet the old
+    # logic picked 1-1 as the score shown right next to an AWAY WIN badge).
+    if result == 'home_win':
+        result_ok = lambda s: s[0] > s[1]
+    elif result == 'away_win':
+        result_ok = lambda s: s[1] > s[0]
+    else:
+        result_ok = lambda s: s[0] == s[1]
+
+    #   BTTS Yes → both teams must score (h>0 AND a>0)
+    #   BTTS No  → at least one team must get 0 (h=0 OR a=0)
+    if btts_yes:
+        candidates = {s: p for s, p in probs.items() if s[0] > 0 and s[1] > 0 and result_ok(s)}
+    else:
+        candidates = {s: p for s, p in probs.items() if (s[0] == 0 or s[1] == 0) and result_ok(s)}
+
+    # Practically always non-empty within a 6x6 grid (e.g. home_win+BTTS-No has
+    # (1,0); home_win+BTTS-Yes has (2,1); same pattern for away_win/draw), but
+    # fall back to result-only agreement, then a sane default, just in case.
+    if not candidates:
+        candidates = {s: p for s, p in probs.items() if result_ok(s)}
+    if candidates:
+        best_score = max(candidates, key=candidates.get)
+    else:
+        best_score = (1, 0) if result == 'home_win' else (0, 1) if result == 'away_win' else (0, 0)
+
+    return {
+        'result':     result,
+        'score':      f'{best_score[0]}-{best_score[1]}',
+        'confidence': conf,
+        'btts_pct':   btts_pct,
+    }
 
 
 def _parse_espn_events(events, limit):
@@ -221,6 +280,140 @@ def _parse_espn_events(events, limit):
             fx['prediction'] = predict_match(ht, at)
         out.append(fx)
     return out
+
+
+def decimal_to_fractional(decimal_odds):
+    """Convert Betfair decimal odds to nearest standard fractional string."""
+    # Map common decimals to bookmaker fractional equivalents
+    MAP = [
+        (1.07, '1/14'), (1.10, '1/10'), (1.14, '1/7'), (1.20, '1/5'),
+        (1.25, '1/4'),  (1.33, '2/7'),  (1.40, '2/5'), (1.44, '4/9'),
+        (1.50, '1/2'),  (1.57, '4/7'),  (1.62, '5/8'), (1.67, '4/6'),
+        (1.72, '8/11'), (1.80, '4/5'),  (1.83, '5/6'), (1.91, '10/11'),
+        (2.00, 'Evens'), (2.10, '11/10'), (2.20, '6/5'), (2.25, '5/4'),
+        (2.38, '11/8'), (2.50, '6/4'),  (2.62, '13/8'), (2.75, '7/4'),
+        (3.00, '2/1'),  (3.25, '9/4'),  (3.50, '5/2'), (4.00, '3/1'),
+        (4.50, '7/2'),  (5.00, '4/1'),  (6.00, '5/1'), (7.00, '6/1'),
+        (8.00, '7/1'),  (9.00, '8/1'),  (10.0, '9/1'), (11.0, '10/1'),
+        (13.0, '12/1'), (17.0, '16/1'), (21.0, '20/1'),
+    ]
+    for threshold, frac in MAP:
+        if decimal_odds <= threshold:
+            return frac
+    n = round(decimal_odds) - 1
+    return f'{n}/1'
+
+
+def _betfair_refresh_token(sm, secret):
+    """Re-login to Betfair and persist the new session token to Secrets Manager."""
+    try:
+        r = requests.post(
+            'https://identitysso.betfair.com/api/login',
+            headers={'X-Application': secret['app_key'], 'Content-Type': 'application/x-www-form-urlencoded'},
+            data={'username': secret['username'], 'password': secret['password']},
+            timeout=10,
+        )
+        resp = r.json()
+        if resp.get('status') == 'SUCCESS':
+            secret['session_token'] = resp['token']
+            secret['last_refresh']  = datetime.now(timezone.utc).isoformat()
+            sm.update_secret(SecretId='betfair-credentials', SecretString=json.dumps(secret))
+            return resp['token']
+    except Exception:
+        pass
+    return None
+
+
+def fetch_betfair_football_odds(fixtures):
+    """Fetch live 1X2 MATCH_ODDS from Betfair for upcoming PL fixtures.
+    Auto-refreshes the session token if expired.
+    Returns dict keyed by Betfair event name → {runner_name: decimal_price}."""
+    try:
+        import boto3 as _boto3
+        sm = _boto3.client('secretsmanager', region_name='eu-west-1')
+        secret = json.loads(sm.get_secret_value(SecretId='betfair-credentials')['SecretString'])
+        app_key = secret.get('app_key', '')
+        session_token = secret.get('session_token', '')
+        if not app_key or not session_token:
+            return {}
+
+        # Find MATCH_ODDS markets for English Premier League (eventTypeId=1, competitionId=10932509)
+        catalogue_url = 'https://api.betfair.com/exchange/betting/rest/v1.0/listMarketCatalogue/'
+        headers = {
+            'X-Application': app_key, 'X-Authentication': session_token,
+            'Content-Type': 'application/json', 'Accept': 'application/json',
+        }
+        cat_body = {
+            'filter': {
+                'eventTypeIds': ['1'],
+                'competitionIds': ['10932509'],  # Premier League
+                'marketTypeCodes': ['MATCH_ODDS'],
+                'inPlayOnly': False,
+            },
+            'marketProjection': ['RUNNER_DESCRIPTION', 'EVENT'],
+            'maxResults': 20,
+        }
+        r = requests.post(catalogue_url, headers=headers, json=cat_body, timeout=10)
+        markets = r.json() if r.status_code == 200 else []
+
+        # Auto-refresh token if session expired, then retry once
+        if isinstance(markets, dict) and markets.get('detail', {}).get('APINGException', {}).get('errorCode') == 'INVALID_SESSION_INFORMATION':
+            new_token = _betfair_refresh_token(sm, secret)
+            if new_token:
+                headers['X-Authentication'] = new_token
+                r = requests.post(catalogue_url, headers=headers, json=cat_body, timeout=10)
+                markets = r.json() if r.status_code == 200 else []
+
+        if not markets or isinstance(markets, dict):
+            return {}
+
+        # Build market_id → fixture mapping
+        market_ids = [m['marketId'] for m in markets]
+        books_url = 'https://api.betfair.com/exchange/betting/rest/v1.0/listMarketBook/'
+        books_body = {
+            'marketIds': market_ids,
+            'priceProjection': {'priceData': ['EX_BEST_OFFERS'], 'exBestOffersOverrides': {'bestPricesDepth': 1}},
+        }
+        r2 = requests.post(books_url, headers=headers, json=books_body, timeout=10)
+        books = {b['marketId']: b for b in (r2.json() if r2.status_code == 200 else [])}
+
+        result = {}
+        for m in markets:
+            mid   = m['marketId']
+            event = m.get('event', {}).get('name', '')  # e.g. "Arsenal v Coventry City"
+            book  = books.get(mid, {})
+            runners = book.get('runners', [])
+            runner_map = {r['selectionId']: r for r in runners}
+            cat_runners = m.get('runners', [])
+
+            odds_map = {}
+            for cr in cat_runners:
+                sid  = cr['selectionId']
+                name = cr.get('runnerName', '')
+                bk   = runner_map.get(sid, {})
+                best = (bk.get('ex', {}).get('availableToBack') or [{}])[0]
+                price = best.get('price')
+                if price:
+                    odds_map[name] = price
+
+            if len(odds_map) >= 2:
+                result[event] = odds_map  # e.g. {'Arsenal': 1.14, 'The Draw': 7.0, 'Coventry City': 18.0}
+
+        return result
+    except Exception:
+        return {}
+
+
+def match_betfair_odds(fixture_home, fixture_away, bf_odds_map):
+    """Find Betfair odds for a fixture — Betfair event names use 'v' not 'vs'."""
+    for event_name, odds in bf_odds_map.items():
+        parts = event_name.lower().replace(' v ', ' vs ').split(' vs ')
+        if len(parts) == 2:
+            h, a = parts[0].strip(), parts[1].strip()
+            if (fixture_home.lower() in h or h in fixture_home.lower()) and \
+               (fixture_away.lower() in a or a in fixture_away.lower()):
+                return odds
+    return {}
 
 
 def fetch_espn_fixtures(league, limit=10):
@@ -255,21 +448,26 @@ def fetch_espn_fixtures(league, limit=10):
     return []
 
 
-# Real GW2 + GW3 fixtures — Source: skysports.com/football/fixtures, verified 21 Aug 2026
-# Update each week from Sky Sports / BBC Sport / FotMob. Never invent fixtures.
-# Used as fallback when ESPN API is unreachable from Lambda
+# Source: skysports.com/football/fixtures, verified 21 Aug 2026
+# Full GW1 + GW2 schedule. Update each week from Sky Sports/BBC/FotMob. Never invent.
 STATIC_PL_FIXTURES = [
-    # GW2 — 22-24 August 2026
-    {'id': 's1', 'date': '2026-08-22T16:30Z', 'home': 'Brentford',              'away': 'Tottenham Hotspur',    'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Gtech Community Stadium'},
-    {'id': 's2', 'date': '2026-08-23T13:00Z', 'home': 'Manchester City',        'away': 'Bournemouth',          'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Etihad Stadium'},
-    {'id': 's3', 'date': '2026-08-23T13:00Z', 'home': 'Brighton & Hove Albion', 'away': 'Aston Villa',          'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Amex Stadium'},
-    {'id': 's4', 'date': '2026-08-23T15:30Z', 'home': 'Newcastle United',       'away': 'Liverpool',            'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': "St. James' Park"},
-    {'id': 's5', 'date': '2026-08-24T19:00Z', 'home': 'Fulham',                 'away': 'Chelsea',              'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Craven Cottage'},
-    # GW3 — 28-31 August 2026
-    {'id': 's6', 'date': '2026-08-28T19:00Z', 'home': 'Crystal Palace',         'away': 'Manchester City',      'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Selhurst Park'},
-    {'id': 's7', 'date': '2026-08-29T16:30Z', 'home': 'Tottenham Hotspur',      'away': 'Newcastle United',     'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Tottenham Hotspur Stadium'},
-    {'id': 's8', 'date': '2026-08-30T13:00Z', 'home': 'Chelsea',                'away': 'Brighton & Hove Albion','completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Stamford Bridge'},
-    {'id': 's9', 'date': '2026-08-31T19:00Z', 'home': 'Aston Villa',            'away': 'Arsenal',              'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Villa Park'},
+    # GW1 — 21-24 August 2026
+    {'id': 'g1f1',  'date': '2026-08-21T19:00Z', 'home': 'Arsenal',                'away': 'Coventry City',         'completed': True,  'home_score': 3, 'away_score': 0, 'status': 'STATUS_FINAL', 'venue': 'Emirates Stadium'},
+    {'id': 'g1f2',  'date': '2026-08-22T11:30Z', 'home': 'Hull City',              'away': 'Manchester United',     'completed': True,  'home_score': 2, 'away_score': 0, 'status': 'STATUS_FINAL', 'venue': 'MKM Stadium'},
+    {'id': 'g1f3',  'date': '2026-08-22T14:00Z', 'home': 'Everton',                'away': 'Crystal Palace',        'completed': True,  'home_score': 2, 'away_score': 0, 'status': 'STATUS_FINAL', 'venue': 'Goodison Park'},
+    {'id': 'g1f4',  'date': '2026-08-22T14:00Z', 'home': 'Ipswich Town',           'away': 'Sunderland',            'completed': True,  'home_score': 2, 'away_score': 1, 'status': 'STATUS_FINAL', 'venue': 'Portman Road'},
+    {'id': 'g1f5',  'date': '2026-08-22T14:00Z', 'home': 'Nottingham Forest',      'away': 'Leeds United',          'completed': True,  'home_score': 0, 'away_score': 1, 'status': 'STATUS_FINAL', 'venue': 'City Ground'},
+    {'id': 'g1f6',  'date': '2026-08-22T16:30Z', 'home': 'Brentford',              'away': 'Tottenham Hotspur',     'completed': True,  'home_score': 3, 'away_score': 0, 'status': 'STATUS_FINAL', 'venue': 'Gtech Community Stadium'},
+    {'id': 'g1f7',  'date': '2026-08-23T13:00Z', 'home': 'Brighton & Hove Albion', 'away': 'Aston Villa',           'completed': True,  'home_score': 4, 'away_score': 0, 'status': 'STATUS_FINAL', 'venue': 'Amex Stadium'},
+    {'id': 'g1f8',  'date': '2026-08-23T13:00Z', 'home': 'Manchester City',        'away': 'Bournemouth',           'completed': True,  'home_score': 2, 'away_score': 1, 'status': 'STATUS_FINAL', 'venue': 'Etihad Stadium'},
+    {'id': 'g1f9',  'date': '2026-08-23T15:30Z', 'home': 'Newcastle United',       'away': 'Liverpool',             'completed': True,  'home_score': 2, 'away_score': 2, 'status': 'STATUS_FINAL', 'venue': "St. James' Park"},
+    {'id': 'g1f10', 'date': '2026-08-24T19:00Z', 'home': 'Fulham',                 'away': 'Chelsea',               'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Craven Cottage'},
+    # GW2 — 28-31 August 2026
+    {'id': 'g2f1',  'date': '2026-08-28T19:00Z', 'home': 'Crystal Palace',         'away': 'Manchester City',       'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Selhurst Park'},
+    {'id': 'g2f2',  'date': '2026-08-29T11:30Z', 'home': 'Liverpool',              'away': 'Nottingham Forest',     'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Anfield'},
+    {'id': 'g2f3',  'date': '2026-08-29T16:30Z', 'home': 'Tottenham Hotspur',      'away': 'Newcastle United',      'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Tottenham Hotspur Stadium'},
+    {'id': 'g2f4',  'date': '2026-08-30T13:00Z', 'home': 'Chelsea',                'away': 'Brighton & Hove Albion','completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Stamford Bridge'},
+    {'id': 'g2f5',  'date': '2026-08-31T19:00Z', 'home': 'Aston Villa',            'away': 'Arsenal',               'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Villa Park'},
 ]
 
 
@@ -345,7 +543,7 @@ def calc_btts_prob(avg_home_for, avg_away_for):
     return round(p_home * p_away * 100)
 
 
-def generate_match_bets(fx, team_stats):
+def generate_match_bets(fx, team_stats, bf_odds_map=None):
     """Return 3-pick bet card (Safe, Value, Longshot) for an upcoming fixture."""
     home, away = fx.get('home', ''), fx.get('away', '')
     pred   = fx.get('prediction', {})
@@ -364,29 +562,44 @@ def generate_match_bets(fx, team_stats):
     h_stats = _stats(home)
     a_stats = _stats(away)
 
-    # ── Safe Pick: match result ───────────────────────────────────────────────
+    # ── Safe Pick: match result — live Betfair odds where available ──────────
     h_str = TEAM_STRENGTH.get(home, 65) + 5
     a_str = TEAM_STRENGTH.get(away, 65)
+    bf    = match_betfair_odds(home, away, bf_odds_map or {})
+
     if result == 'home_win':
         result_label = f'{home} Win'
-        approx_odds  = '4/6' if conf >= 70 else ('5/4' if conf >= 55 else 'Evens')
+        bf_price     = bf.get(home) or bf.get(f'{home} FC')
     elif result == 'away_win':
         result_label = f'{away} Win'
-        approx_odds  = '6/4' if conf >= 70 else '2/1'
+        bf_price     = bf.get(away) or bf.get(f'{away} FC')
     else:
         result_label = 'Draw'
-        approx_odds  = '5/2'
+        bf_price     = bf.get('The Draw') or bf.get('Draw')
+
+    if bf_price:
+        live_odds = decimal_to_fractional(float(bf_price))
+        odds_source = f'Betfair {float(bf_price):.2f}'
+    else:
+        # Fallback: convert model confidence to approximate odds
+        # Use implied probability (with 10% overround) → decimal → fractional
+        implied = max(conf / 100, 0.05)
+        decimal_approx = round(1 / implied * 0.90, 2)  # 10% book margin
+        live_odds   = decimal_to_fractional(decimal_approx)
+        odds_source = f'model {conf}% (no live price)'
 
     safe_pick = {
         'market':     'Match Result',
         'pick':       result_label,
-        'odds':       approx_odds,
+        'odds':       live_odds,
         'confidence': conf,
-        'reason':     f'{home} {h_str} vs {away} {a_str} (strength) — {conf}% model confidence',
+        'reason':     f'{home} {h_str} vs {away} {a_str} — {odds_source}',
     }
 
-    # ── Value Pick: BTTS / totals with % ─────────────────────────────────────
-    btts_pct  = calc_btts_prob(h_stats['avg_for'], a_stats['avg_for'])
+    # ── Value Pick: BTTS ─────────────────────────────────────────────────────
+    # Use btts_pct from predict_match (already in pred dict) so score + BTTS
+    # are always derived from the same model and can never contradict.
+    btts_pct = pred.get('btts_pct') or calc_btts_prob(h_stats['avg_for'], a_stats['avg_for'])
     combined  = h_stats['avg_for'] + a_stats['avg_for']
 
     if btts_pct >= 58:
@@ -395,33 +608,33 @@ def generate_match_bets(fx, team_stats):
             'pick':   'Yes',
             'odds':   '4/5',
             'pct':    btts_pct,
-            'reason': f'BTTS probability {btts_pct}% — {home} avg {h_stats["avg_for"]:.1f} scored, {away} avg {a_stats["avg_for"]:.1f}',
+            'reason': f'BTTS {btts_pct}% — {home} avg {h_stats["avg_for"]:.1f} scored, {away} avg {a_stats["avg_for"]:.1f}',
         }
-    elif combined > 2.7:
+    elif btts_pct >= 50 and combined > 2.5:
         over_pct = round(min((combined / 2.5) * 50, 80))
         value_pick = {
             'market': 'Total Goals',
             'pick':   'Over 2.5',
             'odds':   'Evens',
             'pct':    over_pct,
-            'reason': f'Combined {combined:.1f} avg goals/game — high-scoring expected (Over 2.5: ~{over_pct}%)',
+            'reason': f'Combined {combined:.1f} avg goals/game — over 2.5 expected (~{over_pct}%)',
         }
-    elif btts_pct < 42:
+    elif btts_pct >= 50:
+        value_pick = {
+            'market': 'Both Teams to Score',
+            'pick':   'Yes',
+            'odds':   'Evens',
+            'pct':    btts_pct,
+            'reason': f'BTTS {btts_pct}% — balanced scoring match expected',
+        }
+    else:
         no_pct = 100 - btts_pct
         value_pick = {
             'market': 'Both Teams to Score',
             'pick':   'No',
             'odds':   '4/5',
             'pct':    no_pct,
-            'reason': f'BTTS No probability {no_pct}% — defensive encounter expected',
-        }
-    else:
-        value_pick = {
-            'market': 'Both Teams to Score',
-            'pick':   'Yes',
-            'odds':   'Evens',
-            'pct':    btts_pct,
-            'reason': f'BTTS probability {btts_pct}% — balanced scoring match expected',
+            'reason': f'BTTS No ({no_pct}%) — predicted score {score} consistent with clean sheet',
         }
 
     # ── Longshot: first scorer from stronger team ─────────────────────────────
@@ -464,6 +677,9 @@ def lambda_handler(event, context):
         if not fx.get('prediction'):
             fx['prediction'] = predict_match(fx['home'], fx['away'])
 
+    # Fetch live Betfair MATCH_ODDS for PL fixtures (1X2 prices)
+    bf_odds_map = fetch_betfair_football_odds(STATIC_PL_FIXTURES)
+
     if pl_fixtures:
         source_fixtures = pl_fixtures
     else:
@@ -474,7 +690,7 @@ def lambda_handler(event, context):
     weekly_bets = []
     for fx in source_fixtures:
         if not fx.get('completed') and fx.get('prediction'):
-            fx['bets'] = generate_match_bets(fx, team_stats)
+            fx['bets'] = generate_match_bets(fx, team_stats, bf_odds_map)
             weekly_bets.append(fx)
         if len(weekly_bets) >= 5:
             break
@@ -499,8 +715,10 @@ def lambda_handler(event, context):
         'season':        '2026/27',
     })
 
+    # Save all fixtures (ESPN live if available, else full static list including completed results)
+    all_fixtures_to_save = pl_fixtures if pl_fixtures else STATIC_PL_FIXTURES
     save('PL_FIXTURES', {
-        'fixtures': pl_fixtures,
+        'fixtures': all_fixtures_to_save,
         'is_live':  len(pl_fixtures) > 0,
     })
 
