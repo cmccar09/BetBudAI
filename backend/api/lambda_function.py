@@ -1883,6 +1883,17 @@ def get_vegas_learning(headers, event):
         brier        = round(sum((p.get('combined_prob', 50) / 100 - (1 if p['result_won'] else 0)) ** 2
                                   for p in settled) / n, 4)
 
+        # Model value-add over market-alone (Benter 1994: "the important criteria is
+        # the gain in R² in the combined model over the public's R²... not simply the
+        # R² of the handicapping model alone" — same idea via Brier score instead of R²,
+        # since we're scoring binary win/loss outcomes rather than fitting a regression.
+        # If this isn't reliably positive, the combined model isn't earning its keep
+        # over just backing market-implied probability, whatever its own calibration
+        # looks like in isolation.
+        market_brier = round(sum((p.get('market_prob', 50) / 100 - (1 if p['result_won'] else 0)) ** 2
+                                  for p in settled) / n, 4)
+        model_value_add = round(market_brier - brier, 4)
+
         def _band_stats(picks):
             if not picks:
                 return None
@@ -1973,6 +1984,8 @@ def get_vegas_learning(headers, event):
                 'overall_wr':    overall_wr,
                 'overall_roi':   overall_roi,
                 'brier_score':   brier,
+                'market_brier_score': market_brier,
+                'model_value_add':    model_value_add,
                 'calib_label':   calib_label,
                 'score_bands':   score_bands,
                 'grade_stats':   grade_stats,
@@ -2008,6 +2021,12 @@ def get_vegas_picks(headers, event):
         tz_dublin = _tz.utc
 
     # Benter model parameters
+    # Benter 1994 (Eq 1) estimates these via maximum-likelihood regression on a
+    # held-out sample — they are NOT a "recommended" fixed 1.0/1.0, that's just
+    # this codebase's placeholder pending enough settled data to fit them
+    # properly (see the vegas skill's ALPHA/BETA tuning note — regression-fit
+    # coefficients, ideally with an out-of-sample split as the paper stresses,
+    # not hand-tuned from eyeballing recent results).
     ALPHA   = 1.0   # weight for fundamental model log-probability
     BETA    = 1.0   # weight for market implied log-probability
     TEMP    = 20.0  # softmax temperature for score → probability conversion
@@ -2190,19 +2209,39 @@ def get_vegas_picks(headers, event):
                         'field_known':   field_size,
                     })
 
-            # 5. Harville exacta — coverage-aware (do NOT renormalise combined_probs)
-            # combined_probs are already coverage-discounted (sum ≈ coverage fraction)
-            # Win prob  = combined_probs[i]  (our best estimate, unmodified)
-            # Place den = 1.0 - win_prob     (full field minus the winner, including unseen runners)
+            # 5. Harville exacta — coverage-aware, with Benter's actual bias correction applied.
+            # The textbook Harville formula (P(j 2nd | i won) = p_j / (1-p_i), reusing the
+            # raw win-probability array for the "who's 2nd" role) is empirically biased:
+            # Benter 1994 (Eq 7-9) found it systematically underrates longshots placing and
+            # overrates favorites placing. His fix: derive a SEPARATE, exponent-reweighted
+            # distribution for the runner-up role — sigma_i = p_i^GAMMA, renormalised — so
+            # longshots get relatively more credit for finishing 2nd than their raw win chance
+            # implies. GAMMA=0.81 is his own published value (Hong Kong Jockey Club data,
+            # 1986-1993) — not derived from our data, and he explicitly cautions these aren't
+            # universal constants across tracks/markets. Fixed 2026-08-28: GAMMA/DELTA were
+            # already defined and shown in the API's `methodology` field but never actually
+            # applied to the math — this was advertising a correction it wasn't making.
+            #
+            # combined_probs are coverage-discounted (sum ≈ coverage fraction, not 1.0) to
+            # stay honest about unscored runners — the sigma transform preserves that same
+            # total mass rather than renormalising to 1, so unseen runners still correctly
+            # hold their share of the "who's 2nd" pool too.
+            total_mass  = sum(combined_probs)
+            raw_sigma   = [p ** GAMMA for p in combined_probs]
+            sigma_sum   = sum(raw_sigma)
+            sigma = ([s / sigma_sum * total_mass for s in raw_sigma]
+                     if sigma_sum > 0 else list(combined_probs))
+
             ranked = sorted(range(len(combined_probs)), key=lambda x: -combined_probs[x])
             if len(ranked) >= 2:
                 i_win   = ranked[0]
                 i_place = ranked[1]
 
                 win_p   = combined_probs[i_win]
-                # Conditional: of the remaining probability mass (full field), what fraction belongs to horse j?
-                denom   = 1.0 - win_p
-                place_p = (combined_probs[i_place] / denom) if denom > 0 else 0
+                # Conditional 2nd-place share, using the bias-corrected sigma distribution
+                # for both the numerator and the "mass remaining after the winner" denominator.
+                denom   = total_mass - sigma[i_win]
+                place_p = (sigma[i_place] / denom) if denom > 0 else 0
                 exacta_prob = win_p * place_p
 
                 # Gate: drop if inflated (>35%) or too weak (<3%)
