@@ -248,6 +248,26 @@ Even after root cause #1 was fixed and the poller ran cleanly every 30 minutes, 
 
 ---
 
+## Dedicated Vegas results fetcher (built 2026-08-28)
+
+Three settlement bugs in Vegas's first three days (2026-08-27) all shared one cause: Vegas was settled by machinery built for the main product, and every fix was "make Vegas conform to an assumption it was never designed around" — `show_in_ui` gating it never sets, `course` vs `venue` naming, an unpaginated query tuned for main-product data volumes. Rather than keep patching around a shared pipeline that isn't shaped for Vegas, built Vegas its own independent settlement path that only ever touches `pick_type='vegas'` records and makes zero assumptions about how any other pick type is shaped.
+
+**File**: `vegas_results_fetcher.py` (repo root) — imports and reuses `sl_results_fetcher.py`'s proven scraper functions (`fetch_fast_results()`, `norm()`, `norm_course()`, `_to_uk_local_hhmm()`) rather than reimplementing HTML/JSON parsing. Bundled together in the deploy zip.
+
+**Sources, in priority order**:
+1. **Sporting Life fast-results** (primary) — fast, and gives full finishing order so WIN / PLACED / LOSS can all be determined, not just win-or-not.
+2. **Betfair settled WIN markets** (fallback, name-matched — no `market_id`/`selection_id` needed since Vegas never stores those) — only used for picks SL's feed hasn't caught yet. Reads every runner's WINNER/LOSER status from `listMarketBook`, not just the winner — **this actually fixes a long-standing limitation in the older `sf_results_fetch.py` name-fallback**, which only ever caught winners and left losers PENDING forever (see "Known settlement Lambda issue" note above — that limitation no longer applies to Vegas specifically, now that this fetcher exists). Betfair genuinely can't give placed detail from a WIN market (only WINNER/LOSER exists), so a Betfair-sourced settlement is always `win` or `loss`, never `placed` — only SL-sourced settlements get the richer 3-way outcome. Each settled record's `result_source` field (`sporting_life` or `betfair`) records which path settled it.
+
+**Deployed as**: Lambda `surebet-vegas-results`, role `SureBetLambdaRole` (reused — already had DynamoDB + `betfair-credentials` Secrets Manager access, no new IAM needed), layer `python-dependencies:1` (for `requests`), Python 3.11, 120s timeout / 256MB.
+
+**Schedule**: EventBridge rule `SureBet-VegasResults-30Min-Schedule`, `cron(0/30 11-19 * * ? *)` — every 30 min, 11:00-19:30 UTC = **12:00-20:30 BST**, covering "midday to 8pm" with a half-hour margin on the tail. Like the existing `SureBet-ResultsPoll-30Min-Schedule`, this is a fixed UTC window with no DST awareness — outside BST (GMT months) it runs an hour early relative to UK local midday-8pm. Same known limitation as the existing rule; not fixed here either.
+
+**Testing note**: both SL fast-results and Betfair's `listMarketCatalogue` are effectively same-day-only in practice — SL's feed only carries the current day's races, and `listMarketCatalogue` (same approach the older `sf_results_fetch.py` already relied on) doesn't reliably surface markets from a day+ ago. Validated the query/pagination/pending-detection path live against real data (correctly found 0 pending across 16 already-settled 2026-08-27 picks). Also tried a controlled re-settlement test — cleared one known-correct record (Heretic) and re-ran the fetcher against 2026-08-27 — and neither source matched it, confirming the same-day-only limitation directly rather than proving the matcher works (had to restore Heretic's known-correct values manually afterward). The matching logic itself is the same code path already proven in `sl_results_fetcher.py` in production, just not yet exercised end-to-end through this new file against a live, in-progress card. First real test happens naturally once this runs against today's picks as they're generated, from the 11:00 UTC tick onward — worth a spot-check the first time it fires against real pending picks.
+
+**Relationship to the shared pipeline**: `SureBet-Results-Poll` (via the now-`course`-field-fixed `sl_results_fetcher.py`) will *also* correctly settle Vegas picks going forward. Left both running — they're idempotent (same `SET` values either way), so having two independent paths is a deliberate safety net, not a conflict. If one breaks again, the other still settles picks.
+
+---
+
 ## Data schema for settled Vegas picks
 
 Table: `SureBetBets` | PK: `bet_date` | SK: `bet_id` (format: `vegas_{race_time}_{venue}_{horse}`)
