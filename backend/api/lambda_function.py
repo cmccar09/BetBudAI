@@ -1713,11 +1713,20 @@ def get_vegas_results(headers, event):
         yesterday = (now.date() - timedelta(days=1)).isoformat()
 
         # Yesterday's Vegas picks (settled or pending)
-        y_resp = table.query(
-            KeyConditionExpression=_Key('bet_date').eq(yesterday),
-            FilterExpression=_Attr('pick_type').eq('vegas'),
-        )
+        # A day's bet_date partition holds hundreds of non-Vegas picks (the
+        # 'learning' log alone runs 200-600/day) sorted ahead of 'vegas_'
+        # bet_ids, so a single unpaginated page can easily fill its 1MB limit
+        # before ever reaching a Vegas record — silently returning zero
+        # matches despite Vegas picks existing for the date. Must paginate.
+        y_kwargs = {
+            'KeyConditionExpression': _Key('bet_date').eq(yesterday),
+            'FilterExpression': _Attr('pick_type').eq('vegas'),
+        }
+        y_resp = table.query(**y_kwargs)
         y_items = [decimal_to_float(i) for i in y_resp.get('Items', [])]
+        while y_resp.get('LastEvaluatedKey'):
+            y_resp = table.query(**y_kwargs, ExclusiveStartKey=y_resp['LastEvaluatedKey'])
+            y_items.extend([decimal_to_float(i) for i in y_resp.get('Items', [])])
 
         # All UK/Irish races settle by 21:00 BST, so any pick from yesterday with
         # no settlement at all (neither writer touched it) is implicitly a LOST bet.
