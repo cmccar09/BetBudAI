@@ -167,8 +167,15 @@ def lambda_handler(event, context):
         }
 
     # PRIMARY: Sporting Life fast-results
+    # fetch_fast_results() returns a (dict, dict) tuple only on success — its
+    # early-failure paths (HTTP error, __NEXT_DATA__ not found, JSON parse
+    # error) return a bare {} instead. Blindly unpacking that raises
+    # ValueError, silently zeroing out SL matching for the whole run. Handle
+    # both shapes. Found 2026-08-29 after a full day (~20 runs) with zero SL
+    # matches despite the shared pipeline settling the same picks fine.
     try:
-        race_results, _ = slr.fetch_fast_results()
+        fast_result = slr.fetch_fast_results()
+        race_results = fast_result[0] if isinstance(fast_result, tuple) else (fast_result or {})
     except Exception as e:
         print(f'[vegas_results] SL fast-results fetch failed: {e}')
         race_results = {}
