@@ -2569,6 +2569,7 @@ def get_sport_data(headers, sport):
             body['pl_fixtures']    = (items.get('PL_FIXTURES', {}) or {}).get('fixtures', [])
             body['pl_standings']   = (items.get('PL_STANDINGS', {}) or {}).get('standings', [])
             body['pl_weekly_bets'] = (items.get('PL_WEEKLY_BETS', {}) or {}).get('fixtures', [])
+            body['pl_learning']    = items.get('PL_LEARNING', {})
             body['ucl_data']       = items.get('UCL_DATA', {})
             body['el_data']        = items.get('EL_DATA', {})
         elif sport == 'basketball':

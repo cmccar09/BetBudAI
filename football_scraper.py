@@ -659,6 +659,118 @@ def generate_match_bets(fx, team_stats, bf_odds_map=None):
     return {'safe': safe_pick, 'value': value_pick, 'longshot': longshot}
 
 
+# ─── Daily learning loop ────────────────────────────────────────────────────
+# Snapshot each fixture's prediction the FIRST time it's seen upcoming, before
+# kickoff. This is the only reliable way to later ask "was our prediction
+# right" — recomputing predict_match() after the fact uses TODAY's
+# TEAM_STRENGTH values, not whatever was actually shown to subscribers before
+# the match. Once a fixture is marked completed (STATIC_PL_FIXTURES or ESPN),
+# backfill the actual result into that same snapshot and score it. History
+# entries are immutable once scored — a fixture is graded once, from the
+# prediction that was live pre-match, never re-graded.
+#
+# Added 2026-08-29. Starts from zero: nothing is retroactively graded for
+# fixtures that completed before this existed (there's no honest pre-match
+# snapshot for them) — accuracy numbers only accumulate from here forward.
+
+def update_prediction_history(all_fixtures):
+    """Returns (history_dict, changed_bool). history is keyed by fixture id."""
+    try:
+        resp = sports_table.get_item(Key={'sport': 'football', 'data_key': 'PL_PREDICTION_HISTORY'})
+        history = dict((resp.get('Item') or {}).get('entries', {}) or {})
+    except Exception as e:
+        print(f'[learning] could not load PL_PREDICTION_HISTORY: {e}')
+        history = {}
+
+    changed = False
+    for fx in all_fixtures:
+        home, away = fx.get('home'), fx.get('away')
+        fid = fx.get('id') or (f"{home}-{away}-{fx.get('date', '')[:10]}" if home and away else None)
+        if not fid or not home or not away:
+            continue
+
+        entry = history.get(fid)
+
+        if entry is None:
+            if not fx.get('completed'):
+                pred = fx.get('prediction') or predict_match(home, away)
+                history[fid] = {
+                    'home': home, 'away': away, 'date': fx.get('date', ''),
+                    'pred_result':     pred['result'],
+                    'pred_score':      pred['score'],
+                    'pred_confidence': pred['confidence'],
+                    'pred_btts_pct':   pred['btts_pct'],
+                    'actual_recorded': False,
+                }
+                changed = True
+            continue
+
+        if entry.get('actual_recorded'):
+            continue
+
+        hs, aws_ = fx.get('home_score'), fx.get('away_score')
+        if fx.get('completed') and hs is not None and aws_ is not None:
+            actual_result = 'home_win' if hs > aws_ else ('away_win' if aws_ > hs else 'draw')
+            actual_score  = f'{hs}-{aws_}'
+            actual_btts   = hs > 0 and aws_ > 0
+            entry.update({
+                'actual_result':  actual_result,
+                'actual_score':   actual_score,
+                'actual_btts':    actual_btts,
+                'result_correct': entry['pred_result'] == actual_result,
+                'score_correct':  entry['pred_score'] == actual_score,
+                'btts_correct':   (entry['pred_btts_pct'] >= 50) == actual_btts,
+                'actual_recorded': True,
+            })
+            changed = True
+
+    return history, changed
+
+
+def compute_learning_summary(history):
+    scored = [e for e in history.values() if e.get('actual_recorded')]
+    n = len(scored)
+    if n == 0:
+        return {
+            'n': 0,
+            'message': 'No predictions have completed yet - accuracy accumulates as '
+                       'snapshotted fixtures finish. Check back after this game week.',
+        }
+
+    result_acc = round(100 * sum(1 for e in scored if e['result_correct']) / n, 1)
+    score_acc  = round(100 * sum(1 for e in scored if e['score_correct']) / n, 1)
+    btts_acc   = round(100 * sum(1 for e in scored if e['btts_correct']) / n, 1)
+
+    bands = []
+    for lo, hi in [(0, 50), (50, 60), (60, 70), (70, 80), (80, 101)]:
+        b = [e for e in scored if lo <= e['pred_confidence'] < hi]
+        if b:
+            bands.append({
+                'band':                    f'{lo}-{min(hi, 100)}%',
+                'n':                       len(b),
+                'mean_predicted_confidence': round(sum(e['pred_confidence'] for e in b) / len(b), 1),
+                'actual_hit_rate':         round(100 * sum(1 for e in b if e['result_correct']) / len(b), 1),
+            })
+
+    return {
+        'n':                   n,
+        'result_accuracy_pct': result_acc,
+        'score_accuracy_pct':  score_acc,
+        'btts_accuracy_pct':   btts_acc,
+        'calibration_bands':   bands,
+    }
+
+
+def run_learning_loop(all_fixtures):
+    """Call once per scraper run. Returns the learning summary dict."""
+    history, changed = update_prediction_history(all_fixtures)
+    summary = compute_learning_summary(history)
+    if changed:
+        save('PL_PREDICTION_HISTORY', {'entries': history})
+    save('PL_LEARNING', summary)
+    return summary
+
+
 def lambda_handler(event, context):
     now = datetime.now(timezone.utc).isoformat()
     today = datetime.now(timezone.utc).date().isoformat()
@@ -721,6 +833,15 @@ def lambda_handler(event, context):
         'fixtures': all_fixtures_to_save,
         'is_live':  len(pl_fixtures) > 0,
     })
+
+    # Learning loop always reads STATIC_PL_FIXTURES specifically, not whichever
+    # source happened to be live this run — its fixture `id`s are stable and
+    # manually curated (see skill's "Fixture ID convention"), so history entries
+    # never fork into duplicates if ESPN availability flips between runs.
+    try:
+        run_learning_loop(STATIC_PL_FIXTURES)
+    except Exception as e:
+        print(f'[learning] run_learning_loop failed: {e}')
 
     save('PL_WEEKLY_BETS', {
         'fixtures':   weekly_bets,

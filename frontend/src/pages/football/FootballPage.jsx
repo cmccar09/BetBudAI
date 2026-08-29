@@ -255,10 +255,16 @@ function MatchBetCard({ fx, isMobile }) {
   }) : '';
 
   const bttsLabel = bets.value?.pct != null ? `BTTS · ${bets.value.pct}% likely` : 'BTTS';
+  // generate_match_bets() falls back from 'First Goalscorer' to 'Correct Score' when
+  // the tipped scorer's team confidence is below its gate — read the actual market
+  // name back rather than hardcoding "1st Goalscorer", or the label lies about what's
+  // actually being shown (found 2026-08-28: a Correct Score fallback pick displayed
+  // under a "1st Goalscorer" header).
+  const isCorrectScore = bets.longshot?.market === 'Correct Score';
   const picks = [
     { key: 'safe',     emoji: '🛡️', label: 'Match Result',    color: '#34d399', bg: 'rgba(52,211,153,0.1)',  border: 'rgba(52,211,153,0.25)',  data: bets.safe     },
     { key: 'value',    emoji: '💰', label: bttsLabel,          color: '#fbbf24', bg: 'rgba(251,191,36,0.1)',  border: 'rgba(251,191,36,0.25)',  data: bets.value    },
-    { key: 'longshot', emoji: '🎯', label: '1st Goalscorer',   color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.25)', data: bets.longshot },
+    { key: 'longshot', emoji: isCorrectScore ? '🔢' : '🎯', label: bets.longshot?.market || '1st Goalscorer', color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.25)', data: bets.longshot },
   ];
 
   return (
@@ -684,7 +690,7 @@ function FixturesTab({ apiData, isMobile }) {
             {[
               { label: '🛡️ Match Result', pick: bets.safe?.pick,     odds: bets.safe?.odds,     c: '#34d399' },
               { label: `💰 BTTS${bets.value?.pct != null ? ` (${bets.value?.pct}% likely)` : ''}`, pick: bets.value?.pick, odds: bets.value?.odds, c: '#fbbf24' },
-              { label: '🎯 1st Goalscorer', pick: bets.longshot?.pick, odds: bets.longshot?.odds, c: '#a78bfa' },
+              { label: `${bets.longshot?.market === 'Correct Score' ? '🔢' : '🎯'} ${bets.longshot?.market || '1st Goalscorer'}`, pick: bets.longshot?.pick, odds: bets.longshot?.odds, c: '#a78bfa' },
             ].filter(b => b.pick).map(b => (
               <div key={b.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '7px 12px', borderRadius: 8,
