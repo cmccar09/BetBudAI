@@ -38,6 +38,8 @@ Maintain the Football tab (renamed from World Cup). Covers PL title race, weekly
 | `PL_STANDINGS` | live league table rows |
 | `UCL_DATA` | english_clubs, contenders/odds, fixtures |
 | `EL_DATA` | english_clubs, contenders/odds, fixtures |
+| `PL_LEARNING` | daily learning loop summary — result/score/BTTS accuracy, calibration bands (added 2026-08-29) |
+| `PL_PREDICTION_HISTORY` | per-fixture prediction snapshots + actual outcomes once completed, keyed by fixture id (added 2026-08-29) |
 
 ---
 
@@ -198,6 +200,8 @@ import FootballPage from './pages/football/FootballPage';
 
 **Never tip a first goalscorer without confirming they are in the starting XI (or at minimum named in the squad) for that specific match.**
 
+**The card doesn't always show a goalscorer — and that's by design.** `generate_match_bets()` only tips a first scorer when the *stronger* side's predicted win confidence is at least 52% (`conf >= 52`); below that it falls back to a Correct Score pick instead, on the theory that a near-toss-up match isn't a match to be confident about who scores first either. To find out who the scorer *would have been*, check `FIRST_SCORERS.get(stronger_team)` directly — the entry is still there even when the confidence gate suppresses it (e.g. Crystal Palace vs Man City at 49% confidence: `FIRST_SCORERS['Manchester City']` is Erling Haaland, but the card shows Correct Score instead because 49 < 52). The frontend now labels this fallback correctly (`bets.longshot.market`, either "First Goalscorer" or "Correct Score" — fixed 2026-08-29 after it hardcoded "1st Goalscorer" regardless of which one was actually returned).
+
 This is the same principle as the rugby Bielle-Biarrey Rule. An injured, rested, or suspended player can't score. Tipping them destroys subscriber trust.
 
 ### Verification steps (before each match week)
@@ -298,6 +302,32 @@ aws dynamodb query --table-name BetBudAI_Sports \
   --region eu-west-1 --query 'Items[].[data_key.S, updated_at.S]' --output text
 ```
 If `updated_at` is more than a day old, check the IAM policy above first (fastest to break silently), then CloudWatch logs for `football-scraper` for anything else.
+
+---
+
+## Daily learning loop (added 2026-08-29)
+
+Same idea as the Vegas skill's mission — "every settled pick is data, use it" — applied to football predictions. Runs automatically as part of the existing daily 06:00 UTC `football-scraper` invocation, no separate schedule needed.
+
+**How it works** (`update_prediction_history()` / `compute_learning_summary()` / `run_learning_loop()` in `football_scraper.py`):
+
+1. **Snapshot on first sight.** The first time a fixture from `STATIC_PL_FIXTURES` is seen *not yet completed*, its current `predict_match()` output (result, score, confidence, BTTS%) is saved into `PL_PREDICTION_HISTORY`, keyed by fixture `id`. This has to happen before kickoff — recomputing the prediction after the fact would use *today's* `TEAM_STRENGTH` values, not whatever was actually shown to subscribers before the match. A history entry is written once and never touched again until it's scored.
+2. **Backfill on completion.** Once `STATIC_PL_FIXTURES` marks that same fixture `completed: True` with scores (per the weekly update cadence below), the loop fills in the actual result/score/BTTS and scores the snapshot: `result_correct`, `score_correct`, `btts_correct`. A fixture is graded exactly once — `actual_recorded: True` locks it.
+3. **Summary.** `compute_learning_summary()` aggregates all scored entries into `PL_LEARNING`: overall result/score/BTTS accuracy %, plus calibration bands (predicted-confidence bucket → actual hit rate) in 10-point bands from 50% up. Exposed as `pl_learning` in `GET /api/sports/football`.
+
+**Why it always uses `STATIC_PL_FIXTURES`, never live ESPN data**, even when ESPN fixtures are what's shown elsewhere on the page: ESPN's fixture `id`s and the static list's `id`s (the `g<gameweek>f<fixture_number>` convention) are different namespaces. Mixing sources between runs would fork the same real-world fixture into two history entries under two different IDs. The static list's IDs are stable by convention (see "Fixture ID convention" below), so the loop always reads from there regardless of what's live elsewhere.
+
+**Starts from zero.** Nothing from before 2026-08-29 is retroactively graded — there's no honest pre-match snapshot for fixtures that already completed, and fabricating one after the fact would violate the truth-on-null rule just as much as an invented fixture would. Accuracy numbers only mean something once enough post-2026-08-29 fixtures have actually completed.
+
+**Checking it:**
+```bash
+curl -s https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com/api/sports/football | python3 -c "import json,sys; print(json.load(sys.stdin).get('pl_learning'))"
+```
+`n: 0` with a "no predictions have completed yet" message is expected and correct until fixtures snapshotted after 2026-08-29 finish — not a bug.
+
+**If you change `predict_match()` or `TEAM_STRENGTH`**: existing unscored history entries keep their *original* snapshotted prediction (correct — that's genuinely what was shown before those fixtures kick off). Only *new* fixtures seen after your change get predictions reflecting the update. This is intentional, not a bug to "fix" by re-snapshotting.
+
+---
 
 ## Fixture update cadence (weekly)
 
