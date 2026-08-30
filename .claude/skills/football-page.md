@@ -339,6 +339,8 @@ curl -s https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com/api/sports/footba
 
 Fixtures are **not** scraped live (ESPN blocks AWS Lambda IPs). The `STATIC_PL_FIXTURES` list in `football_scraper.py` is the source of truth and must be kept current manually.
 
+**This cadence lapsed for GW2 (found 2026-08-30)**: 4 fixtures sat `completed: False` for up to 6 days after they'd actually finished, and the list ran out entirely with no GW3 fixtures added. Symptom looked identical to a scoring bug — "predicted scores lack variety" — because the "upcoming, not completed" filter that feeds `pl_weekly_bets` was down to just 2 real fixtures, both modest strength gaps. **If predictions look repetitive or the weekly bets list is short, check fixture staleness before assuming it's the model**: `curl .../api/sports/football | jq '.pl_fixtures[] | select(.completed==false and .date < "<today>")'` — any hits mean results need updating. This also silently blocks the learning loop (root cause below) from ever grading those fixtures, since it only backfills fixtures already marked completed.
+
 **Each game week, before the first kick-off:**
 
 1. Go to Sky Sports or FotMob and verify the next game week's fixtures (dates, times, home/away).
