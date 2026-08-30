@@ -472,13 +472,30 @@ STATIC_PL_FIXTURES = [
     {'id': 'g1f7',  'date': '2026-08-23T13:00Z', 'home': 'Brighton & Hove Albion', 'away': 'Aston Villa',           'completed': True,  'home_score': 4, 'away_score': 0, 'status': 'STATUS_FINAL', 'venue': 'Amex Stadium'},
     {'id': 'g1f8',  'date': '2026-08-23T13:00Z', 'home': 'Manchester City',        'away': 'Bournemouth',           'completed': True,  'home_score': 2, 'away_score': 1, 'status': 'STATUS_FINAL', 'venue': 'Etihad Stadium'},
     {'id': 'g1f9',  'date': '2026-08-23T15:30Z', 'home': 'Newcastle United',       'away': 'Liverpool',             'completed': True,  'home_score': 2, 'away_score': 2, 'status': 'STATUS_FINAL', 'venue': "St. James' Park"},
-    {'id': 'g1f10', 'date': '2026-08-24T19:00Z', 'home': 'Fulham',                 'away': 'Chelsea',               'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Craven Cottage'},
+    # Source: ESPN match report + Bleacher Report, verified 30 Aug 2026 — Fulham 2-3 Chelsea (Xabi Alonso's first win as Chelsea manager)
+    {'id': 'g1f10', 'date': '2026-08-24T19:00Z', 'home': 'Fulham',                 'away': 'Chelsea',               'completed': True,  'home_score': 2, 'away_score': 3, 'status': 'STATUS_FINAL', 'venue': 'Craven Cottage'},
     # GW2 — 28-31 August 2026
-    {'id': 'g2f1',  'date': '2026-08-28T19:00Z', 'home': 'Crystal Palace',         'away': 'Manchester City',       'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Selhurst Park'},
-    {'id': 'g2f2',  'date': '2026-08-29T11:30Z', 'home': 'Liverpool',              'away': 'Nottingham Forest',     'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Anfield'},
-    {'id': 'g2f3',  'date': '2026-08-29T16:30Z', 'home': 'Tottenham Hotspur',      'away': 'Newcastle United',      'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Tottenham Hotspur Stadium'},
+    # Source: ESPN match report, verified 30 Aug 2026 — Cherki brace + Haaland, City 4-1 at Selhurst Park
+    {'id': 'g2f1',  'date': '2026-08-28T19:00Z', 'home': 'Crystal Palace',         'away': 'Manchester City',       'completed': True,  'home_score': 1, 'away_score': 4, 'status': 'STATUS_FINAL', 'venue': 'Selhurst Park'},
+    # Source: ESPN + Al Jazeera match report, verified 30 Aug 2026 — Munoz equalised late for Liverpool after trailing Forest
+    {'id': 'g2f2',  'date': '2026-08-29T11:30Z', 'home': 'Liverpool',              'away': 'Nottingham Forest',     'completed': True,  'home_score': 2, 'away_score': 2, 'status': 'STATUS_FINAL', 'venue': 'Anfield'},
+    # Source: ESPN + NBC Sports match report, verified 30 Aug 2026 — Elanga + Wissa for Newcastle's first win of the season
+    {'id': 'g2f3',  'date': '2026-08-29T16:30Z', 'home': 'Tottenham Hotspur',      'away': 'Newcastle United',      'completed': True,  'home_score': 0, 'away_score': 2, 'status': 'STATUS_FINAL', 'venue': 'Tottenham Hotspur Stadium'},
     {'id': 'g2f4',  'date': '2026-08-30T13:00Z', 'home': 'Chelsea',                'away': 'Brighton & Hove Albion','completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Stamford Bridge'},
     {'id': 'g2f5',  'date': '2026-08-31T19:00Z', 'home': 'Aston Villa',            'away': 'Arsenal',               'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Villa Park'},
+    # GW3 — 4-6 September 2026
+    # Source: Sky Sports (skysports.com "Premier League 2026/27 fixtures live on Sky Sports"), verified 30 Aug 2026 —
+    # TV-selected fixtures with confirmed times; remaining GW3 fixtures default to standard Saturday 15:00 BST kickoff
+    {'id': 'g3f1',  'date': '2026-09-04T19:00Z', 'home': 'Ipswich Town',           'away': 'Liverpool',             'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Portman Road'},
+    {'id': 'g3f2',  'date': '2026-09-05T14:00Z', 'home': 'Nottingham Forest',      'away': 'Tottenham Hotspur',     'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'City Ground'},
+    {'id': 'g3f3',  'date': '2026-09-05T14:00Z', 'home': 'Brentford',              'away': 'Sunderland',            'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Gtech Community Stadium'},
+    {'id': 'g3f4',  'date': '2026-09-05T14:00Z', 'home': 'Brighton & Hove Albion', 'away': 'Leeds United',          'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Amex Stadium'},
+    {'id': 'g3f5',  'date': '2026-09-05T14:00Z', 'home': 'Fulham',                 'away': 'Crystal Palace',        'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Craven Cottage'},
+    {'id': 'g3f6',  'date': '2026-09-05T14:00Z', 'home': 'Manchester City',        'away': 'Coventry City',         'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Etihad Stadium'},
+    {'id': 'g3f7',  'date': '2026-09-05T14:00Z', 'home': 'Newcastle United',       'away': 'Bournemouth',           'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': "St. James' Park"},
+    {'id': 'g3f8',  'date': '2026-09-05T16:30Z', 'home': 'Hull City',              'away': 'Aston Villa',           'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'MKM Stadium'},
+    {'id': 'g3f9',  'date': '2026-09-06T13:00Z', 'home': 'Everton',                'away': 'Manchester United',     'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Goodison Park'},
+    {'id': 'g3f10', 'date': '2026-09-06T15:30Z', 'home': 'Arsenal',                'away': 'Chelsea',               'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Emirates Stadium'},
 ]
 
 
