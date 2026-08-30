@@ -483,6 +483,17 @@ STATIC_PL_FIXTURES = [
     {'id': 'g2f3',  'date': '2026-08-29T16:30Z', 'home': 'Tottenham Hotspur',      'away': 'Newcastle United',      'completed': True,  'home_score': 0, 'away_score': 2, 'status': 'STATUS_FINAL', 'venue': 'Tottenham Hotspur Stadium'},
     {'id': 'g2f4',  'date': '2026-08-30T13:00Z', 'home': 'Chelsea',                'away': 'Brighton & Hove Albion','completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Stamford Bridge'},
     {'id': 'g2f5',  'date': '2026-08-31T19:00Z', 'home': 'Aston Villa',            'away': 'Arsenal',               'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Villa Park'},
+    # GW2 continued — 5 fixtures missing from the original list (found 2026-08-30
+    # via a Google sports-widget cross-check; a full gameweek is 10 matches, this
+    # list only ever had 5). Source: ESPN/Sky Sports match reports, verified 30 Aug 2026.
+    {'id': 'g2f6',  'date': '2026-08-29T14:00Z', 'home': 'Bournemouth',            'away': 'Everton',               'completed': True,  'home_score': 1, 'away_score': 1, 'status': 'STATUS_FINAL', 'venue': 'Vitality Stadium'},
+    {'id': 'g2f7',  'date': '2026-08-29T14:00Z', 'home': 'Coventry City',          'away': 'Hull City',             'completed': True,  'home_score': 0, 'away_score': 1, 'status': 'STATUS_FINAL', 'venue': 'CBS Arena'},
+    {'id': 'g2f8',  'date': '2026-08-30T13:00Z', 'home': 'Leeds United',           'away': 'Brentford',             'completed': True,  'home_score': 1, 'away_score': 1, 'status': 'STATUS_FINAL', 'venue': 'Elland Road'},
+    {'id': 'g2f9',  'date': '2026-08-30T13:00Z', 'home': 'Sunderland',             'away': 'Fulham',                'completed': True,  'home_score': 0, 'away_score': 1, 'status': 'STATUS_FINAL', 'venue': 'Stadium of Light'},
+    # Not yet confirmed finished at time of writing — searches only surfaced
+    # older (2024/25) Man Utd-Ipswich meetings, not this fixture's result.
+    # Leave pending until a real 2026 score can be verified — do not guess.
+    {'id': 'g2f10', 'date': '2026-08-30T15:30Z', 'home': 'Manchester United',      'away': 'Ipswich Town',          'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Old Trafford'},
     # GW3 — 4-6 September 2026
     # Source: Sky Sports (skysports.com "Premier League 2026/27 fixtures live on Sky Sports"), verified 30 Aug 2026 —
     # TV-selected fixtures with confirmed times; remaining GW3 fixtures default to standard Saturday 15:00 BST kickoff
