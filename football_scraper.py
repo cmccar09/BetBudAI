@@ -838,13 +838,15 @@ def lambda_handler(event, context):
         now_iso = datetime.now(timezone.utc).isoformat()
         upcoming = [f for f in STATIC_PL_FIXTURES if f['date'] >= now_iso[:10]]
         source_fixtures = sorted(upcoming, key=lambda f: f['date']) or STATIC_PL_FIXTURES
+    # Every upcoming fixture gets a bet card, not just the first 5 — the cap was
+    # cutting off real matches once more than one game week's worth of fixtures
+    # was in the list (found 2026-08-30, right after adding GW3 on top of the
+    # remaining GW2 fixtures).
     weekly_bets = []
     for fx in source_fixtures:
         if not fx.get('completed') and fx.get('prediction'):
             fx['bets'] = generate_match_bets(fx, team_stats, bf_odds_map)
             weekly_bets.append(fx)
-        if len(weekly_bets) >= 5:
-            break
 
     save('META', {
         'season':           '2026/27',
