@@ -489,7 +489,13 @@ STATIC_PL_FIXTURES = [
     {'id': 'g2f6',  'date': '2026-08-29T14:00Z', 'home': 'Bournemouth',            'away': 'Everton',               'completed': True,  'home_score': 1, 'away_score': 1, 'status': 'STATUS_FINAL', 'venue': 'Vitality Stadium'},
     {'id': 'g2f7',  'date': '2026-08-29T14:00Z', 'home': 'Coventry City',          'away': 'Hull City',             'completed': True,  'home_score': 0, 'away_score': 1, 'status': 'STATUS_FINAL', 'venue': 'CBS Arena'},
     {'id': 'g2f8',  'date': '2026-08-30T13:00Z', 'home': 'Leeds United',           'away': 'Brentford',             'completed': True,  'home_score': 1, 'away_score': 1, 'status': 'STATUS_FINAL', 'venue': 'Elland Road'},
-    {'id': 'g2f9',  'date': '2026-08-30T13:00Z', 'home': 'Sunderland',             'away': 'Fulham',                'completed': True,  'home_score': 0, 'away_score': 1, 'status': 'STATUS_FINAL', 'venue': 'Stadium of Light'},
+    # Reverted to pending 2026-08-30: three separate searches for this result
+    # returned three different scores (0-1, 1-0, 3-1) because search results kept
+    # conflating this fixture with an EARLIER, DIFFERENT Sunderland-Fulham meeting
+    # from 22 Feb 2026 (last season) - same two clubs, wrong match entirely.
+    # Do not re-add a score here without a source that explicitly confirms the
+    # 30 Aug 2026 date, not just the team names.
+    {'id': 'g2f9',  'date': '2026-08-30T13:00Z', 'home': 'Sunderland',             'away': 'Fulham',                'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Stadium of Light'},
     # Not yet confirmed finished at time of writing — searches only surfaced
     # older (2024/25) Man Utd-Ipswich meetings, not this fixture's result.
     # Leave pending until a real 2026 score can be verified — do not guess.
