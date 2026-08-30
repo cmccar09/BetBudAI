@@ -509,10 +509,38 @@ STATIC_PL_FIXTURES = [
     {'id': 'g3f4',  'date': '2026-09-05T14:00Z', 'home': 'Brighton & Hove Albion', 'away': 'Leeds United',          'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Amex Stadium'},
     {'id': 'g3f5',  'date': '2026-09-05T14:00Z', 'home': 'Fulham',                 'away': 'Crystal Palace',        'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Craven Cottage'},
     {'id': 'g3f6',  'date': '2026-09-05T14:00Z', 'home': 'Manchester City',        'away': 'Coventry City',         'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Etihad Stadium'},
-    {'id': 'g3f7',  'date': '2026-09-05T14:00Z', 'home': 'Newcastle United',       'away': 'Bournemouth',           'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': "St. James' Park"},
+    # Corrected 2026-08-30: moved to 12:30 BST for TV, not standard 15:00 — confirmed via newcastleunited.com's own fixture page
+    {'id': 'g3f7',  'date': '2026-09-05T11:30Z', 'home': 'Newcastle United',       'away': 'Bournemouth',           'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': "St. James' Park"},
     {'id': 'g3f8',  'date': '2026-09-05T16:30Z', 'home': 'Hull City',              'away': 'Aston Villa',           'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'MKM Stadium'},
     {'id': 'g3f9',  'date': '2026-09-06T13:00Z', 'home': 'Everton',                'away': 'Manchester United',     'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Goodison Park'},
     {'id': 'g3f10', 'date': '2026-09-06T15:30Z', 'home': 'Arsenal',                'away': 'Chelsea',               'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Emirates Stadium'},
+    # GW4 — 12-14 September 2026
+    # Source: user-supplied official fixture list, verified 30 Aug 2026
+    {'id': 'g4f1',  'date': '2026-09-12T14:00Z', 'home': 'Aston Villa',            'away': 'Nottingham Forest',     'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Villa Park'},
+    {'id': 'g4f2',  'date': '2026-09-12T14:00Z', 'home': 'Bournemouth',            'away': 'Brentford',             'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Vitality Stadium'},
+    {'id': 'g4f3',  'date': '2026-09-12T14:00Z', 'home': 'Chelsea',                'away': 'Hull City',             'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Stamford Bridge'},
+    {'id': 'g4f4',  'date': '2026-09-12T14:00Z', 'home': 'Crystal Palace',         'away': 'Ipswich Town',          'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Selhurst Park'},
+    {'id': 'g4f5',  'date': '2026-09-12T14:00Z', 'home': 'Liverpool',              'away': 'Fulham',                'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Anfield'},
+    {'id': 'g4f6',  'date': '2026-09-12T16:30Z', 'home': 'Tottenham Hotspur',      'away': 'Everton',               'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Tottenham Hotspur Stadium'},
+    {'id': 'g4f7',  'date': '2026-09-12T19:00Z', 'home': 'Sunderland',             'away': 'Arsenal',               'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Stadium of Light'},
+    {'id': 'g4f8',  'date': '2026-09-13T13:00Z', 'home': 'Coventry City',          'away': 'Brighton & Hove Albion','completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'CBS Arena'},
+    # Kept as reported by the user's source (Sun 13 Sept, 16:30 BST); one other
+    # search result suggested Sat 12 Sept 14:00 UTC instead but without a clear
+    # source of its own — flag for re-verification closer to the date.
+    {'id': 'g4f9',  'date': '2026-09-13T15:30Z', 'home': 'Manchester United',      'away': 'Manchester City',       'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Old Trafford'},
+    {'id': 'g4f10', 'date': '2026-09-14T19:00Z', 'home': 'Leeds United',           'away': 'Newcastle United',      'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Elland Road'},
+    # GW5 — 18-20 September 2026
+    # Source: user-supplied official fixture list, verified 30 Aug 2026
+    {'id': 'g5f1',  'date': '2026-09-18T19:00Z', 'home': 'Brentford',              'away': 'Chelsea',               'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Gtech Community Stadium'},
+    {'id': 'g5f2',  'date': '2026-09-19T11:30Z', 'home': 'Tottenham Hotspur',      'away': 'Aston Villa',           'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Tottenham Hotspur Stadium'},
+    {'id': 'g5f3',  'date': '2026-09-19T14:00Z', 'home': 'Brighton & Hove Albion', 'away': 'Arsenal',               'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Amex Stadium'},
+    {'id': 'g5f4',  'date': '2026-09-19T14:00Z', 'home': 'Everton',                'away': 'Ipswich Town',          'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Goodison Park'},
+    {'id': 'g5f5',  'date': '2026-09-19T14:00Z', 'home': 'Leeds United',           'away': 'Crystal Palace',        'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Elland Road'},
+    {'id': 'g5f6',  'date': '2026-09-19T14:00Z', 'home': 'Newcastle United',       'away': 'Hull City',             'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': "St. James' Park"},
+    {'id': 'g5f7',  'date': '2026-09-19T16:30Z', 'home': 'Nottingham Forest',      'away': 'Coventry City',         'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'City Ground'},
+    {'id': 'g5f8',  'date': '2026-09-20T13:00Z', 'home': 'Bournemouth',            'away': 'Liverpool',             'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Vitality Stadium'},
+    {'id': 'g5f9',  'date': '2026-09-20T13:00Z', 'home': 'Manchester City',        'away': 'Sunderland',            'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Etihad Stadium'},
+    {'id': 'g5f10', 'date': '2026-09-20T15:30Z', 'home': 'Fulham',                 'away': 'Manchester United',     'completed': False, 'status': 'STATUS_SCHEDULED', 'venue': 'Craven Cottage'},
 ]
 
 
