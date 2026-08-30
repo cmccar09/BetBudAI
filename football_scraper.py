@@ -132,9 +132,17 @@ FIRST_SCORERS = {
     'Arsenal':                  {'name': 'Bukayo Saka',             'odds': '9/2',  'note': 'Set-piece specialist · top Arsenal scorer'},
     'Liverpool':                {'name': 'Alexander Isak',          'odds': '9/4',  'note': 'Signed from Newcastle · clinical finisher · key man'},
     'Chelsea':                  {'name': 'Cole Palmer',             'odds': '7/2',  'note': 'Penalty taker · free-kick threat'},
-    'Manchester United':        {'name': 'Rasmus Hojlund',          'odds': '4/1',  'note': 'Target man · primary striker'},
+    # Source: ESPN (Højlund's permanent Napoli move confirmed 17 May 2026) +
+    # manutd.com (Sesko's own club page, confirms he kept #30 rather than take
+    # the vacated #9 after Højlund's exit) — verified 30 Aug 2026
+    'Manchester United':        {'name': 'Benjamin Sesko',          'odds': '4/1',  'note': "Højlund's permanent replacement · target man since 2025"},
     'Tottenham Hotspur':        {'name': 'Heung-min Son',           'odds': '7/2',  'note': 'Consistent scorer · strong finisher'},
-    'Newcastle United':         {'name': 'Alexander Isak',          'odds': '7/4',  'note': 'Clinical finisher · penalty taker'},
+    # Source: ESPN (Isak's British-record move to Liverpool, referenced in
+    # CLAUDE.md's verified 2026/27 facts) + footballfancast.com (Woltemade,
+    # Newcastle's £69m record signing from Stuttgart) — verified 30 Aug 2026.
+    # Woltemade was used in a deeper role at times last season, so this is a
+    # softer pick than most entries here — worth a lineup check before relying on it.
+    'Newcastle United':         {'name': 'Nick Woltemade',          'odds': '9/2',  'note': 'Record £69m signing · main striker option post-Isak'},
     'Aston Villa':              {'name': 'Ollie Watkins',           'odds': '7/2',  'note': 'England striker · high xG returns'},
     'Brighton & Hove Albion':   {'name': 'Evan Ferguson',           'odds': '5/1',  'note': 'Young clinical finisher'},
     'West Ham United':          {'name': 'Jarrod Bowen',            'odds': '4/1',  'note': 'Top West Ham scorer · box threat'},

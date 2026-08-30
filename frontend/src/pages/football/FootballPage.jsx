@@ -276,8 +276,11 @@ function MatchBetCard({ fx, isMobile }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <span style={{ fontSize: isMobile ? 14 : 16, fontWeight: 900, color: 'white' }}>{fx.home}</span>
           {fx.prediction?.score ? (
-            <span style={{ fontSize: 16, fontWeight: 900, color: '#fbbf24', padding: '2px 10px',
-              background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: 7, letterSpacing: 1 }}>
+            <span title="AI-predicted score — not a real result" style={{ fontSize: 16, fontWeight: 900, color: '#fbbf24', padding: '2px 10px 2px 6px',
+              background: 'rgba(251,191,36,0.12)', border: '1px dashed rgba(251,191,36,0.5)', borderRadius: 7, letterSpacing: 1,
+              display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: 0.4, color: 'rgba(251,191,36,0.8)',
+                border: '1px solid rgba(251,191,36,0.5)', borderRadius: 3, padding: '1px 3px' }}>AI</span>
               {fx.prediction.score}
             </span>
           ) : (
@@ -662,8 +665,11 @@ function FixturesTab({ apiData, isMobile }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 14, fontWeight: 800, color: 'white' }}>{fx.home}</span>
             {pred.score ? (
-              <span style={{ fontSize: 16, fontWeight: 900, color: '#fbbf24', padding: '2px 10px',
-                background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: 7, letterSpacing: 1 }}>
+              <span title="AI-predicted score — not a real result" style={{ fontSize: 16, fontWeight: 900, color: '#fbbf24', padding: '2px 10px 2px 6px',
+                background: 'rgba(251,191,36,0.12)', border: '1px dashed rgba(251,191,36,0.5)', borderRadius: 7, letterSpacing: 1,
+                display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: 0.4, color: 'rgba(251,191,36,0.8)',
+                  border: '1px solid rgba(251,191,36,0.5)', borderRadius: 3, padding: '1px 3px' }}>AI</span>
                 {pred.score}
               </span>
             ) : (
