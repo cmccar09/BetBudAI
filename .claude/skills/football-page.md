@@ -214,6 +214,14 @@ One source citing a fact isn't verification — it's a single point of failure. 
 
 This is the same principle as the rugby Bielle-Biarrey Rule. An injured, rested, or suspended player can't score. Tipping them destroys subscriber trust.
 
+### More fundamental than injury/rotation: is this player still even at the club? (added 2026-08-30)
+
+Injury and rotation checks assume the player is on the books. **Check that first, separately, before anything else** — a transferred-out player is a stronger and more embarrassing failure than a rested one, and `FIRST_SCORERS` has no expiry mechanism to catch it automatically. Found twice in the same dict on the same day:
+- **Rasmus Hojlund** listed for Manchester United months after his permanent Napoli transfer was confirmed (17 May 2026) — a subscriber sent in the actual ESPN transfer article.
+- **Alexander Isak** listed for *both* Liverpool and Newcastle United simultaneously — he left Newcastle for Liverpool (already documented as fact in CLAUDE.md's own verified 2026/27 facts table), but the Newcastle `FIRST_SCORERS` entry was never updated to match.
+
+**When touching any `FIRST_SCORERS` entry (not just the one you're editing) — check the player is still registered at that club right now**, not "as of when this entry was last written." A quick way to catch the Isak-style duplicate specifically: scan the dict for the same player name appearing under two different teams — that's never legitimate. For any individual entry, a fast sanity check is searching `"<player name>" transfer 2026` and confirming no move away from the listed club — don't rely on the entry having looked correct when it was written; squads change every transfer window, and this dict has no automatic staleness detection.
+
 ### Verification steps (before each match week)
 
 1. **Check team news** on Sky Sports or FotMob for the relevant fixture — look for confirmed injuries, suspensions, or rotation hints from the manager
@@ -239,6 +247,10 @@ The `FIRST_SCORERS` dict is the source of truth. Each entry must reflect the **e
 - Set to `None` / remove the team entry → no first scorer pick for this fixture
 
 ---
+
+### Predicted scores must be visually unambiguous as predictions (added 2026-08-30)
+
+A subscriber flagged that the score badge on match cards ("Man United 2-0 Ipswich") read like a real result at a glance — bold, solid-bordered, styled the same way a genuine score would be. The small "AI predicted score · N% confidence" caption underneath wasn't enough on its own to stop the misread. Both card variants in `FootballPage.jsx` (`MatchBetCard` and the compact fixture card) now carry the score in a small "AI"-tagged chip with a **dashed border** instead of solid, specifically so the badge itself signals "prediction" without requiring the caption to be read. **Keep this treatment on any future predicted-score display** — a solid-bordered score badge with no inline marker is the mistake to avoid; the caption text alone is not sufficient.
 
 ### Consistency rule: predicted score, BTTS, and match result must all agree
 
