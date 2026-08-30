@@ -485,8 +485,7 @@ export default function VegasPage() {
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#e2e8f0', marginBottom: 6 }}>The rules Benter followed</div>
             <ul style={{ fontSize: 12, color: 'rgba(226,232,240,0.65)', lineHeight: 1.9, margin: 0, paddingLeft: 16 }}>
-              <li>Back <strong style={{ color: '#e2e8f0' }}>every ELITE and STRONG pick</strong> — never skip because you "don't fancy it"</li>
-              <li>Never bet VALUE grade alone — wait for STRONG/ELITE confirmation</li>
+              <li>Back <strong style={{ color: '#e2e8f0' }}>every ELITE pick</strong> — never skip because you "don't fancy it"</li>
               <li>Use the exact Kelly stake — don't round down out of nerves</li>
               <li>Track ROI after 50+ bets, not after 5</li>
               <li>If the edge disappears over time, the model needs recalibration — not more gut picks</li>
@@ -499,7 +498,7 @@ export default function VegasPage() {
           {[
             { label: 'Minimum picks before judging', value: '50+' },
             { label: 'Expected win rate', value: '25–35%' },
-            { label: 'Grades worth staking', value: 'ELITE · STRONG' },
+            { label: 'Grade worth staking', value: 'ELITE only' },
             { label: 'Minimum coverage to trust', value: '≥ 70%' },
           ].map(s => (
             <div key={s.label}>
@@ -549,8 +548,9 @@ export default function VegasPage() {
 
       {/* Value bets — split by grade */}
       {!loading && !error && data?.value_bets?.length > 0 && (() => {
-        const backAll  = (data.value_bets || []).filter(p => p.benter_grade === 'ELITE' || p.benter_grade === 'STRONG');
-        const watchOnly = (data.value_bets || []).filter(p => p.benter_grade === 'VALUE');
+        // ELITE-only as of 2026-08-30 — the API no longer returns STRONG/VALUE
+        // grade picks at all, so value_bets is already the backable list.
+        const backAll = data.value_bets || [];
         const ts = data.today_summary || {};
         return (
           <>
@@ -583,7 +583,7 @@ export default function VegasPage() {
               </div>
             )}
 
-            {/* Back all — ELITE + STRONG */}
+            {/* Back all — ELITE only */}
             {backAll.length > 0 && (
               <>
                 {sectionHead(`Today's Bets · ${backAll.length} qualifying · ${data.races_analysed || 0} races analysed`)}
@@ -601,20 +601,6 @@ export default function VegasPage() {
               </>
             )}
 
-            {/* VALUE grade is not shown — edge (ratio 1.0-1.5x) is within partial-field
-                coverage noise and the site explicitly says not to stake on it, so
-                surfacing it as a "pick" only confuses subscribers. Still computed and
-                persisted to DynamoDB every run for background tracking — once 50+ have
-                settled the model calibration can tell us if the grade threshold should
-                move (see the vegas skill). */}
-
-            {/* No backable picks today */}
-            {backAll.length === 0 && watchOnly.length > 0 && (
-              <div style={{ background: 'rgba(30,41,69,0.5)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 8, padding: '16px 20px', marginBottom: 12 }}>
-                <div style={{ fontSize: 13, color: '#e2e8f0', fontFamily: 'monospace', marginBottom: 4 }}>No ELITE or STRONG picks today</div>
-                <div style={{ fontSize: 12, color: 'rgba(226,232,240,0.45)' }}>Only VALUE-grade picks found — watch list only. This is the correct response: pass the day rather than force a bet.</div>
-              </div>
-            )}
           </>
         );
       })()}
@@ -638,8 +624,8 @@ export default function VegasPage() {
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 10 }}>
             {[
               { label: 'Races Analysed', value: data.races_analysed ?? '—', color: '#34d399' },
-              { label: 'Back All (ELITE+STRONG)', value: (data.value_bets || []).filter(p => p.benter_grade !== 'VALUE').length, color: '#34d399' },
-              { label: 'Watch Only (VALUE)', value: (data.value_bets || []).filter(p => p.benter_grade === 'VALUE').length, color: 'rgba(226,232,240,0.5)' },
+              { label: 'Qualifying Picks (ELITE)', value: (data.value_bets || []).length, color: '#34d399' },
+              { label: 'Grade Required', value: 'ELITE only', color: '#fbbf24' },
               { label: 'Min Edge Required', value: data.methodology?.min_edge ?? '10%', color: '#fbbf24' },
             ].map(stat => (
               <div key={stat.label} style={{ background: 'rgba(30,41,69,0.6)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 6, padding: '12px 14px' }}>
@@ -778,10 +764,10 @@ export default function VegasPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0, background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 8, overflow: 'hidden', marginBottom: 32 }}>
         {[
           {
-            field: 'ELITE / STRONG / VALUE',
+            field: 'ELITE',
             color: '#fbbf24',
             what: 'The grade — how much our model diverges from the market.',
-            why: 'ELITE = model rates the horse 2× or more than market odds imply. STRONG = 1.5–2×. VALUE = 1.0–1.5×. Lower grades are noisier — the edge may be within model error. Only STRONG and ELITE meet Benter\'s minimum threshold for real staking.',
+            why: 'ELITE means our model rates the horse 2× or more than market odds imply. Two lower grades (STRONG 1.5–2×, VALUE 1.0–1.5×) used to appear here too, but as of 2026-08-30 the page only tracks and shows ELITE — STRONG ran -48.6% ROI over 28 races and VALUE was already flagged do-not-stake. Every pick shown now meets the same bar.',
           },
           {
             field: 'Fractional odds (e.g. 14/1)',

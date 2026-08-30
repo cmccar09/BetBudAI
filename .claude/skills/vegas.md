@@ -19,6 +19,21 @@ Invoke this skill when reviewing Vegas performance, tuning model parameters, or 
 
 ---
 
+## Grade policy: ELITE only (changed 2026-08-30)
+
+**Vegas now tracks and displays ELITE grade only.** STRONG and VALUE are no longer generated, persisted, or shown anywhere on the page.
+
+Why: the tier breakdown at the point of this change was `ELITE 11W/46L +13%` · `STRONG 6W/28L -48.6%` · `VALUE 4W/8L +9.4%`. STRONG was actively losing money at scale (28 settled picks, not a small sample) despite meeting Benter's own "minimum divergence threshold" (value_ratio ≥ 1.5) — the threshold itself doesn't guarantee real edge on our data. VALUE was already flagged do-not-stake before this change. Only ELITE (value_ratio ≥ 2.0) was consistently profitable.
+
+**What changed, mechanically:**
+- `get_vegas_picks()`: the grade is still computed for every candidate (needed for the threshold logic itself), but `if grade != 'ELITE': continue` drops STRONG/VALUE before they're ever appended to `value_bets` — so they're never persisted to DynamoDB, never counted in `today_summary`, never part of the daily exposure cap.
+- `get_vegas_results()` and `get_vegas_learning()`: both scans/queries now filter `benter_grade == 'ELITE'` at the DynamoDB level. This isn't just "stop tracking new ones" — it retroactively drops historical STRONG/VALUE rows out of every stat on the page (RECORD, ROI, P&L, PICKS SETTLED, calibration), immediately, not just for picks going forward.
+- Frontend (`VegasPage.jsx`): copy referencing "back every ELITE and STRONG pick" / "ELITE+STRONG" stats / the VALUE watch-list section all removed — the tier breakdown chips were already data-driven (`Object.entries(grade_roi)`), so they auto-shrink to ELITE-only once the backend stops returning other grades.
+
+**If reconsidering this later**: the STRONG/VALUE computation logic still exists in the codebase (grade thresholds, `value_ratio` calc) — only the `continue` cut and the two DynamoDB filters need reverting to bring a grade back. Don't re-enable STRONG without checking whether its ROI has actually recovered on fresh data first — -48.6% over 28 races is a real signal, not noise, at that sample size.
+
+---
+
 ## Checked against Benter's actual 1994 paper (2026-08-28)
 
 This model is named after Bill Benter's system, so it's worth periodically checking our implementation against what he actually published — "Computer Based Horse Race Handicapping and Wagering Systems: A Report" (1994, in *Efficiency of Racetrack Betting Markets*). Full text: [gwern.net mirror](https://gwern.net/doc/statistics/decision/1994-benter.pdf); a very good annotated walkthrough with the exact equations: [Acta Machina](https://actamachina.com/posts/annotated-benter-paper).

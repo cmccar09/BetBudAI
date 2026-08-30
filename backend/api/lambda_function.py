@@ -1718,9 +1718,12 @@ def get_vegas_results(headers, event):
         # bet_ids, so a single unpaginated page can easily fill its 1MB limit
         # before ever reaching a Vegas record — silently returning zero
         # matches despite Vegas picks existing for the date. Must paginate.
+        # ELITE-only as of 2026-08-30 (STRONG -48.6% ROI, VALUE never stakeable) —
+        # filtered at the query so historical STRONG/VALUE rows drop out of every
+        # stat on this page immediately, not just new picks going forward.
         y_kwargs = {
             'KeyConditionExpression': _Key('bet_date').eq(yesterday),
-            'FilterExpression': _Attr('pick_type').eq('vegas'),
+            'FilterExpression': _Attr('pick_type').eq('vegas') & _Attr('benter_grade').eq('ELITE'),
         }
         y_resp = table.query(**y_kwargs)
         y_items = [decimal_to_float(i) for i in y_resp.get('Items', [])]
@@ -1766,14 +1769,15 @@ def get_vegas_results(headers, event):
 
         # Running ROI — all settled Vegas picks ever (level stakes)
         # Includes implicit losers: picks from past dates with no result_won attribute
+        _all_filter = _Attr('pick_type').eq('vegas') & _Attr('benter_grade').eq('ELITE')
         all_resp = table.scan(
-            FilterExpression=_Attr('pick_type').eq('vegas'),
+            FilterExpression=_all_filter,
             ProjectionExpression='result_won, outcome, odds, bet_date, benter_grade',
         )
         all_items = [decimal_to_float(i) for i in all_resp.get('Items', [])]
         while all_resp.get('LastEvaluatedKey'):
             all_resp = table.scan(
-                FilterExpression=_Attr('pick_type').eq('vegas'),
+                FilterExpression=_all_filter,
                 ProjectionExpression='result_won, outcome, odds, bet_date, benter_grade',
                 ExclusiveStartKey=all_resp['LastEvaluatedKey'],
             )
@@ -1850,7 +1854,8 @@ def get_vegas_learning(headers, event):
 
         # Scan all Vegas picks that have been settled by either writer —
         # legacy result_won bool, or the SL fast-results `outcome` string.
-        _settled_filter = _Attr('pick_type').eq('vegas') & (
+        # ELITE-only as of 2026-08-30 — see get_vegas_results for rationale.
+        _settled_filter = _Attr('pick_type').eq('vegas') & _Attr('benter_grade').eq('ELITE') & (
             _Attr('result_won').exists() | _Attr('outcome').exists()
         )
         resp = table.scan(FilterExpression=_settled_filter)
@@ -2155,31 +2160,23 @@ def get_vegas_picks(headers, event):
                              else 'STRONG' if value_ratio >= 1.5
                              else 'VALUE')
 
+                    # Vegas only tracks/surfaces ELITE now (2026-08-30) — STRONG was
+                    # -48.6% ROI over 28 races and VALUE was never stakeable anyway.
+                    # Cut here, before persistence, so nothing STRONG/VALUE graded
+                    # gets written to DynamoDB going forward. See vegas.md.
+                    if grade != 'ELITE':
+                        continue
+
                     # Build Benter advice note
                     odds_v = round(h['odds'], 2)
                     sc     = round(h['score'])
-                    if grade == 'ELITE':
-                        action = f"Back to win — {kelly_units}u stake (half-Kelly)."
-                        if odds_v > 12:
-                            action += " Long price: back consistently over a series, not just once."
-                        elif odds_v < 2.5:
-                            action += " Short price: confirm Betfair steam before placing."
-                        benter = ("Benter would back this. ELITE edge — model sees 2× what "
-                                  "the market prices. This is the core bet type his system was built on.")
-                    elif grade == 'STRONG':
-                        action = f"Back to win — {kelly_units}u stake."
-                        if odds_v > 10:
-                            action += " Long price: use smaller level-stakes unit if Kelly feels large."
-                        elif odds_v < 3:
-                            action += " Short price — reduce to 50% of Kelly if unsure."
-                        benter = ("Benter would back this. STRONG edge meets his minimum "
-                                  "divergence threshold. He would stake exactly as Kelly says — no rounding down.")
-                    else:
-                        half_k = max(1.0, round(kelly_units / 2, 1))
-                        action = f"Small stake only — {half_k}u max. Edge is narrow; watch first if possible."
-                        benter = ("Benter would flag but not act on VALUE grade alone. "
-                                  "Edge may be within softmax noise from partial field coverage. "
-                                  "Wait for STRONG/ELITE confirmation before staking.")
+                    action = f"Back to win — {kelly_units}u stake (half-Kelly)."
+                    if odds_v > 12:
+                        action += " Long price: back consistently over a series, not just once."
+                    elif odds_v < 2.5:
+                        action += " Short price: confirm Betfair steam before placing."
+                    benter = ("Benter would back this. ELITE edge — model sees 2× what "
+                              "the market prices. This is the core bet type his system was built on.")
 
                     if sc < 90:
                         benter += f" Score {sc} — some signals incomplete; treat as speculative."
@@ -2287,11 +2284,10 @@ def get_vegas_picks(headers, event):
         # day's combined recommended stake never exceeds DAILY_EXPOSURE_CAP units.
         # 2026-08-27: added after a 16-pick day asked for 185u combined — 14 of
         # those picks were already hitting the per-pick cap on their own.
-        # VALUE grade is excluded: it's "do not stake" (background tracking only,
-        # not shown on the page as of 2026-08-27), so it shouldn't eat into the
-        # exposure budget meant for picks subscribers actually act on.
+        # value_bets is ELITE-only as of 2026-08-30 (filtered above), so every
+        # entry here is stakeable — no grade exclusion needed any more.
         DAILY_EXPOSURE_CAP = 50.0
-        _stakeable = [vb for vb in value_bets if vb['benter_grade'] != 'VALUE']
+        _stakeable = value_bets
         _raw_total = round(sum(vb['kelly_units'] for vb in _stakeable), 1)
         daily_exposure_scaled = _raw_total > DAILY_EXPOSURE_CAP and _raw_total > 0
         if daily_exposure_scaled:
@@ -2365,8 +2361,7 @@ def get_vegas_picks(headers, event):
             vb['finish_position']     = (_rec or {}).get('finish_position')
             vb['result_winner_name']  = (_rec or {}).get('result_winner_name') or (_rec or {}).get('winner_name')
 
-        today_settled = [vb for vb in value_bets if vb['result_status'] in ('won', 'placed', 'lost')
-                          and vb['benter_grade'] != 'VALUE']
+        today_settled = [vb for vb in value_bets if vb['result_status'] in ('won', 'placed', 'lost')]
         today_summary = {
             'won':     sum(1 for vb in value_bets if vb['result_status'] == 'won'),
             'placed':  sum(1 for vb in value_bets if vb['result_status'] == 'placed'),
