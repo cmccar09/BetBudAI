@@ -132,10 +132,14 @@ FIRST_SCORERS = {
     'Arsenal':                  {'name': 'Bukayo Saka',             'odds': '9/2',  'note': 'Set-piece specialist · top Arsenal scorer'},
     'Liverpool':                {'name': 'Alexander Isak',          'odds': '9/4',  'note': 'Signed from Newcastle · clinical finisher · key man'},
     'Chelsea':                  {'name': 'Cole Palmer',             'odds': '7/2',  'note': 'Penalty taker · free-kick threat'},
-    # Source: ESPN (Højlund's permanent Napoli move confirmed 17 May 2026) +
-    # manutd.com (Sesko's own club page, confirms he kept #30 rather than take
-    # the vacated #9 after Højlund's exit) — verified 30 Aug 2026
-    'Manchester United':        {'name': 'Benjamin Sesko',          'odds': '4/1',  'note': "Højlund's permanent replacement · target man since 2025"},
+    # Source: sportinglife.com (Mbeumo "fancied" for 2026/27 Golden Boot) +
+    # confirmed Man Utd XI vs Ipswich Town 30 Aug 2026 (Rashford/Cunha/Mbeumo
+    # front three, no recognised striker) + strettynews.com/readmanutd.com
+    # (Sesko out since pre-season with a shin injury, still not involved) —
+    # verified 30 Aug 2026. Sesko was the previous pick here but he isn't in
+    # the matchday squad — being on the club's books isn't enough, he also
+    # has to be playing.
+    'Manchester United':        {'name': 'Bryan Mbeumo',            'odds': '7/2',  'note': 'Starting front three · Sesko out injured, no #9 in the XI'},
     'Tottenham Hotspur':        {'name': 'Heung-min Son',           'odds': '7/2',  'note': 'Consistent scorer · strong finisher'},
     # Source: ESPN (Isak's British-record move to Liverpool, referenced in
     # CLAUDE.md's verified 2026/27 facts) + footballfancast.com (Woltemade,
