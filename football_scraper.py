@@ -182,8 +182,8 @@ def predict_match(home, away):
     each other."""
     h_str = TEAM_STRENGTH.get(home, 65) + 5  # +5 home advantage
     a_str = TEAM_STRENGTH.get(away, 65)
-    lam_h = strength_to_avg_goals(h_str)
-    lam_a = strength_to_avg_goals(a_str)
+    lam_h = strength_to_avg_goals(h_str, a_str)
+    lam_a = strength_to_avg_goals(a_str, h_str)
 
     probs = {}
     p_home_win = p_draw = p_away_win = 0.0
@@ -209,17 +209,22 @@ def predict_match(home, away):
     btts_pct = calc_btts_prob(lam_h, lam_a)
     btts_yes = btts_pct >= 50
 
-    # Pick most likely score from scorelines that AGREE with BOTH the BTTS verdict
-    # and the predicted result. BTTS-agreement alone isn't enough: the single most
-    # probable joint (h, a) cell is very often a low draw score like 1-1 even when
-    # one side clearly leads on SUMMED win probability (e.g. away_win at 39.8% can
-    # still lose to a draw's 25.6% for the single most-likely-CELL vote, because
-    # away-win probability is spread thin across many cells — 0-1, 1-2, 0-2, 2-3...
-    # — no single one of which beats the 1-1 peak). Without this filter, "predicted
-    # result: away win" and "predicted score: 1-1" would both be true and directly
-    # contradict each other, which is exactly the bug this produced in practice
-    # (found 2026-08-28, e.g. Fulham 70 vs Chelsea 80 → away_win 39.8% yet the old
-    # logic picked 1-1 as the score shown right next to an AWAY WIN badge).
+    # Pick the scoreline CLOSEST to each team's own expected goals (naive rounding
+    # of lam_h/lam_a) among scorelines that agree with BOTH the BTTS verdict and
+    # the predicted result — not the single globally most-probable cell.
+    #
+    # Two distinct bugs lived here before this (found 2026-08-28 and 2026-08-30):
+    # picking the global argmax cell ignores how lopsided the actual match is.
+    # Poisson probability concentrates so heavily on low totals that (2,1)/(1,2)
+    # wins the argmax across almost any realistic PL lam_h/lam_a pair — a 57%
+    # confidence near-lock and a 40% confidence coin-flip both landed on the exact
+    # same "2-1" (found 2026-08-30), because the argmax barely moves with the
+    # actual gap between the teams. Anchoring on the naive expected-goals cell
+    # instead lets the shown score actually track lam_h/lam_a — a big favourite's
+    # higher lam_h pulls the score toward 3-0/3-1, a near-even match stays 1-1/2-1
+    # — while the closest-valid-cell search still guarantees the three outputs
+    # (score, BTTS, result) never contradict each other, which was the original
+    # 2026-08-28 bug (e.g. an away_win shown with a 1-1 scoreline).
     if result == 'home_win':
         result_ok = lambda s: s[0] > s[1]
     elif result == 'away_win':
@@ -230,17 +235,23 @@ def predict_match(home, away):
     #   BTTS Yes → both teams must score (h>0 AND a>0)
     #   BTTS No  → at least one team must get 0 (h=0 OR a=0)
     if btts_yes:
-        candidates = {s: p for s, p in probs.items() if s[0] > 0 and s[1] > 0 and result_ok(s)}
+        btts_ok = lambda s: s[0] > 0 and s[1] > 0
     else:
-        candidates = {s: p for s, p in probs.items() if (s[0] == 0 or s[1] == 0) and result_ok(s)}
+        btts_ok = lambda s: s[0] == 0 or s[1] == 0
 
+    candidates = {s: p for s, p in probs.items() if result_ok(s) and btts_ok(s)}
     # Practically always non-empty within a 6x6 grid (e.g. home_win+BTTS-No has
     # (1,0); home_win+BTTS-Yes has (2,1); same pattern for away_win/draw), but
     # fall back to result-only agreement, then a sane default, just in case.
     if not candidates:
         candidates = {s: p for s, p in probs.items() if result_ok(s)}
+
     if candidates:
-        best_score = max(candidates, key=candidates.get)
+        naive_h, naive_a = round(lam_h), round(lam_a)
+        best_score = min(
+            candidates,
+            key=lambda s: (abs(s[0] - naive_h) + abs(s[1] - naive_a), -candidates[s]),
+        )
     else:
         best_score = (1, 0) if result == 'home_win' else (0, 1) if result == 'away_win' else (0, 0)
 
@@ -528,12 +539,23 @@ def calc_team_stats(standings):
     return stats
 
 
-def strength_to_avg_goals(strength):
-    """Map team strength (51–96) to expected goals scored per game.
+def strength_to_avg_goals(strength, opponent_strength=None):
+    """Map team strength (51-96) to expected goals scored per game.
 
-    Calibrated to PL averages: elite clubs ~1.8-2.0, mid-table ~1.1-1.3, promoted ~0.7-0.9.
+    Base rate calibrated to PL averages: elite clubs ~1.8-2.0, mid-table ~1.1-1.3,
+    promoted ~0.7-0.9. Without `opponent_strength` this is opponent-blind — Liverpool's
+    expected goals would be identical whether they're playing Forest or Man City,
+    which is exactly why predicted scores used to converge on the same "2-1" for
+    every fixture regardless of how lopsided the actual matchup was (found
+    2026-08-30). When `opponent_strength` is given, scale the base rate by the
+    strength gap: a weaker opponent's defense concedes more, a stronger one concedes
+    less. Capped so this adjusts rather than dominates the base attacking rate.
     """
-    return round(0.7 + max(strength - 51, 0) * 0.025, 2)
+    base = 0.7 + max(strength - 51, 0) * 0.025
+    if opponent_strength is not None:
+        gap = strength - opponent_strength
+        base *= max(0.4, min(2.3, 1 + gap / 70))
+    return round(base, 2)
 
 
 def calc_btts_prob(avg_home_for, avg_away_for):
