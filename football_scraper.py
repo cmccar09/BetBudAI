@@ -745,6 +745,12 @@ def update_prediction_history(all_fixtures):
             continue
 
         if entry.get('actual_recorded'):
+            # One-time backfill: entries graded before miss analysis existed
+            # (2026-08-30) won't have it yet. Only ADDS the analysis field —
+            # never touches the actual grading, which stays immutable.
+            if not entry.get('score_correct', True) and 'miss_analysis' not in entry:
+                entry['miss_analysis'] = _analyze_score_miss(entry, entry['home'], entry['away'])
+                changed = True
             continue
 
         hs, aws_ = fx.get('home_score'), fx.get('away_score')
@@ -761,9 +767,89 @@ def update_prediction_history(all_fixtures):
                 'btts_correct':   (entry['pred_btts_pct'] >= 50) == actual_btts,
                 'actual_recorded': True,
             })
+            if not entry['score_correct']:
+                entry['miss_analysis'] = _analyze_score_miss(entry, home, away)
             changed = True
 
     return history, changed
+
+
+def _analyze_score_miss(entry, home, away):
+    """Explain WHY a wrong score prediction was wrong, not just that it was.
+
+    Two very different kinds of miss, and only one of them is actionable:
+      - 'right_result_wrong_margin': picked the correct side, exact goals off.
+        Expected noise — even a good model rarely nails the exact scoreline.
+        Nothing to adjust for.
+      - 'wrong_result': picked the wrong side entirely. This is the real
+        signal — it means TEAM_STRENGTH mis-rated one or both teams for this
+        matchup. Identifies which team outperformed the model's expectation
+        (the one whose actual goal margin exceeded what was predicted) so a
+        recurring pattern is visible for the next TEAM_STRENGTH review.
+    """
+    ph, pa = map(int, entry['pred_score'].split('-'))
+    ah, aa = map(int, entry['actual_score'].split('-'))
+    pred_margin, actual_margin = ph - pa, ah - aa
+
+    if entry['result_correct']:
+        return {
+            'miss_type': 'right_result_wrong_margin',
+            'note': (f"Correctly backed {entry['pred_result'].replace('_', ' ')} but the margin was off "
+                     f"({entry['pred_score']} predicted vs {entry['actual_score']} actual) - normal variance, not a strength-rating issue."),
+        }
+
+    # Wrong side entirely — work out which team beat its expected margin.
+    surprised_team, flat_team = (home, away) if actual_margin > pred_margin else (away, home)
+    return {
+        'miss_type':       'wrong_result',
+        'confident_miss':  entry['pred_confidence'] >= 60,
+        'predicted':       f"{entry['pred_result']} ({entry['pred_score']}, {entry['pred_confidence']}% conf)",
+        'actual':          f"{entry['actual_result']} ({entry['actual_score']})",
+        'margin_error':    actual_margin - pred_margin,
+        'surprised_team':  surprised_team,
+        'underrated_team': flat_team,
+        'note': (f"Backed {entry['pred_result'].replace('_', ' ')} at {entry['pred_confidence']}% confidence - "
+                 f"{surprised_team} outperformed what TEAM_STRENGTH expected of them."),
+    }
+
+
+def update_team_strength_signals(history):
+    """Aggregate wrong-RESULT misses (not margin-only misses — those are
+    expected noise) by team, so a recurring "this team keeps beating our
+    rating" pattern is visible for the next manual TEAM_STRENGTH review
+    instead of being buried inside individual fixture history entries.
+
+    Deliberately NOT automatic — a team surprising the model twice isn't
+    enough evidence to safely auto-adjust a live scoring input, and an
+    ungoverned feedback loop nudging its own strength ratings from its own
+    recent misses is exactly the kind of thing that quietly drifts wrong
+    without anyone noticing. This surfaces the signal; a human still decides
+    whether to act on it during the weekly TEAM_STRENGTH review.
+    """
+    tracker = {}
+    for entry in history.values():
+        ma = entry.get('miss_analysis')
+        if not ma or ma.get('miss_type') != 'wrong_result':
+            continue
+        surprised, flat = ma['surprised_team'], ma['underrated_team']
+        tracker.setdefault(surprised, {'overperformed': 0, 'underperformed': 0, 'recent_notes': []})
+        tracker.setdefault(flat, {'overperformed': 0, 'underperformed': 0, 'recent_notes': []})
+        tracker[surprised]['overperformed'] += 1
+        tracker[flat]['underperformed'] += 1
+        tracker[surprised]['recent_notes'].append(f"{entry['date'][:10]}: {ma['note']}")
+
+    review = []
+    for team, t in tracker.items():
+        net = t['overperformed'] - t['underperformed']
+        if abs(net) >= 2:
+            review.append({
+                'team':         team,
+                'net_surprises': net,
+                'suggestion':   'consider raising TEAM_STRENGTH' if net > 0 else 'consider lowering TEAM_STRENGTH',
+                'recent_notes': t['recent_notes'][-3:],
+            })
+
+    return tracker, review
 
 
 def compute_learning_summary(history):
@@ -791,12 +877,19 @@ def compute_learning_summary(history):
                 'actual_hit_rate':         round(100 * sum(1 for e in b if e['result_correct']) / len(b), 1),
             })
 
+    misses = [e for e in scored if not e.get('score_correct') and e.get('miss_analysis')]
+    misses.sort(key=lambda e: e['date'], reverse=True)
+
     return {
         'n':                   n,
         'result_accuracy_pct': result_acc,
         'score_accuracy_pct':  score_acc,
         'btts_accuracy_pct':   btts_acc,
         'calibration_bands':   bands,
+        'recent_misses': [
+            {'home': e['home'], 'away': e['away'], 'date': e['date'], **e['miss_analysis']}
+            for e in misses[:10]
+        ],
     }
 
 
@@ -804,6 +897,8 @@ def run_learning_loop(all_fixtures):
     """Call once per scraper run. Returns the learning summary dict."""
     history, changed = update_prediction_history(all_fixtures)
     summary = compute_learning_summary(history)
+    _tracker, teams_to_review = update_team_strength_signals(history)
+    summary['teams_to_review'] = teams_to_review
     if changed:
         save('PL_PREDICTION_HISTORY', {'entries': history})
     save('PL_LEARNING', summary)
