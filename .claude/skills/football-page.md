@@ -196,6 +196,16 @@ import FootballPage from './pages/football/FootballPage';
 # Source: Transfermarkt 2026/27 squad page, verified 21 Aug 2026
 ```
 
+### Cross-check 3+ independent sources before writing a fixture or result (added 2026-08-30)
+
+One source citing a fact isn't verification — it's a single point of failure. **Before writing any `completed: True` result or any fixture date/time into `STATIC_PL_FIXTURES`, check at least 3 independent sources and confirm they agree** (e.g. ESPN + Sky Sports + one of BBC Sport/FotMob/a direct match-report search). A single search result returning a score is not enough to write it as fact.
+
+**Why this matters, concretely**: cross-checking a "final score" for Sunderland vs Fulham (30 Aug 2026) turned up **three different scores across three separate searches — 0-1, 1-0, then 3-1**. The root cause: search results kept silently conflating this fixture with a completely different Sunderland-Fulham match from **22 February 2026** (the previous season) — same two clubs, wrong date, but nothing in a single search result flagged that. One source alone would have shipped a confidently-wrong "final score" with a citation that looked perfectly legitimate.
+
+**The specific trap to watch for**: two clubs play each other at least twice a season (home and away), sometimes more with cup fixtures, across multiple seasons of search-indexed history. A query like `"Sunderland" "Fulham" result` has no date anchor, so it happily returns the most prominent/recent-looking match between those two names regardless of which season it's from. **Always include the exact date in the search query**, and when reading the result, explicitly check the date mentioned in the source matches the fixture you're verifying — not just the two team names.
+
+**When sources disagree, don't average or guess — don't write anything.** Leave the fixture `completed: False` and try again later (scores don't become less available with time; a contested result now is a checkable one tomorrow). Writing a plausible-looking wrong score is worse than showing no score at all — it's indistinguishable from a correct one until someone notices the contradiction, same as any other truth-on-null violation.
+
 ## First Goalscorer rule — always verify before tipping
 
 **Never tip a first goalscorer without confirming they are in the starting XI (or at minimum named in the squad) for that specific match.**
@@ -355,7 +365,7 @@ Fixtures are **not** scraped live (ESPN blocks AWS Lambda IPs). The `STATIC_PL_F
 
 **Each game week, before the first kick-off:**
 
-1. Go to Sky Sports or FotMob and verify the next game week's fixtures (dates, times, home/away). **Count them — a full gameweek is 10 fixtures / 20 teams.** A source that only surfaces the TV-selected matches (5-6 of them) will look complete enough to stop searching at; it isn't.
+1. Verify the next game week's fixtures (dates, times, home/away) against **at least 3 independent sources** — e.g. Sky Sports + FotMob + a Google fixtures search (BBC Sport and ESPN also work). See "Cross-check 3+ independent sources" above for why one source isn't enough, especially for results (dated match reports get conflated with earlier meetings between the same two clubs). **Count them — a full gameweek is 10 fixtures / 20 teams.** A source that only surfaces the TV-selected matches (5-6 of them) will look complete enough to stop searching at; it isn't.
 2. Add the new fixtures to `STATIC_PL_FIXTURES` — one dict per match with `id`, `date` (ISO 8601 UTC), `home`, `away`, `completed: False`.
 3. Mark any finished matches `completed: True` and add `home_score` / `away_score`.
 4. Re-deploy the scraper Lambda so DynamoDB (`PL_WEEKLY_BETS`) reflects the new data:
