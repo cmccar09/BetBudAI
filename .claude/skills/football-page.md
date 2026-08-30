@@ -320,6 +320,16 @@ Same idea as the Vegas skill's mission — "every settled pick is data, use it" 
 1. **Snapshot on first sight.** The first time a fixture from `STATIC_PL_FIXTURES` is seen *not yet completed*, its current `predict_match()` output (result, score, confidence, BTTS%) is saved into `PL_PREDICTION_HISTORY`, keyed by fixture `id`. This has to happen before kickoff — recomputing the prediction after the fact would use *today's* `TEAM_STRENGTH` values, not whatever was actually shown to subscribers before the match. A history entry is written once and never touched again until it's scored.
 2. **Backfill on completion.** Once `STATIC_PL_FIXTURES` marks that same fixture `completed: True` with scores (per the weekly update cadence below), the loop fills in the actual result/score/BTTS and scores the snapshot: `result_correct`, `score_correct`, `btts_correct`. A fixture is graded exactly once — `actual_recorded: True` locks it.
 3. **Summary.** `compute_learning_summary()` aggregates all scored entries into `PL_LEARNING`: overall result/score/BTTS accuracy %, plus calibration bands (predicted-confidence bucket → actual hit rate) in 10-point bands from 50% up. Exposed as `pl_learning` in `GET /api/sports/football`.
+4. **Miss analysis (added 2026-08-30).** Every time a prediction's exact score is wrong, `_analyze_score_miss()` explains why, split into two very different cases:
+   - **`right_result_wrong_margin`** — backed the correct side, exact goals off. This is expected noise (even a good model rarely nails the exact scoreline) — no team attribution, nothing to act on.
+   - **`wrong_result`** — backed the wrong side entirely. This is the real signal. Identifies which team **outperformed what `TEAM_STRENGTH` expected of them** (the side whose actual goal margin beat the predicted margin), because that's what a mis-rated strength value looks like in practice.
+
+   `update_team_strength_signals()` aggregates `wrong_result` misses by team across all of history. A team that's recurred with a net 2+ surprises in one direction (overperforming or underperforming its rating) shows up in `pl_learning.teams_to_review` with a suggested direction — `consider raising TEAM_STRENGTH` or `consider lowering TEAM_STRENGTH` — plus the 3 most recent notes explaining each surprise.
+
+   **This is deliberately not automatic.** The loop surfaces the pattern; it does not touch `TEAM_STRENGTH` itself. Two or three surprises isn't enough evidence to safely auto-adjust a live scoring input, and a loop that nudges its own strength ratings from its own recent misses is exactly the kind of thing that quietly drifts wrong without anyone noticing — same governance call the Vegas skill makes for `ALPHA`/`BETA` (computed signal informs a human decision, not an automatic parameter change). **Check `teams_to_review` as part of the weekly fixture update below, before touching `TEAM_STRENGTH` for any other reason** — if a team's already flagged, that's real evidence to weigh alongside whatever prompted the look in the first place.
+   ```bash
+   curl -s https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com/api/sports/football | python3 -c "import json,sys; d=json.load(sys.stdin)['pl_learning']; print('teams_to_review:', d.get('teams_to_review')); print('recent_misses:', d.get('recent_misses'))"
+   ```
 
 **Why it always uses `STATIC_PL_FIXTURES`, never live ESPN data**, even when ESPN fixtures are what's shown elsewhere on the page: ESPN's fixture `id`s and the static list's `id`s (the `g<gameweek>f<fixture_number>` convention) are different namespaces. Mixing sources between runs would fork the same real-world fixture into two history entries under two different IDs. The static list's IDs are stable by convention (see "Fixture ID convention" below), so the loop always reads from there regardless of what's live elsewhere.
 
@@ -353,6 +363,7 @@ Fixtures are **not** scraped live (ESPN blocks AWS Lambda IPs). The `STATIC_PL_F
    aws lambda invoke --function-name football-scraper --payload '{}' --region eu-west-1 /tmp/out.json
    ```
 5. The Fixtures tab on the site reads from `pl_weekly_bets` (set by the scraper) — no frontend rebuild needed unless the UI changes.
+6. **Check `pl_learning.teams_to_review`** (step 4 of the daily learning loop above) before moving on. A flagged team means it's genuinely been surprising `TEAM_STRENGTH`'s rating across multiple results, not just this one — worth weighing when you next touch that team's strength value for any reason.
 
 **Fixture ID convention:** `g<gameweek>f<fixture_number>` — e.g. `g2f1` for GW2 fixture 1. Keep IDs stable once set (they link bets to fixtures).
 
