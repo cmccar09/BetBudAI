@@ -12,6 +12,7 @@ import NFLPage from './pages/nfl/NFLPage';
 import DartsPage from './pages/darts/DartsPage';
 import GAAPage from './pages/gaa/GAAPage';
 import PredictionMarketsPage from './pages/prediction-markets/PredictionMarketsPage';
+import VegasPage from './pages/vegas/VegasPage';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL ||
   'https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com';
@@ -777,6 +778,7 @@ function App() {
         { key:'picks5',    label:'Daily Picks',      emoji:'🏆' },
         { key:'punchestown', label:'Featured Meeting', emoji:'🐎' },
         { key:'laythe',    label:'Favourite Watch',   emoji:'🏇' },
+        { key:'vegas',     label:'Vegas',             emoji:'🎰' },
         { key:'darts',     label:'Darts',             emoji:'🎯' },
         { key:'gaa',       label:'Cork GAA',          emoji:'🏐' },
         { key:'football',  label:'Football',          emoji:'⚽' },
@@ -935,6 +937,7 @@ function App() {
           { key:'picks5',    label:'Daily Picks',      emoji:'🏆', sub:'4+ tips daily — free',       gated: false, tierRequired: null },
           { key:'punchestown', label:'Featured Meet', emoji:'🐎', sub:'Race card analysis — free', gated: false, tierRequired: null },
           { key:'laythe',    label:'Favourite Watch',      emoji:'🏇', sub:'Vulnerable Favorites', gated: false, tierRequired: null },
+          { key:'vegas',     label:'Vegas',            emoji:'🎰', sub:'Benter value picks — free',    gated: false, tierRequired: null },
           { key:'darts',     label:'Darts',            emoji:'🎯', sub:'PDC majors — free',           gated: false, tierRequired: null },
           { key:'gaa',       label:'GAA',              emoji:'🏐', sub:'Club championships — free',   gated: false, tierRequired: null },
           { key:'football',  label:'Football',          emoji:'⚽', sub:'PL · UCL · EL predictions — free', gated: false, tierRequired: null },
@@ -1005,6 +1008,7 @@ function App() {
             { key:'picks',    tierRequired: null, component: () => <Top5PicksView isAuthenticated={isAuthenticated} onSignUp={() => navigateToPage('home', { destination: 'home' })} /> },
             { key:'picks5',   tierRequired: null, component: () => <Top5PicksView isAuthenticated={isAuthenticated} onSignUp={() => navigateToPage('home', { destination: 'home' })} /> },
             { key:'laythe',   tierRequired: null, component: () => <LayTheFavView isAuthenticated={isAuthenticated} onSignUp={() => navigateToPage('home', { destination: 'home' })} /> },
+            { key:'vegas',    tierRequired: null, component: () => <VegasPage /> },
             { key:'darts',    tierRequired: null, component: () => <DartsPage /> },
             { key:'gaa',      tierRequired: null, component: () => <GAAPage /> },
             { key:'football', tierRequired: null, component: () => <FootballPage /> },
@@ -2978,6 +2982,7 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                         {pick.horse || 'Unknown'}
                         {pick.is_hot_prospect && <span style={{ background:'linear-gradient(135deg,#dc2626,#f59e0b)', color:'white', fontSize:'10px', fontWeight:'800', padding:'2px 8px', borderRadius:'5px', marginLeft:'8px', verticalAlign:'middle', letterSpacing:'0.5px' }}>🔥 HOT PROSPECT</span>}
                         {pick.pick_type === 'watchlist' && <span style={{ background:'linear-gradient(135deg,#1d4ed8,#2563eb)', color:'white', fontSize:'10px', fontWeight:'800', padding:'2px 8px', borderRadius:'5px', marginLeft:'8px', verticalAlign:'middle', letterSpacing:'0.5px' }}>👀 WATCHLIST</span>}
+                        {(pick.warnings||[]).some(w=>w.startsWith('BEST_AVAILABLE')) && <span style={{ background:'linear-gradient(135deg,#0369a1,#0284c7)', color:'white', fontSize:'10px', fontWeight:'800', padding:'2px 8px', borderRadius:'5px', marginLeft:'8px', verticalAlign:'middle', letterSpacing:'0.5px' }}>⭐ BEST AVAILABLE</span>}
                       </div>
                       <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', marginTop:'6px', alignItems:'center' }}>
                         {pick.course && <span style={{ background:'#1e3a5f', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'700' }}>{pick.course}</span>}
@@ -6044,35 +6049,6 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
           </div>
         </div>
 
-        {/* ELITE LAY FILTER — standalone proven stats */}
-        <div style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.18),rgba(168,85,247,0.08))', border:'2px solid rgba(167,139,250,0.5)', borderRadius:'14px', padding: isMobile ? '16px' : '20px 24px', marginBottom:'18px' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'14px', flexWrap:'wrap' }}>
-            <span style={{ width:'8px', height:'8px', borderRadius:'50%', background:'#a78bfa', boxShadow:'0 0 6px #a78bfa', display:'inline-block' }}></span>
-            <span style={{ fontSize:'11px', fontWeight:'800', letterSpacing:'1.5px', textTransform:'uppercase', color:'#c4b5fd' }}>⭐ Elite Lay Filter · Score 13+ · Odds 2.0–2.5 (Evens–6/4)</span>
-          </div>
-          <div style={{ display:'flex', flexWrap:'wrap', gap: isMobile ? '14px' : '28px', marginBottom:'12px' }}>
-            <div>
-              <div style={{ fontSize: isMobile ? '30px' : '38px', fontWeight:'900', color:'#34d399', lineHeight:1 }}>+7.7%</div>
-              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>ROI · proven over 984 races</div>
-            </div>
-            <div>
-              <div style={{ fontSize: isMobile ? '20px' : '26px', fontWeight:'800', color:'#fbbf24', lineHeight:1 }}>60%</div>
-              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Lay win rate</div>
-            </div>
-            <div>
-              <div style={{ fontSize: isMobile ? '20px' : '26px', fontWeight:'800', color:'white', lineHeight:1 }}>80+</div>
-              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Qualifying races analysed</div>
-            </div>
-            <div>
-              <div style={{ fontSize: isMobile ? '20px' : '26px', fontWeight:'800', color:'#a78bfa', lineHeight:1 }}>+6.2pts</div>
-              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>Profit on 80pts staked</div>
-            </div>
-          </div>
-          <div style={{ fontSize:'10px', color:'rgba(167,139,250,0.55)', lineHeight:1.5 }}>
-            Data-proven filter from 984 settled lay records. Score ≥13, odds 2.0–2.5 only. All qualifying lays logged pre-race — no cherry-picking.
-          </div>
-        </div>
-
         {/* VIP ROLLERS ELITE LAY FILTER */}
         {vipElite.length > 0 && (
           <div style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.18),rgba(168,85,247,0.08))', border:'2px solid rgba(167,139,250,0.5)', borderRadius:'14px', padding: isMobile ? '14px' : '18px 22px', marginBottom:'22px' }}>
@@ -6153,34 +6129,49 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
         </div>
       </div>
 
-      {/* Weekly recap card */}
-      {dailyHistory.length > 0 && (() => {
-        const week = dailyHistory.slice(0, 7);
-        const wkSelections = week.reduce((a, d) => a + ((d.summary || {}).settled || 0), 0);
-        const wkWins      = week.reduce((a, d) => a + ((d.summary || {}).fav_lost || 0), 0);
-        const wkLosers    = wkSelections - wkWins;
-        const wkPct       = wkSelections > 0 ? Math.round((wkWins / wkSelections) * 100) : null;
-        const newestDate  = week[0]?.date || '';
-        const oldestDate  = week[week.length - 1]?.date || '';
+      {/* Elite Lay Record — season running total (score 13+, odds 2.0–2.5).
+          NOTE: totalW/totalR source from elite_fav_lost/elite_settled (not the old
+          fav_lost/settled 7+ tier) so this card actually matches its own "Score 13+ ·
+          Odds 2.0–2.5" label — see _elite_stats_from_races in backend/api/lambda_function.py.
+          Historical days that predate elite-tier tracking are backfilled server-side in
+          _load_lay_history from their stored races_settled, so this is real data. */}
+      {(() => {
+        // Season starts 2026-08-22 (fresh tracker)
+        const SEASON_START = '2026-08-22';
+        const seasonDays   = dailyHistory.filter(d => (d.date || '') >= SEASON_START);
+        const totalW  = seasonDays.reduce((a, d) => a + ((d.summary || {}).elite_fav_lost  || 0), 0);
+        const totalR  = seasonDays.reduce((a, d) => a + ((d.summary || {}).elite_settled   || 0), 0);
+        const totalL  = totalR - totalW;
+        const winPct  = totalR > 0 ? Math.round((totalW / totalR) * 100) : null;
+        const pctColor = winPct == null ? '#94a3b8' : winPct >= 55 ? '#34d399' : winPct >= 45 ? '#fbbf24' : '#f87171';
         return (
-          <div style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.18),rgba(34,211,238,0.08))', border:'1.5px solid rgba(167,139,250,0.4)', borderRadius:'14px', padding: isMobile ? '14px' : '16px 22px', marginBottom:'14px' }}>
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'6px', marginBottom:'12px' }}>
-              <div style={{ fontSize:'11px', fontWeight:'800', letterSpacing:'1.2px', textTransform:'uppercase', color:'#a78bfa' }}>📊 Weekly Lay Recap</div>
-              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)' }}>{oldestDate} – {newestDate}</div>
+          <div style={{ background:'linear-gradient(135deg,rgba(52,211,153,0.08),rgba(124,58,237,0.12))', border:'1.5px solid rgba(52,211,153,0.3)', borderRadius:'14px', padding: isMobile ? '14px' : '16px 22px', marginBottom:'14px' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'6px', marginBottom:'14px' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+                <span style={{ fontSize:'15px' }}>🎯</span>
+                <span style={{ fontSize:'12px', fontWeight:'800', letterSpacing:'1px', textTransform:'uppercase', color:'#34d399' }}>Elite Lay Record</span>
+                <span style={{ fontSize:'10px', padding:'2px 7px', borderRadius:'4px', background:'rgba(52,211,153,0.15)', color:'rgba(52,211,153,0.8)', fontWeight:'700' }}>Score 13+ · Odds 2.0–2.5</span>
+              </div>
+              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.4)' }}>Season 2026/27</div>
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'10px', textAlign:'center' }}>
               {[
-                { val: wkSelections, lbl: 'Selections', c: '#c4b5fd' },
-                { val: wkWins,       lbl: 'Wins',       c: '#34d399' },
-                { val: wkLosers,     lbl: 'Losers',     c: '#f87171' },
-                { val: wkPct != null ? `${wkPct}%` : '—', lbl: 'Lay Win %', c: '#22d3ee' },
+                { val: totalR  > 0 ? totalR  : '—', lbl: 'Lays Taken', c: '#c4b5fd' },
+                { val: totalW  > 0 ? totalW  : '—', lbl: 'Wins',       c: '#34d399' },
+                { val: totalL  > 0 ? totalL  : '—', lbl: 'Losses',     c: '#f87171' },
+                { val: winPct != null ? `${winPct}%` : '—', lbl: 'Win Rate', c: pctColor },
               ].map(s => (
                 <div key={s.lbl}>
-                  <div style={{ fontSize: isMobile ? '22px' : '28px', fontWeight:'800', color:s.c, lineHeight:1 }}>{s.val}</div>
-                  <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'4px' }}>{s.lbl}</div>
+                  <div style={{ fontSize: isMobile ? '24px' : '30px', fontWeight:'900', color:s.c, lineHeight:1 }}>{s.val}</div>
+                  <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.45)', marginTop:'5px' }}>{s.lbl}</div>
                 </div>
               ))}
             </div>
+            {totalR === 0 && (
+              <div style={{ textAlign:'center', marginTop:'12px', fontSize:'12px', color:'rgba(255,255,255,0.35)' }}>
+                Fresh tracker — results will appear as elite lays settle today
+              </div>
+            )}
           </div>
         );
       })()}
@@ -6211,15 +6202,14 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
             // On mobile, blob+a.click() is blocked — use window.open for API routes,
             // and for local data build a data URI which opens in a new tab.
             if (dailyHistory.length > 0) {
-              const rows = [['date','total','settled','fav_lost','lay_win_pct']];
+              const rows = [['date','elite_selections','elite_wins','elite_lay_win_pct']];
               dailyHistory.forEach(day => {
                 const s = day.summary || {};
                 rows.push([
                   day.date || '',
-                  s.total || 0,
-                  s.settled || 0,
-                  s.fav_lost || 0,
-                  s.lay_win_pct != null ? s.lay_win_pct : ''
+                  s.elite_settled || 0,
+                  s.elite_fav_lost || 0,
+                  s.elite_lay_win_pct != null ? s.elite_lay_win_pct : ''
                 ]);
               });
               const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');

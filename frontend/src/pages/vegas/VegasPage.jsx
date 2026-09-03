@@ -316,6 +316,21 @@ export default function VegasPage() {
         </div>
       </div>
 
+      {/* Paused banner — shown whenever the API reports Vegas ELITE picks are paused */}
+      {data?.vegas_paused && (
+        <div style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.35)', borderRadius: 10, padding: isMobile ? '16px' : '18px 22px', marginBottom: 24, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+          <span style={{ fontSize: 22, flexShrink: 0, lineHeight: 1 }}>⏸️</span>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#fbbf24', fontFamily: 'monospace', letterSpacing: '0.06em', marginBottom: 6 }}>
+              PAUSED FOR RECALIBRATION
+            </div>
+            <p style={{ fontSize: 12.5, color: 'rgba(226,232,240,0.75)', lineHeight: 1.7, margin: 0 }}>
+              {data.vegas_paused_message || 'Vegas ELITE picks are paused for recalibration — new picks are not being published while the underlying model is rebuilt. The historical record below is unaffected.'}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Yesterday's results summary + running ROI */}
       {results && (
         <div style={{ marginBottom: 20 }}>
@@ -537,11 +552,15 @@ export default function VegasPage() {
       {/* No value bets */}
       {!loading && !error && data && data.value_bets?.length === 0 && (
         <div style={{ background: 'rgba(30,41,69,0.7)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '40px 24px', textAlign: 'center' }}>
-          <div style={{ fontSize: 28, marginBottom: 12 }}>🎰</div>
-          <div style={{ fontSize: 14, color: '#e2e8f0', fontFamily: 'monospace', marginBottom: 6 }}>No Value Bets Today</div>
+          <div style={{ fontSize: 28, marginBottom: 12 }}>{data.vegas_paused ? '⏸️' : '🎰'}</div>
+          <div style={{ fontSize: 14, color: '#e2e8f0', fontFamily: 'monospace', marginBottom: 6 }}>
+            {data.vegas_paused ? 'Vegas Selections Paused' : 'No Value Bets Today'}
+          </div>
           <div style={{ fontSize: 12, color: 'rgba(226,232,240,0.45)' }}>
-            The market has already priced in today's picks — no meaningful edge found.
-            {data.races_analysed > 0 && ` (${data.races_analysed} races analysed)`}
+            {data.vegas_paused
+              ? 'No new picks are being published while the model is recalibrated — see the note above.'
+              : <>The market has already priced in today's picks — no meaningful edge found.
+                {data.races_analysed > 0 && ` (${data.races_analysed} races analysed)`}</>}
           </div>
         </div>
       )}

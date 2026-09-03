@@ -1181,6 +1181,23 @@ def analyze_and_save_all(force_reanalyse: bool = False):
     _extended_candidates.sort(key=lambda x: (-x[0], -x[1], x[2]))
     _extended_picks = [r for _, _, _, r in _extended_candidates[:_MAX_EXT_PICKS]]
 
+    # ── FALLBACK: always give subscribers at least 1 tip ─────────────────────
+    # If no main pick passed the quality gates, promote the best extended
+    # candidate so the UI never shows an empty card. Labelled BEST_AVAILABLE
+    # so the UI can show a different confidence badge.
+    if not top_picks and _extended_picks:
+        _fb = _extended_picks[0]
+        top_picks.append(_fb)
+        top_bet_ids[_fb['best']['item']['bet_id']] = 1
+        _selection_rank_scores[_fb['best']['item']['bet_id']] = _pre_cap_score(_fb)
+        _extended_picks = _extended_picks[1:]
+        print(f"\n  [BEST AVAILABLE] No qualifying picks today — promoting "
+              f"{_fb['best']['horse']} (score={_fb['best']['score']:.0f} "
+              f"@{float(_fb['best'].get('odds',0)):.2f}) as best-of-day pick")
+        _fb['best']['item'].setdefault('warnings', []).append(
+            'BEST_AVAILABLE: No qualifying selections today — highest-scoring candidate promoted.'
+        )
+
     _extended_bet_ids = {r['best']['item']['bet_id'] for r in _extended_picks}
     if _extended_picks:
         print("── EXTENDED DAILY PICKS (all odds, all courses) ──────────────────────")

@@ -1677,6 +1677,29 @@ def get_punchestown_tomorrow_picks(headers, event):
             'body': json.dumps({'success': False, 'error': str(e)})
         }
 
+# PAUSED 2026-09-01 — a race-conditional MLE refit of ALPHA/BETA against 212 real
+# races / 1,317 scored horses (2026-08-25..31, via the `learning`-type records'
+# all_horses + result_winner_name) found ALPHA's 95%-CI upper bound is 0.08, not
+# 1.0 — the hand-tuned score shows no cross-validated predictive value beyond
+# market price at current weights (matches the earlier model_value_add=-0.0834
+# finding on 42 picks, now confirmed on ~10x more data). Backtesting the
+# honestly-fit weights through the real selection logic (score>=80, MIN_EDGE,
+# value_ratio>=2.0, one-pick-per-race) produced ZERO qualifying ELITE picks —
+# max value_ratio across all 1,317 observations was 1.04, nowhere near the 2.0
+# bar. Single source of truth for all three /api/vegas* endpoints so the
+# "paused" state can't drift out of sync between them. Do not flip this back to
+# False without re-reading vegas.md's 2026-09-01 entry and getting sign-off.
+VEGAS_PAUSED = True
+VEGAS_PAUSE_MESSAGE = (
+    "Vegas ELITE picks are paused for recalibration. A statistical check found "
+    "the model's edge-detection weights weren't earning their keep over just "
+    "trusting the market price — so we've stopped publishing new picks rather "
+    "than keep shipping picks we can't stand behind. Historical record below is "
+    "unaffected. We're rebuilding the underlying scoring model before this "
+    "comes back."
+)
+
+
 def _vegas_result_won(p):
     """Normalize a Vegas pick's settlement into a win/not-win bool, or None if unsettled.
 
@@ -1816,6 +1839,8 @@ def get_vegas_results(headers, event):
             'headers': headers,
             'body': json.dumps({
                 'success': True,
+                'vegas_paused': VEGAS_PAUSED,
+                'vegas_paused_message': VEGAS_PAUSE_MESSAGE if VEGAS_PAUSED else None,
                 'yesterday': {
                     'date':      yesterday,
                     'picks':     yesterday_picks,
@@ -1878,6 +1903,8 @@ def get_vegas_learning(headers, event):
                 'statusCode': 200,
                 'headers': headers,
                 'body': json.dumps({'success': True, 'settled_count': 0,
+                                    'vegas_paused': VEGAS_PAUSED,
+                                    'vegas_paused_message': VEGAS_PAUSE_MESSAGE if VEGAS_PAUSED else None,
                                     'message': 'No settled Vegas picks yet — check back after races run.'}),
             }
 
@@ -1984,6 +2011,8 @@ def get_vegas_learning(headers, event):
             'headers': headers,
             'body': json.dumps({
                 'success':       True,
+                'vegas_paused':  VEGAS_PAUSED,
+                'vegas_paused_message': VEGAS_PAUSE_MESSAGE if VEGAS_PAUSED else None,
                 'settled_count': n,
                 'wins':          len(wins),
                 'overall_wr':    overall_wr,
@@ -2038,6 +2067,9 @@ def get_vegas_picks(headers, event):
     GAMMA   = 0.81  # Harville win bias correction (Benter 1994)
     DELTA   = 0.65  # Harville place bias correction
     MIN_EDGE = 0.10  # minimum 10% edge over market to qualify as a value bet
+    # VEGAS_PAUSED / VEGAS_PAUSE_MESSAGE: module-level, see definition above
+    # _vegas_result_won() for the full rationale — kept as a single source of
+    # truth shared by all three /api/vegas* endpoints.
 
     try:
         from boto3.dynamodb.conditions import Key as _Key
@@ -2165,6 +2197,12 @@ def get_vegas_picks(headers, event):
                     # Cut here, before persistence, so nothing STRONG/VALUE graded
                     # gets written to DynamoDB going forward. See vegas.md.
                     if grade != 'ELITE':
+                        continue
+
+                    # PAUSED 2026-09-01 — see VEGAS_PAUSED comment above. Nothing
+                    # (ELITE included) gets appended to value_bets while paused, so
+                    # nothing new is persisted to DynamoDB or returned to the API.
+                    if VEGAS_PAUSED:
                         continue
 
                     # Build Benter advice note
@@ -2379,6 +2417,8 @@ def get_vegas_picks(headers, event):
             'body': json.dumps({
                 'success':       True,
                 'date':          target_date,
+                'vegas_paused':  VEGAS_PAUSED,
+                'vegas_paused_message': VEGAS_PAUSE_MESSAGE if VEGAS_PAUSED else None,
                 'value_bets':    value_bets,
                 'exactas':       exactas[:5],
                 'races_analysed': len(races),

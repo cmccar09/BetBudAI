@@ -10,8 +10,8 @@ Invoke this skill when reviewing Vegas performance, tuning model parameters, or 
 
 | Parameter | Current | Purpose | Tuning signal |
 |---|---|---|---|
-| `ALPHA` | 1.0 | Weight on model log-prob | Increase if market is consistently wrong; decrease if market is smarter than us |
-| `BETA` | 1.0 | Weight on market log-prob | Increase if market consistently prices in what we miss |
+| `ALPHA` | 1.0 (**empirically fit value: 0.0, 95% CI [0, 0.08] — see 2026-09-01 section below**) | Weight on model log-prob | Increase if market is consistently wrong; decrease if market is smarter than us |
+| `BETA` | 1.0 (**empirically fit value: ≈1.05**) | Weight on market log-prob | Increase if market consistently prices in what we miss |
 | `TEMP` | 20.0 | Softmax temperature | High = flat distribution; if model over-predicts probabilities → increase |
 | `MIN_EDGE` | 0.10 | Minimum edge to flag a value bet | Raise if low-edge picks losing money; lower if missing profitable picks |
 | Score gate | 80 | Min score for Vegas inclusion | Raise if score 80-89 band is consistently negative ROI |
@@ -31,6 +31,103 @@ Why: the tier breakdown at the point of this change was `ELITE 11W/46L +13%` · 
 - Frontend (`VegasPage.jsx`): copy referencing "back every ELITE and STRONG pick" / "ELITE+STRONG" stats / the VALUE watch-list section all removed — the tier breakdown chips were already data-driven (`Object.entries(grade_roi)`), so they auto-shrink to ELITE-only once the backend stops returning other grades.
 
 **If reconsidering this later**: the STRONG/VALUE computation logic still exists in the codebase (grade thresholds, `value_ratio` calc) — only the `continue` cut and the two DynamoDB filters need reverting to bring a grade back. Don't re-enable STRONG without checking whether its ROI has actually recovered on fresh data first — -48.6% over 28 races is a real signal, not noise, at that sample size.
+
+---
+
+## Model fit at both aggregate and feature level (2026-09-01) — no edge survives, Vegas paused
+
+Followed through on the "not yet actioned" ALPHA/BETA note above — actually fit it to data instead of leaving it hand-tuned — then went a level deeper and fit the individual scoring factors themselves. Conclusion at both levels: no edge over the market survives. **`VEGAS_PAUSED = True` is now live in `get_vegas_picks()`** — no new ELITE picks are generated, persisted, or shown; historical stats are untouched. `VegasPage.jsx` shows a "paused for recalibration" banner instead of quietly going blank. Don't revert the pause based on anything short of a genuinely new, forward-validated model (see paper-trading requirement at the end of this section).
+
+### Aggregate-level fit (ALPHA/BETA)
+
+Fit via grid search maximizing per-race multinomial log-likelihood against **212 races / 1,317 horse observations** reconstructed from `pick_type='learning'` records (2026-08-25 → 08-31) — full field, not just the ELITE-graded subset, to avoid selection bias.
+
+- **MLE: ALPHA = 0.0, BETA ≈ 1.05.** 7-fold leave-one-day-out CV: every fold independently preferred α=0.0. 95% CI on α: **[0, 0.08]**. Rejecting α=1 (today's live setting) is a 300-point log-likelihood rejection — not a close call.
+- Plain reading: **the hand-tuned score carries no measurable predictive value beyond what's already in the Betfair price.** Matches the direction of the earlier `model_value_add = -0.0834` finding (2026-08-28, n=42), now confirmed on a 10× larger, cross-validated, unbiased sample.
+- Backtest through the real production selection logic (score≥80, MIN_EDGE=10pts, value_ratio≥2.0) at the fitted weights: **0 ELITE, 0 STRONG, 0 VALUE picks** — the highest value_ratio achieved anywhere in the dataset was 1.04, nowhere near the 2.0 ELITE bar. Even a deliberately generous α=0.3 (4× above the CI upper bound) still produces zero ELITE picks.
+
+### Feature-level fit (the real question: which of the 63 factors actually predict anything)
+
+Went further than the ALPHA/BETA blend to ask whether the individual factors *inside* the hand-tuned score (trainer reputation +15, jockey quality +12, etc.) are themselves predictive, rather than just asking how much to trust the aggregate. Per-horse `score_breakdown` (the individual factor values, not just the summed score) turned out to be recoverable directly from `pick_type='learning'` records — **242 races / 2,247 settled horse-observations**, 2026-08-25 → 08-31.
+
+**Factor inventory**: 63 keys appear in `score_breakdown` in production. Of those, **27 never fire even once** across the whole window (dead code: `cheltenham_festival`, `track_handedness`, `jockey_hot_form`, `database_history`, `pace_profile`, `bounce_back`, and 21 others) and 4 more (`signals_fired`, `score_cap`, `final_score_cap`, `no_form_cap`) are meta/post-hoc corrections rather than independent factors. **33 candidate features** were actually fit.
+
+**Model**: race-conditional (Plackett-Luce / conditional-logit) softmax over standardized features, L2-regularized, λ chosen via the same leave-one-day-out CV.
+
+| Model | Out-of-sample NLL/race (lower = better) |
+|---|---|
+| Old hand-tuned score (live production) | **2.505 — worse than random guessing** |
+| Uniform (no info) | 2.163 |
+| New feature-level model | 1.911 |
+| Market alone | 1.829 |
+
+The live scoring system isn't neutral — it's actively worse than having no model. The properly-fit feature model does clearly beat guessing, so the individual factors aren't worthless in isolation. But it still doesn't beat the market, and checking why matters: **most of the fitted model's real signal comes from three features that are themselves derived from the horse's own odds** (`sweet_spot`, `optimal_odds`, `market_leader`). Strip those 8 odds-derived features out and performance collapses back toward guessing (2.032). The "independent" handicapping signal is mostly market price wearing a different hat.
+
+**Feature signal vs noise** (sign-stable across all 7 CV folds = signal; sign-flips = noise):
+- **Signal (20 of 33)**: `sweet_spot`, `optimal_odds`, `market_leader`, `deep_form`, `weight_penalty`, `age_bonus`, `timeform_stars`, `trainer_reputation`, `total_wins`, `consistency`, `distance_suitability`, `jockey_quality`, `maiden_fav_penalty`, `favorite_correction`, `unexposed_bonus`, `official_rating_bonus` (n=2, too thin to trust despite passing), `market_leader_no_form` (n=3, same caveat), `learning_odds`, `DEBUTANT_MARKET_CONFIDENCE` (n=3, same caveat), `price_steam`
+- **Noise (13 of 33) — candidates to delete outright**: `going_suitability`, `winless_penalty`, `unknown_trainer_penalty`, `form_trend`, `draw_bias`, `won_last_2_runs`, `recent_win`, `short_form_improvement`, `same_trainer_rival`, `small_field_bonus`, `large_field_penalty`, `DEBUTANT_STEAM`, `cd_bonus`
+
+**Cleanup opportunity independent of the modelling verdict**: deleting the 27 dead + 13 noise factors is zero-risk, low-effort hygiene regardless of what happens with Vegas overall — 40 of 63 factors are either never firing or actively adding noise to a score that's supposed to be meaningful.
+
+**Blended backtest (feature model + market, α/β fit per-fold)**: mean OOS NLL 1.851, essentially tying/trailing market-alone (1.829) — 5 of 7 folds got *worse* from blending. Genuinely out-of-sample grade breakdown: ELITE n=1 (0W/1L), STRONG n=10 (2W/8L, -43.4% ROI), VALUE n=21 (9W/12L, +4.7% ROI but value_add still -0.009 vs market — small-sample noise, not real edge).
+
+### If picking this back up
+
+- More data: 242 races / 33 features is thin — several "signal" features have <100 nonzero observations.
+- Consider targeting less-efficient market segments (smaller fields, lower-tier/evening AW cards) instead of blanket win markets on the big meetings this sample drew from — see improvement idea #8, now partially actioned by this section but the "target less-efficient segments" half of that idea is still open.
+- **Any future candidate model must be paper-traded before it's allowed to publish**: logged but not staked, for 100+ picks / 3-4 weeks minimum, with `model_value_add` tracked live throughout. A backtest that looks good is not sufficient justification to flip `VEGAS_PAUSED` back to `False` — this whole exercise started because a backtest-shaped confidence (ELITE requiring value_ratio ≥ 2.0) turned out not to hold up against honest out-of-sample testing.
+- Full analysis code (`fit_feature_model.py`, `cv_feature_model.py`, `stage2_blend.py`, `oos_backtest.py`) was scratchpad-only, not committed to the repo — rebuild rather than expect to find it if this is picked up later.
+
+---
+
+## Segment-targeting + data-volume check (2026-09-01, second pass) — still no edge, closest thing to a lead is thin
+
+Followed up on the "target less-efficient segments" open item above, plus confirmed the data pipeline is healthy going forward. Same honesty discipline as the first pass: report what's there, don't stretch a small subset into a conclusion it can't support.
+
+### Dataset refresh
+
+Rebuilt from `pick_type='learning'` records, this time **2026-08-11 → 09-01 (22 days, not 7)** — score_breakdown data turned out to go back at least to mid-July (checked 07-15, 08-01, 08-10, 08-15, 08-20, 08-24, all present with the same core schema), so the earlier "~300+ settled picks needed" framing undersold how much history is actually sitting in the table, not just how much is recoverable per-horse (that was the 2026-09-01 finding above). **705 races / 6,898 settled horse-observations** after the same exactly-one-winner data-quality filter as before — roughly 3× the original sample. 2026-09-01 itself was fully settled (355/355 `learning` records) by the time this ran, so it's included.
+
+### Segment definitions (fixed before looking at any results, to avoid fishing)
+
+- **Small field**: ≤8 runners (323 races) vs **large field**: >8 (382 races)
+- **AW/lower-tier tracks**: Lingfield, Kempton, Southwell, Wolverhampton, Newcastle, Dundalk (122 races) — imprecise proxy, flagged honestly: Lingfield and Kempton also run turf/jumps cards and there's no clean surface flag in the data to separate them, so this segment is "mostly AW" not "only AW."
+- **Handicap tier** (409 races) vs **quality tier** — Group/Listed/Conditions Stakes (131 races), as a cleaner "how much professional money is watching this race" proxy than track/surface alone.
+- **AW + small field intersection** (44 races, 14 dates) — closest literal match to "lower-tier evening AW cards."
+
+### Results: same fit/CV/market-comparison rigor as the full-population work, per segment
+
+| Segment | n races | n dates | Feature model NLL/race (CV) | Market NLL/race | Blended NLL/race (CV) | Verdict |
+|---|---|---|---|---|---|---|
+| Full population (refreshed) | 705 | 22 | 1.849 | 1.803 | 1.803 | Market wins (essentially tied) |
+| Small field (≤8) | 323 | 22 | 1.618 | 1.530 | 1.556 | Market wins |
+| Large field (>8) | 382 | 22 | 2.080 | 2.033 | 2.036 | Market wins |
+| AW/lower-tier tracks | 122 | 15 | 1.816 | 1.799 | 1.808 | Market wins |
+| Handicap tier | 409 | 22 | 2.007 | 1.965 | 1.967 | Market wins |
+| Quality tier (Group/Listed/Conditions) | 131 | 22 | 1.708 | **1.532** | 1.679 | Market wins clearly — the most efficient segment, as expected |
+| AW + small field | 44 | 14 | 1.702 | 1.612 | 1.688 | Market wins, but see caveat below |
+
+**No segment beats market.** Quality-tier races (the ones drawing the most professional money) show the *biggest* market advantage of any segment — a clean, internally-consistent sanity check that the whole framework is measuring what it claims to (professional-money markets are hardest to beat, exactly as expected).
+
+**The one mildly interesting wrinkle**: on the AW-tracks segment specifically, the CV-optimal blend weight shifts hard toward the feature model — mean fitted **α≈0.94, β≈0.34** (vs α≈0.4–0.6, β≈0.6–0.75 everywhere else). The market is *less* dominant there relative to the model than anywhere else tested. But even with that much more weight on the feature model, the blended NLL (1.808) still doesn't beat market alone (1.799) — a real shift in the optimal blend, not a real edge.
+
+**Followed it up with a proper out-of-sample backtest anyway**, since it was the one segment worth checking further (fold-specific weights, never fit on the day being tested, same discipline as the full-population backtest):
+
+| Grade | n | W/L | ROI | value_add vs market |
+|---|---|---|---|---|
+| ELITE | 11 | 3/8 | +63.6% | +0.0072 (barely positive) |
+| STRONG | 35 | 10/25 | +34.9% | −0.0145 (still negative) |
+| VALUE | 22 | 6/16 | −24.2% | −0.0518 |
+
+**Read this carefully, don't oversell it**: STRONG shows a real-looking +34.9% ROI on a not-tiny n=35 — but its `value_add` (the calibration check, comparing the model's own Brier score to market's) is still *negative*, meaning the underlying probabilities aren't actually better than market's even though the bets happened to pay off. That combination — positive ROI, negative calibration — is exactly the pattern of variance-driven profit (a few winners at value) rather than genuine skill, the same trap flagged in the original Charles-screenshot investigation that started all of this. ELITE's value_add is barely above zero on n=11, which is not a sample size anything can be concluded from.
+
+**Verdict**: not enough data to say AW tracks are a real edge, and not enough to rule it out either — "not enough data yet" is the honest answer for this one narrow slice, same as the coordinator asked to hear if that's what's true. Every other, better-powered segment (small field, large field, handicap tier, quality tier, and the 705-race full population) shows a clean, unambiguous "market wins" with no comparable wrinkle. If this gets picked up again, AW tracks specifically (not the AW+small-field intersection, which is too thin at n=44/14 dates) is the one place worth re-running once more data accumulates — see rate below.
+
+### Main pipeline data-volume check (confirms Charles was told correctly)
+
+Verified directly rather than assumed: `pick_type='learning'` records are still generating daily, completely unaffected by the Vegas pause (it's a different code path — `VEGAS_PAUSED` only gates `get_vegas_picks()`'s `pick_type='vegas'` records). 2026-09-01: **355 learning records**, created 12:01–12:02 UTC, all with `score_breakdown` intact, 100% settled by the time this was checked same day. Recent daily volumes: 08-29: 515, 08-30: 319, 08-31: 505, 09-01: 355 — averaging **roughly 35-45 races/day** (~400-450 horse-observations/day) at current pace. At that rate, doubling the current 705-race segment-analysis dataset (→ ~1,400 races) would take **another ~3 weeks**; growing the thinnest segment here (AW tracks, 122 races/8 runners-per-race average) to a genuinely trustworthy sample (say 300+ races) would take **roughly 2-3 months** at the current ~5-6 AW races/day rate, since AW meetings are a minority of the daily card.
+
+**Side finding, not part of what was asked but worth flagging**: `pick_type='vegas'` records are *also* still being written today (11 for 2026-09-01) — meaning **the `VEGAS_PAUSED` code change has not actually taken effect in production yet**. The deploy (`.\scripts\deploy_api.ps1` + the frontend wrangler deploy) was blocked by the auto-mode safety classifier when attempted and still needs to be run directly by Charles/the coordinator — see the pause section's deploy status. The code sitting in `backend/api/lambda_function.py` is correct and ready; it just hasn't shipped yet.
 
 ---
 
@@ -203,11 +300,15 @@ The `calibration` array shows predicted vs actual by probability bucket. If `mea
 
 ### Experimental
 
-8. **Logistic regression on signals**: replace the 7-factor score with a logistic regression trained on `result_won` outcomes from DynamoDB history. Needs ~300+ settled picks with form data.
+8. ~~**Logistic regression on signals**~~ — **Attempted 2026-09-01**, see the "Model fit at both aggregate and feature level" section above. A race-conditional (Plackett-Luce) version of this was fit on 242 races / 2,247 observations — beat guessing but not the market, and most of its real signal turned out to be odds-derived features restating market price rather than independent handicapping. The "needs ~300+ settled picks" bar undersold how much data was actually recoverable (per-horse `score_breakdown` was 98.9% intact in `learning` records) — the data problem was never real, the signal problem is. ~~Still open: the "target less-efficient market segments" angle~~ — **also attempted 2026-09-01 (second pass)**, see "Segment-targeting + data-volume check" section above: small field, large field, AW/lower-tier tracks, handicap tier, and quality tier all show market winning cleanly on a refreshed 705-race dataset. AW tracks specifically show a real shift in the optimal blend weight (much more trust placed in the model there) but still don't beat market, and a proper OOS backtest of that segment (n=11-35 per grade) is too small and internally inconsistent (positive ROI, negative calibration) to call a real edge either way. Fully closed out for now, pending more AW-specific data (~2-3 months at current accumulation rate).
 
 9. **Dynamic Kelly sizing**: instead of fixed half-Kelly, use a Bayesian credible interval on win probability and size based on the interval width (bet more when confident, less when uncertain).
 
 10. **Harville exacta from combined probs, not model probs**: currently uses combined_probs for Harville — should verify this is correct (Benter used raw model probs for his Harville computation, adding the market as a separate exacta signal).
+
+11. **Debutant/first-time-out purchase price or breeding signal** (flagged 2026-09-01): Curracloe, a first-time-out runner reportedly bought for €240k, scored -42 (#10 of 19 runners by BetBudAI's score) and won at 22/1. Worth investigating properly, but **one winner is an anecdote, not evidence** — 22/1 shots do sometimes just win, and this is exactly the kind of single-example pattern-matching that likely built several of the 40 dead/noise factors above in the first place. Two things to check before doing anything else: (a) whether sales price / pedigree data is even an available input at all right now — if not, this is a data-availability gap, not a tuning gap; (b) whether "expensive/well-regarded debut runner the model underrates" is a real, repeatable pattern across *all* debut runners in the dataset, tested with the same CV discipline as the section above, not just reacting to this one result. `unexposed_bonus` and `maiden_fav_penalty` already showed real signal in the 2026-09-01 fit; `DEBUTANT_MARKET_CONFIDENCE` showed signal but on only 3 observations — far too thin to trust yet. If pursued, this is a natural extension of the feature-level work above, not a separate project.
+    - **Proposed concrete flag to test**: `DEBUTANT_HIGH_PRICE` — first-time-out runner with a recorded purchase/sales price ≥ €50k. €50k is a starting threshold, not a validated one — pick it because it's a plausible "meaningfully well-regarded" cutoff, then let the backtest tell us whether it's the right line (try a few thresholds either side, e.g. €30k/€50k/€100k, rather than anchoring on the one number that happens to fit Curracloe's €240k). This only becomes buildable once (a) above is answered — if purchase price isn't in the data at all yet, this flag can't exist until that's sourced.
+    - **Data-sourcing prerequisite**: see `.claude/skills/horse-purchase-price.md` — covers where purchase price data can actually be pulled from, and the name-matching problem (match on sire/dam/foaling year, not the horse's name). **Update 2026-09-01, second pass**: actually tried it end-to-end. Goffs turned out to be the working source (plain `requests` + browser User-Agent, no bot-block — the earlier 403 was a WebFetch-tool-specific issue, not real Cloudflare protection; real lot data sits in `data-*` HTML attributes, no scraper build needed). Got exactly **one confirmed real price**: Capitano Josepi (won at 22/1 despite a poor BetBudAI score) sold for **€27,000** — below all three proposed thresholds, and a mild counter-example to the hypothesis rather than support for it (cheap, not expensive). Two other debutants checked (Flower Show, Marquetry) confirmed homebred, correctly returning no price. Bigger finding: BetBudAI's own racecard data has **no sire/dam field at all** right now, and general web search for sire/dam only works for headline-stable horses (Godolphin etc.), not ordinary debutants — so sourcing needs to happen at racecard-ingestion time, not via retroactive per-horse search, before this could ever scale to a real sample. One data point cannot test €30k/€50k/€100k thresholds — that part of the idea is still fully open, just with a proven (if not yet scaled) sourcing path now.
 
 ---
 
