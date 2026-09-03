@@ -151,27 +151,6 @@ def _parse_group_class(spotlight: str) -> int:
     return 0
 
 
-def _parse_distance_hint(spotlight: str) -> str:
-    """
-    Return 'further', 'sharp', or 'suits' based on analyst distance comment.
-    'further' = horse needs longer trips, this race may be too short
-    'sharp'   = horse is a sharp/sprinting type
-    'suits'   = explicitly suits today's trip
-    """
-    if not spotlight:
-        return ''
-    text = spotlight.lower()
-    if any(p in text for p in ['better over further', 'will improve over further',
-                                'middle distance', 'will stay', 'should stay',
-                                'bred to stay', 'get further']):
-        return 'further'
-    if any(p in text for p in ['sharp', 'sprint', 'speed', 'six furlongs', '5f', '6f specialist']):
-        return 'sharp'
-    if any(p in text for p in ['suits', 'ideal', 'right trip', 'right distance']):
-        return 'suits'
-    return ''
-
-
 # ---------------------------------------------------------------------------
 # Main scorer
 # ---------------------------------------------------------------------------
@@ -189,8 +168,6 @@ def score_debutant(horse_data: dict, race_distance_f: float = 0.0) -> tuple[int,
     sire      = ra.get('sire') or horse_data.get('sire', '')
     spotlight = ra.get('spotlight') or horse_data.get('spotlight', '')
     odds      = float(horse_data.get('odds', 0) or 0)
-    pm        = horse_data.get('price_movement', 'stable')
-    pm_pct    = float(horse_data.get('price_move_pct', 0) or 0)
 
     score = 0
     breakdown = {}
@@ -270,35 +247,13 @@ def score_debutant(horse_data: dict, race_distance_f: float = 0.0) -> tuple[int,
     else:
         breakdown['PEDIGREE_CLASS'] = 0
 
-    # ── 4. Distance suitability hint from analyst text ─────────────────────
-    dist_hint = _parse_distance_hint(spotlight)
-    if dist_hint == 'further' and race_distance_f > 0 and race_distance_f <= 7.0:
-        # Analyst says needs further but this is a sprint/mile — flag risk
-        score -= 8
-        breakdown['DISTANCE_HINT'] = -8
-        reasons.append(f"Analyst: needs further than {race_distance_f:.1f}f today: -8pts")
-    elif dist_hint == 'suits':
-        score += 5
-        breakdown['DISTANCE_HINT'] = 5
-        reasons.append(f"Analyst: distance suits today: +5pts")
-    else:
-        breakdown['DISTANCE_HINT'] = 0
-
-    # ── 5. Market signal — amplified for debutants ─────────────────────────
-    # Debutant steam is the strongest possible signal: connections are backing it.
-    # Regular steam bonus is in complete_daily_analysis; this is an *additional* bonus.
-    if pm == 'steaming' and pm_pct >= 20:
-        pts = 15
-        score += pts
-        breakdown['DEBUTANT_STEAM'] = pts
-        reasons.append(f"Debutant steaming {pm_pct:.0f}% — connections backing: +{pts}pts")
-    elif pm == 'drifting' and pm_pct <= -25:
-        pts = -12
-        score += pts
-        breakdown['DEBUTANT_STEAM'] = pts
-        reasons.append(f"Debutant drifting {abs(pm_pct):.0f}% — connections not confident: {pts}pts")
-    else:
-        breakdown['DEBUTANT_STEAM'] = 0
+    # Sections 4 (DISTANCE_HINT) and 5 (DEBUTANT_STEAM) REMOVED 2026-09-03 —
+    # see .claude/skills/vegas.md. DISTANCE_HINT was dead (0/33,552 nonzero,
+    # 2026-06-01->09-02 rebuild dataset — the analyst-text pattern matching in
+    # the removed _parse_distance_hint() never matched real spotlight text).
+    # DEBUTANT_STEAM was noise (sign-flipped across CV folds in the 2026-09-01
+    # feature-level fit) — same steam signal already exists, and IS signal,
+    # via `price_steam` in complete_daily_analysis.py.
 
     # ── 6. Short-price debutant — stable confidence ────────────────────────
     # A debutant at ≤3.5 odds almost always has stable support (insider knowledge).

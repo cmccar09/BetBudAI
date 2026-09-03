@@ -7375,16 +7375,15 @@ ADMIN_DEFAULT_CONFIG = {
 }
 
 # Default scoring weights — mirrors comprehensive_pick_logic.py DEFAULT_WEIGHTS
+# Pruned 2026-09-03 to match that file's cleanup of dead/noise score_breakdown
+# factors (see .claude/skills/vegas.md) — an admin panel showing/editing a
+# weight for a factor that no longer exists in the scoring engine would be
+# actively misleading, not just cosmetically stale.
 ADMIN_DEFAULT_WEIGHTS = {
     'sweet_spot':                 12,
     'optimal_odds':               10,
-    'recent_win':                 16,
     'total_wins':                  8,
     'consistency':                 6,
-    'course_bonus':               12,
-    'database_history':           15,
-    'going_suitability':          16,
-    'track_pattern_bonus':         8,
     'trainer_reputation':         15,
     'trainer_tier2':               8,
     'trainer_tier3':               4,
@@ -7394,20 +7393,11 @@ ADMIN_DEFAULT_WEIGHTS = {
     'weight_penalty':             10,
     'age_bonus':                   7,
     'distance_suitability':       18,
-    'novice_race_penalty':        15,
-    'bounce_back_bonus':           8,
-    'short_form_improvement':      8,
-    'aw_low_class_penalty':       50,
     'heavy_going_penalty':        12,
     'cd_bonus':                   18,
     'graded_race_cd_bonus':        8,
     'official_rating_bonus':       8,
-    'jockey_course_bonus':         8,
     'relative_weight_bonus':       8,
-    'meeting_focus_trainer':      10,
-    'meeting_focus_jockey':       10,
-    'meeting_focus_combo':        10,
-    'new_trainer_debut':           5,
     'form_exact_course_win':      20,
     'form_exact_distance_win':    20,
     'form_going_win':             16,
@@ -7417,12 +7407,7 @@ ADMIN_DEFAULT_WEIGHTS = {
     'form_or_rising':             10,
     'form_big_field_win':          8,
     'unexposed_bonus':            12,
-    'aw_evening_penalty':         12,
-    'unknown_trainer_penalty':     8,
-    'large_field_penalty':        10,
     'class_drop_bonus':           12,
-    'same_trainer_rival_penalty': 10,
-    'irish_handicap_penalty':     10,
 }
 
 

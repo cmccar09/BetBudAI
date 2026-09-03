@@ -893,29 +893,10 @@ def analyze_and_save_all(force_reanalyse: bool = False):
         if not race_runners:
             continue
 
-        # ── SAME-TRAINER DUAL ENTRY PENALTY ─────────────────────────────────
-        # LESSON (2026-04-01): I'm Spartacus vs Clonmacash — same trainer (A McGuinness).
-        # When a trainer runs 2+ horses in the same race, attention is split and the trainer
-        # may favour one runner over another.  Penalise ALL horses from that trainer.
-        _trainer_runs = {}  # trainer_lower -> [index]
-        for _idx, _rr in enumerate(race_runners):
-            _t = _rr['item'].get('trainer', '').strip().lower()
-            if _t:
-                _trainer_runs.setdefault(_t, []).append(_idx)
-        for _t, _idxs in _trainer_runs.items():
-            if len(_idxs) >= 2:
-                _str_penalty = 10  # same_trainer_rival_penalty (matches DEFAULT_WEIGHTS)
-                _trainer_display = race_runners[_idxs[0]]['item'].get('trainer', _t)
-                for _idx in _idxs:
-                    race_runners[_idx]['score'] -= _str_penalty
-                    race_runners[_idx]['item']['comprehensive_score'] = Decimal(str(race_runners[_idx]['score']))
-                    race_runners[_idx]['item']['score_breakdown']['same_trainer_rival'] = -_str_penalty
-                    race_runners[_idx]['item']['selection_reasons'].append(
-                        f"{_trainer_display} runs {len(_idxs)} horses in this race (split focus): -{_str_penalty}pts"
-                    )
-                print(f"  [SAME-TRAINER] {_trainer_display}: {len(_idxs)} runners "
-                      f"— each penalised -{_str_penalty}pts")
-
+        # SAME-TRAINER DUAL ENTRY PENALTY (same_trainer_rival) REMOVED 2026-09-03
+        # — NOISE (sign-flipped across CV folds in the 2026-09-01 feature-level
+        # fit, confirmed on the rebuilt 2026-06-01->09-02 dataset; 14.6% fire
+        # rate). See .claude/skills/vegas.md.
 
         best = max(race_runners, key=lambda x: x['score'])
         sorted_by_score = sorted(race_runners, key=lambda x: x['score'], reverse=True)
@@ -974,8 +955,13 @@ def analyze_and_save_all(force_reanalyse: bool = False):
     _is_weekend = now_utc.weekday() >= 5
     _ODDS_MAX = 2.8 if _is_weekend else 3.5
     # Rule 3 — signal count: at least 2 meaningful signals must fire
-    _KEY_SIGNALS = ('market_leader', 'deep_form', 'going_suitability',
-                    'price_steam', 'trainer_reputation', 'cd_bonus', 'jockey_quality')
+    # Pruned 2026-09-03: going_suitability and cd_bonus no longer appear in
+    # score_breakdown (removed as dead/noise — see .claude/skills/vegas.md).
+    # Left in place, this 7-key basket would have silently become a 5-key
+    # basket needing the SAME 2-of-N minimum — i.e. this main-picks gate
+    # (not just the extended-picks one) would have quietly gotten stricter.
+    _KEY_SIGNALS = ('market_leader', 'deep_form',
+                    'price_steam', 'trainer_reputation', 'jockey_quality')
     _MIN_SIGNALS = 2
 
     def _passes_quality_gates(r):
@@ -1149,10 +1135,14 @@ def analyze_and_save_all(force_reanalyse: bool = False):
     # Runs every day after main picks. Any race type, any odds, score ≥ 80,
     # 2+ signals, future races only. Saved as pick_type='extended' for daily
     # analysis. These are the broader winner candidates surfaced automatically.
-    _KEY_SIGNALS_EXT = ('market_leader', 'deep_form', 'going_suitability',
+    # Pruned 2026-09-03: going_suitability, cd_bonus, won_last_2_runs, form_trend
+    # and DEBUTANT_STEAM were removed from score_breakdown as dead/noise (see
+    # .claude/skills/vegas.md) — leaving them here would have silently made
+    # this 2-of-N gate stricter than intended (5 of 13 keys permanently 0).
+    _KEY_SIGNALS_EXT = ('market_leader', 'deep_form',
                         'distance_suitability', 'price_steam', 'trainer_reputation',
-                        'cd_bonus', 'jockey_quality', 'won_last_2_runs', 'form_trend',
-                        'total_wins', 'timeform_stars', 'DEBUTANT_STEAM')
+                        'jockey_quality',
+                        'total_wins', 'timeform_stars')
     _MIN_SCORE_EXT = 80
     _MIN_SIGS_EXT  = 2
     # Match UI display limit: 4 on weekends (Sat=5, Sun=6), 2 on weekdays
@@ -1290,6 +1280,18 @@ def analyze_and_save_all(force_reanalyse: bool = False):
 
     print(f"\nSaved {total_saved} horses | {ui_promoted} UI picks | "
           f"{total_saved - ui_promoted} learning records\n")
+
+    # ── VEGAS PAPER TRADING (2026-09-03) ────────────────────────────────────
+    # Logs what the rebuilt candidate model WOULD have picked today, under
+    # pick_type='vegas_paper' — completely separate from pick_type='vegas'
+    # (the real, paused feature) and from VEGAS_PAUSED. Never published,
+    # never shown on the frontend. See .claude/skills/vegas.md. Wrapped so a
+    # failure here can never break the real daily picks pipeline above.
+    try:
+        from vegas_paper import compute_and_save_vegas_paper_picks
+        compute_and_save_vegas_paper_picks(all_races_data, today, table)
+    except Exception as _vp_err:
+        print(f"  [VEGAS-PAPER] skipped (non-fatal): {_vp_err}")
 
     # ── ZERO-PICKS ALERT ──────────────────────────────────────────────────────
     if ui_promoted == 0 and total_saved > 0:

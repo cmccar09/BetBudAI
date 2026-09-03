@@ -1,0 +1,94 @@
+{
+  "segment": "aw",
+  "n_races": 451,
+  "n_dates": 52,
+  "market_nll": 1.7884087914908615,
+  "old_score_nll": 2.291333460308371,
+  "uniform_nll": 2.18218213252601,
+  "best_lambda": 100.0,
+  "feature_model_cv_nll": 1.8564047638061394,
+  "blended_cv_nll": 1.8170387537074848,
+  "mean_alpha": 0.7451923076923077,
+  "mean_beta": 0.5048076923076923,
+  "signal_features": [
+    "DEBUTANT_MARKET_CONFIDENCE",
+    "DEBUTANT_STEAM",
+    "PEDIGREE_CLASS",
+    "SIRE_TIER",
+    "age_bonus",
+    "consistency",
+    "deep_form",
+    "distance_suitability",
+    "favorite_correction",
+    "form_trend",
+    "jockey_quality",
+    "learning_odds",
+    "market_leader",
+    "optimal_odds",
+    "price_steam",
+    "recent_win",
+    "rpr_class",
+    "same_trainer_rival",
+    "short_form_improvement",
+    "sweet_spot",
+    "timeform_stars",
+    "total_wins",
+    "trainer_live_form",
+    "trainer_reputation",
+    "unexposed_bonus",
+    "unknown_trainer_penalty",
+    "winless_penalty",
+    "won_last_2_runs"
+  ],
+  "noise_features": [
+    "PURCHASE_PRICE",
+    "beaten_fav_penalty",
+    "maiden_fav_penalty",
+    "market_leader_no_form",
+    "weight_penalty"
+  ],
+  "never_fired_in_cv": [
+    "draw_bias",
+    "going_suitability",
+    "large_field_penalty",
+    "official_rating_bonus",
+    "small_field_bonus"
+  ],
+  "all_lambda_results": {
+    "1.0": {
+      "mean_cv_nll": 1.8937743621491958,
+      "blend_mean_nll": 1.8137451390616413,
+      "mean_alpha": 0.5,
+      "mean_beta": 0.5,
+      "n_folds": 52
+    },
+    "3.0": {
+      "mean_cv_nll": 1.887855171990786,
+      "blend_mean_nll": 1.81397545160608,
+      "mean_alpha": 0.5048076923076923,
+      "mean_beta": 0.4951923076923077,
+      "n_folds": 52
+    },
+    "10.0": {
+      "mean_cv_nll": 1.878050396957643,
+      "blend_mean_nll": 1.8104872783538857,
+      "mean_alpha": 0.5048076923076923,
+      "mean_beta": 0.4951923076923077,
+      "n_folds": 52
+    },
+    "30.0": {
+      "mean_cv_nll": 1.8663307045388013,
+      "blend_mean_nll": 1.8405050045961886,
+      "mean_alpha": 0.6009615384615384,
+      "mean_beta": 0.5,
+      "n_folds": 52
+    },
+    "100.0": {
+      "mean_cv_nll": 1.8564047638061394,
+      "blend_mean_nll": 1.8170387537074848,
+      "mean_alpha": 0.7451923076923077,
+      "mean_beta": 0.5048076923076923,
+      "n_folds": 52
+    }
+  }
+}

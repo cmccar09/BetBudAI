@@ -1,0 +1,94 @@
+{
+  "segment": "full",
+  "n_races": 3362,
+  "n_dates": 93,
+  "market_nll": 1.7899715670985914,
+  "old_score_nll": 2.3957958287172874,
+  "uniform_nll": 2.143010753926576,
+  "best_lambda": 30.0,
+  "feature_model_cv_nll": 1.8204100591306165,
+  "blended_cv_nll": 1.7896887268749413,
+  "mean_alpha": 0.25,
+  "mean_beta": 0.75,
+  "signal_features": [
+    "DEBUTANT_MARKET_CONFIDENCE",
+    "PEDIGREE_CLASS",
+    "PURCHASE_PRICE",
+    "age_bonus",
+    "beaten_fav_penalty",
+    "consistency",
+    "deep_form",
+    "distance_suitability",
+    "draw_bias",
+    "favorite_correction",
+    "form_trend",
+    "going_suitability",
+    "jockey_quality",
+    "learning_odds",
+    "maiden_fav_penalty",
+    "market_leader",
+    "market_leader_no_form",
+    "official_rating_bonus",
+    "optimal_odds",
+    "price_steam",
+    "recent_win",
+    "rpr_class",
+    "same_trainer_rival",
+    "short_form_improvement",
+    "sweet_spot",
+    "timeform_stars",
+    "total_wins",
+    "trainer_reputation",
+    "unexposed_bonus",
+    "unknown_trainer_penalty",
+    "weight_penalty",
+    "winless_penalty",
+    "won_last_2_runs"
+  ],
+  "noise_features": [
+    "DEBUTANT_STEAM",
+    "SIRE_TIER",
+    "trainer_live_form"
+  ],
+  "never_fired_in_cv": [
+    "large_field_penalty",
+    "small_field_bonus"
+  ],
+  "all_lambda_results": {
+    "1.0": {
+      "mean_cv_nll": 1.820632209619866,
+      "blend_mean_nll": 1.789537137144076,
+      "mean_alpha": 0.25,
+      "mean_beta": 0.75,
+      "n_folds": 93
+    },
+    "3.0": {
+      "mean_cv_nll": 1.8206111670033898,
+      "blend_mean_nll": 1.7895478428627254,
+      "mean_alpha": 0.25,
+      "mean_beta": 0.75,
+      "n_folds": 93
+    },
+    "10.0": {
+      "mean_cv_nll": 1.8205438696767757,
+      "blend_mean_nll": 1.7895847760138972,
+      "mean_alpha": 0.25,
+      "mean_beta": 0.75,
+      "n_folds": 93
+    },
+    "30.0": {
+      "mean_cv_nll": 1.8204100591306165,
+      "blend_mean_nll": 1.7896887268749413,
+      "mean_alpha": 0.25,
+      "mean_beta": 0.75,
+      "n_folds": 93
+    },
+    "100.0": {
+      "mean_cv_nll": 1.8204304065542622,
+      "blend_mean_nll": 1.790034164777585,
+      "mean_alpha": 0.25,
+      "mean_beta": 0.75,
+      "n_folds": 93
+    }
+  }
+}

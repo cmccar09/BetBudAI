@@ -32,6 +32,8 @@ $FILES = [ordered]@{
     'weather_going_inference.py'  = 'backend\utils\weather_going_inference.py'
     'bloodstock.py'               = 'bloodstock.py'
     'watchlist.py'                = 'watchlist.py'
+    'vegas_paper.py'              = 'vegas_paper.py'
+    'vegas_paper_model.py'        = 'vegas_paper_model.py'
 }
 
 Write-Host ""
