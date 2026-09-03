@@ -108,12 +108,17 @@ class TestDefaultWeights:
         assert 'cd_bonus' in cpl.DEFAULT_WEIGHTS
         assert cpl.DEFAULT_WEIGHTS['cd_bonus'] > 0
 
-    def test_going_suitability_present(self):
-        assert 'going_suitability' in cpl.DEFAULT_WEIGHTS
-        assert cpl.DEFAULT_WEIGHTS['going_suitability'] > 0
+    def test_going_suitability_removed(self):
+        # 2026-09-03: going_suitability removed as a noise factor (sign-flipped
+        # across CV folds) — see .claude/skills/vegas.md. Regression check that
+        # it doesn't silently reappear as an orphaned weight constant.
+        assert 'going_suitability' not in cpl.DEFAULT_WEIGHTS
 
-    def test_large_field_penalty_present(self):
-        assert 'large_field_penalty' in cpl.DEFAULT_WEIGHTS
+    def test_large_field_penalty_removed(self):
+        # 2026-09-03: large_field_penalty removed as a noise factor (zero
+        # coefficient at every CV fold's optimal regularization) — see
+        # .claude/skills/vegas.md.
+        assert 'large_field_penalty' not in cpl.DEFAULT_WEIGHTS
 
     def test_all_weights_numeric(self):
         for k, v in cpl.DEFAULT_WEIGHTS.items():
@@ -192,12 +197,14 @@ class TestShouldSkipRace:
 
 class TestCDMarkerScoring:
     """
-    C&D winners come via the cd_marker field.
-    Full CD > course-only > distance-only > no marker.
-    Note: distance_suitability bonus is REDUCED when cd_pts > 0 (it uses a smaller
-    confirming bonus instead of the full distance_suitability weight), so a horse
-    with a CD marker but no prior wins may score the same as one with pure form wins.
-    We test the cd_bonus breakdown key directly rather than total score ordering.
+    2026-09-03: the cd_bonus POINT AWARD was removed as a noise factor
+    (sign-flipped across CV folds, and extremely thin — 11/33,552 nonzero on
+    the rebuild dataset) — see .claude/skills/vegas.md. `cd_bonus` no longer
+    appears in `breakdown` at all. The underlying C/D-win DETECTION logic
+    (`cd_pts`, internal to analyze_horse_comprehensive) is kept, because
+    distance_suitability's "Confirmed distance evidence (C/D)" branch still
+    reads it — so a CD marker should still show up indirectly via
+    distance_suitability, just not as its own breakdown key any more.
     """
 
     BASE_HORSE = {
@@ -209,40 +216,22 @@ class TestCDMarkerScoring:
         'age': 7,
     }
 
-    def test_cd_bonus_present_when_marker_set(self):
+    def test_cd_bonus_key_absent_when_marker_set(self):
         horse = dict(self.BASE_HORSE, cd_marker='CD')
         _, breakdown, _ = _score_horse(horse)
-        assert breakdown.get('cd_bonus', 0) > 0
-
-    def test_c_marker_gives_half_cd_bonus(self):
-        horse_c = dict(self.BASE_HORSE, cd_marker='C')
-        horse_cd = dict(self.BASE_HORSE, cd_marker='CD')
-
-        _, bd_c, _ = _score_horse(horse_c)
-        _, bd_cd, _ = _score_horse(horse_cd)
-
-        # CD bonus should be strictly greater than C-only bonus
-        assert bd_cd['cd_bonus'] > bd_c['cd_bonus']
+        assert breakdown.get('cd_bonus', 0) == 0
 
     def test_no_cd_breakdown_zero(self):
         horse = dict(self.BASE_HORSE)  # no cd_marker
         _, breakdown, _ = _score_horse(horse)
         assert breakdown.get('cd_bonus', 0) == 0
 
-    def test_cd_bonus_at_least_base_weight(self):
-        """CD bonus should equal at least the cd_bonus weight."""
+    def test_cd_marker_still_feeds_distance_suitability(self):
+        """CD detection isn't gone — distance_suitability's confirming bonus
+        still fires when cd_pts > 0 internally, even with no cd_bonus key."""
         horse = dict(self.BASE_HORSE, cd_marker='CD')
         _, breakdown, _ = _score_horse(horse)
-        assert breakdown['cd_bonus'] >= cpl.DEFAULT_WEIGHTS['cd_bonus']
-
-    def test_cd_beats_c_in_breakdown_value(self):
-        horse_c  = dict(self.BASE_HORSE, cd_marker='C')
-        horse_cd = dict(self.BASE_HORSE, cd_marker='CD')
-
-        _, bd_c,  _ = _score_horse(horse_c)
-        _, bd_cd, _ = _score_horse(horse_cd)
-
-        assert bd_cd['cd_bonus'] > bd_c['cd_bonus']
+        assert breakdown.get('distance_suitability', 0) > 0
 
     def test_cd_winner_total_score_not_less_than_c_only(self):
         """A CD winner should score no worse than a course-only winner."""
@@ -261,46 +250,30 @@ class TestCDMarkerScoring:
 
 class TestGoingSuitability:
     """
-    Test that a horse with proven going suitability scores more than one without,
-    and that an AW specialist is penalised on soft turf.
+    2026-09-03: going_suitability POINT SCORING removed as a noise factor
+    (sign-flipped across CV folds) — see .claude/skills/vegas.md. `suited` /
+    `_aw_specialist_on_soft` detection and the point award built on top of it
+    are both gone; `going_suitability` no longer appears in `breakdown` at
+    all, for any horse. What's left to test: it doesn't crash, and it no
+    longer differentiates a turf-soft winner from an AW specialist (that
+    used to be exactly what this factor did).
     """
 
     def _soft_going_data(self, course='Cheltenham'):
         return {course: {'going': 'Soft', 'adjustment': 3,
                          'source': 'official', 'surface': 'turf'}}
 
-    def test_turf_winner_suits_soft_scores_higher(self):
-        # Horse with wins on soft (turf) should beat horse with only AW wins
-        horse_turf = {
-            'name': 'Turf Horse',
-            'odds': 4.0,
-            'form': '1-1-1',
-            'trainer': '',
-            'prev_results': [
-                {'position': '1', 'going': 'Soft', 'course': 'Cheltenham'},
-            ],
+    def test_going_suitability_key_absent(self):
+        horse = {
+            'name': 'Turf Horse', 'odds': 4.0, 'form': '1-1-1', 'trainer': '',
+            'prev_results': [{'position': '1', 'going': 'Soft', 'course': 'Cheltenham'}],
         }
-        horse_aw = {
-            'name': 'AW Horse',
-            'odds': 4.0,
-            'form': '1-1-1',
-            'trainer': '',
-            'prev_results': [
-                {'position': '1', 'going': 'Standard', 'course': 'Wolverhampton'},
-                {'position': '1', 'going': 'Standard', 'course': 'Kempton'},
-            ],
-        }
-        soft_going = self._soft_going_data()
+        _, breakdown, _ = _score_horse(horse, going_data=self._soft_going_data())
+        assert 'going_suitability' not in breakdown
 
-        score_turf, _, _ = _score_horse(horse_turf, going_data=soft_going)
-        score_aw, _, _ = _score_horse(horse_aw, going_data=soft_going)
-
-        assert score_turf > score_aw, (
-            f"Turf winner ({score_turf}) should beat AW specialist ({score_aw}) on soft"
-        )
-
-    def test_aw_specialist_penalised_on_soft(self):
-        """AW specialist (2+ AW wins, 0 turf wins) should receive a negative going score."""
+    def test_aw_specialist_no_longer_penalised_on_soft(self):
+        """The AW-specialist-on-soft penalty this used to test is gone —
+        confirm going_suitability is simply absent, not negative."""
         horse = {
             'name': 'AW Specialist',
             'odds': 4.0,
@@ -314,8 +287,7 @@ class TestGoingSuitability:
         }
         soft_going = self._soft_going_data()
         _, breakdown, _ = _score_horse(horse, going_data=soft_going)
-        # going_suitability should be negative (AW specialist penalty)
-        assert breakdown.get('going_suitability', 0) < 0
+        assert breakdown.get('going_suitability', 0) == 0
 
     def test_going_uncertain_does_not_exceed_official(self):
         """Weather-inferred going should produce a smaller or equal going bonus vs official."""
@@ -343,7 +315,7 @@ class TestGoingSuitability:
         horse = {'name': 'No Going', 'odds': 5.0, 'form': '1-2', 'trainer': ''}
         score, breakdown, _ = _score_horse(horse, going_data={})
         assert isinstance(score, (int, float))
-        assert 'going_suitability' in breakdown
+        assert isinstance(breakdown, dict)
 
     def test_heavy_going_applies_penalty(self):
         """All horses should get a heavy going penalty when going is Heavy."""
@@ -461,11 +433,15 @@ class TestSignalCount:
         assert breakdown is not None
         assert isinstance(breakdown, dict)
 
-    def test_rich_horse_fires_cd_bonus(self):
+    def test_rich_horse_cd_marker_feeds_distance_suitability(self):
+        # 2026-09-03: cd_bonus point award removed (noise) — cd_marker='CD'
+        # now shows up via distance_suitability's confirming bonus instead.
+        # See .claude/skills/vegas.md.
         soft_going = {'Cheltenham': {'going': 'Soft', 'adjustment': 3,
                                      'source': 'official', 'surface': 'turf'}}
         _, breakdown, _ = _score_horse(self.RICH_HORSE, going_data=soft_going)
-        assert breakdown.get('cd_bonus', 0) > 0
+        assert breakdown.get('cd_bonus', 0) == 0
+        assert breakdown.get('distance_suitability', 0) > 0
 
     def test_rich_horse_fires_trainer_bonus(self):
         _, breakdown, _ = _score_horse(self.RICH_HORSE)
@@ -485,19 +461,20 @@ class TestSignalCount:
 # ---------------------------------------------------------------------------
 
 class TestLargeFieldPenalty:
+    """
+    2026-09-03: large_field_penalty removed as a noise factor (zero
+    coefficient at every CV fold's optimal regularization strength) — see
+    .claude/skills/vegas.md. Field size no longer affects score at all via
+    this factor (small_field_bonus was removed alongside it for the same
+    reason).
+    """
     BASE_HORSE = {'name': 'Runner', 'odds': 4.0, 'form': '1-1', 'trainer': 'Paul Nicholls'}
 
-    def test_20_runner_field_has_larger_penalty_than_16(self):
+    def test_20_runner_field_has_no_penalty(self):
         _, bd_16, _ = _score_horse(self.BASE_HORSE, n_runners=16)
         _, bd_20, _ = _score_horse(self.BASE_HORSE, n_runners=20)
-
-        pen_16 = bd_16.get('large_field_penalty', 0)
-        pen_20 = bd_20.get('large_field_penalty', 0)
-
-        # Both should be negative; 20-runner penalty harsher
-        assert pen_16 < 0, f"16-runner should have a penalty, got {pen_16}"
-        assert pen_20 < 0, f"20-runner should have a penalty, got {pen_20}"
-        assert pen_20 < pen_16, "20-runner penalty should exceed 16-runner penalty"
+        assert bd_16.get('large_field_penalty', 0) == 0
+        assert bd_20.get('large_field_penalty', 0) == 0
 
     def test_small_field_no_penalty(self):
         _, breakdown, _ = _score_horse(self.BASE_HORSE, n_runners=8)
@@ -507,11 +484,12 @@ class TestLargeFieldPenalty:
         _, breakdown, _ = _score_horse(self.BASE_HORSE, n_runners=15)
         assert breakdown.get('large_field_penalty', 0) == 0
 
-    def test_large_field_reduces_score(self):
-        """Total score with 20 runners should be lower than with 8 runners (all else equal)."""
+    def test_large_field_no_longer_reduces_score(self):
+        """Total score with 20 runners should equal score with 8 runners now
+        that field-size-based scoring is gone."""
         score_8, _, _ = _score_horse(self.BASE_HORSE, n_runners=8)
         score_20, _, _ = _score_horse(self.BASE_HORSE, n_runners=20)
-        assert score_20 < score_8
+        assert score_20 == score_8
 
 
 # ---------------------------------------------------------------------------
@@ -558,13 +536,16 @@ class TestWinlessVsWinner:
 
 class TestBounceBackPattern:
     """
-    Form pattern [good]-[bad]-[good] should trigger bounce_back bonus.
+    2026-09-03: bounce_back removed as a dead factor (0/33,552 nonzero on the
+    rebuild dataset — non-seasonal, the [good]-[bad]-[good] form-string
+    pattern this looked for apparently never matched real data) — see
+    .claude/skills/vegas.md. `bounce_back` no longer appears in `breakdown`.
     """
 
-    def test_classic_bounce_back_fires(self):
+    def test_classic_bounce_back_pattern_no_longer_scored(self):
         horse = {'name': 'Bouncer', 'odds': 5.0, 'form': '1-6-2', 'trainer': ''}
         _, breakdown, _ = _score_horse(horse)
-        assert breakdown.get('bounce_back', 0) > 0
+        assert breakdown.get('bounce_back', 0) == 0
 
     def test_steady_form_no_bounce(self):
         # 1-2-3: steady, no dramatic dip then recovery
@@ -583,12 +564,10 @@ class TestBounceBackPattern:
         _, breakdown, _ = _score_horse(horse)
         assert breakdown.get('bounce_back', 0) == 0
 
-    def test_bounce_back_adds_positive_pts(self):
-        """Bounce-back signal must add positive points, not zero or negative."""
+    def test_bounce_back_no_longer_adds_pts(self):
         horse = {'name': 'Big Bounce', 'odds': 5.0, 'form': '2-9-1', 'trainer': ''}
         _, breakdown, _ = _score_horse(horse)
-        pts = breakdown.get('bounce_back', 0)
-        assert pts > 0
+        assert breakdown.get('bounce_back', 0) == 0
 
 
 # ---------------------------------------------------------------------------
