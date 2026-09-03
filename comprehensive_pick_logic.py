@@ -376,22 +376,46 @@ def analyze_horse_comprehensive(horse_data, course, avg_winner_odds=3.80, course
         # Minimal points for heavy favorites
         sweet_spot_pts = int(weights['sweet_spot'] * 0.2)
         reasons.append(f"Heavy favorite (<1.5): {sweet_spot_pts}pts")
-    elif 9.0 < odds <= 15.0:
-        # Partial points for medium outsiders
-        sweet_spot_pts = int(weights['sweet_spot'] * 0.5)
-        reasons.append(f"Medium outsider (9-15): {sweet_spot_pts}pts")
-    elif 15.0 < odds <= 20.0:
-        # Small points for larger outsiders
-        sweet_spot_pts = int(weights['sweet_spot'] * 0.2)
-        reasons.append(f"Long shot (15-20): {sweet_spot_pts}pts")
-    elif odds > 20.0:
-        # Hard penalty: market strongly disagrees — flag as high-risk
-        # LESSON 2026-03-20: Spit Spot 60/1 scored 92pts (same as Light Fandango 4/1 which WON)
-        # The market price contains information our model lacks. Heavily penalise extreme outsiders.
-        longshot_penalty = int(weights['sweet_spot'] * 2)   # = ~24pts deducted
-        sweet_spot_pts = -longshot_penalty
-        reasons.append(f"Extreme outsider (>{odds:.0f}/1) — market disagrees: -{longshot_penalty}pts")
-    
+    elif 9.0 < odds <= 15.0 or 15.0 < odds <= 20.0 or odds > 20.0:
+        # STEAM OVERRIDE (2026-09-03): a big price alone isn't the risk — a big
+        # price the market hasn't moved on is. session_steam_pct is the horse's
+        # cumulative shortening from today's opening price to now (fixed the
+        # same day: this used to always read 0 because the price-history
+        # snapshot lived on a read-only Lambda filesystem — see
+        # betfair_odds_fetcher.py). A horse genuinely backed in from 33s to
+        # 12s carries real information the flat odds-band penalty below can't
+        # see; a horse that's simply been 25/1 all day with no support does not.
+        _steam = float(horse_data.get('session_steam_pct', 0) or 0)
+        if odds <= 20.0:
+            if _steam >= 40:
+                sweet_spot_pts = int(weights['sweet_spot'] * 0.65)
+                reasons.append(f"Backed in hard ({_steam:.0f}% off today's open) — treated as value range despite {odds:.0f}/1: {sweet_spot_pts}pts")
+            elif _steam >= 25:
+                sweet_spot_pts = int(weights['sweet_spot'] * 0.5)
+                reasons.append(f"Steaming ({_steam:.0f}% off today's open) at {odds:.0f}/1: {sweet_spot_pts}pts")
+            elif odds <= 15.0:
+                sweet_spot_pts = int(weights['sweet_spot'] * 0.5)
+                reasons.append(f"Medium outsider (9-15): {sweet_spot_pts}pts")
+            else:
+                sweet_spot_pts = int(weights['sweet_spot'] * 0.2)
+                reasons.append(f"Long shot (15-20): {sweet_spot_pts}pts")
+        else:
+            # Hard penalty: market strongly disagrees — flag as high-risk
+            # LESSON 2026-03-20: Spit Spot 60/1 scored 92pts (same as Light Fandango 4/1 which WON)
+            # The market price contains information our model lacks. Heavily penalise extreme outsiders
+            # — UNLESS the market has itself been actively re-rating this horse today (real steam),
+            # in which case "the market disagrees" is no longer true; the market is agreeing, loudly.
+            if _steam >= 40:
+                sweet_spot_pts = int(weights['sweet_spot'] * 0.4)
+                reasons.append(f"Extreme price ({odds:.0f}/1) but backed in {_steam:.0f}% today — penalty waived: +{sweet_spot_pts}pts")
+            elif _steam >= 25:
+                sweet_spot_pts = 0
+                reasons.append(f"Extreme price ({odds:.0f}/1) but steaming ({_steam:.0f}% off open) — penalty waived")
+            else:
+                longshot_penalty = int(weights['sweet_spot'] * 2)   # = ~24pts deducted
+                sweet_spot_pts = -longshot_penalty
+                reasons.append(f"Extreme outsider (>{odds:.0f}/1) — market disagrees: -{longshot_penalty}pts")
+
     score += sweet_spot_pts
     breakdown['sweet_spot'] = sweet_spot_pts
     

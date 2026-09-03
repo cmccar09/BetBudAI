@@ -11,6 +11,7 @@ import requests
 import datetime
 
 secrets_client = boto3.client('secretsmanager')
+_cache_table = boto3.resource('dynamodb', region_name='eu-west-1').Table('BetBudAICache')
 
 # Betfair Event Type IDs
 SPORT_EVENT_TYPES = {
@@ -295,32 +296,60 @@ def get_live_betfair_races():
                 "start_time":  market_start,
             })
 
-    # ── PRICE STEAM / DRIFT DETECTION (2026-03-30) ──────────────────────────
-    # Compare current prices against the snapshot from the last fetch.
-    # A horse whose price drops ≥ 20% is being backed ('steaming').
-    # A horse whose price rises ≥ 25% is drifting (market losing confidence).
+    # ── PRICE STEAM / DRIFT DETECTION (2026-03-30, fixed 2026-09-03) ────────
+    # Compare current prices against the snapshot from the last fetch, AND
+    # against the day's opening price (session-cumulative move).
+    # A horse whose price drops ≥ 20% since last fetch is being backed ('steaming').
+    # A horse whose price rises ≥ 25% since last fetch is drifting (confidence leaving).
     # These are stored in 'price_movement' on each runner so the scoring engine
     # can reward backed horses and penalise drifters.
-    _PH_FILE = 'price_history.json'
+    #
+    # BUG FOUND 2026-09-03: this used to read/write a bare local file
+    # ('price_history.json', no /tmp/ prefix). Lambda's deployment directory
+    # is read-only — every write threw, was swallowed by the bare except below,
+    # and _prev_prices was always empty, so pct_move was always 0 and
+    # price_movement was always 'stable'. This bonus has never fired in
+    # production. Fixed by moving the snapshot into BetBudAICache (DynamoDB),
+    # keyed per-day so it naturally resets and needs no cleanup.
+    #
+    # Also now tracks 'session_steam_pct': cumulative move from the day's FIRST
+    # seen price to now, not just the last-fetch delta — a horse that drifts in
+    # gradually (33 -> 28 -> 24 -> 20 -> 16 -> 12) never trips the 20%-per-fetch
+    # threshold on any single step, so the since-last-fetch metric alone misses
+    # real, sustained market confidence. session_steam_pct catches that.
+    _cache_key = f"price_history_{datetime.date.today().isoformat()}"
     try:
-        import os as _os
         _prev_prices = {}
-        if _os.path.exists(_PH_FILE):
-            with open(_PH_FILE, 'r') as _f:
-                _prev_prices = json.load(_f)  # {runner_id_str: price}
-        _new_prices = {}
+        try:
+            _resp = _cache_table.get_item(Key={'cache_key': _cache_key})
+            _raw = _resp.get('Item', {}).get('data')
+            if _raw:
+                _prev_prices = json.loads(_raw)  # {sid: {"opening": p, "last": p}}
+        except Exception as _ge:
+            print(f"  [price_steam] read failed, starting fresh: {_ge}")
+
+        _new_prices = dict(_prev_prices)
         for race in races:
             for runner in race.get('runners', []):
                 sid = str(runner.get('selectionId', ''))
                 cur = float(runner.get('odds', 0) or 0)
                 if not sid or cur <= 1.0:
                     continue
-                prev = _prev_prices.get(sid, cur)
-                if prev > 1.0 and cur > 1.0:
-                    # Convert to probability space for clean percentage change
-                    # p_cur = 1/cur, p_prev = 1/prev
-                    # steam = (p_cur - p_prev) / p_prev = prev/cur - 1
-                    pct_move = (prev - cur) / prev   # positive = price shortened (backed)
+                prior = _prev_prices.get(sid)
+                if prior is None:
+                    # First sighting today — this IS the opening price.
+                    runner['price_movement'] = 'stable'
+                    runner['price_move_pct'] = 0
+                    runner['session_steam_pct'] = 0
+                    runner['opening_odds'] = cur
+                    _new_prices[sid] = {'opening': cur, 'last': cur}
+                    continue
+
+                last = float(prior.get('last', cur) or cur)
+                opening = float(prior.get('opening', last) or last)
+
+                if last > 1.0 and cur > 1.0:
+                    pct_move = (last - cur) / last   # positive = shortened since last fetch
                     if pct_move >= 0.20:
                         runner['price_movement'] = 'steaming'
                         runner['price_move_pct'] = round(pct_move * 100)
@@ -330,10 +359,21 @@ def get_live_betfair_races():
                     else:
                         runner['price_movement'] = 'stable'
                         runner['price_move_pct'] = 0
-                _new_prices[sid] = cur
-        # Save updated prices for next run
-        with open(_PH_FILE, 'w') as _f:
-            json.dump(_new_prices, _f)
+
+                if opening > 1.0 and cur > 1.0:
+                    session_pct = (opening - cur) / opening   # positive = shortened since the day's open
+                    runner['session_steam_pct'] = round(session_pct * 100)
+                else:
+                    runner['session_steam_pct'] = 0
+                runner['opening_odds'] = opening
+
+                _new_prices[sid] = {'opening': opening, 'last': cur}
+
+        _cache_table.put_item(Item={
+            'cache_key': _cache_key,
+            'data': json.dumps(_new_prices),
+            'ttl': int(datetime.datetime.now(datetime.timezone.utc).timestamp()) + 172800,  # 2 days
+        })
     except Exception as _pe:
         print(f"  [price_steam] Warning: {_pe}")
 
