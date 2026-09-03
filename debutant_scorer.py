@@ -263,10 +263,31 @@ def score_debutant(horse_data: dict, race_distance_f: float = 0.0) -> tuple[int,
         breakdown['DEBUTANT_MARKET_CONFIDENCE'] = pts
         reasons.append(f"Debutant at {odds:.1f} — strong market confidence: +{pts}pts")
     elif odds > 15.0:
-        pts = -8
-        score += pts
-        breakdown['DEBUTANT_MARKET_CONFIDENCE'] = pts
-        reasons.append(f"Debutant at {odds:.1f} — outsider, market not expecting debut win: {pts}pts")
+        # STEAM OVERRIDE (2026-09-03): "market not expecting a debut win" isn't
+        # actually true of a horse that's been backed in hard from an even bigger
+        # price — that's the market changing its mind, live, which is exactly the
+        # kind of connections-know-something signal this whole function exists to
+        # catch. session_steam_pct is the cumulative shortening from today's
+        # opening price (see betfair_odds_fetcher.py / comprehensive_pick_logic.py's
+        # sweet_spot for the same fix and the filesystem bug that made this data
+        # always read 0 until today). Found via Curracloe, 42/1 debutant winner
+        # 2026-09-01 (Gowran Park, €240k yearling per the owner) that scored -42
+        # overall, -8 of it right here, despite being exactly the profile this
+        # signal is supposed to reward.
+        _steam = float(horse_data.get('session_steam_pct', 0) or 0)
+        if _steam >= 40:
+            pts = 6
+            score += pts
+            breakdown['DEBUTANT_MARKET_CONFIDENCE'] = pts
+            reasons.append(f"Debutant at {odds:.1f} but backed in {_steam:.0f}% today — real market confidence: +{pts}pts")
+        elif _steam >= 25:
+            breakdown['DEBUTANT_MARKET_CONFIDENCE'] = 0
+            reasons.append(f"Debutant at {odds:.1f}, steaming ({_steam:.0f}% off open) — outsider penalty waived")
+        else:
+            pts = -8
+            score += pts
+            breakdown['DEBUTANT_MARKET_CONFIDENCE'] = pts
+            reasons.append(f"Debutant at {odds:.1f} — outsider, market not expecting debut win: {pts}pts")
     else:
         breakdown['DEBUTANT_MARKET_CONFIDENCE'] = 0
 
