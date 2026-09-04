@@ -207,6 +207,20 @@ Built exactly what the mandate specified: a candidate model computes what it *wo
 
 ---
 
+## Resumed on a business call, not new evidence (2026-09-04)
+
+`VEGAS_PAUSED` flipped back to `False`, live, confirmed via `curl .../api/vegas`. Record this precisely, because it breaks the pattern every other change in this file follows:
+
+**This was not triggered by paper-trading results.** The paper-trading pipeline built 2026-09-03 had run for about one day at the point this was decided — nowhere near the 100 picks / 3-4 weeks it exists to require. The underlying 2026-09-01 finding (α≈0, live scoring worse than random, market wins every segment tested) was never overturned. Nobody re-ran the analysis and found an edge.
+
+**What actually happened**: Charles asked directly to turn Vegas back on. Before touching the flag, the tradeoff was stated plainly — the original finding still stands, the paper-trading gate had barely started, and this would not be a technical resolution, it would be a business decision to have live content over waiting for evidence. Given that framing, the explicit choice was "resume now anyway." That is a legitimate call for the site owner to make — this section exists to make sure the *next* person reading this file (including a future session of this same assistant) doesn't mistake a business decision for a modeling result, and doesn't assume "it's live, so it must have been proven" the way the ELITE-grade backtest confidence wrongly was back in August.
+
+**What's genuinely different from 2026-09-01**, for calibrating how much weight to put on that: two real bugs were fixed 2026-09-03 that the original analysis's dataset was collected *under* — market-steam detection was silently dead (wrong Lambda filesystem path, fixed to DynamoDB) the entire time that dataset was gathered, and both `sweet_spot` and `DEBUTANT_MARKET_CONFIDENCE` blindly penalized big prices with no way to credit genuine steam. So the picks going out now are not identical to what was analysed — they should be somewhat better. But "should be somewhat better" is a hypothesis, not a validated one; the paper-trading pipeline is still the only mechanism that will actually check it, and it's still running, unaffected by this decision (still logging to `pick_type='vegas_paper'`, still not published, still the real evaluation path).
+
+**If this needs pausing again**: don't skip the analysis step a second time just because it was skipped this time. Check real settled `pick_type='vegas'` ROI and `value_add` (not just ROI — the positive-ROI/negative-calibration trap is exactly the failure mode that started the 2026-09-01 investigation) after a real sample accumulates, same as every prior review in this file.
+
+---
+
 ## Checked against Benter's actual 1994 paper (2026-08-28)
 
 This model is named after Bill Benter's system, so it's worth periodically checking our implementation against what he actually published — "Computer Based Horse Race Handicapping and Wagering Systems: A Report" (1994, in *Efficiency of Racetrack Betting Markets*). Full text: [gwern.net mirror](https://gwern.net/doc/statistics/decision/1994-benter.pdf); a very good annotated walkthrough with the exact equations: [Acta Machina](https://actamachina.com/posts/annotated-benter-paper).

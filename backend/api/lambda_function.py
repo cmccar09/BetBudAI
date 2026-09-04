@@ -1687,9 +1687,22 @@ def get_punchestown_tomorrow_picks(headers, event):
 # value_ratio>=2.0, one-pick-per-race) produced ZERO qualifying ELITE picks —
 # max value_ratio across all 1,317 observations was 1.04, nowhere near the 2.0
 # bar. Single source of truth for all three /api/vegas* endpoints so the
-# "paused" state can't drift out of sync between them. Do not flip this back to
-# False without re-reading vegas.md's 2026-09-01 entry and getting sign-off.
-VEGAS_PAUSED = True
+# "paused" state can't drift out of sync between them.
+#
+# RESUMED 2026-09-04 — Charles's explicit call, made with the tradeoff stated
+# plainly first: the underlying finding above still stands (no cross-validated
+# edge was found), and the paper-trading clock built 2026-09-03 specifically to
+# gate a resume decision had only run one day, nowhere near the 100 picks / 3-4
+# weeks it was designed to require. This is a business decision to have live
+# picks over waiting for that evidence, not a technical finding that the model
+# now has edge. Two real bugs were fixed 2026-09-03 (dead market-steam
+# detection; steam-blind odds-ceiling penalties in sweet_spot and
+# DEBUTANT_MARKET_CONFIDENCE) which should make picks going forward somewhat
+# better than what was analysed, but that is not validated either. See
+# vegas.md's 2026-09-04 entry. If this needs pausing again, the same rigor
+# discipline in the 2026-09-01/09-03 entries applies — don't skip it because
+# it was skipped once already.
+VEGAS_PAUSED = False
 VEGAS_PAUSE_MESSAGE = (
     "Vegas ELITE picks are paused for recalibration. A statistical check found "
     "the model's edge-detection weights weren't earning their keep over just "
