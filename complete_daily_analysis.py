@@ -50,8 +50,16 @@ except ImportError:
 db    = boto3.resource('dynamodb', region_name='eu-west-1')
 table = db.Table('SureBetBets')
 
-TARGET_PICKS   = 2      # 2026-06-16: data-driven reset. 75 settled picks show 66.7% WR only in
-                        # non-handicap 2.0-3.5 odds band. 2 high-quality picks beats 5 speculative ones.
+TARGET_PICKS   = 1      # 2026-09-05: pick-racing.md's own stated policy is "1 Best Bet max —
+                        # fewer, better picks. Never chase volume" and pick_type='morning' is
+                        # documented as "the single Morning Pick" — but this was still set to 2,
+                        # so the site was quietly issuing a second morning pick every day that the
+                        # skill never called for. Caught when a subscriber flagged multiple morning
+                        # picks on one day. Reduced to 1 to actually match the documented policy.
+                        # (Prior note: 2026-06-16 data-driven reset — 75 settled picks showed
+                        # 66.7% WR only in non-handicap 2.0-3.5 odds band; 2 high-quality picks
+                        # beats 5 speculative ones. That reasoning supports fewer picks generally,
+                        # not specifically 2 over 1.)
 MIN_CONFIDENCE = 60     # Soft floor — race-type + odds window do the real filtering now.
 
 
@@ -1235,10 +1243,18 @@ def analyze_and_save_all(force_reanalyse: bool = False):
             item['is_dropped']          = _is_dropped
             _is_extended = bid in _extended_bet_ids
             _existing_pt = item.get('pick_type', '')
-            item['pick_type'] = ('dropped'  if _is_dropped
-                                 else 'value'    if is_ui and _existing_pt == 'value'
-                                 else 'morning'  if is_ui
-                                 else 'extended' if _is_extended
+            # 2026-09-05: hot-prospect bonus picks used to also get tagged 'morning',
+            # so pick_racing.md's own documented policy ("the single Morning Pick")
+            # was quietly violated on any day the bonus 6th slot fired — a subscriber
+            # noticed multiple morning-style picks the same day. Hot prospects are a
+            # real, deliberately rare feature (score>=130, badged separately in the
+            # UI) and are kept, but now get their own pick_type so 'morning' always
+            # means exactly one record per day, matching the skill's own definition.
+            item['pick_type'] = ('dropped'       if _is_dropped
+                                 else 'hot_prospect' if is_ui and item['is_hot_prospect']
+                                 else 'value'     if is_ui and _existing_pt == 'value'
+                                 else 'morning'   if is_ui
+                                 else 'extended'  if _is_extended
                                  else 'learning')
             item['race_analyzed_count'] = race_total
             if is_ui:

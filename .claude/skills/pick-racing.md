@@ -42,7 +42,10 @@ aws dynamodb query --table-name SureBetBets \
 Pick types to know:
 - `pick_type = morning` — the single Morning Pick, locked at 13:00 UTC, shown with 🔒 label
 - `pick_type = extended` — Live Opportunities (top 3 weekdays / 4 weekends by score, all courses), updated throughout day
-- Both types now count in ROI (methodology updated 2026-07-13)
+- `pick_type = hot_prospect` — a separate, deliberately rare bonus pick (score ≥130, odds <5.0), badged 🔥 in the UI. Not a second Morning Pick.
+- Both morning and extended count in ROI (methodology updated 2026-07-13)
+
+**"the single Morning Pick" wasn't actually enforced (found + fixed 2026-09-05).** `complete_daily_analysis.py`'s `TARGET_PICKS` was set to 2, not 1 — this file already documented "1 Best Bet max" and "the single Morning Pick" above, but the code quietly issued a second one every day. On top of that, the Hot Prospect bonus slot was tagged with the same `pick_type='morning'` as the real one, so on any day it fired, a subscriber would see multiple "Morning Pick — locked" cards with no way to tell from the data alone that one was the deliberate rare bonus and not a second headline pick. A subscriber caught this from a live screenshot. Fixed both: `TARGET_PICKS = 1`, and Hot Prospect now gets its own `pick_type='hot_prospect'` so `pick_type='morning'` always means exactly one record per day, matching this file's own stated policy. If this needs to change again, update the goal table above first — don't let the code and the doc drift apart a second time.
 
 If the query returns nothing, the pipeline hasn't run yet (fires 12:00 UTC):
 ```bash
