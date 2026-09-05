@@ -342,15 +342,28 @@ def _betfair_refresh_token(sm, secret):
             secret['last_refresh']  = datetime.now(timezone.utc).isoformat()
             sm.update_secret(SecretId='betfair-credentials', SecretString=json.dumps(secret))
             return resp['token']
-    except Exception:
-        pass
+        print(f'[football][betfair] login failed: status={r.status_code} resp={resp!r:.300}')
+    except Exception as _le:
+        print(f'[football][betfair] login exception: {_le}')
     return None
 
 
 def fetch_betfair_football_odds(fixtures):
-    """Fetch live 1X2 MATCH_ODDS from Betfair for upcoming PL fixtures.
-    Auto-refreshes the session token if expired.
-    Returns dict keyed by Betfair event name → {runner_name: decimal_price}."""
+    """Fetch live MATCH_ODDS, Both Teams To Score, and First Goalscorer markets
+    from Betfair for upcoming PL fixtures. Auto-refreshes the session token if expired.
+
+    Returns {'match_odds': {...}, 'btts': {...}, 'first_scorer': {...}}, each keyed
+    by Betfair event name → {runner_name: decimal_price}.
+
+    Added 2026-09-05: BTTS/first-scorer picks used to show a flat hardcoded price
+    ('4/5', 'Evens', or a static per-team odds guess) regardless of the actual
+    match — a subscriber correctly called this out as "prices are wrong" after
+    all three picks landed but the shown odds didn't match what was actually
+    available. Only MATCH_ODDS was ever fetched live; this extends the same
+    catalogue call to the other two markets so all three picks can carry a real
+    price when the market exists, with the old static value kept as a fallback
+    for whichever markets aren't up yet or don't match by name.
+    """
     try:
         import boto3 as _boto3
         sm = _boto3.client('secretsmanager', region_name='eu-west-1')
@@ -358,9 +371,10 @@ def fetch_betfair_football_odds(fixtures):
         app_key = secret.get('app_key', '')
         session_token = secret.get('session_token', '')
         if not app_key or not session_token:
-            return {}
+            print('[football][betfair] no app_key/session_token in betfair-credentials secret — skipping live odds')
+            return {'match_odds': {}, 'btts': {}, 'first_scorer': {}}
 
-        # Find MATCH_ODDS markets for English Premier League (eventTypeId=1, competitionId=10932509)
+        # English Premier League: eventTypeId=1, competitionId=10932509
         catalogue_url = 'https://api.betfair.com/exchange/betting/rest/v1.0/listMarketCatalogue/'
         headers = {
             'X-Application': app_key, 'X-Authentication': session_token,
@@ -370,27 +384,47 @@ def fetch_betfair_football_odds(fixtures):
             'filter': {
                 'eventTypeIds': ['1'],
                 'competitionIds': ['10932509'],  # Premier League
-                'marketTypeCodes': ['MATCH_ODDS'],
+                'marketTypeCodes': ['MATCH_ODDS', 'BOTH_TEAMS_TO_SCORE', 'FIRST_GOALSCORER'],
                 'inPlayOnly': False,
             },
-            'marketProjection': ['RUNNER_DESCRIPTION', 'EVENT'],
-            'maxResults': 20,
+            'marketProjection': ['RUNNER_DESCRIPTION', 'EVENT', 'MARKET_DESCRIPTION'],
+            'maxResults': 60,
         }
         r = requests.post(catalogue_url, headers=headers, json=cat_body, timeout=10)
-        markets = r.json() if r.status_code == 200 else []
+        print(f'[football][betfair] catalogue status={r.status_code} body_head={r.text[:300]!r}')
+        # BUG FOUND 2026-09-05: this used to be `r.json() if r.status_code == 200
+        # else []` — on a non-200 response (e.g. an expired session) the error
+        # body was discarded before the INVALID_SESSION_INFORMATION check below
+        # ever got a chance to see it, so the auto-refresh retry could never
+        # fire. Parse the body regardless of status code; Betfair returns a
+        # real JSON error object on 400s, not an empty response.
+        try:
+            markets = r.json()
+        except Exception:
+            markets = []
 
         # Auto-refresh token if session expired, then retry once
         if isinstance(markets, dict) and markets.get('detail', {}).get('APINGException', {}).get('errorCode') == 'INVALID_SESSION_INFORMATION':
+            print('[football][betfair] session expired, refreshing token and retrying once')
             new_token = _betfair_refresh_token(sm, secret)
             if new_token:
                 headers['X-Authentication'] = new_token
                 r = requests.post(catalogue_url, headers=headers, json=cat_body, timeout=10)
-                markets = r.json() if r.status_code == 200 else []
+                print(f'[football][betfair] retry status={r.status_code} body_head={r.text[:300]!r}')
+                try:
+                    markets = r.json()
+                except Exception:
+                    markets = []
+            else:
+                print('[football][betfair] token refresh failed — _betfair_refresh_token returned None')
 
         if not markets or isinstance(markets, dict):
-            return {}
+            print(f'[football][betfair] no usable markets — markets={markets!r:.300}' if not isinstance(markets, dict) else f'[football][betfair] catalogue returned an error object: {markets!r:.300}')
+            return {'match_odds': {}, 'btts': {}, 'first_scorer': {}}
 
-        # Build market_id → fixture mapping
+        print(f'[football][betfair] catalogue returned {len(markets)} markets: '
+              f'{sorted(set(m.get("marketName","?") for m in markets))}')
+
         market_ids = [m['marketId'] for m in markets]
         books_url = 'https://api.betfair.com/exchange/betting/rest/v1.0/listMarketBook/'
         books_body = {
@@ -400,10 +434,23 @@ def fetch_betfair_football_odds(fixtures):
         r2 = requests.post(books_url, headers=headers, json=books_body, timeout=10)
         books = {b['marketId']: b for b in (r2.json() if r2.status_code == 200 else [])}
 
-        result = {}
+        result = {'match_odds': {}, 'btts': {}, 'first_scorer': {}}
         for m in markets:
             mid   = m['marketId']
             event = m.get('event', {}).get('name', '')  # e.g. "Arsenal v Coventry City"
+            # Route by market name rather than trusting the requested code comes
+            # back unchanged — 'Match Odds' / 'Both Teams To Score' / 'First Goalscorer'
+            # are the actual human-readable names Betfair returns.
+            mname = (m.get('marketName') or '').lower()
+            if 'both teams' in mname:
+                bucket = 'btts'
+            elif 'goalscorer' in mname and 'first' in mname:
+                bucket = 'first_scorer'
+            elif 'match odds' in mname:
+                bucket = 'match_odds'
+            else:
+                continue
+
             book  = books.get(mid, {})
             runners = book.get('runners', [])
             runner_map = {r['selectionId']: r for r in runners}
@@ -420,11 +467,15 @@ def fetch_betfair_football_odds(fixtures):
                     odds_map[name] = price
 
             if len(odds_map) >= 2:
-                result[event] = odds_map  # e.g. {'Arsenal': 1.14, 'The Draw': 7.0, 'Coventry City': 18.0}
+                result[bucket][event] = odds_map  # e.g. {'Arsenal': 1.14, 'The Draw': 7.0, 'Coventry City': 18.0}
 
+        print(f'[football][betfair] resolved match_odds={len(result["match_odds"])} '
+              f'btts={len(result["btts"])} first_scorer={len(result["first_scorer"])} events')
         return result
-    except Exception:
-        return {}
+    except Exception as _be:
+        import traceback
+        print(f'[football][betfair] fetch failed: {_be}\n{traceback.format_exc()}')
+        return {'match_odds': {}, 'btts': {}, 'first_scorer': {}}
 
 
 def match_betfair_odds(fixture_home, fixture_away, bf_odds_map):
@@ -661,7 +712,10 @@ def generate_match_bets(fx, team_stats, bf_odds_map=None):
     # ── Safe Pick: match result — live Betfair odds where available ──────────
     h_str = TEAM_STRENGTH.get(home, 65) + 5
     a_str = TEAM_STRENGTH.get(away, 65)
-    bf    = match_betfair_odds(home, away, bf_odds_map or {})
+    _bf_maps = bf_odds_map or {}
+    bf      = match_betfair_odds(home, away, _bf_maps.get('match_odds', {}))
+    bf_btts = match_betfair_odds(home, away, _bf_maps.get('btts', {}))
+    bf_fgs  = match_betfair_odds(home, away, _bf_maps.get('first_scorer', {}))
 
     if result == 'home_win':
         result_label = f'{home} Win'
@@ -698,13 +752,24 @@ def generate_match_bets(fx, team_stats, bf_odds_map=None):
     btts_pct = pred.get('btts_pct') or calc_btts_prob(h_stats['avg_for'], a_stats['avg_for'])
     combined  = h_stats['avg_for'] + a_stats['avg_for']
 
+    # Live BTTS price where Betfair has the market up — falls back to the old
+    # static guess otherwise. Found 2026-09-05: this used to always show a flat
+    # '4/5'/'Evens' regardless of the actual match, which a subscriber correctly
+    # flagged as wrong prices once all three picks landed.
+    _btts_yes_bf = bf_btts.get('Yes') or bf_btts.get('YES')
+    _btts_no_bf  = bf_btts.get('No') or bf_btts.get('NO')
+
     if btts_pct >= 58:
+        if _btts_yes_bf:
+            btts_odds, btts_src = decimal_to_fractional(float(_btts_yes_bf)), f'Betfair {float(_btts_yes_bf):.2f}'
+        else:
+            btts_odds, btts_src = '4/5', 'model estimate (no live price)'
         value_pick = {
             'market': 'Both Teams to Score',
             'pick':   'Yes',
-            'odds':   '4/5',
+            'odds':   btts_odds,
             'pct':    btts_pct,
-            'reason': f'BTTS {btts_pct}% — {home} avg {h_stats["avg_for"]:.1f} scored, {away} avg {a_stats["avg_for"]:.1f}',
+            'reason': f'BTTS {btts_pct}% — {home} avg {h_stats["avg_for"]:.1f} scored, {away} avg {a_stats["avg_for"]:.1f} — {btts_src}',
         }
     elif btts_pct >= 50 and combined > 2.5:
         over_pct = round(min((combined / 2.5) * 50, 80))
@@ -716,33 +781,57 @@ def generate_match_bets(fx, team_stats, bf_odds_map=None):
             'reason': f'Combined {combined:.1f} avg goals/game — over 2.5 expected (~{over_pct}%)',
         }
     elif btts_pct >= 50:
+        if _btts_yes_bf:
+            btts_odds, btts_src = decimal_to_fractional(float(_btts_yes_bf)), f'Betfair {float(_btts_yes_bf):.2f}'
+        else:
+            btts_odds, btts_src = 'Evens', 'model estimate (no live price)'
         value_pick = {
             'market': 'Both Teams to Score',
             'pick':   'Yes',
-            'odds':   'Evens',
+            'odds':   btts_odds,
             'pct':    btts_pct,
-            'reason': f'BTTS {btts_pct}% — balanced scoring match expected',
+            'reason': f'BTTS {btts_pct}% — balanced scoring match expected — {btts_src}',
         }
     else:
         no_pct = 100 - btts_pct
+        if _btts_no_bf:
+            btts_odds, btts_src = decimal_to_fractional(float(_btts_no_bf)), f'Betfair {float(_btts_no_bf):.2f}'
+        else:
+            btts_odds, btts_src = '4/5', 'model estimate (no live price)'
         value_pick = {
             'market': 'Both Teams to Score',
             'pick':   'No',
-            'odds':   '4/5',
+            'odds':   btts_odds,
             'pct':    no_pct,
-            'reason': f'BTTS No ({no_pct}%) — predicted score {score} consistent with clean sheet',
+            'reason': f'BTTS No ({no_pct}%) — predicted score {score} consistent with clean sheet — {btts_src}',
         }
 
     # ── Longshot: first scorer from stronger team ─────────────────────────────
     stronger = home if result in ('home_win', 'draw') else away
     scorer   = FIRST_SCORERS.get(stronger)
     if scorer and conf >= 52:
+        # Live price where Betfair's First Goalscorer market has this exact
+        # player up — match on last name since Betfair's runner naming
+        # ("A Isak") doesn't always match our stored full name ("Alexander
+        # Isak") exactly. Falls back to the static per-team odds guess
+        # otherwise (2026-09-05: that static price was the third static
+        # figure a subscriber flagged as not matching a real market).
+        _scorer_last = scorer['name'].split()[-1].lower()
+        _fgs_price = None
+        for _runner_name, _price in bf_fgs.items():
+            if _scorer_last in _runner_name.lower():
+                _fgs_price = _price
+                break
+        if _fgs_price:
+            fgs_odds, fgs_src = decimal_to_fractional(float(_fgs_price)), f" — Betfair {float(_fgs_price):.2f}"
+        else:
+            fgs_odds, fgs_src = scorer['odds'], ''
         longshot = {
             'market': 'First Goalscorer',
             'pick':   scorer['name'],
             'team':   stronger,
-            'odds':   scorer['odds'],
-            'reason': scorer['note'],
+            'odds':   fgs_odds,
+            'reason': scorer['note'] + fgs_src,
         }
     else:
         longshot = {
