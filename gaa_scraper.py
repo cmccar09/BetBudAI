@@ -20,15 +20,26 @@ Round 1 dates — it superseded slightly different dates found in an earlier
 pass (this scraper's dates below reflect the corrected Master Fixture Plan
 figures, not the earlier estimate).
 
+PSHC/PSFC results, fixtures and standings refreshed 2026-09-07 against the
+live Wikipedia pages for each championship (URLs in the RESULTS section
+below), cross-checked with a news search for the PSHC quarter-final draw
+(no contradicting source found). Only PSHC/PSFC have real results/fixtures
+data — the lower grades (Senior A, Premier Intermediate, etc.) remain
+structure-only per the GRADES 'status' field; do not backfill their
+results/fixtures without an actual source, same rule as everything else here.
+
 Storage: BetBudAI_Sports table
   PK 'sport' = 'gaa'
   SK 'data_key':
-    'GRADES'   — full grade ladder both codes: clubs, divisions/colleges, sponsor, dates, status
-    'PSHC'     — Premier Senior Hurling Championship detail (defending champion, stats)
-    'PSFC'     — Premier Senior Football Championship detail (stats, top scorers)
-    'TIPS'     — division-winner predictions, one per grade, honest about confidence
-    'HISTORY'  — recent champions where verified
-    'META'     — last_updated, season window
+    'GRADES'    — full grade ladder both codes: clubs, divisions/colleges, sponsor, dates, status
+    'PSHC'      — Premier Senior Hurling Championship detail (defending champion, stats)
+    'PSFC'      — Premier Senior Football Championship detail (stats, top scorers)
+    'RESULTS'   — {'hurling': [...], 'football': [...]} — completed match results, PSHC/PSFC only
+    'FIXTURES'  — {'hurling': [...], 'football': [...]} — upcoming/knockout fixtures, PSHC/PSFC only
+    'STANDINGS' — {'hurling': {...}, 'football': {...}} — group tables, PSHC/PSFC only
+    'TIPS'      — division-winner predictions, one per grade, honest about confidence
+    'HISTORY'   — recent champions where verified
+    'META'      — last_updated, season window
 
 Entry point: lambda_handler(event, context) — invoked by Step Functions
 (once added to the SureBet-Sports-DailyRefresh fan-out — see gaa-page.md skill).
@@ -120,7 +131,7 @@ GRADES = [
     },
 ]
 
-# ── Premier Senior Football Championship — real 2026 detail (verified 2026-07-27) ──
+# ── Premier Senior Football Championship — real 2026 detail (verified 2026-07-27, results/fixtures refreshed 2026-09-07) ──
 PSFC_DETAIL = {
     'name': '2026 Cork Premier Senior Football Championship',
     'edition': '7th staging (138th county football championship overall)',
@@ -129,11 +140,10 @@ PSFC_DETAIL = {
     'draw_date': '2025-12-09',
     'window': '24 July – October 2026 (Championship Round 1 per Master Fixture Plan; separate McCarthy '
               'Insurance Group Football League ran March–early July, see league_context)',
-    'stats_as_of': '2026-07-27 (4 group matches played — consistent with Round 1 having just been played '
-                   'over the 24-26 July opening weekend)',
+    'stats_as_of': '2026-09-07 (Round 2 complete in all 3 club groups, Round 3 scheduled 13 Sept; '
+                   'divisional section finished — Carbery through to preliminary QF)',
     'top_scorers': [
-        {'player': 'Mark Lenahan', 'team': 'Avondhu (divisional)', 'tally': '2-12'},
-        {'player': 'Ben Twomey', 'team': 'Avondhu (divisional)', 'tally': '3-07'},
+        {'player': 'Mark Lenahan', 'team': 'Avondhu (divisional)', 'tally': '3-14'},
     ],
     'note': 'Divisional sides (e.g. Avondhu, representing a rural district board rather than a single '
             'club) compete in the group series alongside the 12 senior clubs and the two universities, '
@@ -141,7 +151,58 @@ PSFC_DETAIL = {
     'league_context': COUNTY_LEAGUES['football'],
 }
 
-# ── Premier Senior Hurling Championship — real 2026 detail (verified 2026-07-27) ──
+# ── PSFC results + fixtures — Source: Wikipedia "2026 Cork Premier Senior
+# Football Championship" (https://en.wikipedia.org/wiki/2026_Cork_Premier_Senior_Football_Championship).
+# Verified 2026-09-07. Divisional section (Seandún/Avondhu/MTU Cork/Imokilly/
+# Beara/Duhallow/Carbery/Muskerry/UCC) is a separate qualifying competition
+# that feeds one team (Carbery, as Division champions) into the club knockout —
+# included here for completeness, not part of the 12-club group table.
+PSFC_RESULTS = [
+    # Group 1
+    {'group': 'Group 1', 'round': 1, 'date': '2026-07-24', 'home': "St Finbarr's", 'home_score': '2-15', 'away': 'Carrigaline', 'away_score': '1-20'},
+    {'group': 'Group 1', 'round': 1, 'date': '2026-07-25', 'home': 'Mallow', 'home_score': '0-14', 'away': 'Douglas', 'away_score': '4-10'},
+    {'group': 'Group 1', 'round': 2, 'date': '2026-08-14', 'home': 'Douglas', 'home_score': '1-11', 'away': "St Finbarr's", 'away_score': '3-16'},
+    {'group': 'Group 1', 'round': 2, 'date': '2026-08-16', 'home': 'Carrigaline', 'home_score': '0-16', 'away': 'Mallow', 'away_score': '0-14'},
+    # Group 2
+    {'group': 'Group 2', 'round': 1, 'date': '2026-07-25', 'home': 'Newcestown', 'home_score': '2-16', 'away': 'Nemo Rangers', 'away_score': '1-13'},
+    {'group': 'Group 2', 'round': 1, 'date': '2026-07-26', 'home': "St Michael's", 'home_score': '1-05', 'away': 'Valley Rovers', 'away_score': '1-07'},
+    {'group': 'Group 2', 'round': 2, 'date': '2026-08-15', 'home': 'Valley Rovers', 'home_score': '1-16', 'away': 'Newcestown', 'away_score': '3-09'},
+    {'group': 'Group 2', 'round': 2, 'date': '2026-08-16', 'home': 'Nemo Rangers', 'home_score': '1-21', 'away': "St Michael's", 'away_score': '2-10'},
+    # Group 3
+    {'group': 'Group 3', 'round': 1, 'date': '2026-07-25', 'home': 'Knocknagree', 'home_score': '0-13', 'away': 'Clonakilty', 'away_score': '1-18'},
+    {'group': 'Group 3', 'round': 1, 'date': '2026-07-26', 'home': 'Castlehaven', 'home_score': '0-22', 'away': 'Ballincollig', 'away_score': '3-10'},
+    {'group': 'Group 3', 'round': 2, 'date': '2026-08-16', 'home': 'Clonakilty', 'home_score': '1-12', 'away': 'Castlehaven', 'away_score': '1-12', 'note': 'draw'},
+    {'group': 'Group 3', 'round': 2, 'date': '2026-08-16', 'home': 'Ballincollig', 'home_score': '0-13', 'away': 'Knocknagree', 'away_score': '2-18'},
+    # Divisional section (feeds Division champion into the club knockout)
+    {'group': 'Divisional', 'round': 1, 'date': '2026-04-07', 'home': 'Seandún', 'home_score': '3-14', 'away': 'Avondhu', 'away_score': '3-17'},
+    {'group': 'Divisional', 'round': 1, 'date': '2026-04-07', 'home': 'MTU Cork', 'home_score': '0-05', 'away': 'Imokilly', 'away_score': '0-16'},
+    {'group': 'Divisional', 'round': 2, 'date': '2026-04-14', 'home': 'Beara', 'home_score': '1-07', 'away': 'Avondhu', 'away_score': '3-05'},
+    {'group': 'Divisional', 'round': 3, 'date': '2026-04-21', 'home': 'Avondhu', 'home_score': '1-16', 'away': 'Imokilly', 'away_score': '1-06'},
+    {'group': 'Divisional', 'round': 'Semi-final', 'date': '2026-06-30', 'home': 'Duhallow', 'home_score': '1-23', 'away': 'Carbery', 'away_score': '3-18'},
+    {'group': 'Divisional', 'round': 'Semi-final', 'date': '2026-07-07', 'home': 'Avondhu', 'home_score': '3-12', 'away': 'Muskerry', 'away_score': '3-17'},
+    {'group': 'Divisional', 'round': 'Final', 'date': '2026-07-10', 'home': 'Carbery', 'home_score': '2-23', 'away': 'Muskerry', 'away_score': '2-15'},
+    {'group': 'Divisional', 'round': 'Preliminary QF', 'date': '2026-08-09', 'home': 'Carbery', 'home_score': None, 'away': 'UCC', 'away_score': None, 'note': 'Carbery won walkover'},
+]
+
+PSFC_STANDINGS = {
+    'Group 1': [{'team': 'Carrigaline', 'pts': 4}, {'team': "St Finbarr's", 'pts': 2}, {'team': 'Douglas', 'pts': 2}, {'team': 'Mallow', 'pts': 0}],
+    'Group 2': [{'team': 'Valley Rovers', 'pts': 4}, {'team': 'Newcestown', 'pts': 2}, {'team': 'Nemo Rangers', 'pts': 2}, {'team': "St Michael's", 'pts': 0}],
+    'Group 3': [{'team': 'Clonakilty', 'pts': 3}, {'team': 'Castlehaven', 'pts': 3}, {'team': 'Knocknagree', 'pts': 2}, {'team': 'Ballincollig', 'pts': 0}],
+}
+
+PSFC_FIXTURES = [
+    {'group': 'Group 1', 'round': 3, 'date': '2026-09-13', 'home': 'Carrigaline', 'away': 'Douglas'},
+    {'group': 'Group 1', 'round': 3, 'date': '2026-09-13', 'home': "St Finbarr's", 'away': 'Mallow'},
+    {'group': 'Group 2', 'round': 3, 'date': '2026-09-13', 'home': 'Nemo Rangers', 'away': 'Valley Rovers'},
+    {'group': 'Group 2', 'round': 3, 'date': '2026-09-13', 'home': 'Newcestown', 'away': "St Michael's"},
+    {'group': 'Group 3', 'round': 3, 'date': '2026-09-13', 'home': 'Ballincollig', 'away': 'Clonakilty'},
+    {'group': 'Group 3', 'round': 3, 'date': '2026-09-13', 'home': 'Castlehaven', 'away': 'Knocknagree'},
+    {'stage': 'Quarter-final', 'date': None, 'home': 'TBD', 'away': 'TBD', 'note': 'October — pairings depend on Round 3 group results, not yet determined'},
+    {'stage': 'Semi-final', 'date': None, 'home': 'TBD', 'away': 'TBD'},
+    {'stage': 'Final', 'date': None, 'home': 'TBD', 'away': 'TBD'},
+]
+
+# ── Premier Senior Hurling Championship — real 2026 detail (verified 2026-07-27, results/fixtures refreshed 2026-09-07) ──
 PSHC_DETAIL = {
     'name': '2026 Cork Premier Senior Hurling Championship',
     'sponsor': 'Co-Op Superstores',
@@ -150,9 +211,68 @@ PSHC_DETAIL = {
     'window': '31 July – October 2026 (Championship Round 1 per Master Fixture Plan; separate RedFM '
               'Hurling League ran March–early July, see league_context)',
     'defending_champion': 'Sarsfields',
-    'note': 'Sarsfields enter as defending champions from 2025.',
+    'note': 'Sarsfields enter as defending champions from 2025 — through to the quarter-final after '
+            'finishing level on points in Group 2 (see RESULTS/standings below).',
+    'stats_as_of': '2026-09-07 (group stage complete, all 3 groups through Round 3; quarter-final draw made)',
+    'top_scorer': {'player': 'Jack Leahy', 'tally': '3-17'},
     'league_context': COUNTY_LEAGUES['hurling'],
 }
+
+# ── PSHC results + fixtures — Source: Wikipedia "2026 Cork Premier Senior
+# Hurling Championship" (https://en.wikipedia.org/wiki/2026_Cork_Premier_Senior_Hurling_Championship),
+# cross-checked against a live news search for the quarter-final draw (no
+# contradicting source found; QF pairings below reflect the single Wikipedia
+# source, not independently reconfirmed pairing-by-pairing — flagged per this
+# scraper's own "don't invent, don't oversell a single source" rule). Verified 2026-09-07.
+PSHC_RESULTS = [
+    # Group 1
+    {'group': 'Group 1', 'round': 1, 'date': '2026-08-01', 'home': 'Kanturk', 'home_score': '3-25', 'away': "Fr O'Neill's", 'away_score': '2-15'},
+    {'group': 'Group 1', 'round': 1, 'date': '2026-08-01', 'home': 'Blackrock', 'home_score': '1-22', 'away': 'Glen Rovers', 'away_score': '1-20'},
+    {'group': 'Group 1', 'round': 2, 'date': '2026-08-23', 'home': "Fr O'Neill's", 'home_score': '2-23', 'away': 'Blackrock', 'away_score': '3-29'},
+    {'group': 'Group 1', 'round': 2, 'date': '2026-08-23', 'home': 'Glen Rovers', 'home_score': '3-20', 'away': 'Kanturk', 'away_score': '1-24'},
+    {'group': 'Group 1', 'round': 3, 'date': '2026-09-06', 'home': 'Blackrock', 'home_score': '2-16', 'away': 'Kanturk', 'away_score': '2-27'},
+    {'group': 'Group 1', 'round': 3, 'date': '2026-09-06', 'home': 'Glen Rovers', 'home_score': '1-24', 'away': "Fr O'Neill's", 'away_score': '3-12'},
+    # Group 2
+    {'group': 'Group 2', 'round': 1, 'date': '2026-07-31', 'home': 'Douglas', 'home_score': '0-22', 'away': 'Newtownshandrum', 'away_score': '2-16'},
+    {'group': 'Group 2', 'round': 1, 'date': '2026-08-01', 'home': 'Sarsfields', 'home_score': '0-19', 'away': 'Charleville', 'away_score': '0-21'},
+    {'group': 'Group 2', 'round': 2, 'date': '2026-08-22', 'home': 'Newtownshandrum', 'home_score': '4-14', 'away': 'Sarsfields', 'away_score': '4-21'},
+    {'group': 'Group 2', 'round': 2, 'date': '2026-08-22', 'home': 'Charleville', 'home_score': '0-19', 'away': 'Douglas', 'away_score': '0-14'},
+    {'group': 'Group 2', 'round': 3, 'date': '2026-09-06', 'home': 'Douglas', 'home_score': '1-19', 'away': 'Sarsfields', 'away_score': '3-22'},
+    {'group': 'Group 2', 'round': 3, 'date': '2026-09-06', 'home': 'Newtownshandrum', 'home_score': '1-21', 'away': 'Charleville', 'away_score': '1-17'},
+    # Group 3
+    {'group': 'Group 3', 'round': 1, 'date': '2026-07-31', 'home': 'Midleton', 'home_score': '0-25', 'away': "St Finbarr's", 'away_score': '0-17'},
+    {'group': 'Group 3', 'round': 1, 'date': '2026-08-01', 'home': 'Bride Rovers', 'home_score': '1-20', 'away': 'Newcestown', 'away_score': '0-14'},
+    {'group': 'Group 3', 'round': 2, 'date': '2026-08-22', 'home': 'Newcestown', 'home_score': '1-17', 'away': 'Midleton', 'away_score': '1-18'},
+    {'group': 'Group 3', 'round': 2, 'date': '2026-08-22', 'home': "St Finbarr's", 'home_score': '3-21', 'away': 'Bride Rovers', 'away_score': '1-18'},
+    {'group': 'Group 3', 'round': 3, 'date': '2026-09-06', 'home': 'Midleton', 'home_score': '2-15', 'away': 'Bride Rovers', 'away_score': '2-13'},
+    # 1-18 = 21, 0-21 = 21 — a draw, not a St Finbarr's win. The Wikipedia
+    # page's own "def." framing here was wrong (checked against Irish
+    # Examiner: "Honours even between St Finbarr's and Newcestown" — a draw).
+    {'group': 'Group 3', 'round': 3, 'date': '2026-09-06', 'home': "St Finbarr's", 'home_score': '1-18', 'away': 'Newcestown', 'away_score': '0-21', 'note': 'draw'},
+    # Divisional/colleges section — winner (Imokilly) enters the club knockout at QF stage
+    {'group': 'Divisional', 'round': 'Semi-final', 'date': '2026-08-05', 'home': 'UCC', 'home_score': '0-19', 'away': 'Imokilly', 'away_score': '4-26'},
+    {'group': 'Divisional', 'round': 'Semi-final', 'date': '2026-08-09', 'home': 'Seandún', 'home_score': '1-30', 'away': 'Muskerry', 'away_score': '0-32', 'note': 'AET'},
+    {'group': 'Divisional', 'round': 'Final', 'date': '2026-08-30', 'home': 'Imokilly', 'home_score': '3-22', 'away': 'Seandún', 'away_score': '1-18'},
+]
+
+PSHC_STANDINGS = {
+    'Group 1': [{'team': 'Kanturk', 'pts': 4}, {'team': 'Glen Rovers', 'pts': 4}, {'team': 'Blackrock', 'pts': 4}, {'team': "Fr O'Neill's", 'pts': 0}],
+    'Group 2': [{'team': 'Charleville', 'pts': 4}, {'team': 'Sarsfields', 'pts': 4}, {'team': 'Newtownshandrum', 'pts': 3}, {'team': 'Douglas', 'pts': 1}],
+    'Group 3': [{'team': 'Midleton', 'pts': 6}, {'team': "St Finbarr's", 'pts': 3}, {'team': 'Bride Rovers', 'pts': 2}, {'team': 'Newcestown', 'pts': 1}],
+}
+
+PSHC_FIXTURES = [
+    # Only 3 quarter-finals — Midleton (Group 3 winners, 6pts) go straight to a
+    # semi-final per the source rather than playing a QF; do not invent a 4th
+    # QF pairing to make the bracket "look" symmetric.
+    {'stage': 'Relegation playoff', 'date': None, 'home': 'Douglas', 'away': "Fr O'Neill's"},
+    {'stage': 'Quarter-final', 'date': None, 'home': 'Kanturk', 'away': 'Sarsfields'},
+    {'stage': 'Quarter-final', 'date': None, 'home': 'Charleville', 'away': 'Glen Rovers'},
+    {'stage': 'Quarter-final', 'date': None, 'home': "St Finbarr's", 'away': 'Imokilly'},
+    {'stage': 'Semi-final', 'date': None, 'home': 'Midleton', 'away': 'TBD', 'note': 'vs winner of Kanturk/Sarsfields — Midleton have a direct semi-final berth as Group 3 winners'},
+    {'stage': 'Semi-final', 'date': None, 'home': 'TBD', 'away': 'TBD', 'note': 'Winner of Charleville/Glen Rovers vs winner of St Finbarr\'s/Imokilly'},
+    {'stage': 'Final', 'date': None, 'home': 'TBD', 'away': 'TBD'},
+]
 
 
 def _to_decimal(obj):
@@ -247,16 +367,19 @@ def generate_tips():
             tips.append({
                 'code': 'hurling', 'grade': 'Premier Senior', 'key': 'PSHC',
                 'predicted_winner': 'Sarsfields',
-                'reason': 'Defending champions (2025) — strongest verified signal available pre-group-stage.',
-                'confidence': 'low-medium — based on defending-champion status only, group draw/form not yet factored in',
+                'reason': 'Defending champions (2025), now confirmed through to the quarter-final '
+                          '(v Kanturk) after finishing level on 4pts in Group 2 — stronger signal than '
+                          'pre-season status alone, though Kanturk (also 4pts, +14 Group 1) are a live threat.',
+                'confidence': 'medium — real group-stage form now factored in, still 3 rounds from the final',
             })
         elif g['key'] == 'PSFC':
             tips.append({
                 'code': 'football', 'grade': 'Premier Senior', 'key': 'PSFC',
                 'predicted_winner': None,
-                'reason': 'No defending-champion or standings data strong enough yet for a real pick — '
-                          'early individual stats (Avondhu\'s Lenahan/Twomey) reflect a divisional side, '
-                          'which cannot win the county title itself.',
+                'reason': 'Group stage not yet complete (Round 3 of 3 played 13 Sept) and no team has '
+                          'separated enough from its group to justify a title pick — Carrigaline, Valley '
+                          'Rovers, Clonakilty and Castlehaven all lead their groups but knockout draw '
+                          'isn\'t set until Round 3 finishes.',
                 'confidence': 'insufficient data for a confident tip',
             })
         else:
@@ -298,6 +421,21 @@ def lambda_handler(event, context):
         }))
         sports_table.put_item(Item=_to_decimal({
             'sport': 'gaa', 'data_key': 'TIPS', 'tips': tips, 'updated_at': now_iso,
+        }))
+        sports_table.put_item(Item=_to_decimal({
+            'sport': 'gaa', 'data_key': 'RESULTS',
+            'hurling': PSHC_RESULTS, 'football': PSFC_RESULTS,
+            'updated_at': now_iso,
+        }))
+        sports_table.put_item(Item=_to_decimal({
+            'sport': 'gaa', 'data_key': 'FIXTURES',
+            'hurling': PSHC_FIXTURES, 'football': PSFC_FIXTURES,
+            'updated_at': now_iso,
+        }))
+        sports_table.put_item(Item=_to_decimal({
+            'sport': 'gaa', 'data_key': 'STANDINGS',
+            'hurling': PSHC_STANDINGS, 'football': PSFC_STANDINGS,
+            'updated_at': now_iso,
         }))
         sports_table.put_item(Item=_to_decimal({
             'sport': 'gaa', 'data_key': 'META',
