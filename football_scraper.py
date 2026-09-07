@@ -110,13 +110,19 @@ TEAM_STRENGTH = {
     # Updated 2026/27: Arsenal defending champions, Man City lost Pep+Rodri, Liverpool rebuilt with Isak+Wirtz
     'Arsenal': 93, 'Manchester City': 90, 'Liverpool': 91, 'Chelsea': 80,
     'Manchester United': 76, 'Tottenham Hotspur': 76, 'Newcastle United': 75,
-    'Aston Villa': 73, 'Brighton & Hove Albion': 70, 'West Ham United': 68,
+    'Aston Villa': 73, 'Brighton & Hove Albion': 70,
     'Brentford': 66, 'Fulham': 65, 'Crystal Palace': 64,
-    'Wolverhampton Wanderers': 63, 'Everton': 62, 'Bournemouth': 61,
-    'Nottingham Forest': 60, 'Ipswich Town': 55, 'Leicester City': 57,
-    'Southampton': 54,
+    'Everton': 62, 'Bournemouth': 61,
+    'Nottingham Forest': 60, 'Ipswich Town': 55,
     # Promoted 2026/27 — Source: Sky Sports fixtures, verified 21 Aug 2026
     'Coventry City': 58, 'Hull City': 56, 'Sunderland': 57, 'Leeds United': 61,
+    # West Ham United, Wolverhampton Wanderers, Leicester City and Southampton
+    # removed 2026-09-07 — all relegated (West Ham/Wolves/Burnley went down
+    # 2025/26 per ESPN; Leicester/Southampton the season before), confirmed
+    # via ESPN's current eng.1 teams list (20 teams, none of these four
+    # present) and zero appearances anywhere in STATIC_PL_FIXTURES. Were dead
+    # weight, not actively wrong (never looked up for a real fixture), but
+    # no reason to keep entries for clubs not in this competition.
     # European clubs
     'Real Madrid': 96, 'Bayern Munich': 92, 'PSG': 89,
     'Inter Milan': 85, 'Atletico Madrid': 84, 'Bayer Leverkusen': 83,
@@ -153,17 +159,15 @@ FIRST_SCORERS = {
     # 2026, reunited with Emery from their Villarreal days) — verified 2026-09-07.
     'Aston Villa':              {'name': 'Nicolas Jackson',         'odds': '7/2',  'note': "Watkins' £65m club-record replacement · straight into the starting XI"},
     'Brighton & Hove Albion':   {'name': 'Evan Ferguson',           'odds': '5/1',  'note': 'Young clinical finisher'},
-    'West Ham United':          {'name': 'Jarrod Bowen',            'odds': '4/1',  'note': 'Top West Ham scorer · box threat'},
     'Brentford':                {'name': 'Yoane Wissa',             'odds': '5/1',  'note': 'Clinical from range'},
     'Fulham':                   {'name': 'Raúl Jiménez',            'odds': '5/1',  'note': 'Experienced finisher'},
     'Crystal Palace':           {'name': 'Eberechi Eze',            'odds': '6/1',  'note': 'Creative scorer · free kicks'},
-    'Wolverhampton Wanderers':  {'name': 'Hwang Hee-chan',          'odds': '7/1',  'note': 'Fast clinical finisher'},
     'Everton':                  {'name': 'Dominic Calvert-Lewin',   'odds': '7/1',  'note': 'Aerial threat · penalty taker'},
     'Bournemouth':              {'name': 'Evanilson',               'odds': '5/1',  'note': 'Brazilian striker · good movement'},
     'Nottingham Forest':        {'name': 'Chris Wood',              'odds': '5/1',  'note': 'Penalty taker · target man'},
     'Ipswich Town':             {'name': 'Liam Delap',              'odds': '9/2',  'note': 'Powerful striker · Man City product'},
-    'Leicester City':           {'name': 'Patson Daka',             'odds': '6/1',  'note': 'Pacy striker · strong finisher'},
-    'Southampton':              {'name': 'Adam Armstrong',           'odds': '7/1',  'note': 'Pace merchant · top scorer'},
+    # West Ham United, Wolverhampton Wanderers, Leicester City and Southampton
+    # removed 2026-09-07 — see the matching note in TEAM_STRENGTH above.
 }
 
 # ─── Correct-score approximate odds map ──────────────────────────────────────
@@ -172,6 +176,66 @@ CORRECT_SCORE_ODDS = {
     '3-1': '16/1', '3-2': '22/1', '1-1': '5/1', '0-0': '9/1',
     '0-1': '6/1', '1-2': '10/1', '0-2': '9/1', '0-3': '14/1',
 }
+
+# ─── FIRST_SCORERS safety net (added 2026-09-07) ──────────────────────────────
+# Third time a departed player has been caught live on the site (Hojlund,
+# Isak, Watkins — see football-page.md) — all three found by a subscriber,
+# none by this codebase. FIRST_SCORERS has no expiry mechanism and never
+# will, so instead of relying on someone remembering to check it, verify the
+# named player is still on the club's actual current squad, live, every time
+# a pick is about to be shown — using ESPN's public roster endpoint, which is
+# already the data source this scraper uses for everything else.
+ESPN_TEAM_IDS = {
+    'Arsenal': '359', 'Manchester City': '382', 'Liverpool': '364', 'Chelsea': '363',
+    'Manchester United': '360', 'Tottenham Hotspur': '367', 'Newcastle United': '361',
+    'Aston Villa': '362', 'Brighton & Hove Albion': '331',
+    'Brentford': '337', 'Fulham': '370', 'Crystal Palace': '384',
+    'Everton': '368', 'Bournemouth': '349', 'Nottingham Forest': '393',
+    'Ipswich Town': '373', 'Coventry City': '388', 'Hull City': '306',
+    'Sunderland': '366', 'Leeds United': '357',
+}
+
+_roster_cache = {}  # team name -> set of lowercased full player names, cached per Lambda invocation
+
+
+def _fetch_team_roster(team_name):
+    """Live current-squad names from ESPN, lowercased. Returns None on any
+    failure (network error, unknown team, unexpected shape) so callers can
+    distinguish 'couldn't check' from 'checked and player not found' —
+    fail open, not closed, so a transient ESPN issue doesn't wipe out every
+    First Goalscorer pick on the page."""
+    if team_name in _roster_cache:
+        return _roster_cache[team_name]
+    team_id = ESPN_TEAM_IDS.get(team_name)
+    if not team_id:
+        return None
+    try:
+        r = requests.get(f'{ESPN_SOCCER}/eng.1/teams/{team_id}/roster', headers=HEADERS, timeout=10)
+        if r.status_code != 200:
+            return None
+        athletes = r.json().get('athletes', [])
+        names = {(a.get('fullName') or a.get('displayName') or '').lower() for a in athletes}
+        names.discard('')
+        _roster_cache[team_name] = names
+        return names
+    except Exception as e:
+        print(f'[football] roster fetch failed for {team_name}: {e}')
+        return None
+
+
+def _first_scorer_still_at_club(team_name, player_name):
+    """True if player_name is on team_name's current ESPN roster, or if the
+    roster couldn't be fetched at all (fail open — see _fetch_team_roster).
+    False only on a genuine, confirmed mismatch — that's the case we're
+    actually trying to catch."""
+    roster = _fetch_team_roster(team_name)
+    if roster is None:
+        return True
+    pname = player_name.lower()
+    if pname in roster:
+        return True
+    last = pname.split()[-1]
+    return any(last in r for r in roster)
 
 
 def float_to_decimal(obj):
@@ -813,6 +877,10 @@ def generate_match_bets(fx, team_stats, bf_odds_map=None):
     # ── Longshot: first scorer from stronger team ─────────────────────────────
     stronger = home if result in ('home_win', 'draw') else away
     scorer   = FIRST_SCORERS.get(stronger)
+    if scorer and not _first_scorer_still_at_club(stronger, scorer['name']):
+        print(f"[football] {scorer['name']} not found on {stronger}'s current ESPN roster — "
+              f"suppressing stale First Goalscorer pick, falling back to Correct Score")
+        scorer = None
     if scorer and conf >= 52:
         # Live price where Betfair's First Goalscorer market has this exact
         # player up — match on last name since Betfair's runner naming
