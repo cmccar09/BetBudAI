@@ -147,7 +147,11 @@ FIRST_SCORERS = {
     # Woltemade was used in a deeper role at times last season, so this is a
     # softer pick than most entries here — worth a lineup check before relying on it.
     'Newcastle United':         {'name': 'Nick Woltemade',          'odds': '9/2',  'note': 'Record £69m signing · main striker option post-Isak'},
-    'Aston Villa':              {'name': 'Ollie Watkins',           'odds': '7/2',  'note': 'England striker · high xG returns'},
+    # Source: ESPN (Watkins permanently departed for Al Hilal, 30 Aug 2026) +
+    # ESPN/Al Jazeera (Nicolas Jackson signed from Chelsea for a club-record
+    # ~£65m specifically to replace him, started on debut vs Arsenal 31 Aug
+    # 2026, reunited with Emery from their Villarreal days) — verified 2026-09-07.
+    'Aston Villa':              {'name': 'Nicolas Jackson',         'odds': '7/2',  'note': "Watkins' £65m club-record replacement · straight into the starting XI"},
     'Brighton & Hove Albion':   {'name': 'Evan Ferguson',           'odds': '5/1',  'note': 'Young clinical finisher'},
     'West Ham United':          {'name': 'Jarrod Bowen',            'odds': '4/1',  'note': 'Top West Ham scorer · box threat'},
     'Brentford':                {'name': 'Yoane Wissa',             'odds': '5/1',  'note': 'Clinical from range'},
