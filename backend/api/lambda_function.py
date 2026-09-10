@@ -41,6 +41,7 @@ ses_client = boto3.client('ses', region_name='eu-west-1')
 
 SENDER_EMAIL    = 'charles.mccarthy@gmail.com'
 SITE_URL        = 'https://www.betbudai.com'
+API_BASE_URL    = 'https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com'
 
 # ── Stripe configuration ────────────────────────────────────────────────────
 if stripe:
@@ -371,6 +372,8 @@ def lambda_handler(event, context):
             response = login_subscriber(headers, event)
         elif 'verify-email' in path:
             response = verify_email_token(headers, event)
+        elif 'unsubscribe-daily-email' in path:
+            response = unsubscribe_daily_email(headers, event)
         elif 'register' in path and method == 'POST':
             response = register_subscriber(headers, event)
         elif 'create-checkout-session' in path and method == 'POST':
@@ -4516,6 +4519,10 @@ def _collect_today_ui_picks_for_email(date_str):
 
 
 def _daily_email_recipients():
+    """Returns [{'email': ..., 'unsubscribe_token': ...}, ...]. Generates and
+    persists an unsubscribe_token on the subscriber's own row the first time
+    it's needed (2026-09-10 — added so the daily email can carry a real,
+    working one-click unsubscribe link; previously it had none at all)."""
     recipients = []
     seen = set()
 
@@ -4535,7 +4542,20 @@ def _daily_email_recipients():
             if email in seen:
                 continue
             seen.add(email)
-            recipients.append(email)
+
+            token = row.get('unsubscribe_token')
+            if not token:
+                token = secrets.token_urlsafe(24)
+                try:
+                    subscribers_table.update_item(
+                        Key={'email': email},
+                        UpdateExpression='SET unsubscribe_token = :t',
+                        ExpressionAttributeValues={':t': token},
+                    )
+                except Exception as e:
+                    print(f'unsubscribe_token persist failed for {email}: {e}')
+
+            recipients.append({'email': email, 'unsubscribe_token': token})
 
         lek = resp.get('LastEvaluatedKey')
         if not lek:
@@ -4554,7 +4574,7 @@ def _fmt_time_for_email(raw):
         return txt[11:16] if len(txt) >= 16 else txt
 
 
-def _build_daily_picks_email(date_str, picks):
+def _build_daily_picks_email(date_str, picks, unsubscribe_url=None):
     rows_html = []
     rows_txt = []
     for i, p in enumerate(picks, 1):
@@ -4589,13 +4609,15 @@ def _build_daily_picks_email(date_str, picks):
         + ''.join(rows_html) +
         "</tbody></table>"
         "<p style='margin:16px 0 0;color:#6b7280;font-size:12px;'>Research and education only. Not betting advice. Always gamble responsibly.</p>"
-        "</div></div></body></html>"
+        + (f"<p style='margin:10px 0 0;color:#9ca3af;font-size:11px;'>Don't want this email? <a href='{unsubscribe_url}' style='color:#6b7280;'>Unsubscribe</a> — you'll keep full access to the site, this just stops the daily email.</p>" if unsubscribe_url else "")
+        + "</div></div></body></html>"
     )
 
     text = (
         f"BetBudAI Daily Picks Ready ({date_str})\n\n"
         + "\n".join(rows_txt)
         + "\n\nResearch and education only. Not betting advice. Always gamble responsibly."
+        + (f"\n\nUnsubscribe from this daily email: {unsubscribe_url}" if unsubscribe_url else "")
     )
     return html, text
 
@@ -4619,13 +4641,15 @@ def maybe_send_daily_picks_ready_email(headers, event=None):
         if not recipients:
             return {'statusCode': 200, 'headers': headers, 'body': json.dumps({'success': True, 'date': date_str, 'sent': 0, 'skipped': True, 'reason': 'no_recipients'})}
 
-        html_body, text_body = _build_daily_picks_email(date_str, picks)
         subject = f'BetBudAI Daily Picks Ready — {date_str}'
 
         sent = 0
         if not dry_run:
-            for email in recipients:
+            for r in recipients:
+                email = r['email']
                 try:
+                    unsub_url = f"{API_BASE_URL}/api/unsubscribe-daily-email?email={urllib.parse.quote(email)}&token={r['unsubscribe_token']}"
+                    html_body, text_body = _build_daily_picks_email(date_str, picks, unsubscribe_url=unsub_url)
                     ses_client.send_email(
                         Source=f'BetBudAI <{SENDER_EMAIL}>',
                         Destination={'ToAddresses': [email]},
@@ -4715,6 +4739,51 @@ def verify_email_token(headers, event):
     except Exception as e:
         print(f'verify_email_token error: {e}')
         return {'statusCode': 500, 'headers': headers, 'body': json.dumps({'success': False, 'error': 'Verification failed. Please try again.'})}
+
+
+def _unsubscribe_html_page(title, message, ok=True):
+    color = '#34d399' if ok else '#f87171'
+    return f"""<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;background:#0f172a;color:white;padding:40px;">
+<div style="max-width:480px;margin:0 auto;background:#1e293b;border-radius:16px;padding:40px;text-align:center;">
+  <h1 style="color:#34d399;margin:0 0 24px;">BetBudAI</h1>
+  <h2 style="color:{color};font-size:20px;margin:0 0 12px;">{title}</h2>
+  <p style="color:rgba(255,255,255,0.7);line-height:1.6;">{message}</p>
+  <a href="{SITE_URL}" style="display:inline-block;margin-top:24px;padding:12px 28px;background:rgba(255,255,255,0.08);color:white;text-decoration:none;border-radius:10px;font-weight:600;">Back to BetBudAI</a>
+</div></body></html>"""
+
+
+def unsubscribe_daily_email(headers, event):
+    """GET /api/unsubscribe-daily-email?email=...&token=... — one-click unsubscribe
+    from the daily picks email, linked directly from the email itself (added
+    2026-09-10, ahead of the SES production-access re-application — AWS's
+    review explicitly checks for a working unsubscribe mechanism in any
+    recurring email, and this one previously had none)."""
+    html_headers = dict(headers)
+    html_headers['Content-Type'] = 'text/html; charset=utf-8'
+    try:
+        qs = event.get('queryStringParameters') or {}
+        email = (qs.get('email') or '').strip().lower()
+        token = (qs.get('token') or '').strip()
+        if not email or not token:
+            return {'statusCode': 400, 'headers': html_headers,
+                    'body': _unsubscribe_html_page('Link incomplete', 'This unsubscribe link is missing information. Please use the link from the email directly.', ok=False)}
+
+        item = subscribers_table.get_item(Key={'email': email}).get('Item')
+        if not item or item.get('unsubscribe_token') != token:
+            return {'statusCode': 400, 'headers': html_headers,
+                    'body': _unsubscribe_html_page('Link invalid', "We couldn't verify this unsubscribe link. If you're still receiving emails you don't want, contact support.", ok=False)}
+
+        subscribers_table.update_item(
+            Key={'email': email},
+            UpdateExpression='SET daily_picks_email_opt_out = :v, daily_picks_email_opt_out_at = :t',
+            ExpressionAttributeValues={':v': True, ':t': datetime.utcnow().isoformat() + 'Z'},
+        )
+        return {'statusCode': 200, 'headers': html_headers,
+                'body': _unsubscribe_html_page("You're unsubscribed", "You won't get the daily picks email any more. Your account and access to the site are unaffected — you can re-enable this any time from your account settings.")}
+    except Exception as e:
+        print(f'unsubscribe_daily_email error: {e}')
+        return {'statusCode': 500, 'headers': html_headers,
+                'body': _unsubscribe_html_page('Something went wrong', 'Please try again in a moment, or contact support if this keeps happening.', ok=False)}
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
