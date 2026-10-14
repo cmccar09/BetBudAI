@@ -52,39 +52,36 @@ STRIPE_PRICE_PREMIUM = os.environ.get('STRIPE_PRICE_PREMIUM', '')   # price_xxx 
 STRIPE_PRICE_VIP     = STRIPE_PRICE_PREMIUM or os.environ.get('STRIPE_PRICE_VIP', '')
 
 
-_FREE_MODEL_DATE = '2026-07-01'  # Date the 3-day trial + free subscription model was introduced.
-                                   # Users who joined BEFORE this date are grandfathered — their
-                                   # expired trial auto-converts to free_subscriber, not trial_expired.
 
 def _normalize_local_trial_status(email: str, item: dict | None) -> dict:
-    """Expire local no-card trials once their stored end timestamp has passed.
-    Existing users (joined before the free model date) are grandfathered:
-    their trial expiry maps to 'free_subscriber' not 'trial_expired', so they
-    never see the 'Subscribe for Free' gate — they already have full access.
+    """No trials any more (removed 2026-10-14) — every non-paying account is
+    full access, permanently. This still runs on every status check/login so
+    it doubles as a one-time migration: any account still carrying an old
+    'trialing' or 'trial_expired' status (from before this change) gets
+    promoted to 'free_subscriber' here, the first time it's touched, instead
+    of needing a separate backfill script. Real paying subscribers
+    (has_stripe_sub) are untouched — their status reflects actual billing.
     """
     if not item:
         return item or {}
 
     status = item.get('subscription_status', '')
     has_stripe_sub = bool(item.get('stripe_subscription_id'))
-    trial_end_ts = int(item.get('trial_end_timestamp', 0) or 0)
-    now_ts = int(datetime.now(timezone.utc).timestamp())
 
-    if status == 'trialing' and trial_end_ts and trial_end_ts <= now_ts and not has_stripe_sub:
-        joined_at = str(item.get('joined_at') or '')[:10]
-        is_grandfathered = bool(joined_at) and joined_at < _FREE_MODEL_DATE
-        new_status = 'free_subscriber' if is_grandfathered else 'trial_expired'
-
+    if status in ('trialing', 'trial_expired') and not has_stripe_sub:
         subscribers_table.update_item(
             Key={'email': email},
-            UpdateExpression='SET subscription_status = :status REMOVE subscription_current_period_end',
-            ExpressionAttributeValues={':status': new_status},
+            UpdateExpression=(
+                'SET subscription_status = :status '
+                'REMOVE subscription_current_period_end, trial_end_timestamp, trial_started_at'
+            ),
+            ExpressionAttributeValues={':status': 'free_subscriber'},
         )
         item = dict(item)
-        item['subscription_status'] = new_status
-        item.pop('subscription_current_period_end', None)
-        if is_grandfathered:
-            print(f'[normalize] {email} grandfathered → free_subscriber (joined {joined_at})')
+        item['subscription_status'] = 'free_subscriber'
+        for k in ('subscription_current_period_end', 'trial_end_timestamp', 'trial_started_at'):
+            item.pop(k, None)
+        print(f'[normalize] {email} migrated {status} → free_subscriber (trial removed 2026-10-14)')
 
     return item
 
@@ -4195,20 +4192,18 @@ def register_subscriber(headers, event):
             ExpressionAttributeValues={':v': True},
         )
 
-        # Activate a no-card local trial immediately so the offer matches the live signup flow.
-        trial_end_ts = int((datetime.now(timezone.utc) + timedelta(days=3)).timestamp())
+        # Full access from the moment of registration — no trial, no gate.
+        # (Removed 2026-10-14: the 3-day no-card trial + trial_end_timestamp
+        # that used to land here. See _normalize_local_trial_status above,
+        # which now self-heals any pre-existing trialing/trial_expired
+        # account to free_subscriber the next time it's touched, so this
+        # isn't just a new-signup change.)
         subscribers_table.update_item(
             Key={'email': email},
-            UpdateExpression=(
-                'SET subscription_tier = :tier, subscription_status = :status, '
-                'trial_started_at = :started, trial_end_timestamp = :trial_end, '
-                'subscription_current_period_end = :trial_end'
-            ),
+            UpdateExpression='SET subscription_tier = :tier, subscription_status = :status',
             ExpressionAttributeValues={
                 ':tier': desired_tier,
-                ':status': 'trialing',
-                ':started': joined_at,
-                ':trial_end': trial_end_ts,
+                ':status': 'free_subscriber',
             },
         )
         try:
@@ -4225,7 +4220,7 @@ def register_subscriber(headers, event):
                 'username': username,
                 'full_name': full_name,
                 'subscription_tier': desired_tier,
-                'subscription_status': 'trialing',
+                'subscription_status': 'free_subscriber',
             },
         })}
     except Exception as e:

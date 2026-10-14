@@ -459,75 +459,6 @@ function buildPositiveBannerData(latestWinner, yesterdaySummary, yesterdayPicks,
 }
 
 // ---- App ----
-// ── Subscribe for Free gate ────────────────────────────────────────────────
-// Shown to authenticated users whose 3-day trial has expired.
-// One click, no card, permanently unlocks the free tier.
-function SubscribeFreeGate({ email, onSuccess, pageName }) {
-  const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSubscribeFree = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/subscribe-free`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setDone(true);
-        setTimeout(() => { if (onSuccess) onSuccess(); }, 1200);
-      } else {
-        setError(data.error || 'Something went wrong — please try again.');
-      }
-    } catch (e) {
-      setError('Network error — please try again.');
-    }
-    setLoading(false);
-  };
-
-  if (done) {
-    return (
-      <div style={{ textAlign: 'center', padding: '60px 32px', maxWidth: 560, margin: '40px auto' }}>
-        <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
-        <h2 style={{ color: '#34d399', fontSize: 24, fontWeight: 900, marginBottom: 8 }}>You're in!</h2>
-        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16 }}>Free access confirmed — loading your content…</p>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 16, padding: '48px 32px', textAlign: 'center', maxWidth: 560, margin: '40px auto', border: '2px solid rgba(52,211,153,0.4)' }}>
-      <div style={{ fontSize: 52, marginBottom: 16 }}>🔓</div>
-      <h2 style={{ color: 'white', fontSize: 26, fontWeight: 900, margin: '0 0 12px' }}>Subscribe for Free</h2>
-      <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 15, lineHeight: 1.7, marginBottom: 8 }}>
-        Your 3-day trial has ended. Subscribe to keep your free access — <strong style={{ color: '#34d399' }}>no credit card, no charge, ever.</strong>
-      </p>
-      <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, marginBottom: 28 }}>
-        One click confirms your free account and unlocks everything again.
-      </p>
-      <button
-        onClick={handleSubscribeFree}
-        disabled={loading}
-        style={{
-          background: 'linear-gradient(135deg,#059669,#047857)',
-          border: '2px solid #10b981', borderRadius: 10, padding: '16px 48px',
-          color: 'white', fontSize: 18, fontWeight: 900, cursor: loading ? 'not-allowed' : 'pointer',
-          opacity: loading ? 0.7 : 1, transition: 'all 0.2s', display: 'block', width: '100%', maxWidth: 320, margin: '0 auto',
-        }}
-      >
-        {loading ? 'Confirming…' : '✅ Subscribe for Free — No Card'}
-      </button>
-      {error && <p style={{ color: '#f87171', fontSize: 13, marginTop: 12 }}>{error}</p>}
-      <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, marginTop: 20 }}>
-        Want lay alerts? <a href="#" onClick={e => { e.preventDefault(); }} style={{ color: '#fbbf24' }}>Favourite Watch — €9.99/mo</a>
-      </p>
-    </div>
-  );
-}
 
 function App() {
   const [page, setPage] = useState('home');
@@ -1039,102 +970,57 @@ function App() {
           
           // If no access, show gating message
           if (!hasAccess) {
-            const vipMessage = requiredTier === 'vip';
-            const freeMessage = requiredTier === 'free';
-            const trialExpired = isAuthenticated && authUser?.subscription_status === 'trial_expired';
-            const footballMessage = cfg.key === 'football';
-
-            // Trial-expired authenticated users get "Subscribe for Free" (no Stripe)
-            if (trialExpired && freeMessage) {
-              return (
-                <SubscribeFreeGate
-                  email={authUser?.email}
-                  onSuccess={handleAuthSuccess}
-                  pageName={cfg.key}
-                />
-              );
-            }
+            const isAdminGate = requiredTier === 'admin';
 
             return (
               <div style={{ background:'rgba(255,255,255,0.08)', borderRadius:'16px', padding:'60px 32px', textAlign:'center', maxWidth:'640px', margin:'40px auto' }}>
                 <div style={{ fontSize:'60px', marginBottom:'24px' }}>🔒</div>
                 <h2 style={{ fontSize:'28px', fontWeight:'900', color:'white', marginBottom:'12px' }}>
-                  {freeMessage
-                    ? (footballMessage ? '⚽ Football Predictions — Free Account Required' : 'Create a Free Account')
-                    : isAuthenticated
-                      ? (vipMessage ? 'Favourite Watch Exclusive' : 'Premium Access Required')
-                      : 'Unlock This Content'}
+                  {isAdminGate ? 'Admin Access Required' : 'Sign In Required'}
                 </h2>
                 <p style={{ fontSize:'16px', color:'rgba(255,255,255,0.7)', marginBottom:'28px', lineHeight:'1.6' }}>
-                  {freeMessage ? (
-                    <>
-                      {footballMessage
-                        ? "Get Premier League title race predictions, weekly fixture tips, Champions League and Europa League picks — all updated every week."
-                        : 'Sign up free to see daily picks, analysis and results.'}
-                      <br/>
-                      <strong style={{ color:'#34d399' }}>100% free — no card. Ever.</strong>
-                    </>
-                  ) : isAuthenticated ? (
-                    'This content is exclusive to Favourite Watch members. Upgrade now to unlock premium features and VIP-only strategies.'
+                  {isAdminGate ? (
+                    'This area is restricted to site administrators.'
                   ) : (
                     <>
-                      Get instant access to all picks, daily analysis, and our AI-powered value model.
+                      Create a free account to access this page.
                       <br/>
-                      <strong style={{ color:'#34d399' }}>3-day free trial — no credit card required.</strong>
+                      <strong style={{ color:'#34d399' }}>100% free — no card, no trial.</strong>
                     </>
                   )}
                 </p>
-                <div style={{ display:'flex', flexDirection:'column', gap:'12px', alignItems:'center' }}>
-                  <button onClick={() => {
-                    trackEvent('signup_click', { location: 'gated_page_' + cfg.key, tier: freeMessage ? 'free' : (vipMessage ? 'vip' : 'premium'), user_status: isAuthenticated ? 'authenticated' : 'guest' });
-                    setPage('home');
-                    setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
-                  }} style={{
-                    background:'linear-gradient(135deg,#059669 0%,#047857 100%)',
-                    border:'2px solid #10b981', borderRadius:'10px', padding:'16px 40px',
-                    color:'white', fontSize:'18px', fontWeight:'800',
-                    cursor:'pointer', transition:'all 0.2s',
-                    boxShadow:'0 4px 12px rgba(5,150,105,0.3)',
-                    minWidth:'240px'
-                  }}>
-                    {freeMessage
-                      ? '🎁 Create Free Account'
-                      : isAuthenticated
-                        ? (vipMessage ? 'Upgrade to VIP' : 'View Plans')
-                        : '🎁 Start Free Trial — No Card'}
-                  </button>
-                  {!isAuthenticated && (
+                {!isAdminGate && (
+                  <div style={{ display:'flex', flexDirection:'column', gap:'12px', alignItems:'center' }}>
                     <button onClick={() => {
-                      trackEvent('signin_click', { location: 'gated_page_' + cfg.key, user_status: 'guest' });
+                      trackEvent('signup_click', { location: 'gated_page_' + cfg.key, tier: 'free', user_status: isAuthenticated ? 'authenticated' : 'guest' });
                       setPage('home');
                       setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
                     }} style={{
-                      background:'transparent',
-                      border:'2px solid rgba(255,255,255,0.25)', borderRadius:'10px', padding:'12px 32px',
-                      color:'rgba(255,255,255,0.7)', fontSize:'14px', fontWeight:'700',
-                      cursor:'pointer', transition:'all 0.2s'
+                      background:'linear-gradient(135deg,#059669 0%,#047857 100%)',
+                      border:'2px solid #10b981', borderRadius:'10px', padding:'16px 40px',
+                      color:'white', fontSize:'18px', fontWeight:'800',
+                      cursor:'pointer', transition:'all 0.2s',
+                      boxShadow:'0 4px 12px rgba(5,150,105,0.3)',
+                      minWidth:'240px'
                     }}>
-                      Already a member? Sign In
+                      🎁 Create Free Account
                     </button>
-                  )}
-                </div>
-                <div style={{ marginTop:'24px', padding:'16px', background:'rgba(52,211,153,0.08)', border:'1px solid rgba(52,211,153,0.25)', borderRadius:'10px' }}>
-                  <div style={{ fontSize:'13px', color:'rgba(255,255,255,0.6)', lineHeight:'1.6' }}>
-                    {freeMessage ? (
-                      <>
-                        ✓ No credit card. Ever.<br/>
-                        ✓ 3-day trial then subscribe free — one click, still free<br/>
-                        ✓ Just need an account to sign in
-                      </>
-                    ) : (
-                      <>
-                        ✓ No credit card. Ever.<br/>
-                        ✓ Full access for 3 days — then subscribe free<br/>
-                        ✓ Cancel anytime, no questions asked
-                      </>
+                    {!isAuthenticated && (
+                      <button onClick={() => {
+                        trackEvent('signin_click', { location: 'gated_page_' + cfg.key, user_status: 'guest' });
+                        setPage('home');
+                        setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
+                      }} style={{
+                        background:'transparent',
+                        border:'2px solid rgba(255,255,255,0.25)', borderRadius:'10px', padding:'12px 32px',
+                        color:'rgba(255,255,255,0.7)', fontSize:'14px', fontWeight:'700',
+                        cursor:'pointer', transition:'all 0.2s'
+                      }}>
+                        Already a member? Sign In
+                      </button>
                     )}
                   </div>
-                </div>
+                )}
               </div>
             );
           }
@@ -6428,8 +6314,6 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
 
   const [homeStats, setHomeStats] = useState(null);
-  const [quickEmail, setQuickEmail] = useState('');
-  const [emailStep, setEmailStep] = useState('email'); // 'email' | 'form'
 
   const [form, setForm] = useState({
     fullName: '', email: '', age: '',
@@ -6603,19 +6487,6 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-  };
-
-  const selectedTrialLabel = selectedTrialTier === 'vip' ? 'Favourite Watch' : 'Premium';
-  const selectedTrialPrice = selectedTrialTier === 'vip' ? '€9.99' : '€9.99';
-
-  const handleQuickEmail = () => {
-    const email = quickEmail.trim();
-    if (email) setForm(prev => ({ ...prev, email }));
-    setEmailStep('form');
-    setSelectedTrialTier('premium');
-    setAuthMode('register');
-    setFormError('');
-    trackEvent('signup_click', { location: 'home_cta_quick_email', tier: 'free' });
   };
 
   const handleSubmit = async e => {
@@ -6868,114 +6739,67 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34d399', boxShadow: '0 0 6px #34d399', display: 'inline-block' }}></span>
           <span style={{ color: '#34d399', fontSize: '12px', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase' }}>Live System · UK &amp; Ireland Racing</span>
         </div>
-        <h2 style={{ fontSize: isMobile ? '26px' : '42px', fontWeight: '900', margin: '0 0 16px', lineHeight: 1.15, color: 'white' }}>
-          Back Winners. Avoid Poor Favorites.<br/>
-          <span style={{ background: 'linear-gradient(135deg,#34d399,#059669)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Find the Edge. Track the Results.
-          </span>
+        <h2 style={{ fontSize: isMobile ? '32px' : '48px', fontWeight: '900', margin: '0 0 16px', lineHeight: 1.08, color: 'white', letterSpacing: '-0.01em' }}>
+          SMARTER RACING PICKS.<br/>
+          <span style={{ color: '#34d399' }}>100% FREE.</span>
         </h2>
-        {/* ── VS comparison banner ── */}
-        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'center', alignItems: 'stretch', gap: '0', maxWidth: '560px', margin: '0 auto 20px', borderRadius: '14px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
-          {/* Them */}
-          <div style={{ flex: 1, background: 'rgba(255,255,255,0.04)', padding: isMobile ? '14px 16px' : '18px 20px', textAlign: 'center' }}>
-            <div style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: '4px' }}>Best tipsters in the world</div>
-            <div style={{ fontSize: isMobile ? '28px' : '42px', fontWeight: '900', color: '#fbbf24', lineHeight: 1 }}>+10%</div>
-            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '3px' }}>Industry benchmark</div>
+        <div style={{ fontSize: isMobile ? '15px' : '17px', color: 'rgba(255,255,255,0.65)', maxWidth: '480px', margin: '0 auto 28px', lineHeight: 1.5 }}>
+          Daily horse racing selections, NAP &amp; NB, Favourite Watch and full AI analysis.
+        </div>
+
+        {/* CTA */}
+        {!isAuthenticated && (
+          <div style={{ maxWidth: '480px', margin: '0 auto' }}>
+            <button
+              onClick={() => { trackEvent('signup_click', { location: 'home_hero', tier: 'free', user_status: 'guest' }); setSelectedTrialTier('premium'); setAuthMode('register'); setFormError(''); }}
+              style={{ width: '100%', background: '#34d399', border: 'none', borderRadius: '12px', padding: '17px', color: '#06281c', fontSize: isMobile ? '15px' : '16px', fontWeight: '900', cursor: 'pointer', letterSpacing: '0.3px', textTransform: 'uppercase', boxShadow: '0 4px 20px rgba(52,211,153,0.35)' }}
+            >
+              Create Your Free Account →
+            </button>
+            <div style={{ textAlign: 'center', fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '14px' }}>
+              No payment details · No trial · No subscription · Full access
+            </div>
           </div>
-          {/* Divider */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.06)', padding: isMobile ? '6px 0' : '0 14px' }}>
-            <span style={{ fontSize: '14px', fontWeight: '900', color: 'rgba(255,255,255,0.3)', letterSpacing: '2px' }}>VS</span>
-          </div>
-          {/* Us */}
-          <div style={{ flex: 1, background: 'linear-gradient(135deg,rgba(5,150,105,0.22) 0%,rgba(4,120,87,0.18) 100%)', padding: isMobile ? '14px 16px' : '18px 20px', textAlign: 'center' }}>
-            <div style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '1.5px', textTransform: 'uppercase', color: '#34d399', marginBottom: '4px' }}>BetBudAI · Live Verified</div>
-            <div style={{ fontSize: isMobile ? '28px' : '42px', fontWeight: '900', color: '#34d399', lineHeight: 1, textShadow: '0 0 20px rgba(52,211,153,0.4)' }}>
+        )}
+
+        {/* Real proof — ROI, win streak */}
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'center', alignItems: 'center', gap: isMobile ? '12px' : '28px', flexWrap: 'wrap', margin: '32px 0 8px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: isMobile ? '26px' : '34px', fontWeight: '900', color: '#34d399', lineHeight: 1 }}>
               {roiLoading ? '…' : roi !== null ? `+${roi}%` : '—'}
             </div>
-            <div style={{ fontSize: '11px', color: 'rgba(52,211,153,0.75)', marginTop: '3px' }}>{roiLoading ? '…' : settled ?? '—'} races · no cherry-picking</div>
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '3px' }}>{roiLoading ? '…' : settled ?? '—'} races · verified ROI</div>
           </div>
-        </div>
-
-        {/* Stats row */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? '16px' : '28px', flexWrap: 'wrap', marginBottom: isMobile ? '20px' : '28px' }}>
-          {[
-            { icon: '🤖', label: '20+ signals per horse' },
-            { icon: '🎯', label: 'Daily picks + Favourite Watch lays' },
-            { icon: '📊', label: 'Every pick logged pre-race' },
-            { icon: '📅', label: 'Live since 22 Mar 2026' },
-          ].map((p, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '15px' }}>{p.icon}</span>
-              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>{p.label}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Win streak banner */}
-        {homeStats && homeStats.total_7 > 0 && (
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'linear-gradient(135deg,rgba(251,191,36,0.14),rgba(245,158,11,0.08))', border: '1.5px solid rgba(251,191,36,0.35)', borderRadius: '12px', padding: '10px 20px', marginBottom: '4px' }}>
-            <span style={{ fontSize: '18px' }}>🔥</span>
-            <span style={{ color: '#fbbf24', fontWeight: '800', fontSize: '14px' }}>
-              Last 7 days: <span style={{ color: 'white', fontSize: '17px' }}>{homeStats.wins_7} wins</span> from {homeStats.total_7} picks
-            </span>
-            {homeStats.total_7 > 0 && (
-              <span style={{ color: 'rgba(251,191,36,0.7)', fontSize: '12px', fontWeight: '600' }}>
-                ({Math.round(homeStats.wins_7 / homeStats.total_7 * 100)}% SR)
+          {homeStats && homeStats.total_7 > 0 && (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: '10px', padding: '9px 16px' }}>
+              <span style={{ fontSize: '16px' }}>🔥</span>
+              <span style={{ color: '#fbbf24', fontWeight: '700', fontSize: '13px' }}>
+                Last 7 days: <span style={{ color: 'white' }}>{homeStats.wins_7} wins</span> from {homeStats.total_7} picks
               </span>
-            )}
-          </div>
-        )}
-
-        {/* NAP teaser for non-authenticated users */}
-        {!isAuthenticated && homeStats?.today_nap?.horse && (
-          <div style={{ maxWidth: '380px', margin: '14px auto 0', position: 'relative', textAlign: 'center' }}>
-            <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', padding: '14px 18px', overflow: 'hidden' }}>
-              <div style={{ fontSize: '11px', fontWeight: '700', color: '#fbbf24', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '8px' }}>⭐ Today's NAP Pick</div>
-              <div style={{ filter: 'blur(7px)', userSelect: 'none', pointerEvents: 'none' }}>
-                <div style={{ fontSize: '20px', fontWeight: '900', color: 'white', marginBottom: '4px' }}>
-                  {homeStats.today_nap.horse}
-                </div>
-                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>
-                  {homeStats.today_nap.course} · {homeStats.today_nap.race_time}
-                </div>
-              </div>
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(2px)', borderRadius: '12px' }}>
-                <div style={{ fontSize: '13px', fontWeight: '700', color: 'white', marginBottom: '8px' }}>🔒 Sign up free to unlock</div>
-                <button onClick={() => { setAuthMode('register'); setSelectedTrialTier('premium'); setFormError(''); trackEvent('signup_click', { location: 'nap_teaser', tier: 'free' }); }} style={{ background: 'linear-gradient(135deg,#059669,#047857)', border: 'none', borderRadius: '8px', padding: '8px 18px', color: 'white', fontSize: '12px', fontWeight: '800', cursor: 'pointer' }}>
-                  Reveal Today's NAP →
-                </button>
-              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-
+      {/* ── WHAT YOU GET ───────────────────────────────────────────────── */}
       {!isAuthenticated && (
-        <div style={{ maxWidth: '640px', margin: '0 auto 32px', padding: '0 16px' }}>
-          {/* "100% FREE" badge */}
-          <div style={{ textAlign: 'center', marginBottom: '22px' }}>
-            <div style={{ display: 'inline-block', background: 'linear-gradient(135deg,rgba(52,211,153,0.18),rgba(16,185,129,0.1))', border: '2px solid rgba(52,211,153,0.55)', borderRadius: '50px', padding: '7px 22px', marginBottom: '18px' }}>
-              <span style={{ fontSize: '13px', fontWeight: '900', color: '#34d399', letterSpacing: '2px', textTransform: 'uppercase' }}>BETBUDAI — 100% FREE</span>
-            </div>
-            <div style={{ fontSize: isMobile ? '26px' : '36px', fontWeight: '900', color: 'white', lineHeight: 1.15, marginBottom: '8px' }}>
-              Every pick. Every sport.<br/>
-              <span style={{ background: 'linear-gradient(135deg,#34d399,#059669)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Zero cost. Forever.</span>
-            </div>
-            <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
-              No card required — ever. Just create an account and get daily picks across every sport.
-            </div>
-          </div>
-
-          {/* CTA */}
-          <button
-            onClick={() => { trackEvent('signup_click', { location: 'home_free_hero', tier: 'free', user_status: 'guest' }); setSelectedTrialTier('premium'); setAuthMode('register'); setFormError(''); }}
-            style={{ width: '100%', background: 'linear-gradient(135deg,#059669,#047857)', border: 'none', borderRadius: '12px', padding: '15px', color: 'white', fontSize: '15px', fontWeight: '900', cursor: 'pointer', letterSpacing: '0.3px', boxShadow: '0 4px 20px rgba(5,150,105,0.35)' }}
-          >
-            Create Free Account →
-          </button>
-          <div style={{ textAlign: 'center', fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '10px' }}>
-            No credit card · No trial expiry · Just free picks
+        <div style={{ maxWidth: '620px', margin: '20px auto 0', padding: '0 16px' }}>
+          <h3 style={{ textAlign: 'center', fontSize: isMobile ? '18px' : '20px', fontWeight: '900', color: 'white', letterSpacing: '0.04em', marginBottom: '18px', textTransform: 'uppercase' }}>
+            What you get — completely free
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4,1fr)', gap: '10px', marginBottom: '28px' }}>
+            {[
+              { icon: '🏆', title: 'Daily Picks', desc: "Today's selections, including NAP, NB and full analysis." },
+              { icon: '👁️', title: 'Favourite Watch', desc: 'Find the vulnerable favourites before the race.' },
+              { icon: '📈', title: 'Full Results', desc: 'Track every result and see how the picks are performing.' },
+              { icon: '🧠', title: 'AI Analysis', desc: 'Data-driven insights using 20+ key signals per horse.' },
+            ].map((f, i) => (
+              <div key={i} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '16px 14px' }}>
+                <div style={{ fontSize: '22px', marginBottom: '8px' }}>{f.icon}</div>
+                <div style={{ fontSize: '14px', fontWeight: '800', color: 'white', marginBottom: '4px' }}>{f.title}</div>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.4 }}>{f.desc}</div>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -6994,84 +6818,38 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
         </div>
       )}
 
-      {/* ── FREE SIGNUP CTA ───────────────────────────────────────────── */}
+      {/* ── TODAY'S SELECTIONS preview ──────────────────────────────────── */}
       {!isAuthenticated && (
       <div style={{ maxWidth: '520px', margin: '0 auto 28px', padding: '0 16px' }}>
-        <div style={{ background: 'linear-gradient(135deg,rgba(52,211,153,0.13),rgba(16,185,129,0.06))', border: '2px solid rgba(52,211,153,0.45)', borderRadius: '16px', padding: isMobile ? '20px 18px' : '28px 28px', textAlign: 'center' }}>
-          {/* Pill */}
-          <div style={{ display: 'inline-block', background: 'rgba(52,211,153,0.18)', border: '1px solid rgba(52,211,153,0.4)', borderRadius: '50px', padding: '4px 16px', fontSize: '11px', fontWeight: '800', color: '#34d399', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px' }}>
-            100% Free — No Card Ever
+        <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: isMobile ? '18px' : '24px', textAlign: 'left' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div style={{ fontSize: '13px', fontWeight: '900', color: 'white', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Today's Selections</div>
+            <div style={{ background: 'rgba(52,211,153,0.18)', border: '1px solid rgba(52,211,153,0.4)', borderRadius: '50px', padding: '3px 12px', fontSize: '10px', fontWeight: '800', color: '#34d399', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Preview</div>
           </div>
-          <div style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '900', color: 'white', lineHeight: 1.2, marginBottom: '16px' }}>
-            Join free and get every pick<br/>across every sport — today.
-          </div>
-          {/* 3-column reasons */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '8px', marginBottom: '20px' }}>
-            {[
-              ['🏇', 'Daily racing picks'],
-              ['⭐', 'NAP & NB selections'],
-              ['🏇', 'Lay alerts · Elite filter'],
-              ['⚽', 'Football tips'],
-              ['🎾', 'Tennis & Darts'],
-              ['📊', 'AI score breakdown'],
-            ].map(([icon, label], i) => (
-              <div key={i} style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '8px 6px', fontSize: '11px', color: 'rgba(255,255,255,0.75)', fontWeight: '600' }}>
-                <div style={{ fontSize: '16px', marginBottom: '3px' }}>{icon}</div>
-                {label}
+          {[
+            { label: "Today's NAP", sub: homeStats?.today_nap?.horse ? `${homeStats.today_nap.course} · ${homeStats.today_nap.race_time}` : 'Selection revealed after signup' },
+            { label: 'Favourite Watch', sub: "View today's flagged favourites" },
+          ].map((row, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '10px 0', borderTop: i > 0 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                <span style={{ fontSize: '15px', flexShrink: 0 }}>🔒</span>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: '13.5px', fontWeight: '700', color: 'white' }}>{row.label}</div>
+                  <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.5)' }}>{row.sub}</div>
+                </div>
               </div>
-            ))}
-          </div>
-          {/* Social proof — live subscriber count */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? '16px' : '28px', marginBottom: '18px', flexWrap: 'wrap' }}>
-            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '700' }}>
-              <span>👥</span>
-              <span style={{ color: '#34d399' }}>
-                {homeStats?.subscriber_count > 0 ? `Join ${homeStats.subscriber_count.toLocaleString()} members` : 'Growing community'}
-              </span>
+              <div style={{ fontSize: '13px', fontWeight: '900', color: '#34d399', flexShrink: 0 }}>FREE</div>
             </div>
-            {[['✅', 'No trial expiry'], ['🔓', 'Instant full access']].map(([icon, txt], i) => (
-              <div key={i} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span>{icon}</span><span>{txt}</span>
-              </div>
-            ))}
-          </div>
-          {/* 2-step email capture */}
-          {emailStep === 'email' ? (
-            <>
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-                <input
-                  type="email"
-                  placeholder="Enter your email..."
-                  value={quickEmail}
-                  onChange={e => setQuickEmail(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleQuickEmail()}
-                  style={{ flex: 1, background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.18)', borderRadius: '8px', padding: '12px 14px', color: 'white', fontSize: '14px', outline: 'none' }}
-                />
-                <button
-                  onClick={handleQuickEmail}
-                  style={{ background: 'linear-gradient(135deg,#059669,#047857)', border: 'none', borderRadius: '8px', padding: '12px 16px', color: 'white', fontSize: '14px', fontWeight: '900', cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 4px 14px rgba(5,150,105,0.4)' }}
-                >
-                  Get Free Picks →
-                </button>
-              </div>
-              <div style={{ textAlign: 'center', fontSize: '11px', color: 'rgba(255,255,255,0.25)', marginBottom: '8px' }}>
-                or{' '}
-                <span onClick={() => { setSelectedTrialTier('premium'); setAuthMode('register'); setFormError(''); trackEvent('signup_click', { location: 'home_cta_skip_email', tier: 'free' }); }} style={{ color: '#34d399', cursor: 'pointer', textDecoration: 'underline' }}>
-                  create account directly
-                </span>
-              </div>
-            </>
-          ) : (
-            <button
-              onClick={() => { trackEvent('signup_click', { location: 'home_cta_free_main', tier: 'free', user_status: 'guest' }); setSelectedTrialTier('premium'); setAuthMode('register'); setFormError(''); }}
-              style={{ width: '100%', background: 'linear-gradient(135deg,#059669,#047857)', border: 'none', borderRadius: '10px', padding: '14px', color: 'white', fontSize: '15px', fontWeight: '900', cursor: 'pointer', letterSpacing: '0.2px', boxShadow: '0 4px 18px rgba(5,150,105,0.4)', marginBottom: '10px' }}
-            >
-              Create Free Account →
-            </button>
-          )}
-          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>
-            No credit card · No subscription · No catch
-          </div>
+          ))}
+        </div>
+        <button
+          onClick={() => { trackEvent('signup_click', { location: 'home_selections_preview', tier: 'free', user_status: 'guest' }); setSelectedTrialTier('premium'); setAuthMode('register'); setFormError(''); }}
+          style={{ width: '100%', background: '#34d399', border: 'none', borderRadius: '12px', padding: '16px', color: '#06281c', fontSize: '14px', fontWeight: '900', cursor: 'pointer', letterSpacing: '0.2px', textTransform: 'uppercase', marginTop: '16px', boxShadow: '0 4px 18px rgba(52,211,153,0.3)' }}
+        >
+          See Today's Picks — Join Free →
+        </button>
+        <div style={{ textAlign: 'center', fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '14px' }}>
+          18+ | Gamble responsibly. Selections are not guarantees.
         </div>
       </div>
       )}
@@ -7271,15 +7049,14 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
             </p>
             <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px', textAlign: 'center', marginTop: '4px', marginBottom: 0 }}>
               Don't have an account?{' '}
-              <button type="button" onClick={() => setAuthMode('register')} style={{ background: 'none', border: 'none', color: '#34d399', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Start a free trial</button>
+              <button type="button" onClick={() => setAuthMode('register')} style={{ background: 'none', border: 'none', color: '#34d399', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Create a free account</button>
             </p>
           </form>
         ) : (
           /* ── REGISTER FORM ──────────────────────────────────────────── */
           <>
-        <h3 style={{ color: 'white', fontSize: '22px', fontWeight: '800', margin: '0 0 6px', textAlign: 'center' }}>Start Your 7-Day {selectedTrialLabel} Trial</h3>
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', textAlign: 'center', margin: '0 0 8px' }}>Immediate {selectedTrialLabel} access for 3 days — no card details required.</p>
-        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', textAlign: 'center', margin: '0 0 28px' }}>Cancel anytime. If you want to continue after the trial, the plan is {selectedTrialPrice}/mo.</p>
+        <h3 style={{ color: 'white', fontSize: '22px', fontWeight: '800', margin: '0 0 6px', textAlign: 'center' }}>Create Your Free Account</h3>
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', textAlign: 'center', margin: '0 0 28px' }}>Full access, no payment details, no trial — straight to the dashboard.</p>
 
         <form onSubmit={handleSubmit} noValidate autoComplete="off">
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit,minmax(240px,1fr))', gap: '14px', marginBottom: '18px' }}>
