@@ -248,8 +248,9 @@ All served by `BettingPicksAPI` (`backend/api/lambda_function.py`):
 ## Deployment
 
 - After making any code change, **build and deploy before finishing** — a change that isn't live isn't done
-- Frontend: `cd frontend && npm run build && cd .. && npx wrangler pages deploy frontend/build --project-name betbudai --branch main`
+- Frontend: `cd frontend && unset REACT_APP_API_URL && npm run build && cd .. && npx wrangler pages deploy frontend/build --project-name betbudai --branch main`
   - **`--branch main` is mandatory** — without it wrangler creates a preview URL, NOT www.betbudai.com
+  - **`unset REACT_APP_API_URL` is mandatory before every production build.** The repo-root `.env` (dev-only, correctly gitignored) sets `REACT_APP_API_URL=http://localhost:5000` for local backend testing, and that value leaks into the shell environment used by `npm run build` — Create React App honors a real env var over any fallback in the code, so an un-unset shell silently bakes `localhost:5000` into the production bundle and the live site's `/api/*` calls on every page (login, register, picks, everything) start failing with "Network error" for real users, with no build error to catch it. This happened for real on 2026-10-14 and was live for roughly two deploys before being caught by a login bug report. **After any frontend build, verify**: `grep -o "localhost:5000" frontend/build/static/js/main.*.js` must return nothing, and the same grep against the *live* served bundle (not just the local build folder) must also return nothing — CDN caching means the asset-manifest hash can lag a few seconds behind what wrangler just pushed.
 - API Lambda: always use `scripts/deploy_api.ps1` — deploys to BOTH `BettingPicksAPI` AND `betbudai-picks-api`
 - Analysis Lambda: always use `scripts/build_analysis_lambda.ps1` — never patch the zip manually
 - **Verify the deployment succeeded** — check the Cloudflare deployment URL or invoke the Lambda directly after deploy
