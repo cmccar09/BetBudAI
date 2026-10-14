@@ -40,10 +40,10 @@ function WcAnalysis({ data, hideBet = false }) {
       {/* ⭐ Argentina Top Bet card — shown first and most prominently */}
       {topBet.team && !hideBet && (
         <div style={{ background: 'linear-gradient(135deg,rgba(73,140,84,0.2),rgba(102,167,120,0.12))', border: '2px solid rgba(73,160,90,0.5)', borderRadius: 14, padding: 20, marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: 12, right: 12, background: 'linear-gradient(135deg,#16a34a,#15803d)', borderRadius: 8, padding: '3px 10px', fontSize: 10, fontWeight: 800, color: 'white', textTransform: 'uppercase', letterSpacing: 1 }}>
+          <div style={{ position: 'absolute', top: 12, right: 12, background: 'linear-gradient(135deg,#059669,#047857)', borderRadius: 8, padding: '3px 10px', fontSize: 10, fontWeight: 800, color: 'white', textTransform: 'uppercase', letterSpacing: 1 }}>
             {topBet.confidence}
           </div>
-          <div style={{ fontSize: 12, fontWeight: 800, color: '#4ade80', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>
             ⭐ BetBud Top Bet
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12, flexWrap: 'wrap' }}>
@@ -53,7 +53,7 @@ function WcAnalysis({ data, hideBet = false }) {
               <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>{topBet.bet_type}</div>
             </div>
             <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-              <div style={{ fontSize: 28, fontWeight: 900, color: '#4ade80' }}>{topBet.odds_fractional}</div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: '#34d399' }}>{topBet.odds_fractional}</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>decimal {topBet.odds_decimal}</div>
             </div>
           </div>
@@ -63,7 +63,7 @@ function WcAnalysis({ data, hideBet = false }) {
           {topBet.key_stats && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 6 }}>
               {topBet.key_stats.map((s, i) => (
-                <div key={i} style={{ fontSize: 11, color: '#4ade80', background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: 6, padding: '4px 10px' }}>
+                <div key={i} style={{ fontSize: 11, color: '#34d399', background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 6, padding: '4px 10px' }}>
                   ✓ {s}
                 </div>
               ))}
@@ -210,7 +210,7 @@ export default function WorldCupPage() {
                 color: tab === t.id ? '#f1f5f9' : '#64748b',
                 padding: '10px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 600,
                 whiteSpace: 'nowrap', minWidth: 0,
-                borderBottom: `3px solid ${tab === t.id ? '#6366f1' : 'transparent'}`,
+                borderBottom: `3px solid ${tab === t.id ? '#34d399' : 'transparent'}`,
                 transition: 'all .2s',
                 flexShrink: 0,
               }}
@@ -230,11 +230,11 @@ export default function WorldCupPage() {
               {topBet?.team && (
                 <div style={{ maxWidth: 900, margin: '0 auto', padding: '16px 16px 0' }}>
                   <div style={{ background: 'linear-gradient(135deg,rgba(22,163,74,0.2),rgba(16,185,129,0.1))', border: '2px solid rgba(22,163,74,0.45)', borderRadius: 14, padding: '18px 20px', position: 'relative', overflow: 'hidden' }}>
-                    <div style={{ position: 'absolute', top: 12, right: 12, background: 'linear-gradient(135deg,#16a34a,#15803d)', borderRadius: 8, padding: '3px 10px', fontSize: 10, fontWeight: 800, color: 'white', textTransform: 'uppercase', letterSpacing: 1 }}>
+                    <div style={{ position: 'absolute', top: 12, right: 12, background: 'linear-gradient(135deg,#059669,#047857)', borderRadius: 8, padding: '3px 10px', fontSize: 10, fontWeight: 800, color: 'white', textTransform: 'uppercase', letterSpacing: 1 }}>
                       {topBet.confidence}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10, flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, color: '#4ade80', textTransform: 'uppercase', letterSpacing: 1 }}>⭐ BetBud Top Bet</span>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: 1 }}>⭐ BetBud Top Bet</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 10, flexWrap: 'wrap' }}>
                       <div style={{ fontSize: 36 }}>{topBet.flag || '🇪🇸'}</div>
@@ -243,7 +243,7 @@ export default function WorldCupPage() {
                         <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{topBet.bet_type}</div>
                       </div>
                       <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-                        <div style={{ fontSize: 30, fontWeight: 900, color: '#4ade80' }}>{topBet.odds_fractional}</div>
+                        <div style={{ fontSize: 30, fontWeight: 900, color: '#34d399' }}>{topBet.odds_fractional}</div>
                         <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>decimal {topBet.odds_decimal}</div>
                       </div>
                     </div>
@@ -253,7 +253,7 @@ export default function WorldCupPage() {
                     {topBet.key_stats && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
                         {topBet.key_stats.map((s, i) => (
-                          <span key={i} style={{ fontSize: 11, color: '#4ade80', background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: 6, padding: '4px 10px' }}>✓ {s}</span>
+                          <span key={i} style={{ fontSize: 11, color: '#34d399', background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 6, padding: '4px 10px' }}>✓ {s}</span>
                         ))}
                       </div>
                     )}
@@ -303,7 +303,7 @@ export default function WorldCupPage() {
                         </div>
                         <div style={{ marginTop: 6, display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>
                           <span>W {m.pct[0]}%</span>
-                          <span style={{ color: '#4ade80', fontWeight: 700, fontSize: 11 }}>🤖 {m.fav}</span>
+                          <span style={{ color: '#34d399', fontWeight: 700, fontSize: 11 }}>🤖 {m.fav}</span>
                           <span>L {m.pct[2]}%</span>
                         </div>
                         <div style={{ marginTop: 4, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.08)', display: 'flex', overflow: 'hidden' }}>
@@ -331,7 +331,7 @@ export default function WorldCupPage() {
                         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 1 }}>{p.title}</div>
                         <div style={{ fontSize: 15, fontWeight: 800, color: 'white', margin: '4px 0 2px' }}>{p.name}</div>
                         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 8 }}>{p.sub}</div>
-                        <div style={{ fontSize: 10, color: '#4ade80', fontWeight: 700, background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: 6, padding: '3px 8px', display: 'inline-block' }}>
+                        <div style={{ fontSize: 10, color: '#34d399', fontWeight: 700, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 6, padding: '3px 8px', display: 'inline-block' }}>
                           Live: {p.live}
                         </div>
                       </div>
@@ -366,7 +366,7 @@ export default function WorldCupPage() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
           <div style={{
             width: 22, height: 22, borderRadius: 6,
-            background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+            background: 'linear-gradient(135deg,#059669,#34d399)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12,
             flexShrink: 0,
           }}>⚽</div>

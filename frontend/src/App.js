@@ -2856,7 +2856,7 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
             const outcome = normOutcome(pick);
             const oc = outcomeStyle(outcome);
             return (
-              <div key={idx} style={{ background:'white', borderRadius:'12px', padding: isMobile ? '14px 12px' : '20px 22px', borderLeft:`5px solid ${rankColors[rank] || tier.bg}`, boxShadow:'0 2px 12px rgba(0,0,0,0.1)' }}>
+              <div key={idx} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'12px', padding: isMobile ? '14px 12px' : '20px 22px', borderLeft:`5px solid ${rankColors[rank] || tier.bg}` }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:'8px' }}>
                   <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
                     <div style={{ background: rankColors[rank] || tier.bg, color:'white', borderRadius:'8px', padding:'6px 10px', textAlign:'center', minWidth:'44px' }}>
@@ -2864,7 +2864,7 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                       <div style={{ fontSize:'9px', fontWeight:'700', opacity:0.85, textTransform:'uppercase', lineHeight:'1' }}>Pick</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: isMobile ? '17px' : '20px', fontWeight:'800', color:'#111' }}>
+                      <div style={{ fontSize: isMobile ? '17px' : '20px', fontWeight:'800', color:'white' }}>
                         {pick.horse || 'Unknown'}
                         {pick.is_hot_prospect && <span style={{ background:'linear-gradient(135deg,#dc2626,#f59e0b)', color:'white', fontSize:'10px', fontWeight:'800', padding:'2px 8px', borderRadius:'5px', marginLeft:'8px', verticalAlign:'middle', letterSpacing:'0.5px' }}>🔥 HOT PROSPECT</span>}
                         {pick.pick_type === 'watchlist' && <span style={{ background:'linear-gradient(135deg,#1d4ed8,#2563eb)', color:'white', fontSize:'10px', fontWeight:'800', padding:'2px 8px', borderRadius:'5px', marginLeft:'8px', verticalAlign:'middle', letterSpacing:'0.5px' }}>👀 WATCHLIST</span>}
@@ -2873,8 +2873,8 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                       <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', marginTop:'6px', alignItems:'center' }}>
                         {pick.course && <span style={{ background:'#1e3a5f', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'700' }}>{pick.course}</span>}
                         {pickRaceType(pick) && <span style={{ background:'#7c3aed', color:'white', padding:'3px 10px', borderRadius:'6px', fontSize:'11px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.4px' }}>{pickRaceType(pick)}</span>}
-                        {ft.date && <span style={{ background:'#f3f4f6', color:'#374151', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'600' }}>{ft.date}</span>}
-                        {ft.time && <span style={{ background:'#ecfdf5', color:'#065f46', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'700', border:'1px solid #a7f3d0' }}>{ft.time}</span>}
+                        {ft.date && <span style={{ background:'rgba(255,255,255,0.08)', color:'rgba(255,255,255,0.7)', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'600' }}>{ft.date}</span>}
+                        {ft.time && <span style={{ background:'rgba(52,211,153,0.15)', color:'#34d399', padding:'3px 10px', borderRadius:'6px', fontSize:'12px', fontWeight:'700', border:'1px solid rgba(52,211,153,0.35)' }}>{ft.time}</span>}
                       </div>
                     </div>
                   </div>
@@ -2885,11 +2885,11 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                     {pick.odds && (
                       <div style={{ textAlign:'center' }}>
                         <div style={{ background:'#1e3a5f', color:'white', padding:'5px 14px', borderRadius:'8px', fontWeight:'900', fontSize:'22px' }}>{toFractional(pick.odds)}</div>
-                        <div style={{ fontSize:'10px', color:'#6b7280', marginTop:'2px', fontWeight:'600' }}>ODDS</div>
+                        <div style={{ fontSize:'10px', color:'rgba(255,255,255,0.5)', marginTop:'2px', fontWeight:'600' }}>ODDS</div>
                       </div>
                     )}
                     {pick.odds && parseFloat(pick.odds) <= 1.7 && (
-                      <span style={{ background:'#fef3c7', color:'#92400e', border:'1px solid #fbbf24', borderRadius:'6px', padding:'4px 8px', fontSize:'11px', fontWeight:'700' }}>⚠ Low Odds Value</span>
+                      <span style={{ background:'rgba(251,191,36,0.15)', color:'#fbbf24', border:'1px solid rgba(251,191,36,0.4)', borderRadius:'6px', padding:'4px 8px', fontSize:'11px', fontWeight:'700' }}>⚠ Low Odds Value</span>
                     )}
                     <span style={{ background: tier.bg, color:'white', padding:'5px 12px', borderRadius:'8px', fontSize:'12px', fontWeight:'700' }}>{tier.label}</span>
                   </div>
@@ -2897,13 +2897,13 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                 {/* Betting window */}
                 <div style={{ marginTop:'10px', display:'inline-flex', alignItems:'center', gap:'6px', background: bw.bg, border:`1px solid ${bw.border}`, borderRadius:'7px', padding:'5px 12px' }}>
                   <span style={{ fontSize:'13px', fontWeight:'800', color: bw.color }}>{bw.label}</span>
-                  <span style={{ fontSize:'11px', color:'#6b7280' }}>— {bw.desc}</span>
+                  <span style={{ fontSize:'11px', color:'rgba(255,255,255,0.5)' }}>— {bw.desc}</span>
                 </div>
                 {/* Trainer / Jockey / Form */}
-                <div style={{ fontSize:'13px', color:'#374151', marginTop:'12px', display:'flex', gap:'18px', flexWrap:'wrap', alignItems:'center' }}>
+                <div style={{ fontSize:'13px', color:'rgba(255,255,255,0.75)', marginTop:'12px', display:'flex', gap:'18px', flexWrap:'wrap', alignItems:'center' }}>
                   {pick.trainer && <span><strong>Trainer:</strong> {pick.trainer}</span>}
                   {pick.jockey && <span><strong>Jockey:</strong> {pick.jockey}</span>}
-                  {pick.form && <span style={{ background:'#f3f4f6', borderRadius:'5px', padding:'2px 8px', fontFamily:'monospace', fontWeight:'700', color:'#1e3a5f', letterSpacing:'1px' }}>Form: {pick.form}</span>}
+                  {pick.form && <span style={{ background:'rgba(255,255,255,0.08)', borderRadius:'5px', padding:'2px 8px', fontFamily:'monospace', fontWeight:'700', color:'rgba(255,255,255,0.85)', letterSpacing:'1px' }}>Form: {pick.form}</span>}
                   {renderScoreGapBadge(pick.score_gap)}
                 </div>
                 {/* Selection reasons */}
@@ -2914,7 +2914,7 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                   return reasons.length > 0 ? (
                     <div style={{ display:'flex', flexWrap:'wrap', gap:'5px', marginTop:'8px' }}>
                       {reasons.map((r, ri) => (
-                        <span key={ri} style={{ background:'rgba(30,58,95,0.08)', color:'#1e3a5f', border:'1px solid rgba(30,58,95,0.15)', borderRadius:'5px', padding:'2px 8px', fontSize:'11px', fontWeight:'600' }}>{r}</span>
+                        <span key={ri} style={{ background:'rgba(255,255,255,0.06)', color:'rgba(255,255,255,0.75)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:'5px', padding:'2px 8px', fontSize:'11px', fontWeight:'600' }}>{r}</span>
                       ))}
                     </div>
                   ) : null;
@@ -2926,23 +2926,23 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                       const ev = parseFloat(pick.expected_value);
                       const pos = ev > 0;
                       return (
-                        <span style={{ background: pos ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.1)', color: pos ? '#065f46' : '#991b1b', border:`1px solid ${pos ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.25)'}`, borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>
+                        <span style={{ background: pos ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.1)', color: pos ? '#34d399' : '#f87171', border:`1px solid ${pos ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.25)'}`, borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>
                           EV {pos ? '+' : ''}{ev.toFixed(2)}
                         </span>
                       );
                     })()}
                     {pick.kelly_fraction != null && parseFloat(pick.kelly_fraction) > 0 && (
-                      <span style={{ background:'rgba(59,130,246,0.1)', color:'#1d4ed8', border:'1px solid rgba(59,130,246,0.25)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>
+                      <span style={{ background:'rgba(59,130,246,0.1)', color:'#93c5fd', border:'1px solid rgba(59,130,246,0.25)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'700' }}>
                         Kelly {(parseFloat(pick.kelly_fraction) * 100).toFixed(1)}%
                       </span>
                     )}
                     {pick.race_coverage_pct != null && (
-                      <span style={{ background:'rgba(107,114,128,0.08)', color:'#374151', border:'1px solid rgba(107,114,128,0.2)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'600' }}>
+                      <span style={{ background:'rgba(255,255,255,0.06)', color:'rgba(255,255,255,0.7)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'600' }}>
                         {parseFloat(pick.race_coverage_pct).toFixed(0)}% race data
                       </span>
                     )}
                     {pick.timeform_stars != null && parseFloat(pick.timeform_stars) >= 1 && (
-                      <span style={{ color:'#d97706', fontSize:'13px', fontWeight:'700', letterSpacing:'1px' }}>
+                      <span style={{ color:'#fbbf24', fontSize:'13px', fontWeight:'700', letterSpacing:'1px' }}>
                         {'★'.repeat(Math.min(5, Math.max(1, Math.round(parseFloat(pick.timeform_stars)))))}
                       </span>
                     )}
@@ -2955,16 +2955,16 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                   return (
                     <div style={{ marginTop:'10px', padding:'10px 14px', background:`${tier.bg}18`, borderRadius:'8px', borderLeft:`3px solid ${tier.bg}` }}>
                       <span style={{ background: tier.bg, color:'white', borderRadius:'5px', padding:'2px 9px', fontSize:'11px', fontWeight:'800' }}>{tier.label}</span>
-                      <span style={{ fontSize:'12px', fontWeight:'700', color:'#1e3a5f', marginLeft:'8px' }}>Score: {score.toFixed(0)}</span>
+                      <span style={{ fontSize:'12px', fontWeight:'700', color:'rgba(255,255,255,0.85)', marginLeft:'8px' }}>Score: {score.toFixed(0)}</span>
                     </div>
                   );
                 })()}
                 {/* Result analysis */}
                 {outcome && pick.result_analysis && (
-                  <div style={{ marginTop:'10px', padding:'10px 14px', background:'rgba(0,0,0,0.03)', borderRadius:'8px', fontSize:'12px', color:'#374151', lineHeight:'1.5' }}>
+                  <div style={{ marginTop:'10px', padding:'10px 14px', background:'rgba(255,255,255,0.05)', borderRadius:'8px', fontSize:'12px', color:'rgba(255,255,255,0.75)', lineHeight:'1.5' }}>
                     <strong>Analysis:</strong> {pick.result_analysis}
                     {pick.result_winner_name && pick.result_winner_name !== pick.horse && (
-                      <div style={{ marginTop:'4px', color:'#ef4444', fontWeight:'700' }}>Winner: {pick.result_winner_name}</div>
+                      <div style={{ marginTop:'4px', color:'#f87171', fontWeight:'700' }}>Winner: {pick.result_winner_name}</div>
                     )}
                   </div>
                 )}
@@ -2977,11 +2977,11 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                   return (
                     <>
                       <button onClick={() => setExpandedCards5(prev => { const n = new Set(prev); isOpen ? n.delete(cardKey) : n.add(cardKey); return n; })}
-                        style={{ marginTop:'12px', width:'100%', background:'rgba(30,58,95,0.07)', border:'1px solid rgba(30,58,95,0.18)', borderRadius:'6px', padding:'7px 14px', fontSize:'12px', fontWeight:'700', color:'#1e3a5f', cursor:'pointer', textAlign:'center' }}>
+                        style={{ marginTop:'12px', width:'100%', background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:'6px', padding:'7px 14px', fontSize:'12px', fontWeight:'700', color:'rgba(255,255,255,0.8)', cursor:'pointer', textAlign:'center' }}>
                         {isOpen ? 'Hide Race Card' : `Full Race Card — ${pick.all_horses.length} runners`}
                       </button>
                       {isOpen && (
-                        <div style={{ marginTop:'10px', border:'1px solid rgba(30,58,95,0.15)', borderRadius:'8px', overflow:'hidden' }}>
+                        <div style={{ marginTop:'10px', border:'1px solid rgba(255,255,255,0.12)', borderRadius:'8px', overflow:'hidden' }}>
                           <div style={{ background:'#1e3a5f', color:'white', padding:'7px 12px', fontSize:'11px', fontWeight:'800', textTransform:'uppercase', letterSpacing:'0.5px' }}>
                             AI Scoring — Full Field
                           </div>
@@ -2990,20 +2990,20 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                             const sc = parseFloat(h.score || 0);
                             const barPct = maxSc > 0 ? Math.max(0, Math.min(100, (sc / maxSc) * 100)) : 0;
                             return (
-                              <div key={hi} style={{ padding:'8px 12px', background: isOurPick ? 'rgba(16,185,129,0.1)' : hi%2===0 ? 'white' : 'rgba(0,0,0,0.02)', borderTop: hi>0 ? '1px solid rgba(0,0,0,0.06)' : 'none', display:'flex', alignItems:'center', gap:'10px' }}>
-                                <span style={{ width:'22px', textAlign:'center', fontSize:'11px', fontWeight:'800', color: hi===0?'#d97706':hi===1?'#6b7280':'#9ca3af', flexShrink:0 }}>#{hi+1}</span>
+                              <div key={hi} style={{ padding:'8px 12px', background: isOurPick ? 'rgba(16,185,129,0.12)' : hi%2===0 ? 'rgba(255,255,255,0.03)' : 'transparent', borderTop: hi>0 ? '1px solid rgba(255,255,255,0.08)' : 'none', display:'flex', alignItems:'center', gap:'10px' }}>
+                                <span style={{ width:'22px', textAlign:'center', fontSize:'11px', fontWeight:'800', color: hi===0?'#d97706':hi===1?'rgba(255,255,255,0.6)':'rgba(255,255,255,0.4)', flexShrink:0 }}>#{hi+1}</span>
                                 <div style={{ flex:1, minWidth:0 }}>
                                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'3px' }}>
-                                    <span style={{ fontSize:'13px', fontWeight: isOurPick?'800':'600', color: isOurPick?'#065f46':'#111', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                                    <span style={{ fontSize:'13px', fontWeight: isOurPick?'800':'600', color: isOurPick?'#34d399':'white', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                                       {h.horse}{isOurPick && <span style={{ fontSize:'9px', background:'#10b981', color:'white', borderRadius:'3px', padding:'1px 5px', marginLeft:'5px' }}>PICK</span>}
                                     </span>
-                                    <span style={{ fontSize:'11px', fontWeight:'700', color:'#1e3a5f', flexShrink:0, marginLeft:'6px' }}>{sc>0?'+':''}{sc.toFixed(0)}pts</span>
+                                    <span style={{ fontSize:'11px', fontWeight:'700', color:'rgba(255,255,255,0.7)', flexShrink:0, marginLeft:'6px' }}>{sc>0?'+':''}{sc.toFixed(0)}pts</span>
                                   </div>
-                                  <div style={{ height:'4px', background:'rgba(0,0,0,0.08)', borderRadius:'2px', overflow:'hidden' }}>
+                                  <div style={{ height:'4px', background:'rgba(255,255,255,0.1)', borderRadius:'2px', overflow:'hidden' }}>
                                     <div style={{ width:`${barPct}%`, height:'100%', background: isOurPick?'#10b981':'#3b82f6', borderRadius:'2px' }} />
                                   </div>
                                 </div>
-                                <span style={{ fontSize:'11px', color:'#6b7280', flexShrink:0, minWidth:'36px', textAlign:'right' }}>{h.odds ? toFractional(h.odds) : '—'}</span>
+                                <span style={{ fontSize:'11px', color:'rgba(255,255,255,0.5)', flexShrink:0, minWidth:'36px', textAlign:'right' }}>{h.odds ? toFractional(h.odds) : '—'}</span>
                               </div>
                             );
                           })}
@@ -3035,13 +3035,13 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                 const ft = formatRaceTime(pick.race_time);
                 const tier = tierInfo(pick.comprehensive_score || pick.score);
                 return (
-                  <div key={'watch-'+idx} style={{ background:'rgba(255,255,255,0.92)', borderRadius:'12px', padding: isMobile ? '12px 10px' : '16px 18px', borderLeft:'5px solid #3b82f6', boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>
+                  <div key={'watch-'+idx} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'12px', padding: isMobile ? '12px 10px' : '16px 18px', borderLeft:'5px solid #3b82f6' }}>
                     <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'8px' }}>
                       <div>
-                        <div style={{ fontSize: isMobile ? '15px' : '17px', fontWeight:'800', color:'#1f2937' }}>{pick.horse || 'Unknown'}</div>
+                        <div style={{ fontSize: isMobile ? '15px' : '17px', fontWeight:'800', color:'white' }}>{pick.horse || 'Unknown'}</div>
                         <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', marginTop:'4px', alignItems:'center' }}>
-                          {pick.course && <span style={{ background:'#dbeafe', color:'#1e3a8a', padding:'2px 8px', borderRadius:'5px', fontSize:'11px', fontWeight:'600' }}>{pick.course}</span>}
-                          {ft.time && <span style={{ background:'#eff6ff', color:'#1d4ed8', padding:'2px 8px', borderRadius:'5px', fontSize:'11px', fontWeight:'600' }}>{ft.time}</span>}
+                          {pick.course && <span style={{ background:'rgba(59,130,246,0.15)', color:'#93c5fd', padding:'2px 8px', borderRadius:'5px', fontSize:'11px', fontWeight:'600' }}>{pick.course}</span>}
+                          {ft.time && <span style={{ background:'rgba(59,130,246,0.15)', color:'#93c5fd', padding:'2px 8px', borderRadius:'5px', fontSize:'11px', fontWeight:'600' }}>{ft.time}</span>}
                           <span style={{ background:'#1d4ed8', color:'white', padding:'2px 8px', borderRadius:'5px', fontSize:'11px', fontWeight:'700' }}>W{pick.watchlist_rank || (idx + 1)}</span>
                           <span style={{ background:tier.bg, color:'white', padding:'2px 8px', borderRadius:'5px', fontSize:'11px', fontWeight:'700' }}>{tier.label}</span>
                         </div>
@@ -3065,25 +3065,25 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                 const ft = formatRaceTime(pick.race_time);
                 const dropMeta = formatDroppedMeta(pick);
                 return (
-                  <div key={'dropped-'+idx} style={{ background:'#f3f4f6', borderRadius:'12px', padding: isMobile ? '12px 10px' : '16px 18px', borderLeft:'5px solid #9ca3af', boxShadow:'0 1px 6px rgba(0,0,0,0.06)', opacity:0.7 }}>
+                  <div key={'dropped-'+idx} style={{ background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'12px', padding: isMobile ? '12px 10px' : '16px 18px', borderLeft:'5px solid #6b7280', opacity:0.7 }}>
                     <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'8px' }}>
                       <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
-                        <div style={{ background:'#9ca3af', color:'white', borderRadius:'8px', padding:'6px 10px', textAlign:'center', minWidth:'44px' }}>
+                        <div style={{ background:'#6b7280', color:'white', borderRadius:'8px', padding:'6px 10px', textAlign:'center', minWidth:'44px' }}>
                           <div style={{ fontSize:'14px', fontWeight:'900' }}>✗</div>
                           <div style={{ fontSize:'8px', fontWeight:'700', opacity:0.85, textTransform:'uppercase', lineHeight:'1' }}>Dropped</div>
                         </div>
                         <div>
-                          <div style={{ fontSize: isMobile ? '15px' : '17px', fontWeight:'700', color:'#6b7280', textDecoration:'line-through' }}>{pick.horse || 'Unknown'}</div>
+                          <div style={{ fontSize: isMobile ? '15px' : '17px', fontWeight:'700', color:'rgba(255,255,255,0.6)', textDecoration:'line-through' }}>{pick.horse || 'Unknown'}</div>
                           <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', marginTop:'4px', alignItems:'center' }}>
-                            {pick.course && <span style={{ background:'#d1d5db', color:'#374151', padding:'2px 8px', borderRadius:'5px', fontSize:'11px', fontWeight:'600' }}>{pick.course}</span>}
-                            {ft.time && <span style={{ background:'#e5e7eb', color:'#6b7280', padding:'2px 8px', borderRadius:'5px', fontSize:'11px', fontWeight:'600' }}>{ft.time}</span>}
+                            {pick.course && <span style={{ background:'rgba(255,255,255,0.08)', color:'rgba(255,255,255,0.6)', padding:'2px 8px', borderRadius:'5px', fontSize:'11px', fontWeight:'600' }}>{pick.course}</span>}
+                            {ft.time && <span style={{ background:'rgba(255,255,255,0.08)', color:'rgba(255,255,255,0.6)', padding:'2px 8px', borderRadius:'5px', fontSize:'11px', fontWeight:'600' }}>{ft.time}</span>}
                           </div>
                         </div>
                       </div>
                       <span style={{ background:'#ef4444', color:'white', padding:'4px 10px', borderRadius:'6px', fontSize:'11px', fontWeight:'800' }}>NO LONGER SELECTED</span>
                     </div>
-                    <div style={{ marginTop:'8px', fontSize:'12px', color:'#9ca3af', fontStyle:'italic' }}>This pick was removed during live re-analysis — do not bet.</div>
-                    <div style={{ marginTop:'6px', fontSize:'12px', color:'#b91c1c', fontWeight:'700' }}>Dropped at {dropMeta.droppedAt} • {dropMeta.reason}</div>
+                    <div style={{ marginTop:'8px', fontSize:'12px', color:'rgba(255,255,255,0.45)', fontStyle:'italic' }}>This pick was removed during live re-analysis — do not bet.</div>
+                    <div style={{ marginTop:'6px', fontSize:'12px', color:'#f87171', fontWeight:'700' }}>Dropped at {dropMeta.droppedAt} • {dropMeta.reason}</div>
                   </div>
                 );
               })}
@@ -6071,10 +6071,10 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
           onClick={downloadLaySelectionsCsv}
           id="vip-lay-selections-download-btn"
           style={{
-            background:'rgba(249,115,22,0.16)',
-            border:'1px solid rgba(249,115,22,0.48)',
+            background:'rgba(52,211,153,0.16)',
+            border:'1px solid rgba(52,211,153,0.48)',
             borderRadius:'6px',
-            color:'#fdba74',
+            color:'#34d399',
             cursor:'pointer',
             padding:'6px 12px',
             fontSize:'12px',
@@ -6111,10 +6111,10 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
           }}
           id="vip-historical-download-btn"
           style={{
-            background:'rgba(34,211,238,0.14)',
-            border:'1px solid rgba(34,211,238,0.45)',
+            background:'rgba(251,191,36,0.14)',
+            border:'1px solid rgba(251,191,36,0.45)',
             borderRadius:'6px',
-            color:'#67e8f9',
+            color:'#fbbf24',
             cursor:'pointer',
             padding:'6px 12px',
             fontSize:'12px',
@@ -6135,14 +6135,14 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
         const vc = VERDICT_COLOURS[r.verdict_colour] || VERDICT_COLOURS.GREEN;
         const barPct = Math.min(100, Math.round(r.lay_score / 35 * 100));
         return (
-          <div key={i} style={{ background:'rgba(22,27,34,0.95)', border:`1px solid ${vc.border}`, borderLeft:`4px solid ${vc.fg}`, borderRadius:'10px', marginBottom:'14px', overflow:'hidden' }}>
+          <div key={i} style={{ background:'rgba(255,255,255,0.05)', border:`1px solid ${vc.border}`, borderLeft:`4px solid ${vc.fg}`, borderRadius:'10px', marginBottom:'14px', overflow:'hidden' }}>
 
             {/* Card header */}
             <div style={{ display:'flex', alignItems:'center', gap: isMobile ? '6px' : '10px', flexWrap:'wrap', padding: isMobile ? '10px 12px' : '12px 18px', borderBottom:'1px solid rgba(255,255,255,0.07)', background:'rgba(255,255,255,0.02)' }}>
-              <span style={{ fontWeight:'800', color:'#58a6ff', fontSize: isMobile ? '13px' : '15px', minWidth:'40px' }}>{fmtUtcTime(r.race_time)}</span>
+              <span style={{ fontWeight:'800', color:'#60a5fa', fontSize: isMobile ? '13px' : '15px', minWidth:'40px' }}>{fmtUtcTime(r.race_time)}</span>
               <span style={{ fontWeight:'700', color:'white', fontSize: isMobile ? '13px' : '14px' }}>{r.course}</span>
               <span style={{ flex:1, fontSize:'12px', color:'rgba(255,255,255,0.45)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace: isMobile ? 'normal' : 'nowrap', minWidth:0 }}>{r.race_name}</span>
-              {r.our_pick && <span style={{ background:'rgba(88,166,255,0.18)', color:'#58a6ff', border:'1px solid rgba(88,166,255,0.4)', borderRadius:'4px', padding:'2px 8px', fontSize:'11px', fontWeight:'700' }}>⚡ OUR PICK</span>}
+              {r.our_pick && <span style={{ background:'rgba(96,165,250,0.18)', color:'#60a5fa', border:'1px solid rgba(96,165,250,0.4)', borderRadius:'4px', padding:'2px 8px', fontSize:'11px', fontWeight:'700' }}>⚡ OUR PICK</span>}
               {r.outcome && ['win','won','loss','lost'].includes(r.outcome.toLowerCase()) && (() => {
                 const oc = r.outcome.toLowerCase();
                 const favWon = ['win','won'].includes(oc);
@@ -6166,12 +6166,12 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
               <div style={{ flex:1, minWidth:0 }}>
                 <div style={{ fontSize:'20px', fontWeight:'800', color:'white', marginBottom:'6px' }}>{r.favourite}</div>
                 <div style={{ display:'flex', flexWrap:'wrap', gap:'4px 16px', fontSize:'12px', color:'rgba(255,255,255,0.5)', marginBottom:'4px', alignItems:'center' }}>
-                  <span>@ <b style={{color:'#e6edf3'}}>{r.fav_odds?.toFixed(2)}</b></span>
+                  <span>@ <b style={{color:'white'}}>{r.fav_odds?.toFixed(2)}</b></span>
                   {r.fav_odds <= 1.7 && (
-                    <span style={{ background:'#7c2d12', color:'#fca5a5', border:'1px solid #f87171', borderRadius:'4px', padding:'1px 7px', fontSize:'11px', fontWeight:'700' }}>⚠ Extreme Fav — Check N/R</span>
+                    <span style={{ background:'rgba(239,68,68,0.15)', color:'#f87171', border:'1px solid rgba(239,68,68,0.4)', borderRadius:'4px', padding:'1px 7px', fontSize:'11px', fontWeight:'700' }}>⚠ Extreme Fav — Check N/R</span>
                   )}
-                  <span>Form <b style={{color:'#e6edf3'}}>{r.form || '—'}</b></span>
-                  <span>Runners <b style={{color:'#e6edf3'}}>{r.runners}</b></span>
+                  <span>Form <b style={{color:'white'}}>{r.form || '—'}</b></span>
+                  <span>Runners <b style={{color:'white'}}>{r.runners}</b></span>
                 </div>
                 <div style={{ display:'flex', flexWrap:'wrap', gap:'4px 16px', fontSize:'12px', color:'rgba(255,255,255,0.5)' }}>
                   <span>Trainer <b style={{color:'rgba(255,255,255,0.75)'}}>{r.trainer || '—'}</b></span>
@@ -6231,9 +6231,9 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
                 const favWon = past && r.outcome && ['win','won'].includes(r.outcome.toLowerCase());
                 const favLost = past && r.outcome && !['win','won'].includes(r.outcome.toLowerCase());
                 return (
-                  <div key={i} style={{ background:'rgba(22,27,34,0.95)', border:'1px solid rgba(255,255,255,0.1)', borderLeft:`3px solid ${vc.fg}`, borderRadius:'8px', padding:'10px 12px', opacity: past ? 1 : 0.5 }}>
+                  <div key={i} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderLeft:`3px solid ${vc.fg}`, borderRadius:'8px', padding:'10px 12px', opacity: past ? 1 : 0.5 }}>
                     <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'6px' }}>
-                      <span style={{ fontSize:'13px', color:'#58a6ff', fontWeight:'700' }}>{fmtUtcTime(r.race_time)}</span>
+                      <span style={{ fontSize:'13px', color:'#60a5fa', fontWeight:'700' }}>{fmtUtcTime(r.race_time)}</span>
                       <span style={{ fontSize:'12px', color:'rgba(255,255,255,0.8)' }}>{r.course}</span>
                       <span style={{ fontSize:'14px', fontWeight:'800', color:vc.fg }}>{r.lay_score}</span>
                     </div>
@@ -6254,7 +6254,7 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
             </div>
           ) : (
           <div style={{ overflowX:'auto' }}>
-            <table style={{ width:'100%', borderCollapse:'collapse', background:'rgba(22,27,34,0.95)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'8px', overflow:'hidden' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'8px', overflow:'hidden' }}>
               <thead>
                 <tr style={{ background:'rgba(255,255,255,0.06)' }}>
                   {['Time','Course','Favourite','Odds','Lay Score','Verdict','Result'].map(h => (
@@ -6270,7 +6270,7 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
                   const favLost = past && r.outcome && !['win','won'].includes(r.outcome.toLowerCase());
                   return (
                     <tr key={i} style={{ borderBottom:'1px solid rgba(255,255,255,0.06)', opacity: past ? 1 : 0.5 }}>
-                      <td style={{ padding:'9px 12px', fontSize:'13px', color:'#58a6ff', fontWeight:'700' }}>{fmtUtcTime(r.race_time)}</td>
+                      <td style={{ padding:'9px 12px', fontSize:'13px', color:'#60a5fa', fontWeight:'700' }}>{fmtUtcTime(r.race_time)}</td>
                       <td style={{ padding:'9px 12px', fontSize:'13px', color:'rgba(255,255,255,0.8)' }}>{r.course}</td>
                       <td style={{ padding:'9px 12px', fontSize:'13px', color:'white', fontWeight:'600' }}>{r.favourite}</td>
                       <td style={{ padding:'9px 12px', fontSize:'13px', color:'rgba(255,255,255,0.7)' }}>{r.fav_odds?.toFixed(2)}</td>
@@ -6855,7 +6855,7 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
       )}
 
       {!isAuthenticated && (
-        <div style={{ maxWidth: '560px', margin: '0 auto 20px', background: 'linear-gradient(135deg, rgba(225,48,108,0.16), rgba(131,58,180,0.14), rgba(252,176,69,0.12))', border: '1px solid rgba(255,255,255,0.18)', borderRadius: '12px', padding: '12px 14px', textAlign: 'center' }}>
+        <div style={{ maxWidth: '560px', margin: '0 auto 20px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '12px 14px', textAlign: 'center' }}>
           <div style={{ color: 'white', fontSize: '14px', fontWeight: '800', marginBottom: '6px' }}>Follow BetBudAI on Instagram</div>
           <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px', lineHeight: '1.5', marginBottom: '10px' }}>
             Daily updates, race insights and behind-the-scenes AI picks content.
@@ -6864,7 +6864,7 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
             href="https://www.instagram.com/betbudai?utm_source=qr&igsh=MWg0cWp2a3E3bm5qYw=="
             target="_blank"
             rel="noopener noreferrer"
-            style={{ display: 'inline-block', background: 'linear-gradient(135deg,#e1306c 0%,#833ab4 55%,#fcb045 100%)', border: 'none', borderRadius: '8px', color: 'white', padding: '9px 14px', fontSize: '12px', fontWeight: '800', textDecoration: 'none', letterSpacing: '0.3px' }}
+            style={{ display: 'inline-block', background: '#34d399', border: 'none', borderRadius: '8px', color: '#06281c', padding: '9px 14px', fontSize: '12px', fontWeight: '800', textDecoration: 'none', letterSpacing: '0.3px' }}
           >
             📸 Follow @betbudai
           </a>
