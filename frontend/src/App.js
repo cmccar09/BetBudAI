@@ -6668,73 +6668,6 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
       {/* ── HERO ──────────────────────────────────────────────────────── */}
       <div style={{ textAlign: 'center', padding: isMobile ? '12px 0 28px' : '20px 0 48px' }}>
 
-        {/* Featured Snapshot - Dynamic Good News Story (REPLACES gold banner) */}
-        {featuredSnapshot && featuredSnapshot.horse && (
-          <div style={{
-            maxWidth: isMobile ? '100%' : '680px',
-            margin: '0 auto 24px',
-            padding: isMobile ? '20px 16px' : '28px 24px',
-            background: 'linear-gradient(135deg, rgba(52,211,153,0.18), rgba(16,185,129,0.12))',
-            border: '2px solid rgba(52,211,153,0.4)',
-            borderRadius: '16px',
-            boxShadow: '0 8px 24px rgba(52,211,153,0.15)',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '16px' }}>
-              <span style={{
-                fontSize: '13px',
-                fontWeight: '900',
-                color: '#34d399',
-                background: 'rgba(5,150,105,0.25)',
-                border: '1.5px solid rgba(52,211,153,0.5)',
-                padding: '4px 14px',
-                borderRadius: '999px',
-                letterSpacing: '1.2px',
-                textTransform: 'uppercase'
-              }}>
-                🏆 Featured Snapshot
-              </span>
-            </div>
-            <div style={{ fontSize: isMobile ? '48px' : '56px', textAlign: 'center', marginBottom: '8px' }}>🏇</div>
-            {/* Dynamic winners — pulled from today/yesterday results */}
-            {(() => {
-              const ws    = featuredSnapshot.allWinners || [{ horse: featuredSnapshot.horse, odds: featuredSnapshot.odds, course: featuredSnapshot.course }];
-              const total = featuredSnapshot.total || ws.length;
-              const pct   = total > 0 ? Math.round(ws.length / total * 100) : 100;
-              const parseFrac = s => { const m = String(s||'').match(/^(\d+)\/(\d+)$/); return m ? parseInt(m[1])/parseInt(m[2])+1 : (parseFloat(s)||1); };
-              const acca  = ws.reduce((acc, w) => acc * parseFrac(w.odds), 1);
-              return (
-                <>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', marginBottom: '14px' }}>
-                    {ws.slice(0, 6).map(w => (
-                      <div key={w.horse} style={{
-                        background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)',
-                        borderRadius: '8px', padding: '6px 12px', textAlign: 'center'
-                      }}>
-                        <div style={{ fontSize: '11px', color: '#6ee7b7', fontWeight: 700 }}>✅ WON</div>
-                        <div style={{ fontSize: '14px', fontWeight: 900, color: '#fbbf24' }}>{w.horse}</div>
-                        <div style={{ fontSize: '12px', color: '#34d399', fontWeight: 700 }}>{w.odds}</div>
-                        <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)' }}>{w.course}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{ color: 'rgba(255,255,255,0.95)', fontSize: isMobile ? '16px' : '18px', fontWeight: '700', textAlign: 'center' }}>
-                    <span style={{ color: '#fbbf24', fontWeight: '900', fontSize: '22px' }}>{ws.length} from {total}</span>
-                    {' · '}
-                    <span style={{ color: '#34d399' }}>{pct}% strike rate</span>
-                  </div>
-                  {ws.length >= 2 && (
-                    <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginTop: '6px' }}>
-                      {ws.length}-fold accumulator returned{' '}
-                      <span style={{ color: '#fbbf24', fontWeight: 700 }}>{Math.round(acca)}× stake</span>
-                    </div>
-                  )}
-                  <div style={{ fontSize: isMobile ? '14px' : '16px', textAlign: 'center', marginTop: '12px' }}>🔥🔥🔥</div>
-                </>
-              );
-            })()}
-          </div>
-        )}
-
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(5,150,105,0.18)', border: '1px solid rgba(52,211,153,0.35)', borderRadius: '20px', padding: '6px 16px', marginBottom: '24px' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34d399', boxShadow: '0 0 6px #34d399', display: 'inline-block' }}></span>
           <span style={{ color: '#34d399', fontSize: '12px', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase' }}>Live System · UK &amp; Ireland Racing</span>
@@ -6852,23 +6785,6 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
           18+ | Gamble responsibly. Selections are not guarantees.
         </div>
       </div>
-      )}
-
-      {!isAuthenticated && (
-        <div style={{ maxWidth: '560px', margin: '0 auto 20px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '12px 14px', textAlign: 'center' }}>
-          <div style={{ color: 'white', fontSize: '14px', fontWeight: '800', marginBottom: '6px' }}>Follow BetBudAI on Instagram</div>
-          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px', lineHeight: '1.5', marginBottom: '10px' }}>
-            Daily updates, race insights and behind-the-scenes AI picks content.
-          </div>
-          <a
-            href="https://www.instagram.com/betbudai?utm_source=qr&igsh=MWg0cWp2a3E3bm5qYw=="
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'inline-block', background: '#34d399', border: 'none', borderRadius: '8px', color: '#06281c', padding: '9px 14px', fontSize: '12px', fontWeight: '800', textDecoration: 'none', letterSpacing: '0.3px' }}
-          >
-            📸 Follow @betbudai
-          </a>
-        </div>
       )}
 
       {/* ── AUTH SECTION ──────────────────────────────────────────────── */}
@@ -7130,6 +7046,90 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
           </>
         )}
       </div>
+      )}
+
+      {/* Featured Snapshot - Dynamic Good News Story */}
+      {!isAuthenticated && featuredSnapshot && featuredSnapshot.horse && (
+        <div style={{
+          maxWidth: isMobile ? '100%' : '680px',
+          margin: '0 auto 24px',
+          padding: isMobile ? '20px 16px' : '28px 24px',
+          background: 'linear-gradient(135deg, rgba(52,211,153,0.18), rgba(16,185,129,0.12))',
+          border: '2px solid rgba(52,211,153,0.4)',
+          borderRadius: '16px',
+          boxShadow: '0 8px 24px rgba(52,211,153,0.15)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '16px' }}>
+            <span style={{
+              fontSize: '13px',
+              fontWeight: '900',
+              color: '#34d399',
+              background: 'rgba(5,150,105,0.25)',
+              border: '1.5px solid rgba(52,211,153,0.5)',
+              padding: '4px 14px',
+              borderRadius: '999px',
+              letterSpacing: '1.2px',
+              textTransform: 'uppercase'
+            }}>
+              🏆 Featured Snapshot
+            </span>
+          </div>
+          <div style={{ fontSize: isMobile ? '48px' : '56px', textAlign: 'center', marginBottom: '8px' }}>🏇</div>
+          {/* Dynamic winners — pulled from today/yesterday results */}
+          {(() => {
+            const ws    = featuredSnapshot.allWinners || [{ horse: featuredSnapshot.horse, odds: featuredSnapshot.odds, course: featuredSnapshot.course }];
+            const total = featuredSnapshot.total || ws.length;
+            const pct   = total > 0 ? Math.round(ws.length / total * 100) : 100;
+            const parseFrac = s => { const m = String(s||'').match(/^(\d+)\/(\d+)$/); return m ? parseInt(m[1])/parseInt(m[2])+1 : (parseFloat(s)||1); };
+            const acca  = ws.reduce((acc, w) => acc * parseFrac(w.odds), 1);
+            return (
+              <>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', marginBottom: '14px' }}>
+                  {ws.slice(0, 6).map(w => (
+                    <div key={w.horse} style={{
+                      background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)',
+                      borderRadius: '8px', padding: '6px 12px', textAlign: 'center'
+                    }}>
+                      <div style={{ fontSize: '11px', color: '#6ee7b7', fontWeight: 700 }}>✅ WON</div>
+                      <div style={{ fontSize: '14px', fontWeight: 900, color: '#fbbf24' }}>{w.horse}</div>
+                      <div style={{ fontSize: '12px', color: '#34d399', fontWeight: 700 }}>{w.odds}</div>
+                      <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)' }}>{w.course}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.95)', fontSize: isMobile ? '16px' : '18px', fontWeight: '700', textAlign: 'center' }}>
+                  <span style={{ color: '#fbbf24', fontWeight: '900', fontSize: '22px' }}>{ws.length} from {total}</span>
+                  {' · '}
+                  <span style={{ color: '#34d399' }}>{pct}% strike rate</span>
+                </div>
+                {ws.length >= 2 && (
+                  <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginTop: '6px' }}>
+                    {ws.length}-fold accumulator returned{' '}
+                    <span style={{ color: '#fbbf24', fontWeight: 700 }}>{Math.round(acca)}× stake</span>
+                  </div>
+                )}
+                <div style={{ fontSize: isMobile ? '14px' : '16px', textAlign: 'center', marginTop: '12px' }}>🔥🔥🔥</div>
+              </>
+            );
+          })()}
+        </div>
+      )}
+
+      {!isAuthenticated && (
+        <div style={{ maxWidth: '560px', margin: '0 auto 20px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '12px 14px', textAlign: 'center' }}>
+          <div style={{ color: 'white', fontSize: '14px', fontWeight: '800', marginBottom: '6px' }}>Follow BetBudAI on Instagram</div>
+          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px', lineHeight: '1.5', marginBottom: '10px' }}>
+            Daily updates, race insights and behind-the-scenes AI picks content.
+          </div>
+          <a
+            href="https://www.instagram.com/betbudai?utm_source=qr&igsh=MWg0cWp2a3E3bm5qYw=="
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'inline-block', background: '#34d399', border: 'none', borderRadius: '8px', color: '#06281c', padding: '9px 14px', fontSize: '12px', fontWeight: '800', textDecoration: 'none', letterSpacing: '0.3px' }}
+          >
+            📸 Follow @betbudai
+          </a>
+        </div>
       )}
 
       {/* Responsible gambling footer */}
