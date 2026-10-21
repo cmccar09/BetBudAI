@@ -6611,7 +6611,19 @@ def _analyse_date_lambda(target_date_str, tbl, winner_map=None):
 
         lay_score, flags, details = _score_fav(fav, all_horses_sorted)
         verd = _verdict(lay_score)
-        race_name = fav.get('race_name') or f'{course} {rt[11:16]}'
+        if fav.get('race_name'):
+            race_name = fav.get('race_name')
+        else:
+            # rt is a naive UTC string (no offset) - convert to UK local time
+            # (BST/GMT) rather than slicing the raw UTC digits, which was
+            # silently off by an hour whenever BST was in effect.
+            try:
+                from zoneinfo import ZoneInfo as _ZoneInfo
+                _rt_dt = datetime.fromisoformat(rt).replace(tzinfo=timezone.utc)
+                _local_hhmm = _rt_dt.astimezone(_ZoneInfo('Europe/London')).strftime('%H:%M')
+            except Exception:
+                _local_hhmm = rt[11:16]
+            race_name = f'{course} {_local_hhmm}'
         fav_name = fav.get('horse', '') or ''
 
         # Alternative winner — highest-scored non-favourite for VIP handicap suggestion
@@ -6639,10 +6651,25 @@ def _analyse_date_lambda(target_date_str, tbl, winner_map=None):
         except Exception:
             race_started = True
 
-        # Determine outcome: SL winner_map first, then DynamoDB runner scan.
-        # Do not trust favourite row fallback, which can surface stale/corrupt losses.
+        # Determine outcome: manually-amended result first (stewards' inquiry
+        # corrections — see result_amended flag), then SL winner_map, then
+        # DynamoDB runner scan. A manual amendment is the most authoritative
+        # source available (it means someone confirmed the real outcome after
+        # SL's own scrape was stale/pre-inquiry), so it must win over both.
         fav_outcome = None
-        if race_started and winner_map:
+        if race_started and any(h.get('result_amended') for h in runners):
+            winner_name = None
+            for h in runners:
+                h_outcome = _normalise_fav_outcome(h.get('outcome') or h.get('result'))
+                if h_outcome == 'win':
+                    winner_name = h.get('horse', '')
+                    break
+            if winner_name:
+                fav_outcome = (
+                    'win' if winner_name.strip().lower() == fav_name.strip().lower()
+                    else 'loss'
+                )
+        if race_started and fav_outcome is None and winner_map:
             import re as _re2
             race_hhmm = rt[11:16] if len(rt) >= 16 else ''
             course_key = course.lower().replace('-', ' ').strip()

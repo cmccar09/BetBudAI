@@ -5858,7 +5858,8 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
   const nowUtc = new Date();
   const isPast = r => {
     if (!r.race_time) return false;
-    try { return new Date(r.race_time) < nowUtc; } catch { return false; }
+    const s = r.race_time.endsWith('Z') || r.race_time.includes('+') ? r.race_time : r.race_time + 'Z';
+    try { return new Date(s) < nowUtc; } catch { return false; }
   };
 
   const layScore = r => parseFloat(r.lay_score || 0);
@@ -5949,7 +5950,7 @@ function LayTheFavView({ isAuthenticated, onSignUp }) {
               ))}
             </div>
             {vipElite.map((r, idx) => {
-              const timeStr = r.race_time ? new Date(r.race_time).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/London'}) : '';
+              const timeStr = fmtUtcTime(r.race_time);
               const alt = r.alternative_winner;
               const outcomeIcon = r.outcome === 'loss' || r.outcome === 'lost' ? '✅' : r.outcome === 'win' || r.outcome === 'won' ? '❌' : null;
               return (
