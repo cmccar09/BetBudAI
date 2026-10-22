@@ -631,7 +631,7 @@ function App() {
   const [signupGate, setSignupGate] = useState(null); // null | { tab, label, emoji }
   const [gateEmail, setGateEmail] = useState('');
   const [gateMode, setGateMode] = useState('register'); // 'register' | 'login'
-  const [gateForm, setGateForm] = useState({ fullName:'', email:'', password:'', agreeTerms:false });
+  const [gateForm, setGateForm] = useState({ fullName:'', email:'', username:'', age:'', password:'', agreeTerms:false });
   const [gateLoginForm, setGateLoginForm] = useState({ emailOrUser:'', password:'' });
   const [gateState, setGateState] = useState('idle');
   const [gateError, setGateError] = useState('');
@@ -651,10 +651,15 @@ function App() {
     setGateError('');
     const emailVal = (gateForm.email || gateEmail).trim().toLowerCase();
     const emailRe = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+    const gateAge = parseInt(gateForm.age, 10);
     if (!gateForm.fullName.trim() || gateForm.fullName.trim().length < 3)
       return setGateError('Please enter your full name.');
     if (!emailRe.test(emailVal))
       return setGateError('Please enter a valid email address.');
+    if (!/^[a-zA-Z0-9_]{3,30}$/.test(gateForm.username))
+      return setGateError('Username can only contain letters, numbers and underscores (3-30 characters).');
+    if (isNaN(gateAge) || gateAge < 18 || gateAge > 120)
+      return setGateError('You must be 18 or over to register.');
     if (!gateForm.password || gateForm.password.length < 8)
       return setGateError('Password must be at least 8 characters.');
     if (!gateForm.agreeTerms)
@@ -663,7 +668,7 @@ function App() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/register`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName: gateForm.fullName.trim(), email: emailVal, password: gateForm.password, agreeTerms: true, tier: 'premium' }),
+        body: JSON.stringify({ full_name: gateForm.fullName.trim(), email: emailVal, username: gateForm.username.trim(), age: gateAge, password: gateForm.password, desired_tier: 'premium' }),
       });
       const data = await res.json();
       if (data.success && data.user) {
@@ -686,7 +691,7 @@ function App() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ emailOrUsername: gateLoginForm.emailOrUser.trim().toLowerCase(), password: gateLoginForm.password }),
+        body: JSON.stringify({ email: gateLoginForm.emailOrUser.trim().toLowerCase(), password: gateLoginForm.password }),
       });
       const data = await res.json();
       if (data.success && data.user) {
@@ -1062,6 +1067,8 @@ function App() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
                   <input type="text" placeholder="Full name" autoComplete="name" required value={gateForm.fullName} onChange={e => setGateForm(p => ({ ...p, fullName: e.target.value }))} style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', borderRadius: '9px', padding: '12px 14px', color: 'white', fontSize: '14px', outline: 'none' }} />
                   <input type="email" placeholder="Email address" autoComplete="email" required value={gateForm.email} onChange={e => setGateForm(p => ({ ...p, email: e.target.value }))} style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', borderRadius: '9px', padding: '12px 14px', color: 'white', fontSize: '14px', outline: 'none' }} />
+                  <input type="text" placeholder="Username (e.g. punter_99)" autoComplete="username" required value={gateForm.username} onChange={e => setGateForm(p => ({ ...p, username: e.target.value }))} style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', borderRadius: '9px', padding: '12px 14px', color: 'white', fontSize: '14px', outline: 'none' }} />
+                  <input type="number" placeholder="Age" min="18" max="120" autoComplete="off" required value={gateForm.age} onChange={e => setGateForm(p => ({ ...p, age: e.target.value }))} style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', borderRadius: '9px', padding: '12px 14px', color: 'white', fontSize: '14px', outline: 'none' }} />
                   <input type="password" placeholder="Password (8+ characters)" autoComplete="new-password" required value={gateForm.password} onChange={e => setGateForm(p => ({ ...p, password: e.target.value }))} style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', borderRadius: '9px', padding: '12px 14px', color: 'white', fontSize: '14px', outline: 'none' }} />
                   <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
                     <input type="checkbox" checked={gateForm.agreeTerms} onChange={e => setGateForm(p => ({ ...p, agreeTerms: e.target.checked }))} style={{ marginTop: '2px', accentColor: '#34d399', flexShrink: 0 }} />
