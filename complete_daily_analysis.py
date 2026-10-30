@@ -1309,6 +1309,17 @@ def analyze_and_save_all(force_reanalyse: bool = False):
     except Exception as _vp_err:
         print(f"  [VEGAS-PAPER] skipped (non-fatal): {_vp_err}")
 
+    # ── MULTI-BET BUILDER (2026-10-30) ──────────────────────────────────────
+    # Doubles/Trebles/Trixie/Yankee/Lucky15 built from today's already-
+    # qualified picks (top_picks + extended) — see multi_bet_builder.py for
+    # the selection philosophy and combined-EV search. Non-fatal: a failure
+    # here can never break the real daily picks pipeline.
+    try:
+        from multi_bet_builder import compute_and_save_multi_bets
+        compute_and_save_multi_bets(top_picks + _extended_picks, today, table)
+    except Exception as _mb_err:
+        print(f"  [MULTI-BET] skipped (non-fatal): {_mb_err}")
+
     # ── ZERO-PICKS ALERT ──────────────────────────────────────────────────────
     if ui_promoted == 0 and total_saved > 0:
         _zp_msg = (

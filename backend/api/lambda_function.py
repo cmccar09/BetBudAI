@@ -409,6 +409,8 @@ def lambda_handler(event, context):
             response = get_punchestown_tomorrow_picks(headers, event)
         elif 'picks/extended' in path and method == 'GET':
             response = get_extended_picks(headers, event)
+        elif 'picks/multi-bets' in path and method == 'GET':
+            response = get_multi_bets(headers, event)
         elif 'sports/worldcup' in path and method == 'GET':
             response = get_sport_data(headers, 'worldcup')
         elif 'sports/wimbledon' in path and method == 'GET':
@@ -2537,6 +2539,62 @@ def get_extended_picks(headers, event):
         }
     except Exception as e:
         print(f'get_extended_picks error: {e}')
+        return {'statusCode': 500, 'headers': headers,
+                'body': json.dumps({'success': False, 'error': str(e)})}
+
+
+def get_multi_bets(headers, event):
+    """GET /api/picks/multi-bets — today's grouped-bet suggestions (Double,
+    Treble, Trixie, Yankee, Lucky15) built by multi_bet_builder.py from
+    already-qualified daily picks (score 80+, one leg per race). Each item
+    is pick_type='multi_bet'; a bet type is simply absent from the response
+    if today's qualifying pool was too small for it — no filler legs.
+    """
+    try:
+        from boto3.dynamodb.conditions import Key as _Key
+        from zoneinfo import ZoneInfo
+        params = event.get('queryStringParameters') or {}
+        tz_dublin = ZoneInfo('Europe/Dublin')
+        now_dublin = datetime.now(tz_dublin)
+        target_date = str(params.get('date') or '').strip()[:10] or \
+                      now_dublin.date().isoformat()
+
+        resp = table.query(KeyConditionExpression=_Key('bet_date').eq(target_date))
+        items = [decimal_to_float(i) for i in resp.get('Items', [])]
+        while resp.get('LastEvaluatedKey'):
+            resp = table.query(
+                KeyConditionExpression=_Key('bet_date').eq(target_date),
+                ExclusiveStartKey=resp['LastEvaluatedKey'])
+            items.extend([decimal_to_float(i) for i in resp.get('Items', [])])
+
+        multis = [i for i in items if str(i.get('pick_type', '')) == 'multi_bet']
+        type_order = {'double': 0, 'treble': 1, 'trixie': 2, 'yankee': 3, 'lucky15': 4}
+        multis.sort(key=lambda x: type_order.get(x.get('multi_type', ''), 99))
+
+        bets_out = [{
+            'multi_type':           i.get('multi_type', ''),
+            'legs':                 i.get('legs', []),
+            'num_legs':             i.get('num_legs', 0),
+            'num_bets':             i.get('num_bets', 0),
+            'min_winners_needed':   i.get('min_winners_needed', 0),
+            'combined_odds':        i.get('combined_odds', 0),
+            'combined_win_prob_pct': i.get('combined_win_prob_pct', 0),
+            'combined_ev':          i.get('combined_ev', 0),
+            'scenario_returns':     i.get('scenario_returns', {}),
+        } for i in multis]
+
+        return {
+            'statusCode': 200, 'headers': headers,
+            'body': json.dumps({
+                'success': True, 'date': target_date,
+                'count': len(bets_out), 'multi_bets': bets_out,
+                'methodology': ("Combinations of today's already-qualified picks (score 80+), "
+                                "one leg per race, chosen by exhaustive search for the highest "
+                                "combined EV per bet type."),
+            }, default=str)
+        }
+    except Exception as e:
+        print(f'get_multi_bets error: {e}')
         return {'statusCode': 500, 'headers': headers,
                 'body': json.dumps({'success': False, 'error': str(e)})}
 

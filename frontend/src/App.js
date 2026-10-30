@@ -2476,6 +2476,7 @@ function MyAccountView({ authUser, onLogout, accountSettingsRequest }) {
 function Top5PicksView({ isAuthenticated, onSignUp }) {
   const [allPicks, setAllPicks] = useState([]);
   const [extendedPicks, setExtendedPicks] = useState([]);
+  const [multiBets, setMultiBets] = useState([]);
   const [watchlistPicks, setWatchlistPicks] = useState([]);
   const [droppedPicks, setDroppedPicks] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -2529,15 +2530,22 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
   const loadPicks = async () => {
     setLoading(true); setError(null); setReleasePending(null);
     try {
-      const [res, extRes] = await Promise.all([
+      const [res, extRes, multiRes] = await Promise.all([
         fetch(API_BASE_URL + '/api/results/today'),
         fetch(API_BASE_URL + '/api/picks/extended').catch(() => null),
+        fetch(API_BASE_URL + '/api/picks/multi-bets').catch(() => null),
       ]);
       const data = await res.json();
       // Load extended picks for Top 4 section (covers all courses, not just featured meeting)
       if (extRes?.ok) {
         extRes.json().then(extData => {
           if (extData?.success) setExtendedPicks(extData.picks || []);
+        }).catch(() => null);
+      }
+      // Load today's grouped-bet suggestions (Double/Treble/Trixie/Yankee/Lucky15)
+      if (multiRes?.ok) {
+        multiRes.json().then(multiData => {
+          if (multiData?.success) setMultiBets(multiData.multi_bets || []);
         }).catch(() => null);
       }
       // Load ROI in background — don't block picks display
@@ -3169,6 +3177,64 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
                     <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {p.trainer && <span>T: <span style={{ color: 'rgba(255,255,255,0.75)' }}>{p.trainer}</span></span>}
                       {p.jockey && <span>J: <span style={{ color: 'rgba(255,255,255,0.75)' }}>{p.jockey}</span></span>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ── MULTI-BET BUILDER — Double/Treble/Trixie/Yankee/Lucky15 ── */}
+      {multiBets.length > 0 && (() => {
+        const typeLabel = { double:'Double', treble:'Treble', trixie:'Trixie', yankee:'Yankee', lucky15:'Lucky 15' };
+        const toFracMB = (dec) => { const d = parseFloat(dec); if (!d || d <= 1) return null; const n = d - 1; const denom = 100; const num = Math.round(n * denom); const gcd = (a,b) => b ? gcd(b, a % b) : a; const g = gcd(Math.round(num), denom); return `${Math.round(num / g)}/${denom / g}`; };
+        return (
+          <div style={{ marginBottom: 20, marginTop: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: 1.2 }}>🎯 Multi-Bet Builder</span>
+              <div style={{ flex: 1, height: 1, background: 'rgba(251,191,36,0.2)' }} />
+            </div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 12, lineHeight: 1.5 }}>
+              Built from today's already-qualified picks only (score 80+) — the exact leg combination picked for best combined value per bet type, not just today's top scorers stacked together.
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(260px, 1fr))', gap: 10 }}>
+              {multiBets.map((mb, i) => {
+                const frac = toFracMB(mb.combined_odds);
+                const needsPartial = mb.min_winners_needed < mb.num_legs;
+                const partialKey = String(mb.min_winners_needed);
+                const partialRange = mb.scenario_returns?.[partialKey];
+                const fullKey = String(mb.num_legs);
+                const fullRange = mb.scenario_returns?.[fullKey];
+                return (
+                  <div key={i} style={{
+                    background: 'linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(15,23,42,0.4) 100%)',
+                    border: '1.5px solid rgba(251,191,36,0.35)', borderRadius: 12, padding: '12px 14px',
+                    display: 'flex', flexDirection: 'column', gap: 8,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ background: '#fbbf24', color: '#0f172a', fontSize: 11, fontWeight: 900, padding: '2px 9px', borderRadius: 5 }}>{typeLabel[mb.multi_type] || mb.multi_type}</span>
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{mb.num_legs} legs · {mb.num_bets} bet{mb.num_bets > 1 ? 's' : ''}</span>
+                      {frac && <span style={{ marginLeft: 'auto', background: 'rgba(52,211,153,0.15)', border: '1px solid rgba(52,211,153,0.4)', color: '#34d399', fontSize: 13, fontWeight: 800, padding: '3px 10px', borderRadius: 6 }}>{frac}</span>}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      {(mb.legs || []).map((leg, li) => {
+                        const rt = formatRaceTime(leg.race_time);
+                        return (
+                          <div key={li} style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                            <span style={{ fontWeight: 700, color: '#fff' }}>🏇 {leg.horse}</span>
+                            <span style={{ color: 'rgba(255,255,255,0.45)' }}>{leg.course}{rt.time ? ` · ${rt.time}` : ''}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 7 }}>
+                      {fullRange && <div>€10 stake, all {mb.num_legs} land: <span style={{ color: '#fbbf24', fontWeight: 700 }}>€{(fullRange.max * 10 / mb.num_bets).toFixed(0)} back</span></div>}
+                      {needsPartial && partialRange && (
+                        <div style={{ marginTop: 2 }}>Still returns on any {mb.min_winners_needed} of {mb.num_legs}: <span style={{ color: 'rgba(255,255,255,0.7)' }}>€{(partialRange.min * 10 / mb.num_bets).toFixed(0)}–€{(partialRange.max * 10 / mb.num_bets).toFixed(0)} back</span></div>
+                      )}
+                      <div style={{ marginTop: 2, color: 'rgba(255,255,255,0.35)' }}>Combined win chance: {mb.combined_win_prob_pct?.toFixed ? mb.combined_win_prob_pct.toFixed(1) : mb.combined_win_prob_pct}%</div>
                     </div>
                   </div>
                 );
