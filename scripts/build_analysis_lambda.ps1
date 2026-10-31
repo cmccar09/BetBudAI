@@ -35,6 +35,7 @@ $FILES = [ordered]@{
     'vegas_paper.py'              = 'vegas_paper.py'
     'vegas_paper_model.py'        = 'vegas_paper_model.py'
     'multi_bet_builder.py'        = 'multi_bet_builder.py'
+    'eliminator.py'               = 'eliminator.py'
 }
 
 Write-Host ""

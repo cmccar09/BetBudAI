@@ -418,6 +418,18 @@ def analyze_and_save_all(force_reanalyse: bool = False):
                     print(f"  [ODDS REFRESH ERROR] {_pick.get('horse')}: {_oe}")
 
         print(f"  Odds refresh complete: {_odds_updated}/{_existing_ui_count} picks updated.")
+
+        # ── ELIMINATOR progress check ────────────────────────────────────────
+        # This locked fast path is the ONLY thing that runs for the rest of the
+        # day once the main pick is set, so the Eliminator's round-by-round
+        # advance has to be hooked in here too — not just in the full pipeline
+        # below, which only reaches this point once each morning. Non-fatal.
+        try:
+            from eliminator import advance_round
+            advance_round(today, table)
+        except Exception as _el_err:
+            print(f"  [ELIMINATOR] advance skipped (non-fatal): {_el_err}")
+
         return {
             'statusCode': 200,
             'body': json.dumps({
@@ -1319,6 +1331,19 @@ def analyze_and_save_all(force_reanalyse: bool = False):
         compute_and_save_multi_bets(top_picks + _extended_picks, today, table)
     except Exception as _mb_err:
         print(f"  [MULTI-BET] skipped (non-fatal): {_mb_err}")
+
+    # ── BETBUD ELIMINATOR (2026-10-31) ──────────────────────────────────────
+    # One day's card, 6 races, decreasing nominees per round — see
+    # eliminator.py for the full mechanic and why it's built this way.
+    # init starts today's round (no-op if one already exists); advance
+    # handles the case where this happens to be the day's only full run
+    # and an earlier round from today needs progressing too.
+    try:
+        from eliminator import init_round_for_today, advance_round
+        init_round_for_today(all_races_data, today, table)
+        advance_round(today, table)
+    except Exception as _el_err:
+        print(f"  [ELIMINATOR] skipped (non-fatal): {_el_err}")
 
     # ── ZERO-PICKS ALERT ──────────────────────────────────────────────────────
     if ui_promoted == 0 and total_saved > 0:

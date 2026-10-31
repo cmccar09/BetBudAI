@@ -2477,6 +2477,7 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
   const [allPicks, setAllPicks] = useState([]);
   const [extendedPicks, setExtendedPicks] = useState([]);
   const [multiBets, setMultiBets] = useState([]);
+  const [eliminator, setEliminator] = useState(null);
   const [watchlistPicks, setWatchlistPicks] = useState([]);
   const [droppedPicks, setDroppedPicks] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -2530,10 +2531,11 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
   const loadPicks = async () => {
     setLoading(true); setError(null); setReleasePending(null);
     try {
-      const [res, extRes, multiRes] = await Promise.all([
+      const [res, extRes, multiRes, elimRes] = await Promise.all([
         fetch(API_BASE_URL + '/api/results/today'),
         fetch(API_BASE_URL + '/api/picks/extended').catch(() => null),
         fetch(API_BASE_URL + '/api/picks/multi-bets').catch(() => null),
+        fetch(API_BASE_URL + '/api/picks/eliminator').catch(() => null),
       ]);
       const data = await res.json();
       // Load extended picks for Top 4 section (covers all courses, not just featured meeting)
@@ -2546,6 +2548,12 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
       if (multiRes?.ok) {
         multiRes.json().then(multiData => {
           if (multiData?.success) setMultiBets(multiData.multi_bets || []);
+        }).catch(() => null);
+      }
+      // Load BetBud Eliminator state (6-race survival game)
+      if (elimRes?.ok) {
+        elimRes.json().then(elimData => {
+          if (elimData?.success) setEliminator(elimData.current || null);
         }).catch(() => null);
       }
       // Load ROI in background — don't block picks display
@@ -3254,6 +3262,109 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
         <YesterdayResultsView isFreeUser={false} />
       </div>
 
+      {/* BetBud Eliminator — 6-race survival game, gated behind free registration */}
+      {eliminator && (
+        <div style={{ marginTop:'32px' }}>
+          <BetBudEliminatorCard eliminator={eliminator} isAuthenticated={isAuthenticated} onSignUp={onSignUp} isMobile={isMobile} />
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+// ---- BetBud Eliminator — 6-race survival game card ----
+function BetBudEliminatorCard({ eliminator, isAuthenticated, onSignUp, isMobile }) {
+  const races = eliminator.races || [];
+  const curNum = eliminator.current_round_number || 1;
+  const status = eliminator.status;
+  const formatTime = rt => {
+    if (!rt) return '';
+    try {
+      const d = new Date(rt.endsWith('Z') || rt.includes('+') ? rt : rt + 'Z');
+      return d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Europe/Dublin' });
+    } catch { return rt.substring(11,16); }
+  };
+  const toFracE = (dec) => { const d = parseFloat(dec); if (!d || d <= 1) return null; const n = d - 1; const denom = 100; const num = Math.round(n * denom); const gcd = (a,b) => b ? gcd(b, a % b) : a; const g = gcd(Math.round(num), denom); return `${Math.round(num / g)}/${denom / g}`; };
+  const current = races.find(r => r.round_number === curNum);
+
+  const pillColor = (r) => {
+    if (r.status === 'survived') return { bg:'#059669', color:'#fff', label:'✓' };
+    if (r.status === 'eliminated') return { bg:'#dc2626', color:'#fff', label:'✗' };
+    if (r.round_number === curNum && status === 'in_progress') return { bg:'#fbbf24', color:'#0f172a', label:r.round_number };
+    return { bg:'rgba(255,255,255,0.08)', color:'rgba(255,255,255,0.4)', label:r.round_number };
+  };
+
+  const headline = status === 'success'
+    ? '🏆 BetBud survived all 6 races today!'
+    : status === 'failed'
+      ? `Eliminated at Round ${races.findIndex(r => r.status === 'eliminated') + 1} — new round starts tomorrow`
+      : `Can our AI survive 6 races today?`;
+
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, rgba(5,150,105,0.1) 0%, rgba(15,23,42,0.5) 100%)',
+      border: '1.5px solid rgba(52,211,153,0.35)', borderRadius: 14, padding: '18px 20px',
+    }}>
+      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6, flexWrap:'wrap' }}>
+        <span style={{ fontSize:20 }}>🏆</span>
+        <span style={{ fontSize:15, fontWeight:900, color:'#fff' }}>BetBud Eliminator</span>
+        <span style={{ marginLeft:'auto', fontSize:10, color:'rgba(255,255,255,0.4)', fontWeight:700, textTransform:'uppercase', letterSpacing:0.8 }}>Free to follow</span>
+      </div>
+      <div style={{ fontSize:13, color:'#34d399', fontWeight:700, marginBottom:4 }}>{headline}</div>
+      <div style={{ fontSize:11, color:'rgba(255,255,255,0.5)', marginBottom:14, lineHeight:1.5 }}>
+        One card, 6 races. Round 1: BetBud nominates 6 horses — any one winning keeps the run alive. Each round the picks narrow, down to a single must-win horse in Round 6.
+      </div>
+
+      <div style={{ display:'flex', gap:6, marginBottom:16, flexWrap:'wrap' }}>
+        {races.map((r, i) => {
+          const p = pillColor(r);
+          return (
+            <div key={i} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
+              <div style={{ width:30, height:30, borderRadius:'50%', background:p.bg, color:p.color, display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:900 }}>
+                {p.label}
+              </div>
+              <span style={{ fontSize:9, color:'rgba(255,255,255,0.4)' }}>R{r.round_number}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      {current && (
+        <div style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:10, padding:'12px 14px', position:'relative' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8, flexWrap:'wrap' }}>
+            <span style={{ background:'#fbbf24', color:'#0f172a', fontSize:11, fontWeight:900, padding:'2px 9px', borderRadius:5 }}>ROUND {current.round_number}</span>
+            <span style={{ fontSize:12, color:'rgba(255,255,255,0.6)' }}>📍 {current.course}{current.race_time ? ` · ${formatTime(current.race_time)}` : ''}</span>
+            <span style={{ marginLeft:'auto', fontSize:11, color:'rgba(255,255,255,0.45)' }}>Pick {current.picks_allowed} to win</span>
+          </div>
+
+          {isAuthenticated ? (
+            <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(140px, 1fr))', gap:8 }}>
+              {(current.nominees || []).map((n, i) => {
+                const frac = toFracE(n.odds);
+                return (
+                  <div key={i} style={{ background:'rgba(255,255,255,0.05)', borderRadius:8, padding:'6px 10px', fontSize:12 }}>
+                    <div style={{ color:'#fff', fontWeight:700 }}>🏇 {n.horse}</div>
+                    {frac && <div style={{ color:'#fbbf24', fontSize:11, marginTop:2 }}>{frac}</div>}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ textAlign:'center', padding:'14px 10px' }}>
+              <div style={{ filter:'blur(5px)', userSelect:'none', fontSize:13, color:'rgba(255,255,255,0.4)', marginBottom:10 }}>
+                {(current.nominees || []).map(n => n.horse).join(' · ')}
+              </div>
+              <button
+                onClick={onSignUp}
+                style={{ background:'linear-gradient(135deg,#059669,#047857)', border:'none', borderRadius:8, color:'#fff', fontWeight:800, fontSize:13, padding:'9px 20px', cursor:'pointer' }}
+              >
+                Sign up free to see today's picks →
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

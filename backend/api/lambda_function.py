@@ -411,6 +411,8 @@ def lambda_handler(event, context):
             response = get_extended_picks(headers, event)
         elif 'picks/multi-bets' in path and method == 'GET':
             response = get_multi_bets(headers, event)
+        elif 'picks/eliminator' in path and method == 'GET':
+            response = get_eliminator(headers, event)
         elif 'sports/worldcup' in path and method == 'GET':
             response = get_sport_data(headers, 'worldcup')
         elif 'sports/wimbledon' in path and method == 'GET':
@@ -2595,6 +2597,73 @@ def get_multi_bets(headers, event):
         }
     except Exception as e:
         print(f'get_multi_bets error: {e}')
+        return {'statusCode': 500, 'headers': headers,
+                'body': json.dumps({'success': False, 'error': str(e)})}
+
+
+def get_eliminator(headers, event):
+    """GET /api/picks/eliminator — BetBud Eliminator game state. One query
+    (bet_date='ELIMINATOR') returns the pointer + every round ever played,
+    since they all share that partition. See eliminator.py for the mechanic.
+    """
+    try:
+        from boto3.dynamodb.conditions import Key as _Key
+        resp = table.query(KeyConditionExpression=_Key('bet_date').eq('ELIMINATOR'))
+        items = [decimal_to_float(i) for i in resp.get('Items', [])]
+        while resp.get('LastEvaluatedKey'):
+            resp = table.query(
+                KeyConditionExpression=_Key('bet_date').eq('ELIMINATOR'),
+                ExclusiveStartKey=resp['LastEvaluatedKey'])
+            items.extend([decimal_to_float(i) for i in resp.get('Items', [])])
+
+        pointer = next((i for i in items if i.get('bet_id') == 'CURRENT'), None)
+        rounds = {i.get('bet_id'): i for i in items if str(i.get('bet_id', '')).startswith('ROUND_')}
+
+        current_id = pointer.get('current_round_id') if pointer else None
+        current = rounds.get(f'ROUND_{current_id}') if current_id else None
+
+        current_out = None
+        if current:
+            current_out = {
+                'round_id':             current.get('round_id', ''),
+                'start_date':           current.get('start_date', ''),
+                'status':               current.get('status', 'in_progress'),
+                'current_round_number': current.get('current_round_number', 1),
+                'total_rounds':         current.get('total_rounds', 0),
+                'races': [{
+                    'round_number':  r.get('round_number'),
+                    'course':        r.get('course', ''),
+                    'race_time':     r.get('race_time', ''),
+                    'picks_allowed': r.get('picks_allowed', 0),
+                    'status':        r.get('status', 'pending'),
+                    'nominees': [{
+                        'horse': n.get('horse', ''),
+                        'odds':  n.get('odds', 0),
+                        'score': n.get('score', 0),
+                    } for n in (r.get('nominees') or [])],
+                } for r in (current.get('races') or [])],
+            }
+
+        history = sorted(
+            [r for rid, r in rounds.items()
+             if rid != f'ROUND_{current_id}' and r.get('status') in ('success', 'failed')],
+            key=lambda r: r.get('start_date', ''), reverse=True
+        )[:5]
+        history_out = [{
+            'start_date':      r.get('start_date', ''),
+            'status':          r.get('status', ''),
+            'rounds_survived': sum(1 for race in (r.get('races') or []) if race.get('status') == 'survived'),
+            'total_rounds':    r.get('total_rounds', 0),
+        } for r in history]
+
+        return {
+            'statusCode': 200, 'headers': headers,
+            'body': json.dumps({
+                'success': True, 'current': current_out, 'history': history_out,
+            }, default=str)
+        }
+    except Exception as e:
+        print(f'get_eliminator error: {e}')
         return {'statusCode': 500, 'headers': headers,
                 'body': json.dumps({'success': False, 'error': str(e)})}
 
