@@ -115,6 +115,13 @@ def advance_round(today, table):
     advance/eliminate accordingly. Safe to call repeatedly — a no-op once
     the active round number's race is still unsettled, or the round has
     already finished.
+
+    Loops through as many consecutive already-resolved rounds as it can in
+    one call (rather than one round per pipeline refresh) — refreshes are
+    roughly hourly, and several of today's rounds can easily have gone off
+    within the same hour, so catching up immediately keeps the public page
+    honest instead of showing a round as "in progress" long after it (and
+    the next one, and the one after that) actually finished.
     """
     ptr = table.get_item(Key=POINTER_KEY).get('Item')
     if not ptr or not ptr.get('current_round_id'):
@@ -124,40 +131,48 @@ def advance_round(today, table):
         return
 
     races = round_rec.get('races') or []
-    rn = round_rec.get('current_round_number', 1)
-    if rn < 1 or rn > len(races):
-        return
-    cur = races[rn - 1]
-    if cur.get('status') != 'pending':
-        return
-
     bet_date = round_rec.get('start_date', today)
-    outcomes = []
-    for nom in cur.get('nominees', []):
-        live = table.get_item(Key={'bet_date': bet_date, 'bet_id': nom['bet_id']}).get('Item') or {}
-        outcomes.append(live.get('outcome', 'pending'))
-
     now_iso = datetime.now(timezone.utc).isoformat()
-    if any(o == 'win' for o in outcomes):
-        cur['status'] = 'survived'
-        races[rn - 1] = cur
-        round_rec['races'] = races
-        round_rec['updated_at'] = now_iso
-        if rn >= len(races):
-            round_rec['status'] = 'success'
-            print(f"  [ELIMINATOR] round {round_rec['round_id']} SUCCEEDED — survived all {len(races)} races!")
+    changed = False
+
+    while round_rec.get('status') == 'in_progress':
+        # DynamoDB hands back every number as Decimal — races[rn - 1] needs a real int.
+        rn = int(round_rec.get('current_round_number', 1))
+        if rn < 1 or rn > len(races):
+            break
+        cur = races[rn - 1]
+        if cur.get('status') != 'pending':
+            break
+
+        outcomes = []
+        for nom in cur.get('nominees', []):
+            live = table.get_item(Key={'bet_date': bet_date, 'bet_id': nom['bet_id']}).get('Item') or {}
+            outcomes.append(live.get('outcome', 'pending'))
+
+        if any(o == 'win' for o in outcomes):
+            cur['status'] = 'survived'
+            races[rn - 1] = cur
+            round_rec['races'] = races
+            round_rec['updated_at'] = now_iso
+            changed = True
+            if rn >= len(races):
+                round_rec['status'] = 'success'
+                print(f"  [ELIMINATOR] round {round_rec['round_id']} SUCCEEDED — survived all {len(races)} races!")
+            else:
+                round_rec['current_round_number'] = rn + 1
+                print(f"  [ELIMINATOR] round {round_rec['round_id']}: R{rn} survived "
+                      f"({cur['course']}) — advancing to R{rn + 1}")
+        elif outcomes and all(o in RESOLVED_OUTCOMES for o in outcomes):
+            cur['status'] = 'eliminated'
+            races[rn - 1] = cur
+            round_rec['races'] = races
+            round_rec['status'] = 'failed'
+            round_rec['updated_at'] = now_iso
+            changed = True
+            print(f"  [ELIMINATOR] round {round_rec['round_id']} FAILED at R{rn} ({cur['course']}) — "
+                  f"none of {[n['horse'] for n in cur['nominees']]} won")
         else:
-            round_rec['current_round_number'] = rn + 1
-            print(f"  [ELIMINATOR] round {round_rec['round_id']}: R{rn} survived "
-                  f"({cur['course']}) — advancing to R{rn + 1}")
+            break  # this race hasn't gone off / settled yet — hold and recheck next refresh
+
+    if changed:
         table.put_item(Item=round_rec)
-    elif outcomes and all(o in RESOLVED_OUTCOMES for o in outcomes):
-        cur['status'] = 'eliminated'
-        races[rn - 1] = cur
-        round_rec['races'] = races
-        round_rec['status'] = 'failed'
-        round_rec['updated_at'] = now_iso
-        table.put_item(Item=round_rec)
-        print(f"  [ELIMINATOR] round {round_rec['round_id']} FAILED at R{rn} ({cur['course']}) — "
-              f"none of {[n['horse'] for n in cur['nominees']]} won")
-    # else: this race hasn't gone off / settled yet — hold and recheck next refresh

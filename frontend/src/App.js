@@ -17,6 +17,33 @@ import VegasPage from './pages/vegas/VegasPage';
 const API_BASE_URL = process.env.REACT_APP_API_URL ||
   'https://mnybvagd5m.execute-api.eu-west-1.amazonaws.com';
 
+// Standard UK/Irish bookmaker fractional-odds ladder (num, den, decimal).
+// Snapping decimal odds to the nearest rung on this ladder gives familiar
+// prices (Evens, 9/4, 7/2, 9/1...) instead of a mathematically "exact" but
+// unreadable reduced fraction (e.g. 2.96 decimal -> 49/25, 2.02 -> 51/50).
+const FRACTIONAL_ODDS_LADDER = [
+  [1,100],[1,50],[1,33],[1,25],[1,20],[1,16],[1,14],[1,12],[1,10],[1,9],[1,8],
+  [1,7],[2,13],[1,6],[2,11],[1,5],[2,9],[1,4],[2,7],[3,10],[1,3],[4,11],[2,5],
+  [4,9],[1,2],[4,7],[8,13],[4,6],[8,11],[4,5],[5,6],[8,9],[10,11],[1,1],
+  [11,10],[6,5],[5,4],[11,8],[6,4],[13,8],[7,4],[15,8],[2,1],[85,40],[9,4],
+  [5,2],[11,4],[3,1],[10,3],[7,2],[4,1],[9,2],[5,1],[11,2],[6,1],[13,2],[7,1],
+  [15,2],[8,1],[17,2],[9,1],[10,1],[11,1],[12,1],[14,1],[16,1],[18,1],[20,1],
+  [25,1],[33,1],[40,1],[50,1],[66,1],[80,1],[100,1],[150,1],[200,1],[250,1],
+  [500,1],[1000,1],
+].map(([n,d]) => ({ n, d, dec: 1 + n / d }));
+
+function toFractionalOdds(decimalOdds) {
+  const d = parseFloat(decimalOdds);
+  if (!d || d <= 1) return null;
+  let best = FRACTIONAL_ODDS_LADDER[0];
+  let bestDiff = Math.abs(d - best.dec);
+  for (const rung of FRACTIONAL_ODDS_LADDER) {
+    const diff = Math.abs(d - rung.dec);
+    if (diff < bestDiff) { best = rung; bestDiff = diff; }
+  }
+  return best.n === best.d ? 'Evens' : `${best.n}/${best.d}`;
+}
+
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder');
 
 // -- Upcoming major races calendar --
@@ -712,6 +739,7 @@ function App() {
     if (key !== 'home' && !isAuthenticated) {
       const tabDef = [
         { key:'picks5',    label:'Daily Picks',      emoji:'🏆' },
+        { key:'accumulators', label:'Wknd Accumulators', emoji:'🎟️' },
         { key:'punchestown', label:'Featured Meeting', emoji:'🐎' },
         { key:'laythe',    label:'Favourite Watch',   emoji:'🏇' },
         { key:'vegas',     label:'Vegas',             emoji:'🎰' },
@@ -871,6 +899,7 @@ function App() {
         {[
           { key:'home',      label:'Home',             emoji:'🏠', sub:'About & sign in',     gated: false, tierRequired: null },
           { key:'picks5',    label:'Daily Picks',      emoji:'🏆', sub:'4+ tips daily — free',       gated: false, tierRequired: null },
+          { key:'accumulators', label:'Wknd Accumulators', emoji:'🎟️', sub:'Fri-Sun grouped bets — free', gated: false, tierRequired: null },
           { key:'punchestown', label:'Featured Meet', emoji:'🐎', sub:'Race card analysis — free', gated: false, tierRequired: null },
           { key:'laythe',    label:'Favourite Watch',      emoji:'🏇', sub:'Vulnerable Favorites', gated: false, tierRequired: null },
           { key:'vegas',     label:'Vegas',            emoji:'🎰', sub:'Benter value picks — free',    gated: false, tierRequired: null },
@@ -943,6 +972,7 @@ function App() {
             { key:'punchestown', tierRequired: null, component: () => <PunchestownTomorrowView isAuthenticated={isAuthenticated} onSignUp={() => navigateToPage('home', { destination: 'home' })} /> },
             { key:'picks',    tierRequired: null, component: () => <Top5PicksView isAuthenticated={isAuthenticated} onSignUp={() => navigateToPage('home', { destination: 'home' })} /> },
             { key:'picks5',   tierRequired: null, component: () => <Top5PicksView isAuthenticated={isAuthenticated} onSignUp={() => navigateToPage('home', { destination: 'home' })} /> },
+            { key:'accumulators', tierRequired: null, component: () => <WeekendAccumulatorsPage isAuthenticated={isAuthenticated} onSignUp={() => navigateToPage('home', { destination: 'home' })} /> },
             { key:'laythe',   tierRequired: null, component: () => <LayTheFavView isAuthenticated={isAuthenticated} onSignUp={() => navigateToPage('home', { destination: 'home' })} /> },
             { key:'vegas',    tierRequired: null, component: () => <VegasPage /> },
             { key:'darts',    tierRequired: null, component: () => <DartsPage /> },
@@ -2476,7 +2506,6 @@ function MyAccountView({ authUser, onLogout, accountSettingsRequest }) {
 function Top5PicksView({ isAuthenticated, onSignUp }) {
   const [allPicks, setAllPicks] = useState([]);
   const [extendedPicks, setExtendedPicks] = useState([]);
-  const [multiBets, setMultiBets] = useState([]);
   const [eliminator, setEliminator] = useState(null);
   const [watchlistPicks, setWatchlistPicks] = useState([]);
   const [droppedPicks, setDroppedPicks] = useState([]);
@@ -2531,10 +2560,9 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
   const loadPicks = async () => {
     setLoading(true); setError(null); setReleasePending(null);
     try {
-      const [res, extRes, multiRes, elimRes] = await Promise.all([
+      const [res, extRes, elimRes] = await Promise.all([
         fetch(API_BASE_URL + '/api/results/today'),
         fetch(API_BASE_URL + '/api/picks/extended').catch(() => null),
-        fetch(API_BASE_URL + '/api/picks/multi-bets').catch(() => null),
         fetch(API_BASE_URL + '/api/picks/eliminator').catch(() => null),
       ]);
       const data = await res.json();
@@ -2542,12 +2570,6 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
       if (extRes?.ok) {
         extRes.json().then(extData => {
           if (extData?.success) setExtendedPicks(extData.picks || []);
-        }).catch(() => null);
-      }
-      // Load today's grouped-bet suggestions (Double/Treble/Trixie/Yankee/Lucky15)
-      if (multiRes?.ok) {
-        multiRes.json().then(multiData => {
-          if (multiData?.success) setMultiBets(multiData.multi_bets || []);
         }).catch(() => null);
       }
       // Load BetBud Eliminator state (6-race survival game)
@@ -2722,7 +2744,7 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
       {(() => {
         const winners = winnersToday;
         if (winners.length === 0) return null;
-        const toFrac = (dec) => { const d = parseFloat(dec); if (!d || d <= 1) return null; const n = d - 1; const denom = 10; const num = Math.round(n * denom); const gcd = (a,b) => b ? gcd(b, a%b) : a; const g = gcd(num, denom); return `${num/g}/${denom/g}`; };
+        const toFrac = toFractionalOdds;
         return (
           <div style={{ background:'linear-gradient(135deg, rgba(5,150,105,0.25) 0%, rgba(16,185,129,0.15) 100%)', border:'2px solid rgba(52,211,153,0.6)', borderRadius:'12px', padding:'14px 18px', marginBottom:'16px' }}>
             <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'10px' }}>
@@ -3194,64 +3216,6 @@ function Top5PicksView({ isAuthenticated, onSignUp }) {
         );
       })()}
 
-      {/* ── MULTI-BET BUILDER — Double/Treble/Trixie/Yankee/Lucky15 ── */}
-      {multiBets.length > 0 && (() => {
-        const typeLabel = { double:'Double', treble:'Treble', trixie:'Trixie', yankee:'Yankee', lucky15:'Lucky 15' };
-        const toFracMB = (dec) => { const d = parseFloat(dec); if (!d || d <= 1) return null; const n = d - 1; const denom = 100; const num = Math.round(n * denom); const gcd = (a,b) => b ? gcd(b, a % b) : a; const g = gcd(Math.round(num), denom); return `${Math.round(num / g)}/${denom / g}`; };
-        return (
-          <div style={{ marginBottom: 20, marginTop: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: 1.2 }}>🎯 Multi-Bet Builder</span>
-              <div style={{ flex: 1, height: 1, background: 'rgba(251,191,36,0.2)' }} />
-            </div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 12, lineHeight: 1.5 }}>
-              Built from today's already-qualified picks only (score 80+) — the exact leg combination picked for best combined value per bet type, not just today's top scorers stacked together.
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(260px, 1fr))', gap: 10 }}>
-              {multiBets.map((mb, i) => {
-                const frac = toFracMB(mb.combined_odds);
-                const needsPartial = mb.min_winners_needed < mb.num_legs;
-                const partialKey = String(mb.min_winners_needed);
-                const partialRange = mb.scenario_returns?.[partialKey];
-                const fullKey = String(mb.num_legs);
-                const fullRange = mb.scenario_returns?.[fullKey];
-                return (
-                  <div key={i} style={{
-                    background: 'linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(15,23,42,0.4) 100%)',
-                    border: '1.5px solid rgba(251,191,36,0.35)', borderRadius: 12, padding: '12px 14px',
-                    display: 'flex', flexDirection: 'column', gap: 8,
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ background: '#fbbf24', color: '#0f172a', fontSize: 11, fontWeight: 900, padding: '2px 9px', borderRadius: 5 }}>{typeLabel[mb.multi_type] || mb.multi_type}</span>
-                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{mb.num_legs} legs · {mb.num_bets} bet{mb.num_bets > 1 ? 's' : ''}</span>
-                      {frac && <span style={{ marginLeft: 'auto', background: 'rgba(52,211,153,0.15)', border: '1px solid rgba(52,211,153,0.4)', color: '#34d399', fontSize: 13, fontWeight: 800, padding: '3px 10px', borderRadius: 6 }}>{frac}</span>}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {(mb.legs || []).map((leg, li) => {
-                        const rt = formatRaceTime(leg.race_time);
-                        return (
-                          <div key={li} style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                            <span style={{ fontWeight: 700, color: '#fff' }}>🏇 {leg.horse}</span>
-                            <span style={{ color: 'rgba(255,255,255,0.45)' }}>{leg.course}{rt.time ? ` · ${rt.time}` : ''}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 7 }}>
-                      {fullRange && <div>€10 stake, all {mb.num_legs} land: <span style={{ color: '#fbbf24', fontWeight: 700 }}>€{(fullRange.max * 10 / mb.num_bets).toFixed(0)} back</span></div>}
-                      {needsPartial && partialRange && (
-                        <div style={{ marginTop: 2 }}>Still returns on any {mb.min_winners_needed} of {mb.num_legs}: <span style={{ color: 'rgba(255,255,255,0.7)' }}>€{(partialRange.min * 10 / mb.num_bets).toFixed(0)}–€{(partialRange.max * 10 / mb.num_bets).toFixed(0)} back</span></div>
-                      )}
-                      <div style={{ marginTop: 2, color: 'rgba(255,255,255,0.35)' }}>Combined win chance: {mb.combined_win_prob_pct?.toFixed ? mb.combined_win_prob_pct.toFixed(1) : mb.combined_win_prob_pct}%</div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })()}
-
       </div>{/* end combined picks card */}
 
       {/* Analysis Quality Report */}
@@ -3285,8 +3249,16 @@ function BetBudEliminatorCard({ eliminator, isAuthenticated, onSignUp, isMobile 
       return d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Europe/Dublin' });
     } catch { return rt.substring(11,16); }
   };
-  const toFracE = (dec) => { const d = parseFloat(dec); if (!d || d <= 1) return null; const n = d - 1; const denom = 100; const num = Math.round(n * denom); const gcd = (a,b) => b ? gcd(b, a % b) : a; const g = gcd(Math.round(num), denom); return `${Math.round(num / g)}/${denom / g}`; };
+  const toFracE = toFractionalOdds;
   const current = races.find(r => r.round_number === curNum);
+  const resolvedRaces = races.filter(r => r.status === 'survived' || r.status === 'eliminated');
+
+  const outcomeTag = (outcome) => {
+    if (outcome === 'win') return { label: '✓ WON', bg: 'rgba(52,211,153,0.18)', border: 'rgba(52,211,153,0.5)', color: '#34d399' };
+    if (outcome === 'placed') return { label: 'Placed', bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.35)', color: '#fbbf24' };
+    if (outcome === 'loss') return { label: '✗ Lost', bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.35)' };
+    return null;
+  };
 
   const pillColor = (r) => {
     if (r.status === 'survived') return { bg:'#059669', color:'#fff', label:'✓' };
@@ -3330,8 +3302,8 @@ function BetBudEliminatorCard({ eliminator, isAuthenticated, onSignUp, isMobile 
         })}
       </div>
 
-      {current && (
-        <div style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:10, padding:'12px 14px', position:'relative' }}>
+      {current && current.status === 'pending' && (
+        <div style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:10, padding:'12px 14px', position:'relative', marginBottom: resolvedRaces.length ? 14 : 0 }}>
           <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8, flexWrap:'wrap' }}>
             <span style={{ background:'#fbbf24', color:'#0f172a', fontSize:11, fontWeight:900, padding:'2px 9px', borderRadius:5 }}>ROUND {current.round_number}</span>
             <span style={{ fontSize:12, color:'rgba(255,255,255,0.6)' }}>📍 {current.course}{current.race_time ? ` · ${formatTime(current.race_time)}` : ''}</span>
@@ -3364,6 +3336,190 @@ function BetBudEliminatorCard({ eliminator, isAuthenticated, onSignUp, isMobile 
             </div>
           )}
         </div>
+      )}
+
+      {resolvedRaces.length > 0 && (
+        <div>
+          <div style={{ fontSize:11, fontWeight:800, color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:1, marginBottom:8 }}>
+            How today's picks did
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            {resolvedRaces.map((r, ri) => (
+              <div key={ri} style={{ background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:8, padding:'8px 10px' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6, flexWrap:'wrap' }}>
+                  <span style={{ fontSize:11, fontWeight:800, color: r.status === 'survived' ? '#34d399' : '#f87171' }}>
+                    R{r.round_number} {r.status === 'survived' ? '✓ Survived' : '✗ Eliminated'}
+                  </span>
+                  <span style={{ fontSize:11, color:'rgba(255,255,255,0.4)' }}>📍 {r.course}{r.race_time ? ` · ${formatTime(r.race_time)}` : ''}</span>
+                </div>
+                <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+                  {(r.nominees || []).map((n, ni) => {
+                    const tag = outcomeTag(n.outcome);
+                    return (
+                      <span key={ni} style={{
+                        fontSize:11, padding:'3px 8px', borderRadius:6,
+                        background: tag ? tag.bg : 'rgba(255,255,255,0.04)',
+                        border: `1px solid ${tag ? tag.border : 'rgba(255,255,255,0.1)'}`,
+                        color: tag ? tag.color : 'rgba(255,255,255,0.4)', fontWeight: n.outcome === 'win' ? 800 : 600,
+                      }}>
+                        🏇 {n.horse}{tag ? ` ${tag.label}` : ''}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---- Wknd Accumulators — Multi-Bet Builder + BetBud Eliminator, Fri-Sun only ----
+function WeekendAccumulatorsPage({ isAuthenticated, onSignUp }) {
+  const [multiBets, setMultiBets] = useState([]);
+  const [highlight, setHighlight] = useState(null);
+  const [isWeekend, setIsWeekend] = useState(true);
+  const [nextWeekendDate, setNextWeekendDate] = useState('');
+  const [eliminator, setEliminator] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
+
+  useEffect(() => { const h = () => setIsMobile(window.innerWidth < 1024); window.addEventListener('resize', h); return () => window.removeEventListener('resize', h); }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([
+      fetch(API_BASE_URL + '/api/picks/multi-bets').then(r => r.json()).catch(() => null),
+      fetch(API_BASE_URL + '/api/picks/eliminator').then(r => r.json()).catch(() => null),
+    ]).then(([mb, el]) => {
+      if (mb?.success) {
+        setMultiBets(mb.multi_bets || []);
+        setHighlight(mb.highlight || null);
+        setIsWeekend(!!mb.is_weekend);
+        setNextWeekendDate(mb.next_weekend_date || '');
+      }
+      if (el?.success) setEliminator(el.current || null);
+    }).finally(() => setLoading(false));
+  }, []);
+
+  const typeLabel = { double:'Double', treble:'Treble', trixie:'Trixie', yankee:'Yankee', lucky15:'Lucky 15' };
+  const formatRT = (rt) => {
+    if (!rt) return '';
+    try {
+      const d = new Date(rt.endsWith('Z') || rt.includes('+') ? rt : rt + 'Z');
+      return d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Europe/Dublin' });
+    } catch { return ''; }
+  };
+  const legTag = (outcome) => {
+    if (outcome === 'win') return { label:'WON', bg:'rgba(52,211,153,0.18)', border:'rgba(52,211,153,0.5)', color:'#34d399' };
+    if (outcome === 'loss') return { label:'Lost', bg:'rgba(255,255,255,0.04)', border:'rgba(255,255,255,0.12)', color:'rgba(255,255,255,0.35)' };
+    if (outcome === 'placed') return { label:'Placed', bg:'rgba(251,191,36,0.12)', border:'rgba(251,191,36,0.35)', color:'#fbbf24' };
+    return { label:'Pending', bg:'rgba(255,255,255,0.03)', border:'rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.4)' };
+  };
+
+  return (
+    <div style={{ maxWidth: 960, margin: '0 auto' }}>
+      <div style={{ textAlign:'center', marginBottom: 20 }}>
+        <div style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color:'#fff' }}>🎟️ Wknd Accumulators</div>
+        <div style={{ fontSize: 13, color:'rgba(255,255,255,0.55)', marginTop:4 }}>
+          Grouped bets built from Friday–Sunday's already-qualified picks only (score 80+) — Doubles, Trebles, Trixies, Yankees &amp; Lucky 15s, picked for genuine combined value, not just stacked favourites.
+        </div>
+      </div>
+
+      {!isWeekend && (
+        <div style={{ textAlign:'center', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:12, padding:'24px 20px', marginBottom:20 }}>
+          <div style={{ fontSize:32, marginBottom:8 }}>📅</div>
+          <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:6 }}>Accumulators run Friday–Sunday</div>
+          <div style={{ fontSize:13, color:'rgba(255,255,255,0.5)' }}>
+            Weekend cards give a genuinely wider pool of qualified picks to search for value across. Check back {nextWeekendDate ? `from ${nextWeekendDate}` : 'this weekend'}.
+          </div>
+        </div>
+      )}
+
+      {isWeekend && highlight && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(52,211,153,0.18) 0%, rgba(15,23,42,0.5) 100%)',
+          border: '1.5px solid rgba(52,211,153,0.5)', borderRadius: 14, padding: '16px 20px', marginBottom: 20, textAlign:'center',
+        }}>
+          <div style={{ fontSize: 22, marginBottom: 4 }}>{highlight.full_winner ? '🎉' : '🔒'}</div>
+          <div style={{ fontSize:15, fontWeight:900, color:'#34d399' }}>
+            {typeLabel[highlight.multi_type] || highlight.multi_type} {highlight.full_winner ? 'WON!' : '— return already guaranteed'}
+          </div>
+          <div style={{ fontSize:13, color:'rgba(255,255,255,0.7)', marginTop:4 }}>
+            {highlight.horses.join(' + ')} @ {highlight.combined_odds_fraction}
+          </div>
+          <div style={{ fontSize:13, color:'#fbbf24', fontWeight:700, marginTop:6 }}>
+            €100 on it {highlight.full_winner ? 'returns' : 'already guarantees'} €{Number(highlight.guaranteed_return_on_100).toLocaleString()}
+          </div>
+        </div>
+      )}
+
+      {loading && <div style={{ textAlign:'center', padding:40, color:'rgba(255,255,255,0.5)' }}>Loading…</div>}
+
+      {isWeekend && !loading && multiBets.length === 0 && (
+        <div style={{ textAlign:'center', padding:30, color:'rgba(255,255,255,0.5)', fontSize:13 }}>
+          No qualifying multi-bet pool yet today — check back once more picks clear the 80+ score gate.
+        </div>
+      )}
+
+      {isWeekend && multiBets.length > 0 && (
+        <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))', gap:12, marginBottom: 28 }}>
+          {multiBets.map((mb, i) => {
+            const s = mb.settlement || {};
+            const borderColor = s.full_winner ? 'rgba(52,211,153,0.6)' : s.eliminated ? 'rgba(255,255,255,0.12)' : s.guaranteed_winner ? 'rgba(52,211,153,0.4)' : 'rgba(251,191,36,0.35)';
+            const needsPartial = mb.min_winners_needed < mb.num_legs;
+            const partialKey = String(mb.min_winners_needed);
+            const partialRange = mb.scenario_returns?.[partialKey];
+            const fullKey = String(mb.num_legs);
+            const fullRange = mb.scenario_returns?.[fullKey];
+            return (
+              <div key={i} style={{
+                background: s.full_winner ? 'linear-gradient(135deg, rgba(52,211,153,0.14) 0%, rgba(15,23,42,0.4) 100%)' : 'linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(15,23,42,0.4) 100%)',
+                border: `1.5px solid ${borderColor}`, borderRadius: 12, padding: '12px 14px',
+                display: 'flex', flexDirection: 'column', gap: 8, opacity: s.eliminated ? 0.6 : 1,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap:'wrap' }}>
+                  <span style={{ background: '#fbbf24', color: '#0f172a', fontSize: 11, fontWeight: 900, padding: '2px 9px', borderRadius: 5 }}>{typeLabel[mb.multi_type] || mb.multi_type}</span>
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{mb.num_legs} legs · {mb.num_bets} bet{mb.num_bets > 1 ? 's' : ''}</span>
+                  <span style={{ marginLeft: 'auto', background: 'rgba(52,211,153,0.15)', border: '1px solid rgba(52,211,153,0.4)', color: '#34d399', fontSize: 13, fontWeight: 800, padding: '3px 10px', borderRadius: 6 }}>{mb.combined_odds_fraction}</span>
+                </div>
+                {s.full_winner && <div style={{ fontSize:11, fontWeight:900, color:'#34d399' }}>🎉 ALL LEGS WON</div>}
+                {!s.full_winner && s.guaranteed_winner && <div style={{ fontSize:11, fontWeight:800, color:'#34d399' }}>🔒 Return already guaranteed</div>}
+                {s.eliminated && <div style={{ fontSize:11, fontWeight:800, color:'rgba(255,255,255,0.4)' }}>Out — not enough legs can land now</div>}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {(mb.legs || []).map((leg, li) => {
+                    const tag = legTag(s.legs?.[li]?.outcome);
+                    return (
+                      <div key={li} style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', display: 'flex', gap: 6, flexWrap: 'wrap', alignItems:'center' }}>
+                        <span style={{ fontWeight: 700, color: '#fff' }}>🏇 {leg.horse}</span>
+                        <span style={{ color: 'rgba(255,255,255,0.45)' }}>{leg.course}{formatRT(leg.race_time) ? ` · ${formatRT(leg.race_time)}` : ''}</span>
+                        <span style={{ marginLeft:'auto', fontSize:10, fontWeight:800, padding:'2px 7px', borderRadius:5, background:tag.bg, border:`1px solid ${tag.border}`, color:tag.color }}>{tag.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 7 }}>
+                  {fullRange && <div>€10 stake, all {mb.num_legs} land: <span style={{ color: '#fbbf24', fontWeight: 700 }}>€{(fullRange.max * 10 / mb.num_bets).toFixed(0)} back</span></div>}
+                  {needsPartial && partialRange && (
+                    <div style={{ marginTop: 2 }}>Still returns on any {mb.min_winners_needed} of {mb.num_legs}: <span style={{ color: 'rgba(255,255,255,0.7)' }}>€{(partialRange.min * 10 / mb.num_bets).toFixed(0)}–€{(partialRange.max * 10 / mb.num_bets).toFixed(0)} back</span></div>
+                  )}
+                  <div style={{ marginTop: 2, color: s.guaranteed_winner ? '#34d399' : 'rgba(255,255,255,0.35)', fontWeight: s.guaranteed_winner ? 700 : 400 }}>
+                    {s.guaranteed_winner
+                      ? `€100 on it: €${Number(s.guaranteed_return_on_100).toLocaleString()} ${s.full_winner ? 'returned' : 'already guaranteed'}`
+                      : `€100 on it would return up to €${Number(s.max_possible_return_on_100 || 0).toLocaleString()}`}
+                  </div>
+                  <div style={{ marginTop: 2, color: 'rgba(255,255,255,0.35)' }}>Combined win chance: {mb.combined_win_prob_pct?.toFixed ? mb.combined_win_prob_pct.toFixed(1) : mb.combined_win_prob_pct}%</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {eliminator && (
+        <BetBudEliminatorCard eliminator={eliminator} isAuthenticated={isAuthenticated} onSignUp={onSignUp} isMobile={isMobile} />
       )}
     </div>
   );
@@ -6615,12 +6771,7 @@ function HomePageView({ onAuthSuccess, isAuthenticated, authUser, accountSetting
         }
         // Build snapshot from all winners today or yesterday (any course)
         {
-          const toFrac = (d) => {
-            if (!d || d <= 1) return String(d);
-            const n = Math.round((d - 1) * 4); const den = 4;
-            const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
-            const g = gcd(n, den); return `${n/g}/${den/g}`;
-          };
+          const toFrac = (d) => toFractionalOdds(d) || String(d);
           const extractWinners = (picks) =>
             (picks || [])
               .filter(p => ['win','won'].includes((p.outcome || '').toLowerCase()) && p.show_in_ui !== false)

@@ -136,16 +136,26 @@ def _build_pool(races):
         win_prob_pct = item.get('win_probability')
         if win_prob_pct is None:
             continue  # no calibrated probability available — skip rather than guess
+        horse_name = best.get('horse', item.get('horse', ''))
+        course_name = item.get('course', r.get('venue', ''))
+        race_time_val = item.get('race_time', r.get('race_time', ''))
+        # Same bet_id scheme as complete_daily_analysis.py's main save loop —
+        # lets the API look up each leg's live settlement outcome by key,
+        # rather than re-deriving the race result itself.
+        leg_bet_id = (item.get('bet_id') or
+                      f"{race_time_val}_{course_name}_{horse_name}"
+                      .replace(' ', '_').replace(':', '').replace('.', ''))
         pool.append({
-            'horse':    best.get('horse', item.get('horse', '')),
-            'course':   item.get('course', r.get('venue', '')),
-            'race_time': item.get('race_time', r.get('race_time', '')),
+            'horse':    horse_name,
+            'course':   course_name,
+            'race_time': race_time_val,
             'jockey':   item.get('jockey', ''),
             'trainer':  item.get('trainer', ''),
             'score':    score,
             'odds':     odds,
             'win_prob_pct': float(win_prob_pct),
             'win_prob': float(win_prob_pct) / 100.0,
+            'bet_id':   leg_bet_id,
         })
     pool.sort(key=lambda l: -l['score'])
     return pool[:MAX_POOL_SIZE]
@@ -159,10 +169,18 @@ def _delete_existing(table, today):
             pass  # nothing to delete, or table hiccup — next write still proceeds
 
 
+WEEKEND_WEEKDAYS = (4, 5, 6)  # datetime.weekday(): Fri=4, Sat=5, Sun=6
+
+
 def compute_and_save_multi_bets(races, today, table):
     """races: top_picks + extended_picks from complete_daily_analysis.py (list
     of race-dicts with a 'best' sub-dict). today: 'YYYY-MM-DD'. table: the
     caller's boto3 SureBetBets Table resource (reused, no new connection).
+
+    Weekend-only (2026-11-01): moved to its own "Wknd Accumulators" tab, run
+    only Friday-Sunday — bigger weekend cards give a genuinely wider pool to
+    search for value across, and it keeps the content distinctly a weekend
+    thing rather than diluting it with thin midweek fields.
 
     Re-run every pipeline refresh (odds move through the day — same reasoning
     as the main picks re-ranking). Always clears yesterday's-run leftovers for
@@ -172,6 +190,14 @@ def compute_and_save_multi_bets(races, today, table):
     """
     summary = {'pool_size': 0, 'types_built': []}
     _delete_existing(table, today)
+
+    try:
+        weekday = datetime.strptime(today, '%Y-%m-%d').weekday()
+    except ValueError:
+        weekday = None
+    if weekday not in WEEKEND_WEEKDAYS:
+        print(f"  [MULTI-BET] {today} is not Fri/Sat/Sun — accumulators are weekend-only, skipped")
+        return summary
 
     pool = _build_pool(races)
     summary['pool_size'] = len(pool)
@@ -205,6 +231,7 @@ def compute_and_save_multi_bets(races, today, table):
                     'odds':    Decimal(str(round(l['odds'], 2))),
                     'score':   Decimal(str(round(l['score'], 0))),
                     'win_probability': Decimal(str(round(l['win_prob_pct'], 0))),
+                    'bet_id':  l['bet_id'],
                 }
                 for l in legs
             ],

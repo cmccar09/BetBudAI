@@ -2545,12 +2545,133 @@ def get_extended_picks(headers, event):
                 'body': json.dumps({'success': False, 'error': str(e)})}
 
 
+# Standard UK/Irish bookmaker fractional-odds ladder — same list the frontend
+# uses (frontend/src/App.js's FRACTIONAL_ODDS_LADDER). Snapping decimal odds to
+# the nearest rung gives familiar prices (Evens, 9/4, 7/2, 9/1...) instead of a
+# mathematically "exact" but unreadable reduced fraction (2.96 -> 49/25,
+# 2.02 -> 51/50) — keep the two ladders in sync if either one changes.
+_ODDS_LADDER_RUNGS = [
+    (1,100),(1,50),(1,33),(1,25),(1,20),(1,16),(1,14),(1,12),(1,10),(1,9),(1,8),
+    (1,7),(2,13),(1,6),(2,11),(1,5),(2,9),(1,4),(2,7),(3,10),(1,3),(4,11),(2,5),
+    (4,9),(1,2),(4,7),(8,13),(4,6),(8,11),(4,5),(5,6),(8,9),(10,11),(1,1),
+    (11,10),(6,5),(5,4),(11,8),(6,4),(13,8),(7,4),(15,8),(2,1),(85,40),(9,4),
+    (5,2),(11,4),(3,1),(10,3),(7,2),(4,1),(9,2),(5,1),(11,2),(6,1),(13,2),(7,1),
+    (15,2),(8,1),(17,2),(9,1),(10,1),(11,1),(12,1),(14,1),(16,1),(18,1),(20,1),
+    (25,1),(33,1),(40,1),(50,1),(66,1),(80,1),(100,1),(150,1),(200,1),(250,1),
+    (500,1),(1000,1),
+]
+_ODDS_LADDER = [(n, d, 1 + n / d) for n, d in _ODDS_LADDER_RUNGS]
+
+
+def _fractional_odds(decimal_odds):
+    """Decimal odds -> readable bookmaker-style fraction, e.g. 97.95 -> '97/1',
+    2.96 -> '2/1' (not the mathematically exact but unreadable 49/25). Snaps
+    to the nearest rung of the standard fractional-odds ladder above.
+    """
+    try:
+        d = float(decimal_odds)
+    except (TypeError, ValueError):
+        return 'SP'
+    if d <= 1.0:
+        return 'SP'
+    best_n, best_d, best_dec = min(_ODDS_LADDER, key=lambda r: abs(d - r[2]))
+    if best_n == best_d:
+        return 'Evens'
+    return f"{best_n}/{best_d}"
+
+
+def _leg_bet_id(leg):
+    """Legs saved before 2026-10-31's settlement update don't carry their own
+    bet_id — fall back to deriving it the same way complete_daily_analysis.py's
+    save loop does (race_time_course_horse, spaces/colons/periods stripped),
+    so settlement works on every multi-bet record, not just ones saved after
+    multi_bet_builder.py started storing bet_id directly.
+    """
+    bid = leg.get('bet_id')
+    if bid:
+        return bid
+    return (f"{leg.get('race_time', '')}_{leg.get('course', '')}_{leg.get('horse', '')}"
+            .replace(' ', '_').replace(':', '').replace('.', ''))
+
+
+def _settle_multi_bet(legs, min_winners_needed, outcome_map, stake=100.0):
+    """Given a stored multi-bet's legs and each leg's live settlement outcome
+    (from SureBetBets, looked up by bet_id — same table every scored horse,
+    not just promoted UI picks, already gets settled into), works out:
+      - which legs have won / lost / are still to run
+      - whether this multiple has ALREADY secured a return (guaranteed_winner:
+        enough legs have won outright that no later result can take it away)
+      - whether it is already mathematically dead (eliminated: not enough
+        legs left unresolved to ever reach min_winners_needed)
+      - the real € amount already locked in on a reference stake, and the
+        most it could still return if every unresolved leg also wins
+    'placed' doesn't count as a win here — these are win-only multiples
+    (combined odds are built from win odds), so a placed-but-not-won leg
+    is a loss for this multiple same as an outright loser.
+    """
+    from itertools import combinations
+    n = len(legs)
+    min_winners_needed = int(min_winners_needed)
+    won_idx, lost_idx, pending_idx = [], [], []
+    leg_status = []
+    for idx, l in enumerate(legs):
+        outcome = outcome_map.get(_leg_bet_id(l), 'pending') or 'pending'
+        is_won = outcome == 'win'
+        is_resolved = outcome in ('win', 'loss', 'placed')
+        leg_status.append({
+            'horse': l.get('horse', ''), 'course': l.get('course', ''),
+            'race_time': l.get('race_time', ''),
+            'odds': float(l.get('odds', 0) or 0),
+            'outcome': outcome if is_resolved else 'pending',
+        })
+        (won_idx if is_won else lost_idx if is_resolved else pending_idx).append(idx)
+
+    legs_won, legs_lost, legs_pending = len(won_idx), len(lost_idx), len(pending_idx)
+    all_resolved = legs_pending == 0
+    full_winner = all_resolved and legs_won == n
+    guaranteed_winner = legs_won >= min_winners_needed
+    eliminated = (legs_won + legs_pending) < min_winners_needed
+
+    won_set, lost_set = set(won_idx), set(lost_idx)
+    guaranteed_return = 0.0
+    max_possible_return = 0.0
+    for size in range(min_winners_needed, n + 1):
+        for combo in combinations(range(n), size):
+            combo_set = set(combo)
+            if combo_set & lost_set:
+                continue  # this sub-bet already includes a beaten leg — dead, pays 0
+            odds_prod = 1.0
+            for i in combo:
+                odds_prod *= float(legs[i].get('odds', 0) or 0)
+            ret = stake * odds_prod
+            max_possible_return += ret
+            if combo_set.issubset(won_set):
+                guaranteed_return += ret  # every leg in this sub-bet has already won
+
+    return {
+        'legs': leg_status,
+        'legs_won': legs_won, 'legs_lost': legs_lost, 'legs_pending': legs_pending,
+        'all_resolved': all_resolved,
+        'full_winner': full_winner,
+        'guaranteed_winner': guaranteed_winner,
+        'eliminated': eliminated,
+        'guaranteed_return_on_100': round(guaranteed_return, 2),
+        'max_possible_return_on_100': round(max_possible_return, 2),
+    }
+
+
 def get_multi_bets(headers, event):
     """GET /api/picks/multi-bets — today's grouped-bet suggestions (Double,
     Treble, Trixie, Yankee, Lucky15) built by multi_bet_builder.py from
     already-qualified daily picks (score 80+, one leg per race). Each item
     is pick_type='multi_bet'; a bet type is simply absent from the response
     if today's qualifying pool was too small for it — no filler legs.
+
+    Also settles each bet live against real results (2026-10-31): every leg's
+    bet_id is looked up in the same day's SureBetBets rows for its 'outcome'
+    field, which backend/core/settlement/results_fetcher.py already populates
+    for every scored horse (not just promoted picks) — so win/loss per leg
+    needs no separate pipeline, just a read of data that already exists.
     """
     try:
         from boto3.dynamodb.conditions import Key as _Key
@@ -2560,6 +2681,12 @@ def get_multi_bets(headers, event):
         now_dublin = datetime.now(tz_dublin)
         target_date = str(params.get('date') or '').strip()[:10] or \
                       now_dublin.date().isoformat()
+
+        # Accumulators are only built Friday-Sunday (see multi_bet_builder.py)
+        weekday = now_dublin.weekday()  # Mon=0 ... Sun=6
+        is_weekend = weekday in (4, 5, 6)
+        days_to_friday = (4 - weekday) % 7
+        next_weekend_date = (now_dublin + timedelta(days=days_to_friday)).date().isoformat()
 
         resp = table.query(KeyConditionExpression=_Key('bet_date').eq(target_date))
         items = [decimal_to_float(i) for i in resp.get('Items', [])]
@@ -2573,26 +2700,69 @@ def get_multi_bets(headers, event):
         type_order = {'double': 0, 'treble': 1, 'trixie': 2, 'yankee': 3, 'lucky15': 4}
         multis.sort(key=lambda x: type_order.get(x.get('multi_type', ''), 99))
 
-        bets_out = [{
-            'multi_type':           i.get('multi_type', ''),
-            'legs':                 i.get('legs', []),
-            'num_legs':             i.get('num_legs', 0),
-            'num_bets':             i.get('num_bets', 0),
-            'min_winners_needed':   i.get('min_winners_needed', 0),
-            'combined_odds':        i.get('combined_odds', 0),
-            'combined_win_prob_pct': i.get('combined_win_prob_pct', 0),
-            'combined_ev':          i.get('combined_ev', 0),
-            'scenario_returns':     i.get('scenario_returns', {}),
-        } for i in multis]
+        # One batch lookup of every leg's live outcome across all bet types,
+        # instead of a get_item per leg per bet.
+        all_bet_ids = sorted({_leg_bet_id(l) for i in multis for l in (i.get('legs') or [])})
+        outcome_map = {}
+        if all_bet_ids:
+            keys = [{'bet_date': target_date, 'bet_id': bid} for bid in all_bet_ids]
+            for start in range(0, len(keys), 100):  # batch_get_item caps at 100 keys/call
+                chunk = keys[start:start + 100]
+                br = dynamodb.batch_get_item(RequestItems={
+                    'SureBetBets': {'Keys': chunk, 'ProjectionExpression': 'bet_id, outcome'}
+                })
+                for it in br.get('Responses', {}).get('SureBetBets', []):
+                    outcome_map[it.get('bet_id')] = it.get('outcome')
+
+        bets_out = []
+        for i in multis:
+            legs = i.get('legs', [])
+            min_needed = i.get('min_winners_needed', 0)
+            settlement = _settle_multi_bet(legs, min_needed, outcome_map)
+            combined_odds = i.get('combined_odds', 0)
+            bets_out.append({
+                'multi_type':           i.get('multi_type', ''),
+                'legs':                 legs,
+                'num_legs':             i.get('num_legs', 0),
+                'num_bets':             i.get('num_bets', 0),
+                'min_winners_needed':   min_needed,
+                'combined_odds':        combined_odds,
+                'combined_odds_fraction': _fractional_odds(combined_odds),
+                'combined_win_prob_pct': i.get('combined_win_prob_pct', 0),
+                'combined_ev':          i.get('combined_ev', 0),
+                'scenario_returns':     i.get('scenario_returns', {}),
+                'settlement':           settlement,
+            })
+
+        # Which bet type to headline on the main picks page: the one with the
+        # most already-locked-in money; ties broken by longest combined price.
+        highlight = None
+        candidates = [b for b in bets_out if b['settlement']['guaranteed_winner']]
+        if candidates:
+            candidates.sort(key=lambda b: (b['settlement']['guaranteed_return_on_100'],
+                                            b['combined_odds']), reverse=True)
+            best = candidates[0]
+            highlight = {
+                'multi_type': best['multi_type'],
+                'full_winner': best['settlement']['full_winner'],
+                'combined_odds_fraction': best['combined_odds_fraction'],
+                'guaranteed_return_on_100': best['settlement']['guaranteed_return_on_100'],
+                'horses': [l['horse'] for l in best['legs']],
+            }
 
         return {
             'statusCode': 200, 'headers': headers,
             'body': json.dumps({
                 'success': True, 'date': target_date,
+                'is_weekend': is_weekend, 'next_weekend_date': next_weekend_date,
                 'count': len(bets_out), 'multi_bets': bets_out,
-                'methodology': ("Combinations of today's already-qualified picks (score 80+), "
-                                "one leg per race, chosen by exhaustive search for the highest "
-                                "combined EV per bet type."),
+                'highlight': highlight,
+                'methodology': ("Weekend-only (Fri-Sun): combinations of that day's already-"
+                                "qualified picks (score 80+), one leg per race, chosen by "
+                                "exhaustive search for the highest combined EV per bet type. "
+                                "Settlement reads each leg's real result as races finish — "
+                                "'guaranteed' means enough legs have already won outright that "
+                                "the remaining results can't undo it."),
             }, default=str)
         }
     except Exception as e:
@@ -2605,6 +2775,13 @@ def get_eliminator(headers, event):
     """GET /api/picks/eliminator — BetBud Eliminator game state. One query
     (bet_date='ELIMINATOR') returns the pointer + every round ever played,
     since they all share that partition. See eliminator.py for the mechanic.
+
+    Also attaches each nominee's live win/loss (2026-11-01): a round's own
+    status (pending/survived/eliminated) only says whether the round as a
+    whole is still alive — it doesn't say which specific horse(s) actually
+    won. Nominees carry their own bet_id (same scheme as every other scored
+    horse), so one batch lookup against that day's SureBetBets rows attaches
+    a real outcome per horse, same approach as the multi-bet settlement above.
     """
     try:
         from boto3.dynamodb.conditions import Key as _Key
@@ -2624,9 +2801,27 @@ def get_eliminator(headers, event):
 
         current_out = None
         if current:
+            races = current.get('races') or []
+            round_bet_date = current.get('start_date', '')
+            nominee_outcomes = {}
+            nominee_bet_ids = sorted({_leg_bet_id(n) for r in races for n in (r.get('nominees') or [])})
+            if nominee_bet_ids and round_bet_date:
+                keys = [{'bet_date': round_bet_date, 'bet_id': bid} for bid in nominee_bet_ids]
+                for start in range(0, len(keys), 100):
+                    br = dynamodb.batch_get_item(RequestItems={
+                        'SureBetBets': {'Keys': keys[start:start + 100],
+                                        'ProjectionExpression': 'bet_id, outcome'}
+                    })
+                    for it in br.get('Responses', {}).get('SureBetBets', []):
+                        nominee_outcomes[it.get('bet_id')] = it.get('outcome')
+
+            def _nominee_outcome(n):
+                o = nominee_outcomes.get(_leg_bet_id(n))
+                return o if o in ('win', 'loss', 'placed') else 'pending'
+
             current_out = {
                 'round_id':             current.get('round_id', ''),
-                'start_date':           current.get('start_date', ''),
+                'start_date':           round_bet_date,
                 'status':               current.get('status', 'in_progress'),
                 'current_round_number': current.get('current_round_number', 1),
                 'total_rounds':         current.get('total_rounds', 0),
@@ -2640,8 +2835,9 @@ def get_eliminator(headers, event):
                         'horse': n.get('horse', ''),
                         'odds':  n.get('odds', 0),
                         'score': n.get('score', 0),
+                        'outcome': _nominee_outcome(n),
                     } for n in (r.get('nominees') or [])],
-                } for r in (current.get('races') or [])],
+                } for r in races],
             }
 
         history = sorted(
