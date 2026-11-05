@@ -3390,8 +3390,8 @@ const TENK_CARD_2026_11_05 = [
   { course:'Newbury',    time:'13:52', status:'final', picks:[
     { horse:"Nan's Choice", odds:'10/11', result:'lost' }, { horse:'Princess Day', odds:'5/2', result:'placed' }, { horse:'Royal Response', odds:'4/1', result:'won' },
   ]},
-  { course:'Chelmsford', time:'15:05', status:'pending', picks:[
-    { horse:'Chaise Longue', odds:'5/2', result:null }, { horse:'Queens Bandit', odds:'3/1', result:null },
+  { course:'Chelmsford', time:'15:05', status:'final', picks:[
+    { horse:'Chaise Longue', odds:'5/2', result:'lost' }, { horse:'Queens Bandit', odds:'3/1', result:'placed' },
   ]},
   { course:'Chelmsford', time:'15:40', status:'pending', picks:[
     { horse:'Charging Thunder', odds:'7/4', result:null },
