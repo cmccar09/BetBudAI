@@ -3423,6 +3423,26 @@ function TenKCard() {
           <span style={{ color:'#fbbf24', fontWeight:700 }}> &nbsp;{racesRun}/6 races run · {winners} winner{winners === 1 ? '' : 's'} so far.</span>
         )}
       </div>
+
+      <div style={{ display:'flex', gap:6, marginBottom:16, flexWrap:'wrap' }}>
+        {TENK_CARD_2026_11_05.map((r, i) => {
+          const raceWon = r.picks.some(p => p.result === 'won');
+          const pill = r.status !== 'final'
+            ? { bg:'rgba(255,255,255,0.08)', color:'rgba(255,255,255,0.4)', label:i + 1 }
+            : raceWon
+              ? { bg:'#059669', color:'#fff', label:'✓' }
+              : { bg:'#dc2626', color:'#fff', label:'✗' };
+          return (
+            <div key={i} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
+              <div style={{ width:30, height:30, borderRadius:'50%', background:pill.bg, color:pill.color, display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:900 }}>
+                {pill.label}
+              </div>
+              <span style={{ fontSize:9, color:'rgba(255,255,255,0.4)' }}>R{i + 1}</span>
+            </div>
+          );
+        })}
+      </div>
+
       <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
         {TENK_CARD_2026_11_05.map((r, i) => {
           const raceWinner = r.picks.find(p => p.result === 'won');
