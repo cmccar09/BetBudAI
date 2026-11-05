@@ -3374,30 +3374,39 @@ function BetBudEliminatorCard({ eliminator, isAuthenticated, onSignUp, isMobile 
 
 // ---- Special card: Dermot's €10K Newbury/Clonmel/Chelmsford card, 5 Nov 2026 ----
 // One-off external contest entry (not a BetBudAI pipeline game) — hardcoded for the day, remove once settled.
+// result per pick: null (race not run yet) | 'won' | 'placed' | 'lost'. status per race: 'pending' | 'final'.
 const TENK_CARD_2026_11_05 = [
-  { course:'Newbury',    time:'12:42', picks:[
-    { horse:'Treasure Planet', odds:'11/4' }, { horse:'Spirits Bay', odds:'9/2' }, { horse:'Zarakerjack', odds:'5/1' },
-    { horse:'Faivoir', odds:'14/1' }, { horse:'Cave Bridge', odds:'15/2' }, { horse:'Beorma', odds:'25/1' },
+  { course:'Newbury',    time:'12:42', status:'pending', picks:[
+    { horse:'Treasure Planet', odds:'11/4', result:null }, { horse:'Spirits Bay', odds:'9/2', result:null }, { horse:'Zarakerjack', odds:'5/1', result:null },
+    { horse:'Faivoir', odds:'14/1', result:null }, { horse:'Cave Bridge', odds:'15/2', result:null }, { horse:'Beorma', odds:'25/1', result:null },
   ]},
-  { course:'Clonmel',    time:'12:50', picks:[
-    { horse:'Unflinching', odds:'15/8' }, { horse:'Midtown Manhattan', odds:'3/1' }, { horse:'Young Doran', odds:'6/1' },
-    { horse:'French Adventure', odds:'8/1' }, { horse:'Blue Johnl', odds:'10/1' },
+  { course:'Clonmel',    time:'12:50', status:'pending', picks:[
+    { horse:'Unflinching', odds:'15/8', result:null }, { horse:'Midtown Manhattan', odds:'3/1', result:null }, { horse:'Young Doran', odds:'6/1', result:null },
+    { horse:'French Adventure', odds:'8/1', result:null }, { horse:'Blue Johnl', odds:'10/1', result:null },
   ]},
-  { course:'Clonmel',    time:'13:25', picks:[
-    { horse:'Rokanako', odds:'Evs' }, { horse:'Carleys Lilly', odds:'8/1' }, { horse:'S T Hamo', odds:'7/1' }, { horse:'Highland Call', odds:'11/2' },
+  { course:'Clonmel',    time:'13:25', status:'pending', picks:[
+    { horse:'Rokanako', odds:'Evs', result:null }, { horse:'Carleys Lilly', odds:'8/1', result:null }, { horse:'S T Hamo', odds:'7/1', result:null }, { horse:'Highland Call', odds:'11/2', result:null },
   ]},
-  { course:'Newbury',    time:'13:52', picks:[
-    { horse:"Nan's Choice", odds:'10/11' }, { horse:'Princess Day', odds:'5/2' }, { horse:'Royal Response', odds:'4/1' },
+  { course:'Newbury',    time:'13:52', status:'pending', picks:[
+    { horse:"Nan's Choice", odds:'10/11', result:null }, { horse:'Princess Day', odds:'5/2', result:null }, { horse:'Royal Response', odds:'4/1', result:null },
   ]},
-  { course:'Chelmsford', time:'15:05', picks:[
-    { horse:'Chaise Longue', odds:'5/2' }, { horse:'Queens Bandit', odds:'3/1' },
+  { course:'Chelmsford', time:'15:05', status:'pending', picks:[
+    { horse:'Chaise Longue', odds:'5/2', result:null }, { horse:'Queens Bandit', odds:'3/1', result:null },
   ]},
-  { course:'Chelmsford', time:'15:40', picks:[
-    { horse:'Charging Thunder', odds:'7/4' },
+  { course:'Chelmsford', time:'15:40', status:'pending', picks:[
+    { horse:'Charging Thunder', odds:'7/4', result:null },
   ]},
 ];
 
 function TenKCard() {
+  const racesRun = TENK_CARD_2026_11_05.filter(r => r.status === 'final').length;
+  const winners = TENK_CARD_2026_11_05.reduce((n, r) => n + r.picks.filter(p => p.result === 'won').length, 0);
+  const resultStyle = (result) => {
+    if (result === 'won') return { background:'rgba(52,211,153,0.16)', border:'1px solid rgba(52,211,153,0.5)', color:'#34d399' };
+    if (result === 'placed') return { background:'rgba(96,165,250,0.14)', border:'1px solid rgba(96,165,250,0.45)', color:'#60a5fa' };
+    if (result === 'lost') return { background:'rgba(255,255,255,0.02)', border:'1px solid rgba(255,255,255,0.08)', color:'rgba(255,255,255,0.35)', textDecoration:'line-through' };
+    return { background:'rgba(251,191,36,0.1)', border:'1px solid rgba(251,191,36,0.3)', color:'#fbbf24' };
+  };
   return (
     <div style={{
       background: 'linear-gradient(135deg, rgba(251,191,36,0.14) 0%, rgba(15,23,42,0.5) 100%)',
@@ -3410,24 +3419,36 @@ function TenKCard() {
       </div>
       <div style={{ fontSize:11, color:'rgba(255,255,255,0.5)', marginBottom:14, lineHeight:1.5 }}>
         BetBud's selections for today's special 6-race card — picks narrow each race, from 6 down to a single must-win in the last.
+        {racesRun > 0 && (
+          <span style={{ color:'#fbbf24', fontWeight:700 }}> &nbsp;{racesRun}/6 races run · {winners} winner{winners === 1 ? '' : 's'} so far.</span>
+        )}
       </div>
       <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-        {TENK_CARD_2026_11_05.map((r, i) => (
+        {TENK_CARD_2026_11_05.map((r, i) => {
+          const raceWinner = r.picks.find(p => p.result === 'won');
+          return (
           <div key={i} style={{ background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:8, padding:'8px 10px' }}>
             <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6, flexWrap:'wrap' }}>
               <span style={{ background:'#fbbf24', color:'#0f172a', fontSize:11, fontWeight:900, padding:'2px 9px', borderRadius:5 }}>R{i + 1}</span>
               <span style={{ fontSize:12, color:'rgba(255,255,255,0.6)' }}>📍 {r.course} · {r.time}</span>
+              {r.status === 'final' ? (
+                <span style={{ fontSize:11, fontWeight:800, color: raceWinner ? '#34d399' : '#f87171' }}>
+                  {raceWinner ? `✅ ${raceWinner.horse} won` : '❌ no joy'}
+                </span>
+              ) : (
+                <span style={{ fontSize:11, color:'rgba(255,255,255,0.35)' }}>⏳ pending</span>
+              )}
               <span style={{ marginLeft:'auto', fontSize:11, color:'rgba(255,255,255,0.45)' }}>Pick {r.picks.length}</span>
             </div>
             <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
               {r.picks.map((p, pi) => (
-                <span key={pi} style={{ fontSize:11, padding:'3px 8px', borderRadius:6, background:'rgba(251,191,36,0.1)', border:'1px solid rgba(251,191,36,0.3)', color:'#fbbf24' }}>
-                  🐎 {p.horse} {p.odds}
+                <span key={pi} style={{ fontSize:11, padding:'3px 8px', borderRadius:6, ...resultStyle(p.result) }}>
+                  {p.result === 'won' ? '✅' : p.result === 'placed' ? '🥈' : p.result === 'lost' ? '✖️' : '🐎'} {p.horse} {p.odds}
                 </span>
               ))}
             </div>
           </div>
-        ))}
+        );})}
       </div>
     </div>
   );
