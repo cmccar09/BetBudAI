@@ -3387,8 +3387,8 @@ const TENK_CARD_2026_11_05 = [
   { course:'Clonmel',    time:'13:25', status:'final', picks:[
     { horse:'Rokanako', odds:'Evs', result:'won' }, { horse:'Carleys Lilly', odds:'8/1', result:'lost' }, { horse:'S T Hamo', odds:'7/1', result:'placed' }, { horse:'Highland Call', odds:'11/2', result:'lost' },
   ]},
-  { course:'Newbury',    time:'13:52', status:'pending', picks:[
-    { horse:"Nan's Choice", odds:'10/11', result:null }, { horse:'Princess Day', odds:'5/2', result:null }, { horse:'Royal Response', odds:'4/1', result:null },
+  { course:'Newbury',    time:'13:52', status:'final', picks:[
+    { horse:"Nan's Choice", odds:'10/11', result:'lost' }, { horse:'Princess Day', odds:'5/2', result:'placed' }, { horse:'Royal Response', odds:'4/1', result:'won' },
   ]},
   { course:'Chelmsford', time:'15:05', status:'pending', picks:[
     { horse:'Chaise Longue', odds:'5/2', result:null }, { horse:'Queens Bandit', odds:'3/1', result:null },
