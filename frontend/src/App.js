@@ -3376,16 +3376,16 @@ function BetBudEliminatorCard({ eliminator, isAuthenticated, onSignUp, isMobile 
 // One-off external contest entry (not a BetBudAI pipeline game) — hardcoded for the day, remove once settled.
 // result per pick: null (race not run yet) | 'won' | 'placed' | 'lost'. status per race: 'pending' | 'final'.
 const TENK_CARD_2026_11_05 = [
-  { course:'Newbury',    time:'12:42', status:'pending', picks:[
-    { horse:'Treasure Planet', odds:'11/4', result:null }, { horse:'Spirits Bay', odds:'9/2', result:null }, { horse:'Zarakerjack', odds:'5/1', result:null },
-    { horse:'Faivoir', odds:'14/1', result:null }, { horse:'Cave Bridge', odds:'15/2', result:null }, { horse:'Beorma', odds:'25/1', result:null },
+  { course:'Newbury',    time:'12:42', status:'final', picks:[
+    { horse:'Treasure Planet', odds:'11/4', result:'lost' }, { horse:'Spirits Bay', odds:'9/2', result:'placed' }, { horse:'Zarakerjack', odds:'5/1', result:'won' },
+    { horse:'Faivoir', odds:'14/1', result:'placed' }, { horse:'Cave Bridge', odds:'15/2', result:'lost' }, { horse:'Beorma', odds:'25/1', result:'lost' },
   ]},
-  { course:'Clonmel',    time:'12:50', status:'pending', picks:[
-    { horse:'Unflinching', odds:'15/8', result:null }, { horse:'Midtown Manhattan', odds:'3/1', result:null }, { horse:'Young Doran', odds:'6/1', result:null },
-    { horse:'French Adventure', odds:'8/1', result:null }, { horse:'Blue Johnl', odds:'10/1', result:null },
+  { course:'Clonmel',    time:'12:50', status:'final', picks:[
+    { horse:'Unflinching', odds:'15/8', result:'won' }, { horse:'Midtown Manhattan', odds:'3/1', result:'lost' }, { horse:'Young Doran', odds:'6/1', result:'lost' },
+    { horse:'French Adventure', odds:'8/1', result:'lost' }, { horse:'Blue Johnl', odds:'10/1', result:'placed' },
   ]},
-  { course:'Clonmel',    time:'13:25', status:'pending', picks:[
-    { horse:'Rokanako', odds:'Evs', result:null }, { horse:'Carleys Lilly', odds:'8/1', result:null }, { horse:'S T Hamo', odds:'7/1', result:null }, { horse:'Highland Call', odds:'11/2', result:null },
+  { course:'Clonmel',    time:'13:25', status:'final', picks:[
+    { horse:'Rokanako', odds:'Evs', result:'won' }, { horse:'Carleys Lilly', odds:'8/1', result:'lost' }, { horse:'S T Hamo', odds:'7/1', result:'placed' }, { horse:'Highland Call', odds:'11/2', result:'lost' },
   ]},
   { course:'Newbury',    time:'13:52', status:'pending', picks:[
     { horse:"Nan's Choice", odds:'10/11', result:null }, { horse:'Princess Day', odds:'5/2', result:null }, { horse:'Royal Response', odds:'4/1', result:null },
