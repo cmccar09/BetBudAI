@@ -3372,6 +3372,67 @@ function BetBudEliminatorCard({ eliminator, isAuthenticated, onSignUp, isMobile 
   );
 }
 
+// ---- Special card: Dermot's €10K Newbury/Clonmel/Chelmsford card, 5 Nov 2026 ----
+// One-off external contest entry (not a BetBudAI pipeline game) — hardcoded for the day, remove once settled.
+const TENK_CARD_2026_11_05 = [
+  { course:'Newbury',    time:'12:42', picks:[
+    { horse:'Treasure Planet', odds:'11/4' }, { horse:'Spirits Bay', odds:'9/2' }, { horse:'Zarakerjack', odds:'5/1' },
+    { horse:'Faivoir', odds:'14/1' }, { horse:'Cave Bridge', odds:'15/2' }, { horse:'Beorma', odds:'25/1' },
+  ]},
+  { course:'Clonmel',    time:'12:50', picks:[
+    { horse:'Unflinching', odds:'15/8' }, { horse:'Midtown Manhattan', odds:'3/1' }, { horse:'Young Doran', odds:'6/1' },
+    { horse:'French Adventure', odds:'8/1' }, { horse:'Blue Johnl', odds:'10/1' },
+  ]},
+  { course:'Clonmel',    time:'13:25', picks:[
+    { horse:'Rokanako', odds:'Evs' }, { horse:'Carleys Lilly', odds:'8/1' }, { horse:'S T Hamo', odds:'7/1' }, { horse:'Highland Call', odds:'11/2' },
+  ]},
+  { course:'Newbury',    time:'13:52', picks:[
+    { horse:"Nan's Choice", odds:'10/11' }, { horse:'Princess Day', odds:'5/2' }, { horse:'Royal Response', odds:'4/1' },
+  ]},
+  { course:'Chelmsford', time:'15:05', picks:[
+    { horse:'Chaise Longue', odds:'5/2' }, { horse:'Queens Bandit', odds:'3/1' },
+  ]},
+  { course:'Chelmsford', time:'15:40', picks:[
+    { horse:'Charging Thunder', odds:'7/4' },
+  ]},
+];
+
+function TenKCard() {
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, rgba(251,191,36,0.14) 0%, rgba(15,23,42,0.5) 100%)',
+      border: '1.5px solid rgba(251,191,36,0.4)', borderRadius: 14, padding: '18px 20px', marginBottom: 24,
+    }}>
+      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6, flexWrap:'wrap' }}>
+        <span style={{ fontSize:20 }}>🏆</span>
+        <span style={{ fontSize:15, fontWeight:900, color:'#fff' }}>€10K Card — Newbury, Clonmel &amp; Chelmsford</span>
+        <span style={{ marginLeft:'auto', fontSize:10, color:'rgba(255,255,255,0.4)', fontWeight:700, textTransform:'uppercase', letterSpacing:0.8 }}>5 Nov</span>
+      </div>
+      <div style={{ fontSize:11, color:'rgba(255,255,255,0.5)', marginBottom:14, lineHeight:1.5 }}>
+        BetBud's selections for today's special 6-race card — picks narrow each race, from 6 down to a single must-win in the last.
+      </div>
+      <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+        {TENK_CARD_2026_11_05.map((r, i) => (
+          <div key={i} style={{ background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:8, padding:'8px 10px' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6, flexWrap:'wrap' }}>
+              <span style={{ background:'#fbbf24', color:'#0f172a', fontSize:11, fontWeight:900, padding:'2px 9px', borderRadius:5 }}>R{i + 1}</span>
+              <span style={{ fontSize:12, color:'rgba(255,255,255,0.6)' }}>📍 {r.course} · {r.time}</span>
+              <span style={{ marginLeft:'auto', fontSize:11, color:'rgba(255,255,255,0.45)' }}>Pick {r.picks.length}</span>
+            </div>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+              {r.picks.map((p, pi) => (
+                <span key={pi} style={{ fontSize:11, padding:'3px 8px', borderRadius:6, background:'rgba(251,191,36,0.1)', border:'1px solid rgba(251,191,36,0.3)', color:'#fbbf24' }}>
+                  🐎 {p.horse} {p.odds}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ---- Wknd Accumulators — Multi-Bet Builder + BetBud Eliminator, Fri-Sun only ----
 function WeekendAccumulatorsPage({ isAuthenticated, onSignUp }) {
   const [multiBets, setMultiBets] = useState([]);
@@ -3424,6 +3485,8 @@ function WeekendAccumulatorsPage({ isAuthenticated, onSignUp }) {
           Grouped bets built from Friday–Sunday's already-qualified picks only (score 80+) — Doubles, Trebles, Trixies, Yankees &amp; Lucky 15s, picked for genuine combined value, not just stacked favourites.
         </div>
       </div>
+
+      <TenKCard />
 
       {!isWeekend && (
         <div style={{ textAlign:'center', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:12, padding:'24px 20px', marginBottom:20 }}>
