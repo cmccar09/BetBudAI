@@ -3337,7 +3337,7 @@ function BetBudEliminatorCard({ eliminator, isAuthenticated, onSignUp, isMobile 
       {resolvedRaces.length > 0 && (
         <div>
           <div style={{ fontSize:11, fontWeight:800, color:'rgba(255,255,255,0.5)', textTransform:'uppercase', letterSpacing:1, marginBottom:8 }}>
-            How today's picks did
+            {roundDate ? `How the ${roundDate} picks did` : "How today's picks did"}
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
             {resolvedRaces.map((r, ri) => (
