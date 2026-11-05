@@ -902,17 +902,7 @@ function App() {
           { key:'accumulators', label:'Wknd Accumulators', emoji:'🎟️', sub:'Fri-Sun grouped bets — free', gated: false, tierRequired: null },
           { key:'punchestown', label:'Featured Meet', emoji:'🐎', sub:'Race card analysis — free', gated: false, tierRequired: null },
           { key:'laythe',    label:'Favourite Watch',      emoji:'🏇', sub:'Vulnerable Favorites', gated: false, tierRequired: null },
-          { key:'vegas',     label:'Vegas',            emoji:'🎰', sub:'Benter value picks — free',    gated: false, tierRequired: null },
-          { key:'darts',     label:'Darts',            emoji:'🎯', sub:'PDC majors — free',           gated: false, tierRequired: null },
-          { key:'gaa',       label:'GAA',              emoji:'🏐', sub:'Club championships — free',   gated: false, tierRequired: null },
-          { key:'football',  label:'Football',          emoji:'⚽', sub:'PL · UCL · EL predictions — free', gated: false, tierRequired: null },
-          { key:'wimbledon', label:'Pro Tennis',       emoji:'🎾', sub:'Live predictions — free',    gated: false, tierRequired: null },
-          { key:'tourdefrance', label:'Pro Cycling',   emoji:'🚴', sub:'Stage predictions — free',  gated: false, tierRequired: null },
-          { key:'rugby',     label:'Rugby',            emoji:'🏉', sub:'Nations Championship — free', gated: false, tierRequired: null },
-          { key:'golf',      label:'Pro Golf',          emoji:'⛳', sub:'Majors — free',                gated: false, tierRequired: null },
-          { key:'basketball',label:'Basketball',        emoji:'🏀', sub:'NBA futures — free',            gated: false, tierRequired: null },
-          { key:'nfl',       label:'NFL',               emoji:'🏈', sub:'Super Bowl futures — free',     gated: false, tierRequired: null },
-          { key:'prediction-markets', label:'Prediction Markets', emoji:'🎲', sub:'Polymarket-style AI picks — free', gated: false, tierRequired: null },
+          // Non-horse sport tabs hidden from nav 2026-11-04 (horse-racing-only focus) — pages/routes left intact, not deleted.
           ...(isAuthenticated ? [{ key:'account', label:'My Account', emoji:'👤', sub:'Profile & billing', gated: true, tierRequired: 'premium' }] : []),
           ...(isAdmin ? [{ key:'admin', label:'Admin', emoji:'⚙️', sub:'System controls', gated: true, admin: true, tierRequired: 'admin' }] : []),
         ]
@@ -3252,6 +3242,12 @@ function BetBudEliminatorCard({ eliminator, isAuthenticated, onSignUp, isMobile 
   const toFracE = toFractionalOdds;
   const current = races.find(r => r.round_number === curNum);
   const resolvedRaces = races.filter(r => r.status === 'survived' || r.status === 'eliminated');
+  const roundDate = (() => {
+    if (!eliminator.start_date) return '';
+    try {
+      return new Date(eliminator.start_date + 'T00:00:00Z').toLocaleDateString('en-GB', { day:'numeric', month:'short', timeZone:'UTC' });
+    } catch { return eliminator.start_date; }
+  })();
 
   const outcomeTag = (outcome) => {
     if (outcome === 'win') return { label: '✓ WON', bg: 'rgba(52,211,153,0.18)', border: 'rgba(52,211,153,0.5)', color: '#34d399' };
@@ -3268,10 +3264,10 @@ function BetBudEliminatorCard({ eliminator, isAuthenticated, onSignUp, isMobile 
   };
 
   const headline = status === 'success'
-    ? '🏆 BetBud survived all 6 races today!'
+    ? `🏆 BetBud survived all 6 races${roundDate ? ` on ${roundDate}` : ' today'}!`
     : status === 'failed'
-      ? `Eliminated at Round ${races.findIndex(r => r.status === 'eliminated') + 1} — new round starts tomorrow`
-      : `Can our AI survive 6 races today?`;
+      ? `Eliminated at Round ${races.findIndex(r => r.status === 'eliminated') + 1}${roundDate ? ` (${roundDate})` : ''} — new round starts tomorrow`
+      : `Can our AI survive 6 races${roundDate ? ` on ${roundDate}` : ' today'}?`;
 
   return (
     <div style={{
@@ -3416,6 +3412,7 @@ function WeekendAccumulatorsPage({ isAuthenticated, onSignUp }) {
     if (outcome === 'win') return { label:'WON', bg:'rgba(52,211,153,0.18)', border:'rgba(52,211,153,0.5)', color:'#34d399' };
     if (outcome === 'loss') return { label:'Lost', bg:'rgba(255,255,255,0.04)', border:'rgba(255,255,255,0.12)', color:'rgba(255,255,255,0.35)' };
     if (outcome === 'placed') return { label:'Placed', bg:'rgba(251,191,36,0.12)', border:'rgba(251,191,36,0.35)', color:'#fbbf24' };
+    if (outcome === 'void') return { label:'NR', bg:'rgba(255,255,255,0.03)', border:'rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.45)' };
     return { label:'Pending', bg:'rgba(255,255,255,0.03)', border:'rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.4)' };
   };
 
@@ -3469,11 +3466,12 @@ function WeekendAccumulatorsPage({ isAuthenticated, onSignUp }) {
           {multiBets.map((mb, i) => {
             const s = mb.settlement || {};
             const borderColor = s.full_winner ? 'rgba(52,211,153,0.6)' : s.eliminated ? 'rgba(255,255,255,0.12)' : s.guaranteed_winner ? 'rgba(52,211,153,0.4)' : 'rgba(251,191,36,0.35)';
-            const needsPartial = mb.min_winners_needed < mb.num_legs;
+            const hasVoidLeg = (s.legs || []).some(l => l.outcome === 'void');
+            const needsPartial = !hasVoidLeg && mb.min_winners_needed < mb.num_legs;
             const partialKey = String(mb.min_winners_needed);
             const partialRange = mb.scenario_returns?.[partialKey];
             const fullKey = String(mb.num_legs);
-            const fullRange = mb.scenario_returns?.[fullKey];
+            const fullRange = hasVoidLeg ? null : mb.scenario_returns?.[fullKey];
             return (
               <div key={i} style={{
                 background: s.full_winner ? 'linear-gradient(135deg, rgba(52,211,153,0.14) 0%, rgba(15,23,42,0.4) 100%)' : 'linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(15,23,42,0.4) 100%)',
@@ -3501,6 +3499,7 @@ function WeekendAccumulatorsPage({ isAuthenticated, onSignUp }) {
                   })}
                 </div>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 7 }}>
+                  {hasVoidLeg && <div style={{ color: 'rgba(255,255,255,0.4)' }}>Non-runner — settles on the remaining legs, stake returned on that leg</div>}
                   {fullRange && <div>€10 stake, all {mb.num_legs} land: <span style={{ color: '#fbbf24', fontWeight: 700 }}>€{(fullRange.max * 10 / mb.num_bets).toFixed(0)} back</span></div>}
                   {needsPartial && partialRange && (
                     <div style={{ marginTop: 2 }}>Still returns on any {mb.min_winners_needed} of {mb.num_legs}: <span style={{ color: 'rgba(255,255,255,0.7)' }}>€{(partialRange.min * 10 / mb.num_bets).toFixed(0)}–€{(partialRange.max * 10 / mb.num_bets).toFixed(0)} back</span></div>
